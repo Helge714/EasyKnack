@@ -1,0 +1,22 @@
+[
+  {
+    "Hash": "4025C5F133C6A6554AD48D4E89DFD619B4CD85B7685E716489ECE0D8494F6660",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\GraphRuntime.hpp"
+  },
+  {
+    "Hash": "CCBBE333E876DFAEAD0D96A8330EB55D361808ABA688C9D85382A42D9E366C90",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\MathNode.hpp"
+  },
+  {
+    "Hash": "8702FDB1F06A0ACEE3D2837C0B746E15273953780D83DD5040CE504D39033C30",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\OscillatorNode.hpp"
+  },
+  {
+    "Hash": "261416ACCC001DF08C0EC73918F855845E23495670029D5D9EDCC015B1769786",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\FilterNode.hpp"
+  },
+  {
+    "Hash": "DC054C98E944E5BDDA5D3849DDABD0DEDEBE287B23C63177298F4B2A683594D5",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\reference-v1\\references.exe"
+  }
+]

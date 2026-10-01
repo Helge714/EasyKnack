@@ -1,0 +1,26 @@
+[
+  {
+    "Hash": "E74B2438BF2114764FA1E53647AB9148C4D730EFFEF9A787663C3350F223FD80",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\OscGainFilterKernel.hpp"
+  },
+  {
+    "Hash": "1C2315433FB90032CDE0CFFDFA3C51273DA3BDF1C7A4E7A1D4188DBBBE5C91A6",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\OscillatorNode.hpp"
+  },
+  {
+    "Hash": "26AB614EB9ACA1EB2D720937407654350B41D222E1778FE00CE8546FCC0CB3CC",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\FilterNode.hpp"
+  },
+  {
+    "Hash": "ABBD165503874F22A1E6EE6C36D361807CECD2E5F9A8C3CDF178244D2B98DFBE",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\src\\main\\java\\com\\vin\\easyknack\\ui\\StatefulChainSpecialization.java"
+  },
+  {
+    "Hash": "1F1048741F990E6294F3ADD5708830527BE3018D7549F60F05103495E2FADB89",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\benchmarks\\SpecializedChainHarness.hpp"
+  },
+  {
+    "Hash": "F5BE191EE6135AA99C78A6AA0606609815F81455756AE24937378600C59925E8",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\specialized-chain\\comparison.exe"
+  }
+]

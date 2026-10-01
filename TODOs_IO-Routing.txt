@@ -1,0 +1,886 @@
+# EasyKnack Audio Routing / Virtual Audio TODO
+
+## Current direction: external routing backends (2026-09-16)
+
+Own kernel-driver work is deferred by the current user decision. No installation,
+Secure Boot/test-signing changes, or third-party routing-tool bundling is required.
+Implemented standard WASAPI endpoint access plus ASIO driver/channel-pair access
+behind RoutingAudioBackend. ASIO clocks DSP synchronously; independently clocked
+WASAPI rings use bounded adaptive drift correction. Endpoint identities remain
+persistent and vendor-neutral. Protocol 6 adds ASIO endpoint kinds. The UI does
+not claim that selecting a device automatically reroutes other applications.
+See docs/external-audio-routing.md for setup, licensing and remaining limitations.
+
+Next independent modes: VST3 hosting integration (EasyKnack as a plugin), then
+JACK as needed. Real external-tool insert/latency and long-running physical-device
+acceptance tests remain distinct from the simulated ASIO regression tests.
+
+The following status sections document the earlier incremental work.
+
+## Implementation status (2026-09-16)
+
+The Windows MVP is implemented in incremental layers. See docs/audio-routing.md
+for architecture, boundaries and the manual hardware acceptance checklist.
+
+Implemented:
+* Generic AudioBackend / AudioIO / endpoint and capability APIs, separate from DSP.
+* WASAPI hardware input/output discovery and stream selection; System Default output.
+* Audio Input node, configurable Audio Output node, COPY, mono/stereo and stable persisted references.
+* System capture excluding EasyKnack; application discovery by executable identity;
+  per-application process-tree COPY using ActivateAudioInterfaceAsync (build 20348+).
+* Multiple sources/destinations, channel-preserving DSP, bounded realtime SPSC buffers.
+* Existing TCP bridge extended to protocol 5; live availability and missing-device status.
+* Reconnection by stable identity; explicit devices never silently fall back.
+* Automated DSP, endpoint, persistence, undo, UI and Windows capture integration tests.
+
+Deferred deliberately, following this plan:
+* ROUTE, virtual driver/devices, automatic application reassignment/restoration and kernel IPC.
+* PipeWire, Core Audio, network and embedded integration.
+* Adaptive clock-drift correction, tuned low latency, larger channel layouts and exhaustive
+  USB/Bluetooth hotplug/long-duration hardware validation.
+
+Future virtual-device/transport responsibilities are outlined in docs/audio-routing.md;
+the current in-process rings are not presented as a finished driver transport.
+
+The original plan follows unchanged.
+
+### Next increment: shared audio transport
+
+Implemented: versioned Windows shared memory with fixed-width, pointer-free layout,
+two independent SPSC directions, account/SYSTEM-only ACL, session validation,
+single-owner roles, heartbeat expiry and terminal disconnect. Native build now runs
+a real two-process sample transfer and abrupt-process-exit test.
+See docs/virtual-audio-transport.md.
+
+Still open: actual WaveRT/SysVAD driver, kernel mapping adapter, driver signing,
+virtual endpoint integration, routing manager and restoration. The transport is
+currently a tested user-mode library, not a working virtual Windows audio device.
+
+### Driver build prerequisites (2026-09-16)
+
+Installed VS Build Tools 2026 with C++/Spectre/WDK support and matching
+SDK/WDK 28000.2526. Pinned SysVAD sources and a reproducible x64 reference build
+are available via scripts/build-driver-reference.ps1. Debug build including
+INF/API validation passed. See native/virtual-audio/README.md.
+No driver was installed. The EasyKnack-specific kernel adapter remains open.
+
+### EasyKnack kernel adapter (2026-09-16)
+
+Implemented an x64 SysVAD-derived driver with one stereo 48 kHz PCM16 render and
+capture endpoint, fixed nonpaged rings, versioned buffered IOCTL, exclusive
+SYSTEM/admin control access, stream cleanup and terminal host-lease expiry.
+Sample tone/file output and sideband discovery are disabled. Unsigned INF/SYS/CAT
+package passes WDK INF/API/catalog checks; PCM ring/protocol tests and Maven pass.
+Build: scripts/build-virtual-audio.ps1. Details: native/virtual-audio/README.md.
+
+Still required: test-signed installation in a test environment, Driver Verifier
+and actual duplex/cleanup/power testing, broker/backend integration and ROUTE
+application reassignment/restoration. No driver or boot policy was installed/changed.
+
+## Goal
+
+Extend EasyKnack with a cross-platform audio routing architecture.
+
+Initial implementation target: Windows only.
+
+Later targets:
+
+* Linux via PipeWire
+* macOS via Core Audio
+
+The DSP graph and Java UI must remain platform-independent.
+
+The Windows implementation must be designed so Linux and macOS backends can be added later without changing the graph model or node definitions.
+
+---
+
+# Core Architecture
+
+Use this conceptual architecture:
+
+Java UI / Node Graph
+|
+v
+Java <-> Native Bridge
+|
+v
+Platform-independent C++ Audio API
+|
++----------------------+
+|                      |
+v                      v
+DSP Graph                Audio Backend
+|
+v
+Windows WASAPI
+
+Later:
+
+Audio Backend
+├── Windows WASAPI
+├── Linux PipeWire
+└── macOS Core Audio
+
+Important:
+
+Do NOT put Windows-specific types or APIs inside DSP nodes.
+
+The DSP engine must only operate on audio buffers and abstract audio endpoints.
+
+---
+
+# Phase 1: Generic Audio Endpoint API
+
+Create platform-independent C++ abstractions for audio sources and destinations.
+
+Suggested model:
+
+```cpp
+enum class AudioEndpointType {
+    SystemMix,
+    Application,
+    HardwareInput,
+    HardwareOutput,
+    VirtualInput,
+    VirtualOutput
+};
+
+struct AudioEndpoint {
+    std::string id;
+    std::string name;
+    AudioEndpointType type;
+};
+```
+
+Provide an abstraction similar to:
+
+```cpp
+class AudioBackend {
+public:
+    virtual ~AudioBackend() = default;
+
+    virtual std::vector<AudioEndpoint> enumerateInputs() = 0;
+    virtual std::vector<AudioEndpoint> enumerateOutputs() = 0;
+};
+```
+
+Do not expose WASAPI types outside the Windows backend.
+
+---
+
+# Phase 2: Audio Input Node
+
+Implement an EasyKnack Audio Input node.
+
+The node should allow selecting an audio source.
+
+Possible sources later:
+
+* System Audio
+* Application
+* Hardware Input
+* Virtual Input
+
+Initial UI concept:
+
+```text
+Audio Input
+----------------
+Source:
+[ System Audio ▼ ]
+
+Mode:
+[ Copy / Route ]
+
+Channels:
+[ Stereo ▼ ]
+```
+
+Requirements:
+
+* Endpoint must be stored using a stable ID.
+* Do not persist only the display name.
+* If an endpoint disappears, the node must remain valid but report that the source is unavailable.
+* Route mode should only be selectable for sources that support routing.
+
+---
+
+# Phase 3: Audio Output Node
+
+Implement an Audio Output node.
+
+Initial UI:
+
+```text
+Audio Output
+----------------
+Device:
+[ System Default ▼ ]
+```
+
+Possible outputs:
+
+* System Default
+* Speakers
+* Headphones
+* Audio Interface
+* Virtual Output
+
+The default configuration should use the system default audio output.
+
+---
+
+# Phase 4: Windows Hardware Audio
+
+Implement the Windows backend using WASAPI.
+
+First support:
+
+* Enumerating hardware input devices
+* Enumerating hardware output devices
+* Opening input streams
+* Opening output streams
+* System default output
+* Stereo float audio buffers
+
+The DSP graph should receive normal EasyKnack buffers.
+
+Do not let the graph interact directly with WASAPI.
+
+Target flow:
+
+```text
+Windows Audio Device
+        |
+        v
+Audio Backend
+        |
+        v
+BufferView
+        |
+        v
+EasyKnack DSP Graph
+```
+
+---
+
+# Phase 5: Windows System Audio Capture
+
+Add Windows system audio capture using WASAPI loopback.
+
+Expose it as an input endpoint such as:
+
+```text
+System Audio
+```
+
+Initial mode:
+
+COPY only.
+
+Expected behavior:
+
+```text
+System Audio -------> normal speakers
+       |
+       +-------------> EasyKnack
+```
+
+This should allow:
+
+* Visualizers
+* FFT analysis
+* Recording
+* Audio meters
+* Beat detection
+* Other analysis nodes
+
+Do not implement routing yet.
+
+---
+
+# Phase 6: Windows Application Audio Discovery
+
+Enumerate applications/processes that currently produce audio.
+
+Expose them as EasyKnack input sources.
+
+Example:
+
+```text
+Applications
+├── Chrome
+├── Spotify
+├── Discord
+└── Game
+```
+
+Important:
+
+* A process ID alone is not a persistent project identifier.
+* Applications may restart.
+* Keep runtime identification separate from project persistence.
+* Prefer application/process metadata sufficient to reconnect when possible.
+
+---
+
+# Phase 7: Per-Application Capture
+
+Implement Windows per-application audio capture.
+
+Use the Windows Application / Process Loopback APIs where appropriate.
+
+Initial behavior must be COPY mode:
+
+```text
+Spotify -------------> normal output
+      |
+      +---------------> EasyKnack
+```
+
+EasyKnack should receive the application's audio without changing its normal routing.
+
+This should work as a normal Audio Input node.
+
+---
+
+# Phase 8: Explicit Capture Modes
+
+Represent input behavior explicitly.
+
+Suggested enum:
+
+```cpp
+enum class AudioCaptureMode {
+    Copy,
+    Route
+};
+```
+
+COPY:
+
+```text
+Application -------> normal output
+        |
+        +-----------> EasyKnack
+```
+
+ROUTE:
+
+```text
+Application -------> EasyKnack -------> output device
+```
+
+Do not fake ROUTE by simply capturing the audio.
+
+COPY and ROUTE have different semantics and should remain separate internally.
+
+---
+
+# Phase 9: Prepare Virtual Audio Device Architecture
+
+Do not immediately implement complex DSP inside a Windows driver.
+
+Create a design where a future virtual audio device only transports samples.
+
+Architecture:
+
+```text
+Application
+    |
+    v
+EasyKnack Virtual Audio Device
+    |
+    v
+Shared Buffer / IPC
+    |
+    v
+EasyKnack User-Space Engine
+    |
+    v
+DSP Graph
+    |
+    v
+Physical Output
+```
+
+The virtual audio driver should remain minimal.
+
+Possible Windows starting point:
+
+* Microsoft SysVAD / virtual audio driver architecture
+
+Do not couple the DSP engine to the driver.
+
+---
+
+# Phase 10: Driver <-> Engine Transport
+
+When implementing the virtual device, use a realtime-safe communication mechanism such as a ring buffer / shared memory transport.
+
+Requirements:
+
+* no heap allocations in realtime audio callbacks
+* no blocking locks
+* underrun must output silence rather than crash
+* overrun must be handled safely
+* driver and engine lifetime must be handled correctly
+* EasyKnack closing must not crash the driver
+
+---
+
+# Phase 11: Application Routing
+
+Implement ROUTE mode.
+
+Goal:
+
+```text
+Spotify
+   |
+   v
+EasyKnack Virtual Device
+   |
+   v
+EasyKnack Graph
+   |
+   v
+System Default Output
+```
+
+From the user's perspective:
+
+```text
+Audio Input
+
+Source:
+Spotify
+
+[x] Route through EasyKnack
+```
+
+The user should not normally need to manually change Windows audio settings.
+
+Where possible, EasyKnack should configure and restore routing automatically.
+
+---
+
+# Phase 12: Feedback Prevention
+
+Prevent routing loops.
+
+Example invalid loop:
+
+```text
+System Audio
+    |
+    v
+EasyKnack
+    |
+    v
+System Audio
+    |
+    v
+EasyKnack
+```
+
+Requirements:
+
+* exclude EasyKnack's own output streams from system/application capture when appropriate
+* identify EasyKnack-created virtual endpoints
+* detect obvious graph feedback paths
+
+If DSP feedback is desired later, require an explicit delay/state node.
+
+---
+
+# Phase 13: Multiple Inputs
+
+Support multiple audio source nodes simultaneously.
+
+Example:
+
+```text
+Spotify ---- EQ -----------+
+                           |
+Game ------- Compressor ---+---- Mixer ---- Output
+                           |
+Discord ---- Gain ---------+
+```
+
+Each application/source should have an independent stream/buffer.
+
+Do not assume there is only one global audio input.
+
+---
+
+# Phase 14: Multiple Outputs
+
+Do not assume there is only one output.
+
+Support:
+
+* System Default
+* Physical devices
+* Later virtual outputs
+
+Example:
+
+```text
+Master
+  |
+  +----> Speakers
+  |
+  +----> Headphones
+  |
+  +----> Virtual Out 1
+```
+
+---
+
+# Phase 15: Virtual Outputs
+
+Later add EasyKnack virtual outputs.
+
+Examples:
+
+```text
+EasyKnack Virtual Out 1
+EasyKnack Virtual Out 2
+```
+
+Other applications may select these as inputs.
+
+Example:
+
+```text
+Spotify
+   |
+EasyKnack DSP
+   |
+   +----> Speakers
+   |
+   +----> EasyKnack Virtual Out 1 ----> OBS
+```
+
+EasyKnack does not need to control OBS or other downstream applications.
+
+It only provides the virtual output.
+
+---
+
+# Phase 16: Device Hotplug
+
+Handle runtime audio device changes safely.
+
+Examples:
+
+* USB interface unplugged
+* headphones connected
+* Bluetooth device disconnected
+* default device changes
+
+Requirements:
+
+* audio thread must not crash
+* unavailable endpoints must be reported to Java/UI
+* reconnect where appropriate
+* `System Default` should follow system default changes
+
+---
+
+# Phase 17: Sample Rate Handling
+
+Do not assume all devices use the same sample rate.
+
+Example:
+
+```text
+Source      44100 Hz
+EasyKnack   48000 Hz
+Output      48000 Hz
+```
+
+Create a clear place in the architecture for resampling.
+
+Do not add ad-hoc resampling logic inside individual DSP nodes.
+
+---
+
+# Phase 18: Channel Layout
+
+Initially support:
+
+* Mono
+* Stereo
+
+Design the API so multichannel can be added later.
+
+Avoid hard-coding every node to a single `float*`.
+
+Prefer buffer/channel views.
+
+Example conceptual structure:
+
+```cpp
+struct AudioBufferView {
+    float** channels;
+    std::size_t channelCount;
+    std::size_t frameCount;
+};
+```
+
+Exact representation may differ if the existing engine already has a better structure.
+
+---
+
+# Phase 19: Realtime Safety
+
+Audio callback code must follow realtime rules.
+
+Do not perform:
+
+* `new`
+* `delete`
+* file I/O
+* blocking mutex locks
+* Java calls
+* GUI calls
+* logging that may block
+* uncontrolled memory growth
+
+Allocate required buffers when preparing the graph or opening streams.
+
+The audio callback should mostly perform buffer access and DSP computation.
+
+---
+
+# Phase 20: Java / Native API
+
+Create a small stable native API for Java.
+
+Conceptually:
+
+```cpp
+listAudioInputs()
+listAudioOutputs()
+
+setInputEndpoint(nodeId, endpointId)
+setInputMode(nodeId, mode)
+
+setOutputEndpoint(nodeId, endpointId)
+```
+
+Use the project's existing native communication mechanism if one already exists.
+
+Do not introduce a second unrelated Java/native architecture unnecessarily.
+
+---
+
+# Phase 21: Persistence
+
+Projects must save endpoint configuration.
+
+Store information such as:
+
+```text
+endpoint type
+stable endpoint ID
+fallback/display name
+capture mode
+channel configuration
+```
+
+If an endpoint is missing when opening the project:
+
+* keep the node
+* mark the endpoint unavailable
+* allow the user to select a replacement
+
+Do not silently switch to an unrelated device.
+
+---
+
+# Windows MVP
+
+The first usable Windows milestone should contain:
+
+* Audio Input node
+* Audio Output node
+* Hardware inputs
+* Hardware outputs
+* System Default output
+* System Audio capture
+* Application discovery
+* Per-application capture
+* COPY mode
+* multiple input nodes
+* existing EasyKnack DSP graph processing
+
+Do NOT require a custom virtual audio driver for the first MVP.
+
+The goal is to get useful functionality working before implementing complex routing.
+
+---
+
+# Windows Phase 2
+
+After the MVP:
+
+* Virtual audio device
+* ROUTE mode
+* Automatic per-application routing
+* Routing restoration
+* Virtual outputs
+* Feedback prevention
+* robust IPC / ring buffers
+
+---
+
+# Windows Phase 3
+
+Later optimize:
+
+* low latency
+* configurable buffer sizes
+* CPU usage monitoring
+* underrun/xrun counters
+* better resampling
+* multichannel audio
+* device recovery
+* latency measurement
+
+Possible buffer settings:
+
+```text
+64
+128
+256
+512
+```
+
+---
+
+# Linux Backend - Later
+
+Do not implement now.
+
+Design Windows code so a PipeWire backend can later implement the same generic `AudioBackend` interface.
+
+Expected future features:
+
+* enumerate PipeWire audio nodes
+* application streams as EasyKnack sources
+* system audio capture
+* hardware inputs/outputs
+* virtual sinks/sources
+* routing through PipeWire
+
+The DSP graph must require no changes.
+
+---
+
+# macOS Backend - Later
+
+Do not implement now.
+
+Design for a future Core Audio backend.
+
+Expected future features:
+
+* Core Audio hardware devices
+* system/application capture
+* Core Audio process taps
+* virtual devices where necessary
+* hardware and virtual outputs
+
+Again, no DSP graph changes should be required.
+
+---
+
+# Backend Capabilities
+
+Different operating systems may support different features.
+
+Expose backend capabilities explicitly.
+
+Example:
+
+```cpp
+struct AudioBackendCapabilities {
+    bool systemCapture;
+    bool applicationCapture;
+    bool applicationRouting;
+    bool virtualInputs;
+    bool virtualOutputs;
+};
+```
+
+The Java UI should use this information to hide or disable unsupported features.
+
+Do not scatter platform checks throughout the UI.
+
+---
+
+# Future: Network Audio
+
+Do not implement now.
+
+Keep endpoint abstraction generic enough for future endpoints such as:
+
+```text
+Network Input
+Network Output
+```
+
+These could later transport audio between EasyKnack instances or computers.
+
+---
+
+# Future: Embedded / Teensy
+
+The DSP engine must remain independent from:
+
+* WASAPI
+* PipeWire
+* Core Audio
+* Java
+* virtual audio drivers
+
+This is important because EasyKnack graphs may later be exported to embedded targets such as Teensy.
+
+Keep:
+
+```text
+DSP Core
+```
+
+separate from:
+
+```text
+Desktop Audio Backend
+```
+
+---
+
+# Important Implementation Rule
+
+Do not implement all phases at once.
+
+Work incrementally.
+
+Preferred immediate order:
+
+1. Inspect the existing EasyKnack audio architecture.
+2. Introduce generic audio endpoint abstractions without breaking existing audio.
+3. Implement Windows hardware device enumeration.
+4. Implement Audio Input and Audio Output nodes.
+5. Implement system audio COPY capture.
+6. Implement application discovery.
+7. Implement per-application COPY capture.
+8. Add tests.
+9. Only then design ROUTE / virtual-device functionality.
+
+Preserve existing behavior and tests wherever possible.
+
+Before making large architectural changes, prefer adapting existing EasyKnack abstractions instead of creating duplicate systems.

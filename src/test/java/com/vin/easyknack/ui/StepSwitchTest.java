@@ -1,0 +1,158 @@
+package com.vin.easyknack.ui;
+
+import static org.junit.jupiter.api.Assertions.*;
+import java.nio.file.*;
+import java.util.*;
+import javax.swing.SwingUtilities;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import com.vin.easyknack.nodes.*;
+import com.vingame.glswing.node.GLNode;
+import com.vingame.glswing.node.model.*;
+
+class StepSwitchTest {
+    @Test void navigationRestoresConnectedEditorsAndRates()throws Exception{
+        WorkspaceController[] holder=new WorkspaceController[1];var id=GLNodeId.random();
+        try{
+            SwingUtilities.invokeAndWait(()->{
+                var c=holder[0]=new WorkspaceController();var graph=c.workspace().currentGraph();var node=new StepSwitchNode();
+                var math=new MathNode();var other=GLNodeId.random();
+                graph.edit("Nodes",e->{e.addNode(new GLGraphNode(id,node.registration().id(),node.defaults()));e.addNode(new GLGraphNode(other,math.registration().id(),math.defaults()));});
+                var source=c.workspace().editor().getNodes().stream().filter(n->n.findPort("audio-out")!=null).findFirst().orElseThrow();
+                c.workspace().editor().connect(source.findPort("audio-out"),view(c,id).findPort("step-0"));
+                c.workspace().editor().setSelectedNode(view(c,other));c.actions().extractComposite();
+            });
+            for(int repeat=0;repeat<2;repeat++){
+                SwingUtilities.invokeAndWait(()->holder[0].actions().openSelectedComposite());
+                SwingUtilities.invokeAndWait(()->holder[0].workspace().navigateBack());
+                SwingUtilities.invokeAndWait(()->{
+                    var v=view(holder[0],id);
+                    assertEquals(1,v.findPort("step-0").getActiveConnectionCount());
+                    assertEquals(com.vingame.glswing.node.GLNodePort.Shape.CIRCLE,v.findPort("step-0").getShape());
+                    assertEquals(com.vingame.glswing.node.GLNodePort.Shape.CIRCLE,v.findPort("value").getShape());
+                    var row=v.getContents().stream().filter(com.vingame.glswing.ui.GLLayoutGroup.class::isInstance).findFirst().orElseThrow();
+                    assertFalse(row.getGLChildren().stream().filter(com.vingame.glswing.ui.GLSlider.class::isInstance).findFirst().orElseThrow().isVisible());
+                });
+            }
+        }finally{SwingUtilities.invokeAndWait(()->{if(holder[0]!=null)holder[0].close();});}
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void hostAcceptsManualButtonsAndPublishesSelection()throws Exception{
+        var n=new StepSwitchNode();String payload="!"+NativeContractGenerator.fingerprint(n)+" "+n.encode(new NodeState(n.defaults()),p->-1);
+        try(var client=new com.vin.easyknack.audio.AudioHostClient()){
+            client.start(com.vin.easyknack.audio.AudioHostClient.defaultExecutable(),true);
+            assertEquals("OK",client.command("GRAPH 2 switch stepswitch "+payload+" @ c ee"+"c".repeat(32)+" out out 0 0 @ a c"));
+            assertEquals("OK",client.command("PLAY"));awaitIndex(client,0);
+            assertEquals("OK",client.command("TRIGGER switch:next"));awaitIndex(client,1);
+            assertEquals("OK",client.command("TRIGGER switch:select-3"));awaitIndex(client,3);
+            assertEquals("OK",client.command("TRIGGER switch:select-3"));awaitIndex(client,3);
+            assertEquals("OK",client.command("TRIGGER switch:next"));awaitIndex(client,0);
+            assertEquals("OK",client.command("TRIGGER switch:reset"));awaitIndex(client,0);
+            assertEquals("OK",client.command("STOP"));
+        }
+    }
+    private static void awaitIndex(com.vin.easyknack.audio.AudioHostClient client,int expected)throws Exception{
+        long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(3);
+        do{
+            var frame=com.vin.easyknack.audio.AudioAnalysis.parse(client.command("ANALYSIS")).get("switch");
+            if(frame!=null&&frame.frequency()==expected)return;
+            Thread.sleep(20);
+        }while(System.nanoTime()<deadline);
+        fail("Host did not publish step "+expected);
+    }
+    private static GLNode view(WorkspaceController c,GLNodeId id){return c.workspace().editor().getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();}
+    @Test void groupedEditorsSelectWithoutModelChangesAndRemainAvailableWhenConnected()throws Exception{
+        SwingUtilities.invokeAndWait(()->{
+            try(var c=new WorkspaceController()){
+                var graph=c.workspace().currentGraph();var node=new StepSwitchNode();var id=GLNodeId.random();
+                graph.edit("Switch",e->e.addNode(new GLGraphNode(id,node.registration().id(),node.defaults())));
+                var view=(StepSwitchView)view(c,id);
+                var groups=view.getContents().stream().filter(com.vingame.glswing.ui.GLLayoutGroup.class::isInstance).map(com.vingame.glswing.ui.GLLayoutGroup.class::cast).toList();
+                assertEquals(4,groups.size());
+                var button=(com.vingame.glswing.ui.GLButton)groups.get(2).getGLChildren().stream().filter(com.vingame.glswing.ui.GLButton.class::isInstance).findFirst().orElseThrow();
+                var sent=new ArrayList<String>();com.vin.easyknack.audio.ManualTriggers.receiver(sent::add);
+                var before=graph.snapshot();button.doClick();assertEquals(List.of(id+":select-2"),sent);assertEquals(before,graph.snapshot());
+                com.vin.easyknack.audio.AudioAnalysis.publish(Map.of(id.toString(),new com.vin.easyknack.audio.AudioAnalysis.Frame(2,0,0,new float[]{2})));
+                assertEquals(2,view.activeStep());assertEquals(button.getGLTheme().buttonStyle().pressedDarkColor(),button.getGLStyle().background());
+                var source=c.workspace().editor().getNodes().stream().filter(n->n.findPort("audio-out")!=null).findFirst().orElseThrow();
+                c.workspace().editor().connect(source.findPort("audio-out"),view.findPort("step-2"));
+                assertFalse(view.findPort("step-2").isContentHiddenWhenConnected());
+                assertTrue(button.isVisible());
+                assertFalse(groups.get(2).getGLChildren().stream().filter(com.vingame.glswing.ui.GLSlider.class::isInstance).findFirst().orElseThrow().isVisible());
+            }finally{com.vin.easyknack.audio.ManualTriggers.receiver(id->{});com.vin.easyknack.audio.AudioAnalysis.clear();}
+        });
+    }
+    @Test void changingStepsRetainsInputsAndUndoRestoresRemovedConnections()throws Exception{
+        SwingUtilities.invokeAndWait(()->{
+            try(var c=new WorkspaceController()){
+                var graph=c.workspace().currentGraph();var node=new StepSwitchNode();var id=GLNodeId.random();
+                graph.edit("Step Switch",e->e.addNode(new GLGraphNode(id,node.registration().id(),node.defaults())));
+                var source=c.workspace().editor().getNodes().stream().filter(n->n.findPort("audio-out")!=null).findFirst().orElseThrow();
+                c.workspace().editor().connect(source.findPort("audio-out"),view(c,id).findPort("step-3"));
+                var cable=graph.snapshot().connections().get(graph.snapshot().connections().size()-1);
+                view(c,id).setLocation(1200,300);
+                c.setNodeProperty(id,StepSwitchNode.input(0),GLNodeValue.of(42.));
+                c.setNodeProperty(id,StepSwitchNode.STEPS,GLNodeValue.of(6.));
+                assertNotNull(view(c,id).findPort("step-5"));assertTrue(graph.snapshot().connections().contains(cable));
+                c.setNodeProperty(id,StepSwitchNode.STEPS,GLNodeValue.of(2.));
+                assertNull(view(c,id).findPort("step-3"));assertFalse(graph.snapshot().connections().contains(cable));
+                assertDoesNotThrow(c::audioGraph);
+                assertTrue(c.history().undo());assertNotNull(view(c,id).findPort("step-5"));assertTrue(graph.snapshot().connections().contains(cable));
+                assertEquals(1200f,view(c,id).getX());
+                assertEquals(42.,graph.snapshot().findNode(id).orElseThrow().properties().get("step-0").toJavaValue());
+            }
+        });
+    }
+    @Test void ratesAndInactiveInputs(){
+        var n=new StepSwitchNode();var s=new NodeState(n.defaults());
+        assertEquals(ProcessingRate.CONTROL,n.resolveAutomaticRate(s,Map.of()));
+        assertEquals(ProcessingRate.AUDIO,n.resolveAutomaticRate(s,Map.of(StepSwitchNode.NEXT,ProcessingRate.EVENT)));
+        assertEquals(ProcessingRate.AUDIO,n.resolveAutomaticRate(s,Map.of(StepSwitchNode.input(1),ProcessingRate.AUDIO)));
+        assertDoesNotThrow(()->n.encode(s,p->{assertFalse(p.value().equals("step-4"));return -1;}));
+        assertTrue(NodeRegistry.find(n.registration().id()).isPresent());
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void sampleAccurateSwitchingAndBlockDeferredTriggers()throws Exception{
+        var n=new StepSwitchNode();var values=new HashMap<>(n.defaults());values.put("steps",GLNodeValue.of(3.));
+        for(int i=0;i<3;i++)values.put("step-"+i,GLNodeValue.of((i+1)*10.));
+        String payload="!"+NativeContractGenerator.fingerprint(n)+" "+n.encode(new NodeState(values),p->-1);
+        var dir=Files.createTempDirectory(Path.of("target"),"step-switch-").toAbsolutePath();var source=dir.resolve("test.cpp");
+        Files.writeString(source,"""
+            #include "AudioGraph.hpp"
+            #include <cassert>
+            using namespace easyknack;
+            int main(){
+                StepSwitchNode node;std::istringstream config("%s");node.configure(config);
+                float output[8]{},indices[8]{},silence[8]{},audio[8]{1,2,3,4,5,6,7,8};
+                const float* inputs[34]{};float* outputs[]={output,indices};
+                ValueEventBuffer next,reset;next.clear(8);reset.clear(8);
+                const ValueEventBuffer* events[34]{};events[0]=&next;events[1]=&reset;
+                ProcessContext c{inputs,34,output,8,48000,silence,8};c.outputs=outputs;c.outputCount=2;c.valueEventInputs=events;
+                next.push(2,1,ValueEventKind::trigger);next.push(4,1,ValueEventKind::trigger);next.push(4,1,ValueEventKind::trigger);
+                next.push(6,1,ValueEventKind::trigger);reset.push(6,1,ValueEventKind::trigger);
+                node.process(c);float expected[]={10,10,20,20,10,10,10,10};for(int i=0;i<8;i++)assert(output[i]==expected[i]);
+                next.clear(8);reset.clear(8);next.push(0,1,ValueEventKind::trigger);inputs[3]=audio;
+                node.process(c);for(int i=0;i<8;i++)assert(output[i]==audio[i]&&indices[i]==1);
+                char rates[34]{};rates[3]='c';c.sourceRates=rates;node.process(c);for(int i=0;i<8;i++)assert(output[i]==30&&indices[i]==2);
+                node.index=1;next.clear(8);node.process(c);for(int i=0;i<8;i++)assert(output[i]==1);
+                inputs[3]=nullptr;c.bufferSize=1;node.index=0;next.push(2,1,ValueEventKind::trigger);
+                node.process(c);assert(output[0]==10&&indices[0]==0&&node.index==1);
+                next.clear(8);node.process(c);assert(output[0]==20&&indices[0]==1);
+                reset.push(0,1,ValueEventKind::trigger);node.process(c);assert(output[0]==10);
+                c.valueEventInputs=nullptr;node.bindIdentity("switch");
+                submitManualTrigger("switch:next");submitManualTrigger("switch:next");++manualTriggerEpoch;node.process(c);assert(output[0]==30);
+                ++manualTriggerEpoch;node.process(c);assert(output[0]==30);
+                submitManualTrigger("switch:select-1");++manualTriggerEpoch;node.process(c);assert(output[0]==20);
+                submitManualTrigger("switch:select-1");++manualTriggerEpoch;node.process(c);assert(output[0]==20);
+                submitManualTrigger("switch:select-2");submitManualTrigger("switch:reset");++manualTriggerEpoch;node.process(c);assert(output[0]==10);
+                node.index=2;
+                StepSwitchNode changed;changed.steps=2;node.applyParameters(changed);assert(node.index==0);
+                node.index=1;changed.inheritState(node);assert(changed.index==1);
+                auto graph=AudioGraph::parse("GRAPH 2 switch stepswitch %s @ c eecccccccccccccccccccccccccccccccc out out 0 0 @ a c");
+                float block[256];graph.process(block,256);for(auto v:block)assert(v==10);
+                submitManualTrigger("switch:next");++manualTriggerEpoch;graph.process(block,256);for(auto v:block)assert(v==20);
+            }
+            """.formatted(payload,payload));
+        RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
+    }
+}

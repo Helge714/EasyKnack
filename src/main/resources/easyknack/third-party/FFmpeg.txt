@@ -1,0 +1,22 @@
+EasyKnack audio-file import uses FFmpeg 7.1, distributed by Bytedeco as
+org.bytedeco:ffmpeg:7.1-1.5.11 (standard, not the -gpl variant).
+FFmpeg copyright (c) the FFmpeg developers.
+The inspected Windows executable reports LGPL version 3 or later (-L).
+JavaCPP and its presets are separate components; retain their upstream notices.
+
+FFmpeg project and license information:
+https://ffmpeg.org/
+https://ffmpeg.org/legal.html
+https://github.com/FFmpeg/FFmpeg/tree/n7.1
+
+Exact preset version, build configuration, dependency versions and patches:
+https://github.com/bytedeco/javacpp-presets/tree/1.5.11/ffmpeg
+https://github.com/bytedeco/javacpp-presets/blob/1.5.11/ffmpeg/cppbuild.sh
+https://github.com/bytedeco/javacpp-presets/blob/1.5.11/ffmpeg/LICENSE.md
+https://github.com/bytedeco/javacpp/tree/1.5.11
+
+The codec runtime is distributed as separate, replaceable Maven JARs in target/lib;
+EasyKnack does not modify its executable or libraries. Before publishing a binary
+application distribution, include the corresponding sources/build materials and
+notices for the exact shipped binaries and their dependencies as required by their
+licenses. These upstream links do not replace that distribution step.

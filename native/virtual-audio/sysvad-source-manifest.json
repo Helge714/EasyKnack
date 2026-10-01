@@ -1,0 +1,1517 @@
+{
+  "commit": "97429c5623590d52f001249460daf43e6749d777",
+  "files": [
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ef3ee38d1ce61958787dda3b8c669627b248080",
+      "size": 2665,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6ef3ee38d1ce61958787dda3b8c669627b248080"
+    },
+    {
+      "path": "audio/sysvad/A2dpHpDevice.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00c408315667f65af49372ef25309e9a1c98ad34",
+      "size": 112481,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/00c408315667f65af49372ef25309e9a1c98ad34"
+    },
+    {
+      "path": "audio/sysvad/A2dpHpDevice.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f07b89ad03b712984b434c42ab2ba5355549852",
+      "size": 19850,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1f07b89ad03b712984b434c42ab2ba5355549852"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c96314deb7d325d0f898062a061c6407b466516",
+      "size": 4644,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7c96314deb7d325d0f898062a061c6407b466516"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApo.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76115f4db4dc7dd13720bcc48bb9cc15a985934d",
+      "size": 1191,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/76115f4db4dc7dd13720bcc48bb9cc15a985934d"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApo.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4bbcd19a69792f330b8733e6596677265dc23971",
+      "size": 13279,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/4bbcd19a69792f330b8733e6596677265dc23971"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApo.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36906cda9f04493c36cc5491534e9bc4d67958b2",
+      "size": 2292,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/36906cda9f04493c36cc5491534e9bc4d67958b2"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoDll.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70fa103d4ca57e76a219cf4d8f1eaf8133854a90",
+      "size": 1566,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/70fa103d4ca57e76a219cf4d8f1eaf8133854a90"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoDll.def",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f3b0c5ab2904679a35b1754b96b769f2c27c358",
+      "size": 66,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3f3b0c5ab2904679a35b1754b96b769f2c27c358"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoDll.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17461922e7cc26ff8881c7930d551f25c43f0b0b",
+      "size": 828,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/17461922e7cc26ff8881c7930d551f25c43f0b0b"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoDll.rc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "796d5204a8b79519ebaa2b480d00b4c3311d25f8",
+      "size": 586,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/796d5204a8b79519ebaa2b480d00b4c3311d25f8"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoDll.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf3415a1c850bd8e3f27502adcb871bc952c31a6",
+      "size": 210,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/cf3415a1c850bd8e3f27502adcb871bc952c31a6"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoMfx.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0c16f34856e4f2b70f97bf25ee25d28b7ea3ba16",
+      "size": 28845,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0c16f34856e4f2b70f97bf25ee25d28b7ea3ba16"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/AecApoMfx.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "13391e8a8fbb66bb99184c0dd4d7e728374b310f",
+      "size": 345,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/13391e8a8fbb66bb99184c0dd4d7e728374b310f"
+    },
+    {
+      "path": "audio/sysvad/APO/AecApo/Resource.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f4b89a45173051e2261c92c743c0df819f4ead7",
+      "size": 566,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7f4b89a45173051e2261c92c743c0df819f4ead7"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/Delay.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "721de3efc664f584b86bd8ecf2778534f6ac1a75",
+      "size": 3483,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/721de3efc664f584b86bd8ecf2778534f6ac1a75"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPO.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65ee98e5951e3fadd40ccd3471dcce63d601697b",
+      "size": 10654,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/65ee98e5951e3fadd40ccd3471dcce63d601697b"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPO.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "391bf1ab77ca1318e548c5dadc667d4668c3685c",
+      "size": 13445,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/391bf1ab77ca1318e548c5dadc667d4668c3685c"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPO.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1858f392045653da34ab9dac2bc5d66ddb3f4c04",
+      "size": 1620,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1858f392045653da34ab9dac2bc5d66ddb3f4c04"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPODll.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "968d7f86f132c65f93831b61110f1d43d71ad6b0",
+      "size": 1636,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/968d7f86f132c65f93831b61110f1d43d71ad6b0"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPODll.def",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f3b0c5ab2904679a35b1754b96b769f2c27c358",
+      "size": 66,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3f3b0c5ab2904679a35b1754b96b769f2c27c358"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPODll.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46b4fe5b8bca664207fc980fecee7f7215e793bc",
+      "size": 1277,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/46b4fe5b8bca664207fc980fecee7f7215e793bc"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPODll.rc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc6e9532a41163c899ae4dde768cc3577b4120f7",
+      "size": 748,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/dc6e9532a41163c899ae4dde768cc3577b4120f7"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPODll.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ccba5702a94934fcea2081016118d79b1ecda95",
+      "size": 214,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/5ccba5702a94934fcea2081016118d79b1ecda95"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPOInterface.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f74cd5fbcd8cc7ea7a2976dc56bc3cbf34f7710e",
+      "size": 524,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/f74cd5fbcd8cc7ea7a2976dc56bc3cbf34f7710e"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPOMFX.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af67571b8f8aad42a167a3526c2cb3cc7485709e",
+      "size": 40868,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/af67571b8f8aad42a167a3526c2cb3cc7485709e"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPOMFX.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d1f19e2121d4c69c6a2e3052410cce7c4b40388",
+      "size": 347,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0d1f19e2121d4c69c6a2e3052410cce7c4b40388"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPOSFX.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67ae2788f78661237ed4e7181eeaf9099f6ea7cc",
+      "size": 22714,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/67ae2788f78661237ed4e7181eeaf9099f6ea7cc"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/DelayAPOSFX.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1a1005391401b7c5b6fb2e0d5edd460818627bbe",
+      "size": 347,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1a1005391401b7c5b6fb2e0d5edd460818627bbe"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/Resource.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eda62a7a1c10252ee04cc4ae68fcfaaea3153710",
+      "size": 612,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/eda62a7a1c10252ee04cc4ae68fcfaaea3153710"
+    },
+    {
+      "path": "audio/sysvad/APO/DelayAPO/delayapo.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "055bdc2c3a71a1a99890988307dda2e3e28cb10b",
+      "size": 1180,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/055bdc2c3a71a1a99890988307dda2e3e28cb10b"
+    },
+    {
+      "path": "audio/sysvad/APO/Inc/CommonMacros.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "097c6d473595d9d9528d71759d9b3417560157b5",
+      "size": 10575,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/097c6d473595d9d9528d71759d9b3417560157b5"
+    },
+    {
+      "path": "audio/sysvad/APO/Inc/CustomPropKeys.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dab286a53baf041bd0c824a98d7aa4719d5fb32d",
+      "size": 1819,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/dab286a53baf041bd0c824a98d7aa4719d5fb32d"
+    },
+    {
+      "path": "audio/sysvad/APO/Inc/tlist.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c0479aaac71ed90c8892a039786ed3886646869",
+      "size": 9252,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6c0479aaac71ed90c8892a039786ed3886646869"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d67eaca042442ca589b22093219410b8c2ff052f",
+      "size": 1648,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/d67eaca042442ca589b22093219410b8c2ff052f"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "faa8592ed6e229638d625b88caade7faa5b53e90",
+      "size": 5368,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/faa8592ed6e229638d625b88caade7faa5b53e90"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApo.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a6e102a3754e168a90004881a0cb5ef927c95a7",
+      "size": 1191,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3a6e102a3754e168a90004881a0cb5ef927c95a7"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApo.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff74c60bdcd5162fa6f0b372815c2aeae19dba5a",
+      "size": 13471,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ff74c60bdcd5162fa6f0b372815c2aeae19dba5a"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApo.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7ff54ea862df69e84b1a15bba7d9365b290e1bf2",
+      "size": 1616,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7ff54ea862df69e84b1a15bba7d9365b290e1bf2"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoDll.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "286b7869fe126debf2cec475d29aff59defee2ad",
+      "size": 1566,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/286b7869fe126debf2cec475d29aff59defee2ad"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoDll.def",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f3b0c5ab2904679a35b1754b96b769f2c27c358",
+      "size": 66,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3f3b0c5ab2904679a35b1754b96b769f2c27c358"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoDll.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "086643d7c5631305d2a9fc0eaa5b382ab417e8e6",
+      "size": 870,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/086643d7c5631305d2a9fc0eaa5b382ab417e8e6"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoDll.rc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9add845279a7e06b41367782ff0a88b6c1537405",
+      "size": 586,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9add845279a7e06b41367782ff0a88b6c1537405"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoDll.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b89d2a41325533e0b26dfb5a2b391070afac25c9",
+      "size": 210,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/b89d2a41325533e0b26dfb5a2b391070afac25c9"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoEfx.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77c78364c53c0efb5e25e634235e02fe6313aba3",
+      "size": 22967,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/77c78364c53c0efb5e25e634235e02fe6313aba3"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoEfx.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc5bd41a6d80d17a4d1f3f4f15423400c8e1894f",
+      "size": 345,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/dc5bd41a6d80d17a4d1f3f4f15423400c8e1894f"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/KWSApoInterface.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c0c98ad13edf03eaafb39911fec16fae78fc94c",
+      "size": 387,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6c0c98ad13edf03eaafb39911fec16fae78fc94c"
+    },
+    {
+      "path": "audio/sysvad/APO/KWSApo/Resource.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df1260e197ff827cdcaa206b219cbe5dedb29262",
+      "size": 566,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/df1260e197ff827cdcaa206b219cbe5dedb29262"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/Resource.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e7dff6d254d2b201bd756bd600e2847c584c97c",
+      "size": 611,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0e7dff6d254d2b201bd756bd600e2847c584c97c"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPO.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d169d9dbae733bbcb0e93f3aba64b34df03d4532",
+      "size": 14075,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/d169d9dbae733bbcb0e93f3aba64b34df03d4532"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPO.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43a5c87b5057a7a8198596586d3956327bccc2b3",
+      "size": 13573,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/43a5c87b5057a7a8198596586d3956327bccc2b3"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPO.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b3493d4d2f0b6a8a566566d571c8c77a4c71273",
+      "size": 1618,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9b3493d4d2f0b6a8a566566d571c8c77a4c71273"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPODll.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff7a1cd697aa5b2f287b8e59bcd5439b6783e075",
+      "size": 1670,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ff7a1cd697aa5b2f287b8e59bcd5439b6783e075"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPODll.def",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f3b0c5ab2904679a35b1754b96b769f2c27c358",
+      "size": 66,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3f3b0c5ab2904679a35b1754b96b769f2c27c358"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPODll.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9000c7ca15b7d1dffdad335ac87ffe85b58e14c",
+      "size": 1266,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e9000c7ca15b7d1dffdad335ac87ffe85b58e14c"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPODll.rc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b73f4734e0a85672458bc30cd1d42c078b9960d3",
+      "size": 737,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/b73f4734e0a85672458bc30cd1d42c078b9960d3"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPODll.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab3277b3ef22e90d8332186e86b45770d33c5de6",
+      "size": 212,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ab3277b3ef22e90d8332186e86b45770d33c5de6"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPOInterface.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a06b5f0de88d1b6008693417aa9e07707ddf04d2",
+      "size": 578,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a06b5f0de88d1b6008693417aa9e07707ddf04d2"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPOMFX.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3bebda2e50ed2ee3760c63b6e349196525ffbf56",
+      "size": 346,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3bebda2e50ed2ee3760c63b6e349196525ffbf56"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/SwapAPOSFX.rgs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c553edd534e8018be8985ad067033f460e19291f",
+      "size": 346,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c553edd534e8018be8985ad067033f460e19291f"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/swap.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6fa39fa30b64fb14b30596d0e46b56d5b34784d1",
+      "size": 3094,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6fa39fa30b64fb14b30596d0e46b56d5b34784d1"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/swapapo.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "861d5bcb65c0f2de3e76908ef4b05e47f8d7893e",
+      "size": 1251,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/861d5bcb65c0f2de3e76908ef4b05e47f8d7893e"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/swapapomfx.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b05b156861ca49281cb4e7ea13711c81080295fa",
+      "size": 51381,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/b05b156861ca49281cb4e7ea13711c81080295fa"
+    },
+    {
+      "path": "audio/sysvad/APO/SwapAPO/swapaposfx.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef418f7585969cac17c9597cd1c8bb28cc3c3ff0",
+      "size": 29764,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ef418f7585969cac17c9597cd1c8bb28cc3c3ff0"
+    },
+    {
+      "path": "audio/sysvad/BthhfpDevice.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "389563ed653238a0d60f043a6bfe9f96ce4090fd",
+      "size": 90504,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/389563ed653238a0d60f043a6bfe9f96ce4090fd"
+    },
+    {
+      "path": "audio/sysvad/BthhfpDevice.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7cee261645babc7d5c6e912ceac5907729b54bad",
+      "size": 13467,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7cee261645babc7d5c6e912ceac5907729b54bad"
+    },
+    {
+      "path": "audio/sysvad/ContosoKeywordDetector.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f12f4de7b94ef15eed0f6a18f4be88c84c497ea",
+      "size": 1610,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6f12f4de7b94ef15eed0f6a18f4be88c84c497ea"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/A2dpHpDeviceFormats.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b6894fc3d18aab89012320a83ec259fc24830804",
+      "size": 6102,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/b6894fc3d18aab89012320a83ec259fc24830804"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/AudioModule0.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c1f0755779b59826afcdd7c3f0efc3139bcf07a7",
+      "size": 7565,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c1f0755779b59826afcdd7c3f0efc3139bcf07a7"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/AudioModule1.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f01eaed8e73e65ee36ff633dad1d9d731d12b8a",
+      "size": 8090,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9f01eaed8e73e65ee36ff633dad1d9d731d12b8a"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/AudioModule2.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93d3fdf3bf5f3699b9e3c8da82fb6cb288be6e9e",
+      "size": 7570,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/93d3fdf3bf5f3699b9e3c8da82fb6cb288be6e9e"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/AudioModuleHelper.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25ded875e272edf9b972d2d16f6d1823bdbadd6e",
+      "size": 18736,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/25ded875e272edf9b972d2d16f6d1823bdbadd6e"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/AudioModuleHelper.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa7a2c233ef7b8b08d05d4239a9add022d52325c",
+      "size": 2700,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/fa7a2c233ef7b8b08d05d4239a9add022d52325c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/EndpointsCommon.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c1ba8b14fecc295d0b2cac8cde1772ccb2efd1d8",
+      "size": 11647,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c1ba8b14fecc295d0b2cac8cde1772ccb2efd1d8"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/EndpointsCommon.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "413cac132ae7cd590b2abb6e77ecd497848497b0",
+      "size": 1263,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/413cac132ae7cd590b2abb6e77ecd497848497b0"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/MiniportAudioEngineNode.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c3979f212b7f53147d8a2e74c2914bc6ec02a68",
+      "size": 40130,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/8c3979f212b7f53147d8a2e74c2914bc6ec02a68"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/MiniportStreamAudioEngineNode.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49f4cec87a0437fdcf4d0c6ee7d7aae37d02327f",
+      "size": 34190,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/49f4cec87a0437fdcf4d0c6ee7d7aae37d02327f"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/NewDelete.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "daa076e29af1d50b6e3adc2e8cdbdeedd06a5339",
+      "size": 3656,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/daa076e29af1d50b6e3adc2e8cdbdeedd06a5339"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/NewDelete.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fefcda6e18fe428953e19f0c3afa2a419a9cb43e",
+      "size": 2836,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/fefcda6e18fe428953e19f0c3afa2a419a9cb43e"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/UsbHsDeviceFormats.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "720bfa9f9f9fb914f8662d6b256f7f6a57dbd75e",
+      "size": 7438,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/720bfa9f9f9fb914f8662d6b256f7f6a57dbd75e"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphpminipairs.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b46796c709a6de70c8ea07f41cda6a61fb01e2b3",
+      "size": 5114,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/b46796c709a6de70c8ea07f41cda6a61fb01e2b3"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphpminwavert.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "532fc92f6375367d829b04b0af42f37153dbe54b",
+      "size": 4714,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/532fc92f6375367d829b04b0af42f37153dbe54b"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphpspeakertopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f24a4dcabf992daf41d666859e511354f07e8aa",
+      "size": 3119,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0f24a4dcabf992daf41d666859e511354f07e8aa"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphpspeakertopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71f68030ee60a03b88bdf38ac0e10b72b3ebe73c",
+      "size": 559,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/71f68030ee60a03b88bdf38ac0e10b72b3ebe73c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphpspeakertoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a3e23dee0871458f245e7a81922a682be6e7f2c",
+      "size": 6665,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7a3e23dee0871458f245e7a81922a682be6e7f2c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphpspeakerwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00f69958efaf45fece502c23c0a193c523cbc63c",
+      "size": 23854,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/00f69958efaf45fece502c23c0a193c523cbc63c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphptopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "661569f8a22150f2e672e11ad550619f690142e1",
+      "size": 17883,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/661569f8a22150f2e672e11ad550619f690142e1"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/a2dphptopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b2303bdd5889ed6764a2217c42236378adb28ec",
+      "size": 1733,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0b2303bdd5889ed6764a2217c42236378adb28ec"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpmictopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1a74de8f87ea9094a5a63e4ebf715b1c7ae3e319",
+      "size": 6875,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1a74de8f87ea9094a5a63e4ebf715b1c7ae3e319"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpmictopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48f93a69f73de8249cc647caaafe298ef1be72b5",
+      "size": 735,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/48f93a69f73de8249cc647caaafe298ef1be72b5"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpmictoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ea699569c873c03a14737bfdb57d95dd5359024",
+      "size": 9684,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0ea699569c873c03a14737bfdb57d95dd5359024"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpmicwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cdec96a9aa8d5aedf497b24dad57ff639a199cdf",
+      "size": 8259,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/cdec96a9aa8d5aedf497b24dad57ff639a199cdf"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpmicwbwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e94c5d20087073026d798982b50abe84684c6555",
+      "size": 7973,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e94c5d20087073026d798982b50abe84684c6555"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpminipairs.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52c33c0215aab21b7c559f6f96476b6ae7dd61f3",
+      "size": 9578,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/52c33c0215aab21b7c559f6f96476b6ae7dd61f3"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpminwavert.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db705a68881b38e86685103873211e82beedc623",
+      "size": 5522,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/db705a68881b38e86685103873211e82beedc623"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpspeakertopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c5f7b70c995bac30cd2c1d03e5e086bda5bda564",
+      "size": 6987,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c5f7b70c995bac30cd2c1d03e5e086bda5bda564"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpspeakertopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ef8482d3453c17aed0deb370783070e425aa9b8",
+      "size": 789,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3ef8482d3453c17aed0deb370783070e425aa9b8"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpspeakertoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "145198786f4a64e110fa0ab5dc950f3a6336f06c",
+      "size": 9888,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/145198786f4a64e110fa0ab5dc950f3a6336f06c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpspeakerwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "855d6268214f3332e6f06da9678a4c170c47a8e7",
+      "size": 8131,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/855d6268214f3332e6f06da9678a4c170c47a8e7"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfpspeakerwbwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c91f84d153a3e1b873f71a88c0a734639a63b52",
+      "size": 7886,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9c91f84d153a3e1b873f71a88c0a734639a63b52"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfptopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "27d8410f6ee13eb844ddd5c9c745e82ef3b4ecdb",
+      "size": 17024,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/27d8410f6ee13eb844ddd5c9c745e82ef3b4ecdb"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/bthhfptopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24c0e1c4eeb4de704ae81e144b6a1f47b9c9c95d",
+      "size": 1425,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/24c0e1c4eeb4de704ae81e144b6a1f47b9c9c95d"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/micarray1toptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4d2e31969c00b97c70e6dfbaf0d0e8ae0d0ef1fe",
+      "size": 8090,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/4d2e31969c00b97c70e6dfbaf0d0e8ae0d0ef1fe"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/micarraytopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1898243af823877cd93628835d08cfbfe28b261f",
+      "size": 30176,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1898243af823877cd93628835d08cfbfe28b261f"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/micarraytopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a4c2d8ae93f6e326d641ab55b086c33a759cd235",
+      "size": 2948,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a4c2d8ae93f6e326d641ab55b086c33a759cd235"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/micarraywavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "55309092014c4eb0ae3f9daac509df8c2385f25d",
+      "size": 28484,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/55309092014c4eb0ae3f9daac509df8c2385f25d"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/mintopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9fb2cc21efdf3206a83545942b9eb68bafedd748",
+      "size": 32077,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9fb2cc21efdf3206a83545942b9eb68bafedd748"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/mintopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0bae44d3274915a762c380852fd51ba4353d059",
+      "size": 7512,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/f0bae44d3274915a762c380852fd51ba4353d059"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/minwavert.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6b8e8c3cad83eb22d034f0f341318639f3f9445",
+      "size": 117794,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c6b8e8c3cad83eb22d034f0f341318639f3f9445"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/minwavert.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42cad965e3048a356dd3a73859e0e69949320ef9",
+      "size": 22455,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/42cad965e3048a356dd3a73859e0e69949320ef9"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/minwavertstream.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "adea0c824c0830fd213fd2f7061160e7f111c556",
+      "size": 62515,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/adea0c824c0830fd213fd2f7061160e7f111c556"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/minwavertstream.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e9e882c041914d890e22b85c2fa61f2c8e99704",
+      "size": 9480,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/4e9e882c041914d890e22b85c2fa61f2c8e99704"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/simple.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a284acbc6e0c2719c658507cf3933626b9c0a0e2",
+      "size": 3319,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a284acbc6e0c2719c658507cf3933626b9c0a0e2"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakerhptopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cd1d97be1057ebe449677a6d5f2779beaa37abe",
+      "size": 8513,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1cd1d97be1057ebe449677a6d5f2779beaa37abe"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakerhptopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9974859fefa795aa40071fcb342d24f165febaf6",
+      "size": 384,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9974859fefa795aa40071fcb342d24f165febaf6"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakerhptoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "936ec0b6e9c33547e990b3d7adeed415cf988331",
+      "size": 6081,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/936ec0b6e9c33547e990b3d7adeed415cf988331"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakerhpwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e1cf15948c2cd0e501b50aec6491b0b2cdb40364",
+      "size": 27153,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e1cf15948c2cd0e501b50aec6491b0b2cdb40364"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakertopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "002b11747e9e995e4e16fcf89bdc17c293475a57",
+      "size": 3040,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/002b11747e9e995e4e16fcf89bdc17c293475a57"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakertopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ea213740f172dd14521961cb2913c6b65ea0535",
+      "size": 363,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1ea213740f172dd14521961cb2913c6b65ea0535"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakertoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea3890f7c6af69d3d83923cf8bc699173bbca34d",
+      "size": 6182,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ea3890f7c6af69d3d83923cf8bc699173bbca34d"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/speakerwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6fb058abc90ed261169ff94dbf24d64aa1f8cc1c",
+      "size": 27039,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6fb058abc90ed261169ff94dbf24d64aa1f8cc1c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsmictopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0be275f34de329132a4179982632a26e0816ae4c",
+      "size": 8522,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0be275f34de329132a4179982632a26e0816ae4c"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsmictopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2a872c53e28a87f09bc0f22fb10bb71a93deddf",
+      "size": 726,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e2a872c53e28a87f09bc0f22fb10bb71a93deddf"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsmictoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac3c89d054e16edb76bc0ba2f1ff27bf44fc113d",
+      "size": 9823,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ac3c89d054e16edb76bc0ba2f1ff27bf44fc113d"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsmicwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2b4567475b8d13d10b5fe544c84df667a22dac51",
+      "size": 13457,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/2b4567475b8d13d10b5fe544c84df667a22dac51"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsminipairs.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7642324063d0d451cb16d9fbdd3eb9501efd76fb",
+      "size": 8339,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7642324063d0d451cb16d9fbdd3eb9501efd76fb"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsminwavert.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a1fa3f156c073228af7de78866782b32a85375f6",
+      "size": 5097,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a1fa3f156c073228af7de78866782b32a85375f6"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsspeakertopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6899e36aaaa2abe53d0402eff023d47dcf67a9e",
+      "size": 2610,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e6899e36aaaa2abe53d0402eff023d47dcf67a9e"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsspeakertopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e87253a2e9fa0d66727236e8486b83a2c1c4ef7",
+      "size": 550,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/4e87253a2e9fa0d66727236e8486b83a2c1c4ef7"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsspeakertoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f79024f65bc8c4861d4317390acecf61e3f3095",
+      "size": 6256,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/2f79024f65bc8c4861d4317390acecf61e3f3095"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhsspeakerwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "619dd325a26a533177eb6891f8c96a33aefc61fb",
+      "size": 25275,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/619dd325a26a533177eb6891f8c96a33aefc61fb"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhstopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e32f202794d814c62dec78033234258a15e62975",
+      "size": 16441,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e32f202794d814c62dec78033234258a15e62975"
+    },
+    {
+      "path": "audio/sysvad/EndpointsCommon/usbhstopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d3a3adab4c172937b399fa3aa760aef155fce1b2",
+      "size": 1513,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/d3a3adab4c172937b399fa3aa760aef155fce1b2"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/KeywordDetectorContosoAdapter.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c88b1ae0c49b004aeeebd29289cfaa0fffe1ca62",
+      "size": 11661,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c88b1ae0c49b004aeeebd29289cfaa0fffe1ca62"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/KeywordDetectorContosoAdapter.def",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddeb3eac1dc2bfb75a9c7f8e0b3adf9f27aca204",
+      "size": 125,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ddeb3eac1dc2bfb75a9c7f8e0b3adf9f27aca204"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/KeywordDetectorContosoAdapter.idl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80c6342d9bcc202f0c30ff571a88c5dafae6e8a7",
+      "size": 897,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/80c6342d9bcc202f0c30ff571a88c5dafae6e8a7"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/KeywordDetectorContosoAdapter.rc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ce780220031517be5788c7acffc110ecca6b88a",
+      "size": 457,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/6ce780220031517be5788c7acffc110ecca6b88a"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/KeywordDetectorContosoAdapter.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "98726d7a2a67958533a46afc65f119fb2b7a7d9a",
+      "size": 13158,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/98726d7a2a67958533a46afc65f119fb2b7a7d9a"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/KeywordDetectorContosoAdapter.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0f2001a2ac369f56da8720aa495446a35fc6031",
+      "size": 1509,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/f0f2001a2ac369f56da8720aa495446a35fc6031"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/dllmain.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac4128595d84014915cdd17139e236572dc601cd",
+      "size": 932,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ac4128595d84014915cdd17139e236572dc601cd"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/stdafx.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c8b5956d09e529d7105566e66e1b7746760d095",
+      "size": 308,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3c8b5956d09e529d7105566e66e1b7746760d095"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/stdafx.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b8ae2aec1b16d4f85eb536465132ea439773b1b9",
+      "size": 405,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/b8ae2aec1b16d4f85eb536465132ea439773b1b9"
+    },
+    {
+      "path": "audio/sysvad/KeywordDetectorAdapter/targetver.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87c0086de751bac3d47208b77d76b82d78f26702",
+      "size": 306,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/87c0086de751bac3d47208b77d76b82d78f26702"
+    },
+    {
+      "path": "audio/sysvad/Package/package.VcxProj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9af119658791343c8a9a3101fcde41e8edab21a5",
+      "size": 5146,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9af119658791343c8a9a3101fcde41e8edab21a5"
+    },
+    {
+      "path": "audio/sysvad/Package/package.VcxProj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63b7554872e818884553750c49074d3ec6dae486",
+      "size": 1008,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/63b7554872e818884553750c49074d3ec6dae486"
+    },
+    {
+      "path": "audio/sysvad/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76ef8be285fc190ccef66c91eddd1583ab8b34a8",
+      "size": 16476,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/76ef8be285fc190ccef66c91eddd1583ab8b34a8"
+    },
+    {
+      "path": "audio/sysvad/SysVadShared.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26cff9e284b91d531fee0e90329c148976a26eb5",
+      "size": 743,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/26cff9e284b91d531fee0e90329c148976a26eb5"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/ComponentizedApoSample.inx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2cda2dae5be64396da1647dc14cba266ce8606a5",
+      "size": 11119,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/2cda2dae5be64396da1647dc14cba266ce8606a5"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/ComponentizedAudioSample.inx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6655868b940071c1814cfaf23c1f266578038b8",
+      "size": 25853,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c6655868b940071c1814cfaf23c1f266578038b8"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/ComponentizedAudioSampleExtension.inx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7511017c83516be125ab6e2539350ea5e071aa9f",
+      "size": 6686,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/7511017c83516be125ab6e2539350ea5e071aa9f"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/TabletAudioSample.rc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ab06ea6f516f5fbdf883d28d3d472be9b3ed4a5",
+      "size": 624,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/3ab06ea6f516f5fbdf883d28d3d472be9b3ed4a5"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/TabletAudioSample.vcxproj",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a37a16b150b1e6bf84f8a2130ae19566b82ab73c",
+      "size": 18791,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a37a16b150b1e6bf84f8a2130ae19566b82ab73c"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/TabletAudioSample.vcxproj.Filters",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "142c7f025cb7961bccc8521d2a747a0a92557ebb",
+      "size": 1597,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/142c7f025cb7961bccc8521d2a747a0a92557ebb"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/hdmitopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d187f4670eeeeb6c775bb544f0ae0b42146f1550",
+      "size": 18500,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/d187f4670eeeeb6c775bb544f0ae0b42146f1550"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/hdmitopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0e8a2d80dd83fec7abe459e7ceaed9044fcd3b7",
+      "size": 2142,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a0e8a2d80dd83fec7abe459e7ceaed9044fcd3b7"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/hdmitoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c360d7984af3134aae2c57f4fd4731b4f727b9b1",
+      "size": 7397,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/c360d7984af3134aae2c57f4fd4731b4f727b9b1"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/hdmiwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd0f9236d0816bf076fbc46dab3d84e9dffd7d21",
+      "size": 31289,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/bd0f9236d0816bf076fbc46dab3d84e9dffd7d21"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micarray2toptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0c03a8395781088cf8285b0a564443f6091e6682",
+      "size": 7725,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0c03a8395781088cf8285b0a564443f6091e6682"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micarray2wavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1087d5eb0f6a7d4fe7eec5778b2547110296cc60",
+      "size": 30331,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1087d5eb0f6a7d4fe7eec5778b2547110296cc60"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micarray3toptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02a3d76e7025b3488d64d0fae569a5c07107dda0",
+      "size": 7720,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/02a3d76e7025b3488d64d0fae569a5c07107dda0"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micarray3wavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba2b0569fefe32865cb0fb7f6f3c98fb45d117b3",
+      "size": 13762,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ba2b0569fefe32865cb0fb7f6f3c98fb45d117b3"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micintopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4927a9b255d859b5b3b5b22be8ece8870398c390",
+      "size": 8000,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/4927a9b255d859b5b3b5b22be8ece8870398c390"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micintopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af4b8be2d90b29238ba8b5fa0cdb7e79c25aaa60",
+      "size": 360,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/af4b8be2d90b29238ba8b5fa0cdb7e79c25aaa60"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micintoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "329c2f2bb3363fdd7a629fbfc39706d6f931a52f",
+      "size": 8027,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/329c2f2bb3363fdd7a629fbfc39706d6f931a52f"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/micinwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "64acba00c0c6887f3b5b12538a2eb3d17c278495",
+      "size": 12362,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/64acba00c0c6887f3b5b12538a2eb3d17c278495"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/minipairs.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d00f5a549b8d92befb5df6bffdef92ea27c483a",
+      "size": 22725,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0d00f5a549b8d92befb5df6bffdef92ea27c483a"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/spdiftopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f715e41d7677d91c2e3a694dc65a64d08350abb6",
+      "size": 1899,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/f715e41d7677d91c2e3a694dc65a64d08350abb6"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/spdiftopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ffaefb5ccaf990cf45e194392389922640847d2c",
+      "size": 355,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/ffaefb5ccaf990cf45e194392389922640847d2c"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/spdiftoptable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e1376a8245353ae9da532b3dd98cf48abc89594",
+      "size": 5562,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/8e1376a8245353ae9da532b3dd98cf48abc89594"
+    },
+    {
+      "path": "audio/sysvad/TabletAudioSample/spdifwavtable.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd23799cd72cee0d2ed6dbd5d57f14379862327c",
+      "size": 24234,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/fd23799cd72cee0d2ed6dbd5d57f14379862327c"
+    },
+    {
+      "path": "audio/sysvad/ToneGenerator.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2ff7cbddb3ff8ca7a123dbbf74441f773322a813",
+      "size": 6971,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/2ff7cbddb3ff8ca7a123dbbf74441f773322a813"
+    },
+    {
+      "path": "audio/sysvad/ToneGenerator.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e364ccd4908bc3b66eb6c5e32afcbd4bbbe3c025",
+      "size": 1576,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e364ccd4908bc3b66eb6c5e32afcbd4bbbe3c025"
+    },
+    {
+      "path": "audio/sysvad/UnittestData.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8a342372548a2de40e11d7db66f6019b8e737f9",
+      "size": 445,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/e8a342372548a2de40e11d7db66f6019b8e737f9"
+    },
+    {
+      "path": "audio/sysvad/UsbHsDevice.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2b92bd9405080dc5792d919c7577c394a2f028ac",
+      "size": 136341,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/2b92bd9405080dc5792d919c7577c394a2f028ac"
+    },
+    {
+      "path": "audio/sysvad/UsbHsDevice.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d45fa7c9536eadc9c2ee008b22484db85167cc6",
+      "size": 21424,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/9d45fa7c9536eadc9c2ee008b22484db85167cc6"
+    },
+    {
+      "path": "audio/sysvad/adapter.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f44c593f0e636b5cd17d00aa1054c64caae6d6d",
+      "size": 36974,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/0f44c593f0e636b5cd17d00aa1054c64caae6d6d"
+    },
+    {
+      "path": "audio/sysvad/basetopo.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ceb414acd33c0506a753c7119fbcb883094eacf",
+      "size": 18307,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1ceb414acd33c0506a753c7119fbcb883094eacf"
+    },
+    {
+      "path": "audio/sysvad/basetopo.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "429c05eb326aad3b2a69120730d07fb068112b63",
+      "size": 2575,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/429c05eb326aad3b2a69120730d07fb068112b63"
+    },
+    {
+      "path": "audio/sysvad/common.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1334411e5243d66c3154ca8d4cdbff952e9ed02a",
+      "size": 144921,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1334411e5243d66c3154ca8d4cdbff952e9ed02a"
+    },
+    {
+      "path": "audio/sysvad/common.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17e8ebca54798d4053ed2ad163e2d550479379a0",
+      "size": 27685,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/17e8ebca54798d4053ed2ad163e2d550479379a0"
+    },
+    {
+      "path": "audio/sysvad/hw.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1666e14650bc1445fecaf00f28368be0bbbd4163",
+      "size": 7119,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/1666e14650bc1445fecaf00f28368be0bbbd4163"
+    },
+    {
+      "path": "audio/sysvad/hw.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cdfe4f7588f6c676ab9b2bcec1bba47f46b1cab0",
+      "size": 2999,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/cdfe4f7588f6c676ab9b2bcec1bba47f46b1cab0"
+    },
+    {
+      "path": "audio/sysvad/ihvprivatepropertyset.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d36454c45321a1c1869464a738dd21335a2df614",
+      "size": 619,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/d36454c45321a1c1869464a738dd21335a2df614"
+    },
+    {
+      "path": "audio/sysvad/kshelper.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5213426b9642ddab8f3ce3ef228ca9910748e2e",
+      "size": 25977,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/d5213426b9642ddab8f3ce3ef228ca9910748e2e"
+    },
+    {
+      "path": "audio/sysvad/kshelper.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8cc49566a14b5f928781f1094284fc2d0808d4c",
+      "size": 5807,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a8cc49566a14b5f928781f1094284fc2d0808d4c"
+    },
+    {
+      "path": "audio/sysvad/savedata.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39789f3b9386164e7faa471f4c267cf62a42377d",
+      "size": 28566,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/39789f3b9386164e7faa471f4c267cf62a42377d"
+    },
+    {
+      "path": "audio/sysvad/savedata.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "942210251cf00ddf83aa755c8f15049eca6e323e",
+      "size": 5207,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/942210251cf00ddf83aa755c8f15049eca6e323e"
+    },
+    {
+      "path": "audio/sysvad/sysvad.h",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3cc555ce348dcd0af782bc35e92f426bc0b5011",
+      "size": 6958,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/a3cc555ce348dcd0af782bc35e92f426bc0b5011"
+    },
+    {
+      "path": "audio/sysvad/sysvad.sln",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ee722a7debee8818dccfb1d06d0e40f2d3a7529",
+      "size": 8350,
+      "url": "https://api.github.com/repos/microsoft/Windows-driver-samples/git/blobs/8ee722a7debee8818dccfb1d06d0e40f2d3a7529"
+    }
+  ]
+}

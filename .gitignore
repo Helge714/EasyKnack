@@ -1,0 +1,24 @@
+/target/
+*.log
+
+# Native build output and local IDE caches
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake-build-*/
+.vs/
+*.obj
+*.pdb
+*.ilk
+*.class
+*.exe
+*.dll
+
+# Local credentials and operating-system files
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+Thumbs.db
+.DS_Store

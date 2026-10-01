@@ -1,0 +1,22 @@
+[
+  {
+    "Hash": "4025C5F133C6A6554AD48D4E89DFD619B4CD85B7685E716489ECE0D8494F6660",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\GraphRuntime.hpp"
+  },
+  {
+    "Hash": "CCBBE333E876DFAEAD0D96A8330EB55D361808ABA688C9D85382A42D9E366C90",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\MathNode.hpp"
+  },
+  {
+    "Hash": "261416ACCC001DF08C0EC73918F855845E23495670029D5D9EDCC015B1769786",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\native\\audio-host\\src\\nodes\\FilterNode.hpp"
+  },
+  {
+    "Hash": "F44FF4AFBC428DB4BE1A29B6D709343EA8D1ED38EA63C72635175350A651F6EE",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\src\\main\\java\\com\\vin\\easyknack\\ui\\GroupSourceExporter.java"
+  },
+  {
+    "Hash": "227B8F63DB1157046CD228E4C1E9B4400B6708F78435AC259DDCC616F60BF113",
+    "Path": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\reference-v1\\references.exe"
+  }
+]

@@ -1,0 +1,499 @@
+# EasyKnack Event-Rate Refactor
+
+## Goal
+
+Replace the current scalar/event execution model with a sparse per-block event representation.
+
+Current behavior appears to treat EventRate largely as scalar processing (`bufferSize == 1`) and/or separate node evaluations.
+
+Target behavior:
+
+```text
+AudioRate   -> dense float buffer per block
+ControlRate -> one/few values per block
+EventRate   -> sparse list of {sampleOffset, value}
+```
+
+Events must remain sample-accurate within the current audio block.
+
+Do not change the external node semantics unnecessarily.
+
+---
+
+## Core Event Representation
+
+Introduce a realtime-safe event type:
+
+```cpp
+struct ValueEvent {
+    std::uint32_t sampleOffset;
+    float value;
+};
+```
+
+Introduce a fixed-capacity or preallocated event buffer:
+
+```cpp
+struct EventBuffer {
+    ValueEvent* events;
+    std::uint32_t count;
+    std::uint32_t capacity;
+};
+```
+
+Requirements:
+
+* no heap allocation in the audio thread
+* deterministic maximum capacity
+* events sorted by `sampleOffset`
+* offsets must satisfy `0 <= offset < blockSize`
+* overflow must be handled safely
+* no exceptions in realtime processing
+
+A fixed-capacity implementation is acceptable initially.
+
+---
+
+## Event Buffer Semantics
+
+An EventRate value only exists when it changes or explicitly emits an event.
+
+Example for a 256-sample block:
+
+```text
+[
+    {17,  1.0},
+    {128, 0.5},
+    {241, 0.0}
+]
+```
+
+Do NOT represent this as a dense 256-float buffer filled mostly with unchanged values.
+
+---
+
+## ProcessContext
+
+Extend or refactor `ProcessContext` so nodes can access inputs according to their processing representation.
+
+Conceptually:
+
+```cpp
+struct ProcessContext {
+    std::size_t bufferSize;
+    double sampleRate;
+
+    const float* audioInput(std::size_t port) const noexcept;
+    const EventBuffer& eventInput(std::size_t port) const noexcept;
+
+    float* audioOutput;
+    EventBuffer* eventOutput;
+};
+```
+
+The exact API should fit the existing engine architecture.
+
+Do not expose platform-specific audio APIs here.
+
+---
+
+## Event Source Information
+
+A node must be able to determine which input produced an event.
+
+This is required for nodes such as:
+
+* Sample & Hold
+* Reset
+* Counter
+* Sequencer
+* Envelope
+* Toggle
+* Clock sync
+
+Possible designs:
+
+```cpp
+struct ValueEvent {
+    std::uint32_t sampleOffset;
+    float value;
+    std::uint16_t sourcePort;
+};
+```
+
+or separate event buffers per input port.
+
+Prefer separate per-port event buffers if that fits the existing graph architecture cleanly.
+
+Do not collapse all events into one stream if that makes source-port identity ambiguous.
+
+---
+
+## Event Nodes Execute Once Per Block
+
+EventRate nodes should normally be processed once per audio block, not once per event.
+
+Example:
+
+```text
+block starts
+    |
+    v
+Node receives sparse event buffers
+    |
+    v
+Node processes all events in sample order
+    |
+    v
+Node emits sparse output events
+```
+
+Avoid repeated scheduler dispatch for every event unless a specific architecture requires it.
+
+---
+
+## Event Ordering
+
+When multiple events occur in one block:
+
+* process them in increasing `sampleOffset`
+* preserve deterministic behavior
+* define behavior for multiple events at the same sample
+
+Initial rule:
+
+```text
+same sample + same port:
+process in insertion order
+```
+
+If the system later wants "last value wins", make that explicit.
+
+---
+
+## Audio + Event Interaction
+
+Nodes must be able to sample an AudioRate input at an event position.
+
+Example Sample & Hold:
+
+```cpp
+for (const auto& trigger : triggerEvents) {
+    heldValue = audioInput[trigger.sampleOffset];
+    outputEvents.push(trigger.sampleOffset, heldValue);
+}
+```
+
+This is a primary use case and should be efficient.
+
+Do not force AudioRate input buffers to be converted to EventRate first.
+
+---
+
+## Control + Event Interaction
+
+If an EventRate node reads a ControlRate input:
+
+* use the currently valid control value at the event position
+* avoid creating redundant event streams solely for unchanged controls
+
+---
+
+## Event Output State
+
+Define whether EventRate output means:
+
+1. isolated impulses/events only, or
+2. value changes that remain active until the next event
+
+Recommended model:
+
+```text
+EventRate represents value changes over time.
+```
+
+Example:
+
+```text
+{17, 0.2}
+{80, 0.7}
+```
+
+means:
+
+```text
+samples 0..16   -> previous value
+samples 17..79  -> 0.2
+samples 80..end -> 0.7
+```
+
+Nodes that require impulses can emit explicit pulse events.
+
+Keep the distinction documented.
+
+---
+
+## Event-to-Audio Conversion
+
+Provide an explicit conversion path when an EventRate signal feeds an AudioRate consumer.
+
+The engine may expand sparse events into a dense buffer using the held-value semantics.
+
+Example:
+
+```text
+events:
+{3, 1.0}
+{7, 0.0}
+
+audio:
+0 0 0 1 1 1 1 0 0 ...
+```
+
+Do not make every EventRate node generate dense buffers internally.
+
+---
+
+## Audio-to-Event Conversion
+
+Do not automatically convert arbitrary AudioRate signals to EventRate unless the node semantics explicitly define a detector.
+
+Examples that may produce EventRate:
+
+* threshold crossing
+* edge detector
+* comparator
+* trigger detector
+
+A generic AudioRate signal is not automatically an EventRate signal.
+
+---
+
+## Sample & Hold Migration
+
+Current Sample & Hold behavior:
+
+* AudioRate: rising-edge detection per sample
+* ControlRate: rising-edge detection per control evaluation
+* EventRate: currently limited by scalar execution
+
+Target EventRate behavior:
+
+```text
+In      -> Audio/Control/Value source
+Trigger -> EventRate input
+Out     -> EventRate or held Value output
+```
+
+For each trigger event:
+
+1. obtain input value at `sampleOffset`
+2. update held state
+3. emit output event at the same `sampleOffset`
+
+Do not sample when unrelated input events occur.
+
+---
+
+## Clock Migration
+
+Current ClockNode may initially run using the existing EventRate implementation.
+
+Later migrate it so it generates events inside the current block.
+
+Target behavior:
+
+```cpp
+while (nextTriggerSample < blockEnd) {
+    outputEvents.push({
+        offsetWithinBlock,
+        1.0f
+    });
+
+    advanceToNextTrigger();
+}
+```
+
+A slow clock should generate almost no work between triggers.
+
+No dense zero-filled audio buffer should be necessary in EventRate mode.
+
+---
+
+## Clock Synchronization
+
+Clock sync/reset inputs must remain sample-accurate.
+
+If a sync event occurs at offset `N`:
+
+* reset clock phase at sample `N`
+* any subsequent generated clock events in the same block must use the new phase
+* ordering between sync events and generated ticks must be deterministic
+
+---
+
+## Realtime Memory Management
+
+Do not use:
+
+* `std::vector::push_back()` if it can allocate
+* dynamic allocation
+* blocking locks
+* Java callbacks
+* logging in the realtime path
+
+Use:
+
+* fixed-capacity buffers
+* preallocated pools
+* spans/views
+* deterministic overflow handling
+
+---
+
+## Capacity / Overflow
+
+Define a maximum event count per block.
+
+For example:
+
+```cpp
+constexpr std::size_t MaxEventsPerPort = 256;
+```
+
+If exceeded:
+
+* do not crash
+* record an overflow counter outside the realtime path if possible
+* drop excess events deterministically
+
+Later this can be tuned based on actual workloads.
+
+---
+
+## Graph Scheduling
+
+Avoid waking EventRate subgraphs when there are no relevant events.
+
+Desired behavior:
+
+```text
+Clock -> SampleHold -> Counter -> Sequencer
+```
+
+If the current block contains no Clock event:
+
+```text
+the EventRate subgraph performs little or no processing
+```
+
+This is one of the main performance goals.
+
+---
+
+## Processing Rate Conversions
+
+Keep conversions explicit and centralized.
+
+Required paths:
+
+```text
+Audio -> Audio
+Control -> Control
+Event -> Event
+
+Control -> Audio
+Event -> Audio
+Control -> Event (only where meaningful)
+```
+
+Avoid hidden conversions scattered across nodes.
+
+---
+
+## Tests
+
+Add tests for:
+
+### Basic event buffer
+
+* insertion
+* ordering
+* capacity
+* invalid offsets
+* same-sample events
+
+### Event timing
+
+* exact sample offset preservation
+* block boundary events
+* event at offset 0
+* event at offset blockSize - 1
+
+### Sample & Hold
+
+* only trigger events sample input
+* audio input sampled at correct offset
+* multiple triggers inside one block
+* held value survives block boundaries
+
+### Clock
+
+* correct number of events
+* correct sample offsets
+* phase continuity between blocks
+* sync/reset inside a block
+
+### Event -> Audio conversion
+
+* correct held-value expansion
+* event at offset 0
+* multiple events in one block
+
+### Realtime safety
+
+* no allocation during processing where practical to test
+
+---
+
+## Migration Strategy
+
+Do not rewrite the whole engine at once.
+
+Preferred order:
+
+1. Introduce `ValueEvent`.
+2. Introduce realtime-safe `EventBuffer`.
+3. Add event-buffer support to `ProcessContext`.
+4. Preserve current EventRate behavior temporarily.
+5. Add explicit event inputs/outputs.
+6. Migrate Sample & Hold.
+7. Migrate Clock.
+8. Add Event -> Audio expansion.
+9. Migrate other EventRate-capable nodes.
+10. Remove old scalar EventRate execution only after all nodes are migrated.
+
+Existing AudioRate and ControlRate behavior must remain working during migration.
+
+---
+
+## Important Architectural Rule
+
+EventRate is not "a slower AudioRate".
+
+It is a sparse representation of discrete value changes with sample-accurate offsets inside an audio block.
+
+Target representation:
+
+```text
+AudioRate:
+float[blockSize]
+
+ControlRate:
+float
+
+EventRate:
+ValueEvent[]
+```
+
+Keep those three concepts distinct throughout the engine.

@@ -1,0 +1,37 @@
+package com.vin.easyknack.nodes;
+
+@RegisterNode(id="easyknack.analysis.spectrum",title="FFT",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+public final class SpectrumNode extends BasicNode {
+    @Override public NodeState normalizeState(NodeState state){
+        var value=state.values().get("overlap");
+        if(value!=null&&value.toJavaValue() instanceof String old){
+            double overlap=switch(old){case "none"->0;case "half"->.5;case "threequarters"->.75;default->throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown legacy overlap: ")+old);};
+            var values=new java.util.HashMap<>(state.values());values.put("overlap",com.vingame.glswing.node.model.GLNodeValue.of(overlap));
+            return new NodeState(values,state.connectedInputs());
+        }
+        return state;
+    }
+    @Override public String encode(NodeState state,java.util.function.ToIntFunction<PropertyId> input){return super.encode(normalizeState(state),input);}
+    public static final PropertyId IN=new PropertyId("audio-in"),OUT=new PropertyId("analysis"),
+        SIZE=new PropertyId("size"),WINDOW=new PropertyId("window"),OVERLAP=new PropertyId("overlap"),CHANNEL=new PropertyId("channel"),PADDING=new PropertyId("padding"),REMOVE_DC=new PropertyId("remove-dc"),SYNC=new PropertyId("synchronous");
+    public void define(NodeBuilder n,NodeState s){
+        n.addOutput(OUT,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL)
+            .tooltip(com.vin.easyknack.ui.AppText.literal("Complex spectrum for analysis, bin processing and IFFT. Every frame retains its original sample position."));
+        n.addInput(IN,"Audio In").rates(PortRates.AUDIO_CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("Audio is collected in an internal buffer. All preserves stereo channels and voices; Left, Right and Mix sum voices."));
+        n.addEditor(SYNC,"Synchronous",Editor.checkBox(true)).tooltip(com.vin.easyknack.ui.AppText.literal("Enabled: compute every frame in the audio path. Disabled: background analysis may deliver late or missing frames; IFFT remains allowed but can produce gaps or artifacts."));
+        n.addEditor(SIZE,"Window size",Editor.comboBox(java.util.List.of("256","512","1024","2048","4096","8192"),"2048",v->v))
+            .tooltip(com.vin.easyknack.ui.AppText.literal("Samples per FFT window. A larger window improves frequency separation but covers a longer period of time. Changing this setting resets the analysis."));
+        n.addEditor(WINDOW,"Window",Editor.comboBox(java.util.List.of("Hann","Hamming","Blackman","Rectangular"),"Hann",v->v.toLowerCase(java.util.Locale.ROOT)));
+        n.addEditor(PADDING,"Zero padding",Editor.comboBox(java.util.List.of("None","Linear correlation (2x)"),"None",v->v.equals("None")?"none":"double"))
+            .tooltip(com.vin.easyknack.ui.AppText.literal("2x pads the window with zeros for linear autocorrelation. It interpolates the spectrum but does not improve frequency resolution. For pitch analysis, use a Rectangular window and 2x padding."));
+        n.addEditor(REMOVE_DC,"Remove DC",Editor.checkBox(false)).tooltip(com.vin.easyknack.ui.AppText.literal("Subtract the input window mean before windowing. Enable for the former DC-centered autocorrelation behavior."));
+        int size=Integer.parseInt(s.text(SIZE,"2048"));
+        int hop=Math.max(s.flag(SYNC,true)?64:1,(int)Math.round(size*(1-s.number(OVERLAP,.75))));
+        n.addEditor(OVERLAP,"Overlap",Editor.Slider.bar(.75,0,1).step(.001).formats(UnitFormats.PROPORTION))
+            .tooltip(com.vin.easyknack.ui.AppText.literal("Window overlap: 0–1 (or percent). Rounded to a whole-sample hop, minimum one sample. Current hop: ")+hop+com.vin.easyknack.ui.AppText.literal(" samples. High overlap increases processing cost. Synchronous processing uses at least 64 samples per hop. A busy asynchronous worker may skip frames."));
+        n.addEditor(CHANNEL,"Channel",Editor.comboBox(java.util.List.of("All","Left","Right","Mix"),"All",v->v.toLowerCase(java.util.Locale.ROOT)))
+            .tooltip(com.vin.easyknack.ui.AppText.literal("All preserves stereo and polyphony for IFFT. Mix analyzes (Left + Right) / 2. Mono keeps its level; opposite-phase channels cancel. Polyphonic voices are summed."));
+    }
+    public NativeProcessor processor(){return new NativeProcessor("spectrum","nodes/SpectrumNode.hpp",ParameterContract.builder()
+        .source(IN).value(SIZE).value(WINDOW).value(OVERLAP).value(CHANNEL).value(PADDING).value(REMOVE_DC).value(SYNC).build());}
+}
