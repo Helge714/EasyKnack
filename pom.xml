@@ -53,6 +53,13 @@
         </arguments></configuration>
       </execution><execution><id>generate-native-contracts</id><phase>process-classes</phase><goals><goal>java</goal></goals>
         <configuration><mainClass>com.vin.easyknack.nodes.NativeContractGenerator</mainClass></configuration>
+      </execution><execution><id>package-build-identity</id><phase>prepare-package</phase><goals><goal>exec</goal></goals>
+        <configuration><executable>${java.home}/bin/java</executable><arguments>
+          <argument>${project.basedir}/scripts/BuildMetadata.java</argument>
+          <argument>${project.basedir}</argument>
+          <argument>${project.build.outputDirectory}/META-INF/easyknack/build.properties</argument>
+          <argument>${project.version}</argument><argument>${project.artifactId}</argument>
+        </arguments></configuration>
       </execution></executions>
     </plugin>
   </plugins></build>

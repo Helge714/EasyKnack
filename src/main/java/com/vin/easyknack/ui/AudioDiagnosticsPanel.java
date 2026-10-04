@@ -43,7 +43,7 @@ final class AudioDiagnosticsPanel extends GLContainer {
     private void saveReport(){
         var host=com.vin.easyknack.plugins.PluginManager.activeHost();
         var executable=AudioHostClient.defaultExecutable();
-        String metadata="# application="+Optional.ofNullable(AudioDiagnosticsPanel.class.getPackage().getImplementationVersion()).orElse("0.0.1-SNAPSHOT / development")+"\n# plugin_build="+(host==null?"builtin":host.getParent().getFileName())+"\n";
+        String metadata="# application="+com.vin.easyknack.BuildInfo.application().display()+"\n# core="+com.vin.easyknack.BuildInfo.core().display()+"\n# plugin_build="+(host==null?"builtin":host.getParent().getFileName())+"\n";
         String report=metadata+history.report(state.name());
         var request=GLFileDialogRequest.save().title(text("save","Save report…")).filter(com.vin.easyknack.ui.AppText.literal("CSV report"),"csv").suggestedFileName("easyknack-diagnostics.csv").build();
         new RememberingFileDialogs().show(request,this).whenComplete((choice,error)->javax.swing.SwingUtilities.invokeLater(()->{
