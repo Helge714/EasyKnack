@@ -1,5 +1,22 @@
 # Windows packaging (developer guide)
 
+Double-click **Build-Installer.bat** in the repository root to build an EXE
+installer from the current sources, including tests and the native host. The
+console stays open on success or failure; on success the output folder opens.
+Each build uses a new folder under `target/distribution` and includes the shortcut
+selection dialog. Native compilation and installer compression can take several
+minutes; detailed logs are referenced by the build scripts.
+
+The launcher detects PowerShell 7, a JDK from `JAVA_HOME`, PATH or `~/.jdks`,
+LLVM-MinGW and WiX from `target/tools`, and Maven from PATH or the local Eclipse
+Maven runtime. It does not download tools. GLSwing must already be available as
+the required external Maven dependency. Tool locations can be overridden:
+
+```bat
+Build-Installer.bat -JdkHome "C:\tools\jdk-25" -Toolchain "C:\tools\llvm-mingw" -WixDirectory "C:\tools\wix" -Maven "C:\tools\maven\bin\mvn.cmd"
+Build-Installer.bat -CheckTools
+```
+
 Build a self-contained Windows x64 application folder:
 
 ```powershell
