@@ -1,5 +1,11 @@
 # Später
 
+## Core / application ownership
+
+- Architecture classification and ordered extraction backlog: [Core boundary audit](docs/CORE-BOUNDARY.md).
+- Export geometry has moved to GLSwing; label reuse, image capture/encoding,
+  remembered dialogs and neutral group-editor capabilities remain separate follow-ups.
+
 ## Automatische Build-Kennung und Versionspflege
 
 Dauerhafte Arbeitsregeln: [AGENTS.md](AGENTS.md). Core und EasyKnack unabhängig
