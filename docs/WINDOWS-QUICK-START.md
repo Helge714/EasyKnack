@@ -1,5 +1,8 @@
 # EasyKnack for Windows
 
+When using the installer, choose independently whether to create a desktop shortcut
+and a Start Menu entry. Neither shortcut is required to use EasyKnack.
+
 Open **EasyKnack.exe** in the EasyKnack folder. Java and the tools needed for
 Formula, Bake and plugins are included; no separate installation is necessary.
 

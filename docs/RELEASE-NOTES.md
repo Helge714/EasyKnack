@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Windows EXE/MSI installers let users choose desktop and Start Menu shortcuts independently.
+
 - Added a self-contained Windows app-image build with bundled Java/C++ tools,
   native audio host and media support. Installed host/tool discovery no longer
   depends on the working directory. No document, plugin ABI or protocol change.

@@ -26,7 +26,8 @@ does not trigger compilation at startup. Existing source plugins may need a
 one-time rebuild after upgrading the application or relocating its compiler.
 
 `-Type exe` or `-Type msi` additionally invokes jpackage's per-user installer
-backend. It requires a WiX version supported by the selected JDK on the build
+backend. Both installer formats offer independent checkboxes for a desktop shortcut
+and a Start Menu entry. It requires a WiX version supported by the selected JDK on the build
 machine. Failure to build an installer leaves the portable image intact. Signing,
 an application icon, file associations and release/update testing remain separate
 release work; this local build does not declare a release.
