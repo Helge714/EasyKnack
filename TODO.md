@@ -34,30 +34,36 @@ Release pflegen, nicht pro Kompilierung erhöhen.
 
 ## Eigenständig nutzbare Windows-Auslieferung
 
+Stand: Pakettests mit gebündelter Laufzeit und eingeschränktem PATH bestehen
+(Host, MP3, Formula, Gruppenexport/Plugin-Build, Cache-Neustart, Dokumente und
+EXE-Fenster). Keine Abnahme auf einer frischen Windows-Installation.
+
 Ziel: Installieren und `EasyKnack.exe` starten, ohne Java, Maven, Eclipse oder
 Compiler manuell einzurichten. Zuerst einen portablen Anwendungsordner prüfen,
 danach einen EXE-/MSI-Installer mit `jpackage` erstellen. Die Launcher-EXE darf
 zugehörige Laufzeitdateien im Paket benötigen; keine einzelne Monolith-Datei nötig.
 
-- [ ] Reproduzierbaren Release-Build ergänzen: EasyKnack, externe GLSwing-JAR,
+- [x] Lokalen Windows-Paket-Build ergänzen: EasyKnack, externe GLSwing-JAR,
   passende Java-Laufzeit, vorgebauter Audiohost, native Grafik-/Audio-/Medienbibliotheken,
   Plugin-SDK, Themes, Sprachen und Beispiele vollständig bündeln.
-- [ ] Bake, Formula und Quellcode-Plugins ohne Entwicklungsinstallation ermöglichen:
+- [x] Bake, Formula und Quellcode-Plugins ohne Entwicklungsinstallation ermöglichen:
   passende C++-Toolchain einschließlich benötigter Header, Linker und Bibliotheken
   sowie Java-Compiler-Unterstützung mitliefern. Der aktuelle Plugin-Build erwartet
   `javac.exe`; eine reine Minimal-Java-Laufzeit genügt dafür nicht unverändert.
-- [ ] Toolchain und Ressourcen relativ zur Installation finden; Abhängigkeiten von
+- [x] Toolchain und Ressourcen relativ zur Installation finden; Abhängigkeiten von
   `target/tools`, Eclipse, lokalem Maven-Cache, PATH und aktuellem Arbeitsverzeichnis
   beseitigen. Start aus Pfaden mit Leerzeichen und Nicht-ASCII-Zeichen prüfen.
 - [ ] Schreibgeschützte Installation unterstützen: Einstellungen, Plugins, temporäre
   Builds und versionierte Caches im Benutzerverzeichnis speichern. Updates dürfen
   Nutzerdaten nicht überschreiben; inkompatible Caches zuverlässig invalidieren.
-- [ ] Normalstart mit vorgebautem Host ohne Kompilierung sicherstellen. Nur bei
+- [x] Normalstart mit vorgebautem Host ohne Kompilierung sicherstellen. Nur bei
   tatsächlichem Bedarf für Plugins, Bake oder Formula kompilieren; Fortschritt und
   Fehler verständlich anzeigen. Funktionierende Builds bei Fehlern erhalten.
-- [ ] Portables Windows-Paket mit `jpackage --type app-image` erstellen und testen;
-  anschließend Installer, Icon, Version, Startmenü, Deinstallation und optionale
-  `.knack`-Dateizuordnung ergänzen. Erneute Installation und Updates prüfen.
+- [x] Portables Windows-Paket mit `jpackage --type app-image` erstellen und testen.
+  Build und isolierte Prüfungen: [Windows packaging](docs/WINDOWS-PACKAGE.md).
+- [ ] Installer auf sauberem Windows installieren/deinstallieren, Updates prüfen;
+  eigenes Icon, Signierung und optionale `.knack`-Dateizuordnung ergänzen.
+  EXE-/MSI-Buildskripte mit Version aus Maven und Startmenü sind vorbereitet.
 - [ ] Lizenz-/Weitergabeanforderungen der gebündelten Laufzeit, Toolchain und
   Bibliotheken prüfen und erforderliche Lizenztexte/Quellcodehinweise beilegen.
 - [ ] Abnahme auf sauberem Windows ohne JDK, Maven oder C++-Werkzeuge: Start,

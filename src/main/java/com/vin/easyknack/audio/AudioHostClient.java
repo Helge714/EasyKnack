@@ -58,13 +58,7 @@ public final class AudioHostClient implements AutoCloseable {
         if(pluginHost!=null)return pluginHost;
         String configured = System.getProperty("easyknack.audio.host");
         if (configured != null) return Path.of(configured);
-        try {
-            Path code = Path.of(AudioHostClient.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            Path base = code.getParent();
-            Path packaged = base.resolve("native/easyknack-audio-host.exe");
-            if (Files.isRegularFile(packaged)) return packaged;
-        } catch (Exception ignored) { /* Development fallback below. */ }
-        return Path.of("target/native/easyknack-audio-host.exe");
+        return com.vin.easyknack.InstallationPaths.audioHost();
     }
 
     @Override public void close() {

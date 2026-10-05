@@ -215,8 +215,7 @@ public final class PluginManager {
     private static String compiler(Properties configuration) throws IOException {
         String configured = System.getProperty("easyknack.plugin.cxx", configuration.getProperty("cxx"));
         if (configured != null && !configured.isBlank()) return configured;
-        var roots=new ArrayList<>(List.of(Path.of("tools"),Path.of("target/tools")));
-        try{roots.add(Path.of(PluginManager.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent().resolve("tools"));}catch(Exception ignored){}
+        var roots=com.vin.easyknack.InstallationPaths.compilerRoots();
         for (Path root : roots) if (Files.isDirectory(root))
             try (var paths = Files.walk(root, 4)) {
                 var found = paths.filter(p -> p.getFileName().toString().equalsIgnoreCase("clang++.exe")).sorted().findFirst();

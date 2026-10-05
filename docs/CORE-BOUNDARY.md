@@ -84,8 +84,10 @@ The complete Core run exposed seven failures in the existing baseline: six
 `MavenSmokeTest` cases (controls, configuration editors, localization/themes,
 lists, menus and theme-code support), plus
 `GLNodeInsertionTest.exclusionReconnectsAndOnlyClosesSimpleChains`. Running the failed cases with the pre-refactor `GLLabel` in an
-isolated test classpath reproduces the same seven failures. These remain separate
-Core test debt; the refactor must not be reported as an all-green Core suite.
+isolated test classpath reproduces the same seven failures. The packaging follow-up
+resolved this debt: obsolete theme constants and preset names were corrected in
+the tests, and missing reference-dash schema entries were added. The complete Core
+run now passes: 116 passed, one optional GL test skipped (117 total).
 
 ## Version and compatibility assessment
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a self-contained Windows app-image build with bundled Java/C++ tools,
+  native audio host and media support. Installed host/tool discovery no longer
+  depends on the working directory. No document, plugin ABI or protocol change.
+
 - Shared UI/export and group-authoring infrastructure now comes from GLSwing.
   Dialogs remember folders by stable purpose across language changes; directory
   selections remember the selected folder. Existing group/template documents remain compatible.
