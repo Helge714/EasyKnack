@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Audio File player
 
 The Audio File node is under **Input / Output**. Connect Audio Out to an output or

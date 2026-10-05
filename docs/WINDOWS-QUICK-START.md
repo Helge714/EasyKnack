@@ -1,28 +1,64 @@
 # EasyKnack for Windows
 
-When using the installer, choose independently whether to create a desktop shortcut
-and a Start Menu entry. Neither shortcut is required to use EasyKnack.
+## Install or open
 
-The installer registers EasyKnack for `.knack` documents. Double-click a document
-to open it; if Windows asks which app to use, select EasyKnack. An existing
-EasyKnack window receives the document, including requests made while it starts.
-Unsaved changes still prompt you to save, discard or cancel before switching.
+Run the installer and choose the installation folder. Desktop and Start Menu
+shortcuts are independently selectable. Alternatively, open `EasyKnack.exe` in
+the portable application folder. Keep that entire folder together; copying only
+the EXE is not sufficient.
 
-Open **EasyKnack.exe** in the EasyKnack folder. Java and the tools needed for
-Formula, Bake and plugins are included; no separate installation is necessary.
+Java, the audio host, media decoding and the tools for Formula, Bake and source
+plugins are included in packaged builds. No separate Java or compiler installation
+is needed. These development builds are unsigned.
 
-Keep the entire folder together when moving or copying the application.
-Do not copy just the EXE. Documents can be saved anywhere you choose.
+The installer registers `.knack` documents. Double-click one to open it; if Windows
+asks which application to use, select EasyKnack. An existing EasyKnack window
+receives the document, including requests made during startup. Unsaved changes
+are checked before switching documents.
 
-Select an output device in the Audio Out node before starting audio. Capturing
-system or application audio may require a separately installed virtual audio
-routing tool; no virtual audio driver is installed by this package.
+## Make your first sound
 
-Examples are available from the application's example menu. Your examples,
-settings and plugins are stored in your user profile and are not removed when
-you replace the application folder. Allow the progress display to finish when
-installing a source plugin or baking a group for the first time.
+1. Choose **File → New**. This creates an Oscillator connected to Audio Output.
+2. In **Audio Output**, choose your physical speakers or headphones. Start with a
+   low device volume: the initial graph generates a continuous tone.
+3. Choose **Audio → Start**. Change the Oscillator's **Frequency** to hear the result.
+4. Choose **Audio → Stop** when finished.
+5. Choose **File → Save**, select a location and save a `.knack` document.
 
-This is an unsigned development build for testing. To update, close EasyKnack,
-extract the new application into a separate folder and start its EasyKnack.exe.
-Keep the previous folder until you have verified your documents in the new build.
+Add a **Gain** node between the Oscillator and Audio Output to adjust the signal
+level within the graph. The output's **Device volume** controls the Windows device
+and can affect other applications using it.
+
+## Start building
+
+Use **Nodes → Add Node** to find a node. Drag an output port to a compatible input
+port to connect it. An unconnected numeric input uses its editor value; a connected
+input uses its incoming signal. Select a node to see its properties in the Inspector.
+
+**File → Examples** opens editable example documents. **Settings → Preferences**
+changes the interface language and theme immediately. This guide uses English UI names.
+
+## If you hear nothing
+
+- Check that Audio is started and the nodes are connected.
+- Verify the selected output device, its Windows volume and its mute state.
+- Check that relevant nodes are not muted. Read the status line and graph warnings.
+- After connecting a device, refresh devices in the Audio menu and select it again.
+- A virtual cable is not a speaker. To listen through it, route its receiving side
+  into EasyKnack and send the result to a physical output.
+
+See [audio routing](user/audio.md) for microphones, system audio and virtual devices.
+Capturing system or application audio does not, by itself, silence the original output.
+
+## Keep your work
+
+Save documents wherever you choose. Examples normally live in
+`%USERPROFILE%/Documents/EasyKnack/Beispiele`; plugins and media caches use
+`%USERPROFILE%/.easyknack`. Media files are not embedded in `.knack` documents.
+Keep the source audio files when moving or backing up a project.
+
+Close EasyKnack before replacing a portable installation or installing an update.
+Keep document backups while testing development builds.
+
+Continue with the [user guide](user/README.md), [node reference](user/nodes.md),
+or [known limitations](user/limitations.md).

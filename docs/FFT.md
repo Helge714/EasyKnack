@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # FFT and spectrum processing
 
 The palette contains one **FFT**, under **Spectral**. Its **Spectrum** output feeds

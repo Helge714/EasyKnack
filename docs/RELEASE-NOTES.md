@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Replaced the mixed-language README with an English quick start and linked user
+  guide, node reference and known limitations. Windows packages include the guide.
+  Developer and historical notes are separate; no runtime or document-format change.
+
 - Windows installers register .knack documents. File launches reuse the running
   application, queue during startup and preserve the unsaved-changes prompt.
   No document, plugin ABI or audio protocol change.

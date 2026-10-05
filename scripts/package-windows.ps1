@@ -65,6 +65,7 @@ try {
     Write-Host 'Bundling compiler, headers, libraries and license notices...'
     Copy-Item -LiteralPath $Toolchain -Destination "$inputDir/tools/llvm-mingw" -Recurse
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
+    Copy-Item -LiteralPath "$PSScriptRoot/../docs/user" -Destination "$inputDir/user" -Recurse
     @('format=1', "product.version=$version", "platform=windows-x86_64", 'toolchain=tools/llvm-mingw/bin/clang++.exe') | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     foreach ($library in Get-ChildItem -LiteralPath "$inputDir/lib" -Filter '*.jar') {

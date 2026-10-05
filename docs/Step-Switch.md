@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Step Switch
 
 Available under Routing. Starts on input 1 (Index 0). Set Steps to 1–32 directly in the node; unconnected inputs supply their slider values, so the same node works as a step sequencer.

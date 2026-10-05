@@ -74,27 +74,22 @@ zugehörige Laufzeitdateien im Paket benötigen; keine einzelne Monolith-Datei n
   virtuelle Audiogeräte-/Treiberinstallation wie VB-Cable ist nicht automatisch
   Bestandteil des Anwendungspakets.
 
-## Nutzerdokumentation grundlegend überarbeiten
+## User documentation
 
-- [ ] Die gesamte Nutzerdokumentation auf Englisch verfassen; Terminologie und
-  Beispiele durchgehend konsistent halten.
-- [ ] README und Nutzerdokumentation professionell und konsequent aus Sicht der
-  Anwender neu strukturieren: Einstieg, Installation/Start, grundlegende Bedienung,
-  typische Arbeitsabläufe und eine klar getrennte Referenz zum Nachschlagen.
-- [ ] Nur Informationen aufnehmen, die für die Nutzung relevant sind. Historische
-  Architekturentscheidungen, behobene Entwicklungsprobleme und interne
-  Implementierungsdetails aus den Nutzerseiten entfernen; weiterhin benötigte
-  Entwicklernotizen separat ablegen und nicht mit der Anleitung vermischen.
-- [ ] Allgemeine Anleitung unabhängig von Eclipse formulieren. IDE-/Build-Anweisungen
-  gehören in eine gesonderte Entwicklerdokumentation.
-- [ ] Zu spezielle Node-Details aus Einstieg und allgemeinen Anleitungen in eine
-  gezielt verlinkte Node-Referenz verschieben. Dort Zweck, Anschlüsse, Einstellungen
-  und nutzungsrelevante Grenzen erläutern, nicht die Entstehungsgeschichte.
-- [ ] Wichtiges priorisieren, Wiederholungen und überholte Aussagen entfernen,
-  Begriffe und Sprache vereinheitlichen; kurze, nachvollziehbare Beispiele verwenden.
-- [ ] Abnahme: Ein neuer Nutzer findet ohne Entwicklungswissen den Weg vom Start
-  zum ersten funktionierenden Graphen und kann Detailfragen gezielt nachschlagen.
-  Sämtliche beschriebenen Schritte mit dem aktuellen Programm prüfen.
+- [x] Replace the mixed README with an English, task-oriented entry point and
+  Windows quick start; separate source builds from packaged-user instructions.
+- [x] Add an English user guide covering workspace/documents, routing, groups,
+  Formula/plugins, analysis/export and a task-based node reference.
+- [x] State current portability and processing limitations separately. Check names
+  and workflows against current source instead of repeating superseded notes.
+- [x] Keep developer references and the former README in a clearly labelled
+  development/history area; retain existing technical notes and manual changes.
+- [x] Bundle the quick start and linked user guide in Windows packages.
+- [ ] Complete a first-time-user walkthrough in a freshly installed build:
+  first sound, save/reopen, routing, group creation and analysis export. Source
+  review and link checks do not replace this interactive acceptance test.
+
+Current guide: [User guide](docs/user/README.md).
 
 ## Wiedereinstieg: Core und Formula-Editor (02.10.2026)
 

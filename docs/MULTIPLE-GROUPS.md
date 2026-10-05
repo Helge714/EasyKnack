@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Instance Groups
 
 Choose **New Instance Group** under Routing in the Add menu. The initial graph is

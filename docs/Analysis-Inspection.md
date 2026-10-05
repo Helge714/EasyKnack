@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Analysis inspection
 
 Double-click an oscilloscope or analysis plot to open the large view. Escape returns to the node editor.

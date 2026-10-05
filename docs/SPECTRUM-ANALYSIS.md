@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Spectrum analysis
 
 New graphs use **Audio → FFT → Analysis Viewer / Spectrum Statistics**. No Buffer

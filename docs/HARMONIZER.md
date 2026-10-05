@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Harmonizer example
 
 Open **Datei > Harmonizer-Beispiel öffnen …**. Unsaved work uses the normal save/discard dialog. Audio stays stopped until started explicitly. The patch starts with a 660 Hz oscillator feeding a reusable Harmonizer group, targeting 440 Hz. Replace the oscillator with Audio Input for a live source. Double-click the group to inspect or modify it; copy it into other documents or export it through the existing plugin export.

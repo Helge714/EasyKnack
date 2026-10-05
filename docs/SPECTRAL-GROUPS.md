@@ -1,3 +1,6 @@
+> **Technical reference:** This page includes implementation details and may contain
+> historical behaviour. For current usage, start with the [English user guide](user/README.md).
+
 # Spectral Groups: FFT-Werte und Audio pro Bin
 
 Eine Spectral Group verwendet die positiven Bins ihres Spectrum-Eingangs als
