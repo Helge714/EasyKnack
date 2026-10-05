@@ -1,11 +1,8 @@
 package com.vin.easyknack.ui;
 import java.awt.image.BufferedImage;
-import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
-import javax.imageio.ImageIO;
-import com.jogamp.opengl.*;
 import com.vingame.glswing.component.*;
 import com.vingame.glswing.ui.*;
 import com.vingame.glswing.layout.GLConstraints;
@@ -67,7 +64,7 @@ final class GraphImageExport {
                 cancel.addActionListener(e->ref[0].close());
                 export.addActionListener(e->{
                     String extension=format.getSelectedItem().toLowerCase(Locale.ROOT);writing=true;export.setEnabled(false);
-                    dialogs.show(GLFileDialogRequest.save().title(AppText.text("image.export")).filter(format.getSelectedItem(),extension).suggestedFileName("Graph."+extension).build(),owner).whenComplete((choice,error)->java.awt.EventQueue.invokeLater(()->{
+                    dialogs.show("graph.image",GLFileDialogRequest.save().title(AppText.text("image.export")).filter(format.getSelectedItem(),extension).suggestedFileName("Graph."+extension).build(),owner).whenComplete((choice,error)->java.awt.EventQueue.invokeLater(()->{
                         if(closed)return;
                         if(error!=null||!choice.approved()){writing=false;sync();if(error!=null)message.setText(error.getMessage());return;}
                         try{
@@ -131,24 +128,12 @@ final class GraphImageExport {
     }
     static void write(BufferedImage image,String format,Path destination)throws java.io.IOException{write(image,format,destination,.9f);}
     static void write(BufferedImage image,String format,Path destination,float quality)throws java.io.IOException{
-        var target=destination.toAbsolutePath();var temp=Files.createTempFile(target.getParent(),".easyknack-image-",".tmp");
-        try{
-            try(var stream=Files.newOutputStream(temp)){encode(image,format,quality,stream);}
-            try{Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
-            catch(AtomicMoveNotSupportedException unavailable){Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING);}
-        }finally{Files.deleteIfExists(temp);}
+        try { GLImageExport.write(image,format,destination,quality); }
+        catch(GLImageExport.EncoderUnavailableException error){throw new java.io.IOException(AppText.text("image.encoder"),error);}
     }
     static void encode(BufferedImage image,String format,float quality,java.io.OutputStream output)throws java.io.IOException{
-        var writers=ImageIO.getImageWritersByFormatName(format);if(!writers.hasNext())throw new java.io.IOException(AppText.text("image.encoder"));
-        var writer=writers.next();
-        try(var stream=new javax.imageio.stream.MemoryCacheImageOutputStream(output)){
-            writer.setOutput(stream);var options=writer.getDefaultWriteParam();
-            if(format.equalsIgnoreCase("jpg")||format.equalsIgnoreCase("jpeg")){
-                if(!Float.isFinite(quality)||quality<.01f||quality>1)throw new IllegalArgumentException("JPEG quality must be between 0.01 and 1");
-                options.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);options.setCompressionQuality(quality);
-            }
-            writer.write(null,new javax.imageio.IIOImage(image,null,null),options);stream.flush();
-        }finally{writer.dispose();}
+        try { GLImageExport.encode(image,format,quality,output); }
+        catch(GLImageExport.EncoderUnavailableException error){throw new java.io.IOException(AppText.text("image.encoder"),error);}
     }
     static BufferedImage capturePixels(WorkspaceController source,Area area,int width,int height,double padding,boolean transparent){
         if(!ExportDimensions.valid(width,height)||!Double.isFinite(padding)||padding<0||padding*2>=Math.min(width,height))throw new IllegalArgumentException(AppText.text("image.limit"));
@@ -214,35 +199,12 @@ final class GraphImageExport {
         return renderPixels(view,width,height,w,h,transparent);
     }
     static BufferedImage renderPixels(GLContainer view,float width,float height,int w,int h,boolean transparent){
-        if(!ExportDimensions.valid(w,h))throw new IllegalArgumentException(AppText.text("image.limit"));
-        var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setDoubleBuffered(false);caps.setAlphaBits(8);
-        var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,1,1);
-        try{
-            drawable.display();
-            drawable.invoke(true,d->{
-                int[] texture=new int[1],buffer=new int[1];
-                d.getGL().glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE,texture,0);d.getGL().glGetIntegerv(GL.GL_MAX_RENDERBUFFER_SIZE,buffer,0);
-                int limit=Math.min(texture[0],buffer[0]);
-                if(w>limit||h>limit)throw new IllegalArgumentException(AppText.format("image.gpuLimit",limit));
-                return true;
-            });
-            drawable.setSurfaceSize(w,h);
-        }catch(RuntimeException|Error failure){drawable.destroy();throw failure;}
-        var result=new BufferedImage[1];
-        drawable.addGLEventListener(new GLEventListener(){
-            GLRenderer2D renderer;
-            public void init(GLAutoDrawable d){renderer=GLRenderer2D.create(d.getGL().getGL3());}
-            public void reshape(GLAutoDrawable d,int x,int y,int width,int height){}
-            public void dispose(GLAutoDrawable d){if(renderer!=null)renderer.dispose(d.getGL().getGL3());}
-            public void display(GLAutoDrawable d){
-                var gl=d.getGL().getGL3();gl.glViewport(0,0,w,h);gl.glClearColor(0,0,0,transparent?0:1);gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-                var context=renderer.beginFrame(gl,width,height,Projection2D.TOP_LEFT_PIXELS.create(width,height));
-                view.renderComponent(context);renderer.endFrame();
-                var pixels=ByteBuffer.allocateDirect(w*h*4);gl.glPixelStorei(GL.GL_PACK_ALIGNMENT,1);gl.glReadPixels(0,0,w,h,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE,pixels);
-                var image=new BufferedImage(w,h,transparent?BufferedImage.TYPE_INT_ARGB_PRE:BufferedImage.TYPE_INT_RGB);int[] data=new int[w*h];
-                for(int y=0;y<h;y++)for(int x=0;x<w;x++){int i=((h-y-1)*w+x)*4;data[y*w+x]=((pixels.get(i+3)&255)<<24)|((pixels.get(i)&255)<<16)|((pixels.get(i+1)&255)<<8)|(pixels.get(i+2)&255);}
-                image.getRaster().setDataElements(0,0,w,h,data);result[0]=image;
-            }
-        });try{drawable.display();return result[0];}finally{drawable.destroy();}
+        try { return GLComponentImageCapture.capture(view,width,height,w,h,transparent); }
+        catch (RuntimeException failure) {
+            for (Throwable cause=failure;cause!=null;cause=cause.getCause())
+                if(cause instanceof GLComponentImageCapture.SizeLimitException limit)
+                    throw new IllegalArgumentException(AppText.format("image.gpuLimit",limit.maximumSide()),failure);
+            throw failure;
+        }
     }
 }

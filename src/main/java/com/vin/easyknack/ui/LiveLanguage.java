@@ -15,7 +15,7 @@ final class LiveLanguage {
         else if(c instanceof GLSlider v){v.setText(AppText.translateExisting(v.getText()));refresh(v.getContextMenu(),seen);}
         else if(c instanceof GLMenuBarItem v){v.setText(AppText.translateExisting(v.getText()));refresh(v.getMenu(),seen);}
         else if(c instanceof GLMenuItem v){v.setText(AppText.translateExisting(v.getText()));if(v.getSubMenu()!=null)refresh(v.getSubMenu(),seen);}
-        if(c instanceof GLControl v)v.setToolTipText(AppText.translateExisting(v.getToolTipText()));
+        if(c instanceof GLToolTipTarget v)v.setToolTipText(AppText.translateExisting(v.getToolTipText()));
         for(var child:c.getGLChildren())refresh(child,seen);
     }
 }

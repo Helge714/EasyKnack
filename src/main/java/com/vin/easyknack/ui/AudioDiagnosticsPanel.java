@@ -46,7 +46,9 @@ final class AudioDiagnosticsPanel extends GLContainer {
         String metadata="# application="+com.vin.easyknack.BuildInfo.application().display()+"\n# core="+com.vin.easyknack.BuildInfo.core().display()+"\n# plugin_build="+(host==null?"builtin":host.getParent().getFileName())+"\n";
         String report=metadata+history.report(state.name());
         var request=GLFileDialogRequest.save().title(text("save","Save report…")).filter(com.vin.easyknack.ui.AppText.literal("CSV report"),"csv").suggestedFileName("easyknack-diagnostics.csv").build();
-        new RememberingFileDialogs().show(request,this).whenComplete((choice,error)->javax.swing.SwingUtilities.invokeLater(()->{
+        var files=new RememberingFileDialogs();
+        files.show("audio.diagnostics",request,this).whenComplete((choice,error)->javax.swing.SwingUtilities.invokeLater(()->{
+            files.close();
             if(error!=null){message=error.getMessage();refresh();return;}if(!choice.approved())return;
             java.util.concurrent.CompletableFuture.runAsync(()->{try{
                 String fingerprint="unavailable";

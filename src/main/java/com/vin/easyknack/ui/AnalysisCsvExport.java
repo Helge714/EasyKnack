@@ -37,7 +37,7 @@ final class AnalysisCsvExport {
     }
     private static void chooseFile(AnalysisChart.Snapshot snapshot,GLParent owner,Format format){
         var files=new RememberingFileDialogs();
-        files.show(GLFileDialogRequest.save().title(AppText.text("analysis.csv")).filter("CSV","csv").suggestedFileName("Analysis.csv").build(),owner)
+        files.show("analysis.csv",GLFileDialogRequest.save().title(AppText.text("analysis.csv")).filter("CSV","csv").suggestedFileName("Analysis.csv").build(),owner)
             .whenComplete((choice,error)->EventQueue.invokeLater(()->{
                 files.close();
                 if(error!=null){message(owner,error.getMessage());return;}

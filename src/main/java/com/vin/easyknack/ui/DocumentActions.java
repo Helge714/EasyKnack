@@ -75,7 +75,7 @@ final class DocumentActions implements AutoCloseable {
         var request = GLFileDialogRequest.open().title(com.vin.easyknack.ui.AppText.literal("Node-Dokument öffnen"))
                 .filter(com.vin.easyknack.ui.AppText.literal("EasyKnack (*.knack)"), "knack").filter(com.vin.easyknack.ui.AppText.literal("Ältere Node-Dokumente (*.glgraph)"), "glgraph");
         if (path != null) request.initialDirectory(path.getParent());
-        onUi(dialogs.show(request.build(), owner), (selection, failure) -> {
+        onUi(dialogs.show("document.open",request.build(), owner), (selection, failure) -> {
             if (failure != null) { busy = false; error(GLDocumentOperation.OPEN, null, failure); return; }
             if (!selection.approved()) { busy = false; return; }
             var selected = selection.selectedPath();
@@ -102,7 +102,7 @@ final class DocumentActions implements AutoCloseable {
                     .filter(com.vin.easyknack.ui.AppText.literal("EasyKnack (*.knack)"), "knack")
                     .suggestedFileName(saveName(path));
             if (path != null) request.initialDirectory(path.getParent());
-            onUi(dialogs.show(request.build(), owner), (selection, failure) -> {
+            onUi(dialogs.show("document.save",request.build(), owner), (selection, failure) -> {
                 if (failure != null || !selection.approved()) {
                     busy = false;
                     if (failure != null) error(GLDocumentOperation.SAVE, path, failure);
@@ -143,7 +143,7 @@ final class DocumentActions implements AutoCloseable {
         catch(RuntimeException failure){error(GLDocumentOperation.SAVE,null,failure);return;}
         busy=true;
         var request=GLFileDialogRequest.save().title(com.vin.easyknack.ui.AppText.literal("Export group as plugin")).filter(com.vin.easyknack.ui.AppText.literal("EasyKnack source plugin (*.knackplugin)"),"knackplugin").suggestedFileName(exported.suggestedFileName());
-        onUi(dialogs.show(request.build(),owner),(selection,failure)->{
+        onUi(dialogs.show("plugin.export",request.build(),owner),(selection,failure)->{
             if(failure!=null||!selection.approved()){busy=false;if(failure!=null)error(GLDocumentOperation.SAVE,null,failure);return;}
             var destination=selection.selectedPath();
             onUi(CompletableFuture.runAsync(()->{try{exported.write(destination);}catch(java.io.IOException e){throw new CompletionException(e);}}),(ignored,writeFailure)->{
@@ -154,14 +154,14 @@ final class DocumentActions implements AutoCloseable {
     void importPlugin() {
         if(busy||closed)return;busy=true;
         var request=GLFileDialogRequest.open().title(com.vin.easyknack.ui.AppText.literal("Install source plugin")).filter(com.vin.easyknack.ui.AppText.literal("EasyKnack source plugin"), "knackplugin", "zip");
-        onUi(dialogs.show(request.build(),owner),(selection,failure)->{
+        onUi(dialogs.show("plugin.install",request.build(),owner),(selection,failure)->{
             if(failure!=null||!selection.approved()){busy=false;if(failure!=null)error(GLDocumentOperation.OPEN,null,failure);return;}
             buildPlugin(selection.selectedPath());
         });
     }
     void importGroups(){
         if(busy||closed)return;busy=true;
-        onUi(dialogs.show(GLFileDialogRequest.open().title(AppText.text("group.import.title")).filter(com.vin.easyknack.ui.AppText.literal("EasyKnack"),"knack","glgraph").build(),owner),(selection,failure)->{
+        onUi(dialogs.show("group.import",GLFileDialogRequest.open().title(AppText.text("group.import.title")).filter(com.vin.easyknack.ui.AppText.literal("EasyKnack"),"knack","glgraph").build(),owner),(selection,failure)->{
             if(failure!=null||!selection.approved()){busy=false;if(failure!=null)error(GLDocumentOperation.OPEN,null,failure);return;}
             onUi(files.read(selection.selectedPath()),(document,readFailure)->{
                 busy=false;if(readFailure!=null){error(GLDocumentOperation.OPEN,selection.selectedPath(),readFailure);return;}
@@ -200,7 +200,7 @@ final class DocumentActions implements AutoCloseable {
     void configurePluginCompiler() {
         if(busy||closed)return;busy=true;
         var request=GLFileDialogRequest.open().title(com.vin.easyknack.ui.AppText.literal("Select LLVM-MinGW clang++.exe")).filter(com.vin.easyknack.ui.AppText.literal("C++ compiler"), "exe");
-        onUi(dialogs.show(request.build(),owner),(selection,failure)->{
+        onUi(dialogs.show("compiler.select",request.build(),owner),(selection,failure)->{
             busy=false;
             if(failure!=null){error(GLDocumentOperation.OPEN,null,failure);return;}
             if(!selection.approved())return;

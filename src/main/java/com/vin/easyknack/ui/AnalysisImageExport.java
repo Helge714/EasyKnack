@@ -31,7 +31,7 @@ final class AnalysisImageExport {
                     save.setEnabled(false);String extension=format.getSelectedItem().toLowerCase(java.util.Locale.ROOT);
                     int w=(int)width.getValue(),h=(int)height.getValue();float q=(float)quality.getValue()/100;
                     var selected=area.getSelectedItem().equals(AppText.text("analysis.fullArea"))?snapshot.withView(AnalysisChart.View.FULL,snapshot.cursorA(),snapshot.cursorB()):snapshot;
-                    files.show(GLFileDialogRequest.save().title(AppText.text("analysis.export")).filter(format.getSelectedItem(),extension).suggestedFileName("Analysis."+extension).build(),owner)
+                    files.show("analysis.image",GLFileDialogRequest.save().title(AppText.text("analysis.export")).filter(format.getSelectedItem(),extension).suggestedFileName("Analysis."+extension).build(),owner)
                     .whenComplete((choice,error)->EventQueue.invokeLater(()->{
                         if(closed)return;
                         if(error!=null||!choice.approved()){save.setEnabled(true);if(error!=null)message.setText(error.getMessage());return;}
