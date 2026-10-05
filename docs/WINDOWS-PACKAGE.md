@@ -41,6 +41,12 @@ See the [JDK packaging requirements](https://docs.oracle.com/en/java/javase/25/j
 
 ## Validation
 
+The local Windows x64 image and EXE installer have been built with JDK 25 and
+WiX 3.14.1. The isolated functional tests and EXE window open/close test pass,
+including an image path containing spaces and a non-ASCII character. The EXE
+installer has not yet been installed or uninstalled on a clean machine. The MSI
+option is available but has not been separately validated.
+
 Use `scripts/test-windows-package.ps1 -Image <EasyKnack folder>` to test using
 only the bundled Java and compiler, an unrelated working directory and isolated
 user/cache directories. It checks the native parameter contract, a playing null

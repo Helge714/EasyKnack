@@ -63,7 +63,8 @@ zugehörige Laufzeitdateien im Paket benötigen; keine einzelne Monolith-Datei n
   Build und isolierte Prüfungen: [Windows packaging](docs/WINDOWS-PACKAGE.md).
 - [ ] Installer auf sauberem Windows installieren/deinstallieren, Updates prüfen;
   eigenes Icon, Signierung und optionale `.knack`-Dateizuordnung ergänzen.
-  EXE-/MSI-Buildskripte mit Version aus Maven und Startmenü sind vorbereitet.
+  EXE-Installer mit Version aus Maven und Startmenü ist gebaut; MSI-Option
+  vorhanden, aber noch nicht separat geprüft.
 - [ ] Lizenz-/Weitergabeanforderungen der gebündelten Laufzeit, Toolchain und
   Bibliotheken prüfen und erforderliche Lizenztexte/Quellcodehinweise beilegen.
 - [ ] Abnahme auf sauberem Windows ohne JDK, Maven oder C++-Werkzeuge: Start,
