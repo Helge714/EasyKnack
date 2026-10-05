@@ -11,6 +11,28 @@ import com.vingame.glswing.ui.GLPopupMenu;
 
 /** All workspace widgets, including the menus, are rendered on the GLCanvas. */
 public final class WorkspaceView extends GLContainer implements AutoCloseable, com.vingame.glswing.input.GLKeyTarget, com.vin.easyknack.nodes.AnalysisEditor.Host {
+    private javax.swing.Timer launchTimer;
+    private boolean openingExternal;
+    public void acceptLaunches(com.vin.easyknack.DocumentLaunch launches, JFrame window) {
+        var pending = new java.util.ArrayDeque<java.nio.file.Path>();
+        launchTimer = new javax.swing.Timer(300, event -> {
+            if (!window.isShowing() || openingExternal || !documents.canOpenExternal()) return;
+            try {
+                if (pending.isEmpty()) {
+                    var request = launches.poll();
+                    if (request == null) return;
+                    pending.addAll(request);
+                    window.setExtendedState(window.getExtendedState() & ~java.awt.Frame.ICONIFIED);
+                    window.toFront(); window.requestFocus();
+                }
+                if (!pending.isEmpty()) {
+                    closeAnalysis(); openingExternal = true;
+                    documents.openExternal(pending.removeFirst()).whenComplete((opened, failure) -> openingExternal = false);
+                }
+            } catch (Exception failure) { failure.printStackTrace(); }
+        });
+        launchTimer.start();
+    }
     private final AnalysisFocusView analysisFocus=new AnalysisFocusView(this::closeAnalysis);
     @Override public void openAnalysis(com.vin.easyknack.nodes.AnalysisEditor.Plot source){
         workspace.setVisible(false);analysisFocus.open(source);resized(getWidth(),getHeight());
@@ -203,5 +225,5 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     @Override public boolean preservesKeyboardFocusOnPress(){return analysisFocus.isVisible();}
 
     public java.util.concurrent.CompletionStage<Boolean> requestClose() { return documents.requestClose(); }
-    @Override public void close() { com.vin.easyknack.audio.FileAudition.stop(); documents.close(); pluginActivity.close(); controller.close(); }
+    @Override public void close() { if (launchTimer != null) launchTimer.stop(); com.vin.easyknack.audio.FileAudition.stop(); documents.close(); pluginActivity.close(); controller.close(); }
 }

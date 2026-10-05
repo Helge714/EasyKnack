@@ -10,6 +10,16 @@ public final class EasyKnack {
     private EasyKnack() { }
 
     public static void main(String[] args) {
+        final DocumentLaunch launches;
+        try {
+            launches = DocumentLaunch.start(args);
+            if (launches == null) return;
+        } catch (Exception failure) {
+            failure.printStackTrace();
+            javax.swing.JOptionPane.showMessageDialog(null, failure.getMessage(), "EasyKnack", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(launches::close, "EasyKnack instance cleanup"));
         GLApplication.builder()
                 .locale(com.vin.easyknack.ui.ApplicationSettings.locale())
                 .title(com.vin.easyknack.ui.AppText.literal("EasyKnack — Audio Workspace"))
@@ -38,15 +48,18 @@ public final class EasyKnack {
                         }))
                 .surface(context -> {
                     context.parent().setGLTheme(ApplicationTheme.current().theme());
-                    return new WorkspaceView(context.window());
+                    var view = new WorkspaceView(context.window());
+                    view.acceptLaunches(launches, context.window());
+                    return view;
                 })
                 .onCloseRequest(context -> context.parent().getGLChildren().stream()
                         .filter(WorkspaceView.class::isInstance).map(WorkspaceView.class::cast).findFirst()
                         .map(WorkspaceView::requestClose).orElseGet(() -> java.util.concurrent.CompletableFuture.completedFuture(true)))
-                .onClose(context -> context.parent().getGLChildren().stream()
+                .onClose(context -> { context.parent().getGLChildren().stream()
                         .filter(WorkspaceView.class::isInstance)
-                        .map(WorkspaceView.class::cast).forEach(WorkspaceView::close))
+                        .map(WorkspaceView.class::cast).forEach(WorkspaceView::close); launches.close(); })
                 .onFailure(error -> {
+                    launches.close();
                     System.err.println("EasyKnack konnte nicht gestartet werden.");
                     error.printStackTrace();
                 })

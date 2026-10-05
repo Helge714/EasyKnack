@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Windows installers register .knack documents. File launches reuse the running
+  application, queue during startup and preserve the unsaved-changes prompt.
+  No document, plugin ABI or audio protocol change.
+
 - Windows EXE/MSI installers let users choose desktop and Start Menu shortcuts independently.
 
 - Added a self-contained Windows app-image build with bundled Java/C++ tools,

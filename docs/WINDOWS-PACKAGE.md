@@ -44,9 +44,13 @@ one-time rebuild after upgrading the application or relocating its compiler.
 
 `-Type exe` or `-Type msi` additionally invokes jpackage's per-user installer
 backend. Both installer formats offer independent checkboxes for a desktop shortcut
-and a Start Menu entry. It requires a WiX version supported by the selected JDK on the build
+and a Start Menu entry, and register `.knack` file opening for the current user.
+Windows retains control over the user's default-app choice. Document launch requests
+are handed to the existing application through a per-user lock and local request
+directory under `~/.easyknack/instance`; no network listener is required.
+It requires a WiX version supported by the selected JDK on the build
 machine. Failure to build an installer leaves the portable image intact. Signing,
-an application icon, file associations and release/update testing remain separate
+an application icon and release/update testing remain separate
 release work; this local build does not declare a release.
 
 To package an already verified image without recompiling it:

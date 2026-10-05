@@ -35,6 +35,25 @@ final class DocumentActions implements AutoCloseable {
         titleTimer = new Timer(700, event -> updateTitle()); titleTimer.start();
     }
     private boolean modified() { return !checkpoint.equals(NodeDocuments.comparable(controller.snapshotDocument())); }
+    boolean canOpenExternal() { return !busy && !closed && closeDecision == null; }
+    CompletionStage<Boolean> openExternal(Path source) {
+        var result = new CompletableFuture<Boolean>();
+        if (!canOpenExternal()) return CompletableFuture.completedFuture(false);
+        busy = true;
+        onUi(files.read(source), (document, failure) -> {
+            busy = false;
+            if (failure != null) { error(GLDocumentOperation.OPEN, source, failure); result.complete(false); return; }
+            onUi(requestClose(), (proceed, closeFailure) -> {
+                if (!Boolean.TRUE.equals(proceed)) { result.complete(false); return; }
+                try {
+                    controller.openDocument(source.getFileName().toString(), document);
+                    path = source; checkpoint = NodeDocuments.comparable(controller.snapshotDocument()); updateTitle();
+                    result.complete(true);
+                } catch (RuntimeException invalid) { error(GLDocumentOperation.OPEN, source, invalid); result.complete(false); }
+            });
+        });
+        return result;
+    }
     private void updateTitle() {
         if (!closed) window.setTitle((modified() ? "* " : "") + (path == null ? AppText.text("untitled") : path.getFileName()) + " — EasyKnack"+(activity.isEmpty()?"":" — "+activity));
     }
