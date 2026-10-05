@@ -37,3 +37,10 @@ sharing documents that depend on local media or plugins.
 See [developer documentation](docs/development/README.md) for builds, architecture
 and technical references. GLSwing is an external Maven dependency. Product changes
 are recorded separately in [release notes](docs/RELEASE-NOTES.md).
+
+## License
+
+EasyKnack is licensed under the [GNU GPL version 3 only](LICENSE)
+(`GPL-3.0-only`), unless otherwise indicated. Third-party components retain their
+own licenses; GLSwing remains Apache-2.0. See [third-party notices](THIRD-PARTY.md)
+and the [distribution checklist](docs/development/LICENSING.md).

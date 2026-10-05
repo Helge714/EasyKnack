@@ -1,5 +1,12 @@
 # Später
 
+## Distribution licensing
+
+- [x] Set EasyKnack to GPL-3.0-only; keep GLSwing Apache-2.0 and third-party licenses separate.
+- [x] Include project license/overview in JARs and Windows packages, plus native/FFmpeg notices.
+- [ ] Complete exact-binary dependency/source review before public distribution; see
+  [licensing checklist](docs/development/LICENSING.md). Source archives/offers are not yet prepared.
+
 ## Core / application ownership
 
 - [x] Extract shared label tooltips, image capture/encoding/preview, remembered

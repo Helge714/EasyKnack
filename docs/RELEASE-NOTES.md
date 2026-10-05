@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Declared EasyKnack GPL-3.0-only; GLSwing and third-party licenses remain unchanged.
+  Packages include project and native-component notices. Corresponding-source
+  preparation remains a release requirement. No runtime or document-format change.
+
 - Replaced the mixed-language README with an English quick start and linked user
   guide, node reference and known limitations. Windows packages include the guide.
   Developer and historical notes are separate; no runtime or document-format change.

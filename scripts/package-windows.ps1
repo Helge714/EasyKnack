@@ -66,6 +66,14 @@ try {
     Copy-Item -LiteralPath $Toolchain -Destination "$inputDir/tools/llvm-mingw" -Recurse
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/user" -Destination "$inputDir/user" -Recurse
+    Copy-Item -LiteralPath "$root/LICENSE", "$root/THIRD-PARTY.md" -Destination $inputDir
+    New-Item -ItemType Directory -Path "$inputDir/licenses/asio", "$inputDir/licenses/miniaudio", "$inputDir/licenses/ffmpeg" | Out-Null
+    Copy-Item -LiteralPath "$root/native/audio-host/third_party/asio/LICENSE.txt", "$root/native/audio-host/third_party/asio/COPYING" -Destination "$inputDir/licenses/asio"
+    $miniaudio = [IO.File]::ReadAllText("$root/native/audio-host/third_party/miniaudio.h")
+    $licenseStart = $miniaudio.LastIndexOf('This software is available as a choice of the following licenses.')
+    if ($licenseStart -lt 0) { throw 'miniaudio license section not found.' }
+    $miniaudio.Substring($licenseStart).Replace('*/','').Trim() | Set-Content -LiteralPath "$inputDir/licenses/miniaudio/LICENSE.txt" -Encoding utf8
+    Copy-Item -Path "$root/src/main/resources/easyknack/third-party/*" -Destination "$inputDir/licenses/ffmpeg"
     @('format=1', "product.version=$version", "platform=windows-x86_64", 'toolchain=tools/llvm-mingw/bin/clang++.exe') | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     foreach ($library in Get-ChildItem -LiteralPath "$inputDir/lib" -Filter '*.jar') {

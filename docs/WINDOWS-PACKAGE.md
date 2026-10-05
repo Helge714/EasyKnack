@@ -84,6 +84,5 @@ entries found inside dependency JARs are copied to `app/licenses`; Java legal
 notices and LLVM-MinGW's original notices are retained with their distributions.
 Before public distribution, review the exact bundled FFmpeg build and all
 dependency licenses, and arrange any required corresponding sources and notices.
-Copying license files alone is not a completed redistribution audit. Choose and
-add the EasyKnack project license as well. External virtual audio drivers are not
+Copying license files alone is not a completed redistribution audit. EasyKnack uses GPL-3.0-only; see the [licensing checklist](development/LICENSING.md). External virtual audio drivers are not
 included. These local unsigned images are for validation, not published releases.
