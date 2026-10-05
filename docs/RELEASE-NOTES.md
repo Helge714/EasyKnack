@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Shared UI/export and group-authoring infrastructure now comes from GLSwing.
+  Dialogs remember folders by stable purpose across language changes; directory
+  selections remember the selected folder. Existing group/template documents remain compatible.
+
 - Image-export geometry now uses GLSwing's shared dimension model; sizing and
   padding behavior are unchanged. No document or audio-protocol migration.
 

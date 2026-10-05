@@ -2,9 +2,14 @@
 
 ## Core / application ownership
 
+- [x] Extract shared label tooltips, image capture/encoding/preview, remembered
+  dialogs, editor capabilities/templates and nested graph copying into Core.
+- [x] Separate inspector coupling and graph diagnostics within EasyKnack.
+- [ ] Resolve the seven baseline Core test failures documented in the audit
+  (theme/layout expectations and node exclusion spacing).
+
 - Architecture classification and ordered extraction backlog: [Core boundary audit](docs/CORE-BOUNDARY.md).
-- Export geometry has moved to GLSwing; label reuse, image capture/encoding,
-  remembered dialogs and neutral group-editor capabilities remain separate follow-ups.
+- Generic mechanisms now live in GLSwing; application rate/unit/DSP policies remain in EasyKnack.
 
 ## Automatische Build-Kennung und Versionspflege
 

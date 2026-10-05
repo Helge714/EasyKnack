@@ -8,12 +8,8 @@ import com.vingame.glswing.node.composite.*;
 final class GroupImport {
     record Result(GLNodeGraphAsset selected,List<GLNodeGraphAsset> assets,List<EditorTemplates.Template> templates){}
     static Result copy(GLNodeGraphDocument source,String selectedId,String rootName){
-        var selected=source.findAsset(selectedId).orElseThrow();
-        var byType=new HashMap<String,GLNodeGraphAsset>();
-        for(var asset:NodeDocuments.assets(source))if(asset.compositeDescriptor()!=null)byType.put(asset.compositeDescriptor().nodeTypeId(),asset);
-        var needed=new LinkedHashMap<String,GLNodeGraphAsset>();collect(selected,byType,needed);
+        var plan=GLNodeGraphAssetCopy.plan(source,selectedId,"easyknack.asset.","easyknack.composite.");
         var ids=new HashMap<String,String>();
-        for(var asset:needed.values()){ids.put(asset.id(),"easyknack.asset."+UUID.randomUUID());if(asset.compositeDescriptor()!=null)ids.put(asset.compositeDescriptor().nodeTypeId(),"easyknack.composite."+UUID.randomUUID());}
         var templates=new ArrayList<EditorTemplates.Template>();
         var value=source.root().metadata().get(EditorTemplates.KEY);
         if(value!=null)for(var raw:(List<?>)value.toJavaValue()){
@@ -22,33 +18,35 @@ final class GroupImport {
             templates.add(new EditorTemplates.Template(id,t.label(),t.entries(),t.initial()));
         }
         // Copied editors can carry a portable template without a library entry.
-        for(var asset:needed.values())if(asset.compositeDescriptor()!=null)for(var port:asset.compositeDescriptor().portMappings()){
+        for(var asset:plan.assets())if(asset.compositeDescriptor()!=null)for(var port:asset.compositeDescriptor().portMappings()){
             var t=GroupInputs.template(port);if(t==null||ids.containsKey(t.id()))continue;
             var id=UUID.randomUUID().toString();ids.put(t.id(),id);ids.put(EditorTemplates.PREFIX+t.id(),EditorTemplates.PREFIX+id);
         }
-        var result=new ArrayList<GLNodeGraphAsset>();
-        for(var asset:needed.values()){
-            var graph=asset.graph();
-            var nodeIds=new HashMap<GLNodeId,GLNodeId>();graph.nodes().forEach(n->nodeIds.put(n.id(),GLNodeId.random()));
-            var localIds=new HashMap<>(ids);nodeIds.forEach((oldId,newId)->localIds.put(oldId.toString(),newId.toString()));
-            var nodes=graph.nodes().stream().map(n->new GLGraphNode(nodeIds.get(n.id()),ids.getOrDefault(n.typeId(),n.typeId()),n.typeVersion(),rewriteMap(n.withoutProperty(GroupBakes.PROPERTY).properties(),localIds))).toList();
-            java.util.function.Function<GLNodeEndpoint,GLNodeEndpoint> endpoint=e->e==null?null:new GLNodeEndpoint(nodeIds.get(e.nodeId()),e.portId());
-            var descriptor=asset.compositeDescriptor();
-            if(descriptor==null)descriptor=new GLCompositeNodeDescriptor("easyknack.composite."+UUID.randomUUID(),ids.get(asset.id()),1,List.of());
-            else descriptor=new GLCompositeNodeDescriptor(ids.get(descriptor.nodeTypeId()),ids.get(asset.id()),descriptor.minimumAssetVersion(),descriptor.portMappings().stream().map(p->{
-                var options=new LinkedHashMap<>(rewriteMap(p.presentation().editorOptions(),localIds));
-                var copy=options.get("copySource");if(copy!=null&&copy.toJavaValue() instanceof String text){for(var entry:nodeIds.entrySet())text=text.replace(entry.getKey().toString(),entry.getValue().toString());options.put("copySource",GLNodeValue.of(text));}
-                return new GLCompositePortMapping(p.publicPort(),endpoint.apply(p.internalEndpoint()),new GLCompositePortPresentation(ids.getOrDefault(p.presentation().inputEditorId(),p.presentation().inputEditorId()),p.presentation().socketVisible(),options),p.additionalEndpoints().stream().map(endpoint).toList());
-            }).toList(),descriptor.properties(),descriptor.propertyMappings().stream().map(p->new GLCompositePropertyMapping(p.publicPropertyId(),nodeIds.get(p.internalNodeId()),p.internalPropertyId(),p.values())).toList());
-            var metadata=new LinkedHashMap<>(rewriteMap(asset.metadata(),localIds));metadata.remove(GroupBakes.SAVED);metadata.remove(EditorTemplates.KEY);
-            if(asset.compositeDescriptor()==null)metadata.put("easyknack.title",GLNodeValue.of(rootName));
-            var positions=new LinkedHashMap<GLNodeId,com.vingame.glswing.node.binding.GLNodeViewState>();asset.viewState().nodes().forEach((oldId,state)->{if(nodeIds.containsKey(oldId))positions.put(nodeIds.get(oldId),state);});
-            var wires=graph.connections().stream().map(c->new GLGraphConnection(GLNodeConnectionId.random(),endpoint.apply(c.output()),endpoint.apply(c.input()))).toList();
-            result.add(new GLNodeGraphAsset(ids.get(asset.id()),asset.version(),GLNodeGraphAssetKind.COMPOSITE,new GLNodeGraphSnapshot(GLNodeGraphId.random(),0,nodes,wires),new com.vingame.glswing.node.binding.GLNodeEditorViewState(positions,asset.viewState().auxiliaryNodes()),metadata,descriptor));
-        }
-        return new Result(result.stream().filter(a->a.id().equals(ids.get(selectedId))).findFirst().orElseThrow(),List.copyOf(result),List.copyOf(templates));
+        var result=GLNodeGraphAssetCopy.copy(plan,ids,"easyknack.composite."+UUID.randomUUID(),new GLNodeGraphAssetCopy.Policy(){
+            @Override public Map<String,GLNodeValue> nodeProperties(GLGraphNode node,GLNodeGraphAssetCopy.Context context){
+                return rewriteMap(node.withoutProperty(GroupBakes.PROPERTY).properties(),context.ids());
+            }
+            @Override public Map<String,GLNodeValue> editorOptions(GLCompositePortMapping port,GLNodeGraphAssetCopy.Context context){
+                var options=new LinkedHashMap<>(rewriteMap(port.presentation().editorOptions(),context.ids()));
+                var copy=options.get("copySource");
+                if(copy!=null&&copy.toJavaValue() instanceof String text){
+                    for(var entry:context.nodeIds().entrySet())text=text.replace(entry.getKey().toString(),entry.getValue().toString());
+                    options.put("copySource",GLNodeValue.of(text));
+                }
+                return options;
+            }
+            @Override public Map<String,GLNodeValue> metadata(GLNodeGraphAsset asset,GLNodeGraphAssetCopy.Context context){
+                var metadata=new LinkedHashMap<>(rewriteMap(asset.metadata(),context.ids()));
+                metadata.remove(GroupBakes.SAVED);metadata.remove(EditorTemplates.KEY);
+                if(asset.compositeDescriptor()==null)metadata.put("easyknack.title",GLNodeValue.of(rootName));
+                return metadata;
+            }
+            @Override public GLNodeValue value(GLNodeValue value,GLNodeGraphAssetCopy.Context context){
+                return GLNodeValue.of(rewrite(value.toJavaValue(),context.ids()));
+            }
+        });
+        return new Result(result.selected(),result.assets(),List.copyOf(templates));
     }
-    private static void collect(GLNodeGraphAsset a,Map<String,GLNodeGraphAsset> types,Map<String,GLNodeGraphAsset> result){if(result.putIfAbsent(a.id(),a)!=null)return;for(var node:a.graph().nodes()){var child=types.get(node.typeId());if(child!=null)collect(child,types,result);}}
     private static Map<String,GLNodeValue> rewriteMap(Map<String,GLNodeValue> source,Map<String,String> ids){var out=new LinkedHashMap<String,GLNodeValue>();source.forEach((k,v)->out.put(k,GLNodeValue.of(rewrite(v.toJavaValue(),ids))));return out;}
     private static Object rewrite(Object v,Map<String,String> ids){
         if(v instanceof String s)return ids.getOrDefault(s,s);
