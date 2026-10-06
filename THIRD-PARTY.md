@@ -20,6 +20,9 @@ that all corresponding-source obligations have already been fulfilled.
 | JogAmp JOGL / GlueGen and transitive JARs | Preserve the notices/licenses from each exact artifact; review bundled native components too. |
 | Bundled JDK | Retain the runtime's legal directory. OpenJDK GPLv2 with Classpath Exception and additional component notices require review against the exact JDK distribution. |
 | LLVM-MinGW toolchain | LLVM Apache-2.0 with LLVM exceptions plus separately licensed toolchain components; retain all supplied notices, not only the top-level LICENSE.TXT. |
+| GNU Make 4.4.1 and MinGW gendef (inside the compiler bundle) | GPL-3.0-or-later; matching source trees, build recipes and license notices are collected. |
+| Compiler's Python, libffi and LLDB-MI | Separate licenses; preserve their notices. Their pinned source archives are collected too. |
+| Microsoft VC/UCRT DLLs included in Temurin | Microsoft redistribution terms apply; these files are not relicensed as OpenJDK code. See the native distribution review before publication. |
 
 ## Where notices are installed
 
@@ -48,6 +51,7 @@ source archive matching any particular installer. The release checklist in
 New installer builds include project and upstream source-material archives with
 checksums and a REVIEW.json report. Remaining provenance checks are documented in
 `docs/development/SOURCE-PACKAGES.md`; review them before public distribution.
+The detailed native findings are in `docs/development/source-audit/NATIVE-RUNTIMES.md`.
 
 ## Plugins and generated code
 

@@ -68,6 +68,9 @@ try {
     } finally { $application.Dispose() }
     Write-Host 'Bundling compiler, headers, libraries and license notices...'
     Copy-Item -LiteralPath $Toolchain -Destination "$inputDir/tools/llvm-mingw" -Recurse
+    # Local LLDB/Python runs can leave bytecode caches in the compiler directory.
+    # Remove only generated files inside the newly staged copy, never the source toolchain.
+    Remove-CompilerBytecodeCaches "$inputDir/tools/llvm-mingw"
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/user" -Destination "$inputDir/user" -Recurse
     Copy-Item -LiteralPath "$root/LICENSE", "$root/THIRD-PARTY.md" -Destination $inputDir

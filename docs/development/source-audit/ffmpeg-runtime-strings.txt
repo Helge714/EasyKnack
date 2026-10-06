@@ -1,0 +1,4 @@
+../mingw-w64/mingw-w64-libraries/winpthreads/src/rwlock.c
+GCC: (Rev10, Built by MSYS2 project) 12.2.0
+GCC: (Rev11, Built by MSYS2 project) 12.2.0
+JGCC: (Rev10, Built by MSYS2 project) 12.2.0

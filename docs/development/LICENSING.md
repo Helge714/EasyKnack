@@ -17,6 +17,10 @@ used under its GPLv3 alternative, not the proprietary agreement.
   build and adds a deterministic sources archive plus collected upstream materials.
 - Exact JAR hashes, FFmpeg build configuration and Temurin source revisions are
   recorded. See [source package instructions](SOURCE-PACKAGES.md).
+- Native distribution review now includes official archive comparisons, Temurin
+  SBOM/configuration, full compiler-component sources (including GPL gendef/Make),
+  GCC/MSYS2 sources and native-library notices with source-member checksums.
+  See [verified findings and remaining boundaries](source-audit/NATIVE-RUNTIMES.md).
 
 ## Before publishing any binary
 
@@ -26,8 +30,10 @@ used under its GPLv3 alternative, not the proprietary agreement.
   Record component versions, hashes, license choices and source provenance.
 - [ ] Collect matching source/build materials for the exact FFmpeg binary and its
   enabled libraries; verify -L and -buildconf for the artifact being distributed.
-- [ ] Collect the corresponding sources/materials required for the exact bundled
-  JDK and any other copyleft components. Review all LLVM-MinGW component notices.
+- [x] Collect the identified OpenJDK build sources/configuration and LLVM-MinGW
+  component sources/notices, including GNU Make and gendef.
+- [ ] Resolve the remaining FFmpeg CRT/pthread provenance and applicable Microsoft
+  runtime redistribution terms documented in the native review.
 - [ ] Build from an identified release revision and archive corresponding EasyKnack
   sources and build scripts. Include uncommitted changes if distributing a local build;
   an archive of HEAD alone does not describe a dirty binary.

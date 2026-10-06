@@ -10,6 +10,8 @@
 *.pdb
 *.ilk
 *.class
+__pycache__/
+*.pyc
 *.exe
 *.dll
 

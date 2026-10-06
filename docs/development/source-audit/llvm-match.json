@@ -1,0 +1,16 @@
+{
+  "archive": "llvm-official.zip",
+  "archiveSha256": "d955112db27ebbefec0b1fc77d4fcfe7b51ed767912e74e4e00b4a63e9d3ac97",
+  "expectedFiles": 9015,
+  "installedFiles": 9019,
+  "installedTreeSha256": "a606a0f28ecbe2bf25afab1b6ca1d5476a76b3ecd25dc21bf501dde39f5bc2e5",
+  "missing": [],
+  "extra": [
+    "python/lib/python3.12/encodings/__pycache__/__init__.cpython-312.pyc",
+    "python/lib/python3.12/encodings/__pycache__/aliases.cpython-312.pyc",
+    "python/lib/python3.12/encodings/__pycache__/cp1252.cpython-312.pyc",
+    "python/lib/python3.12/encodings/__pycache__/utf_8.cpython-312.pyc"
+  ],
+  "changed": [],
+  "exactMatch": false
+}

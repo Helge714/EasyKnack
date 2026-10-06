@@ -1,0 +1,13 @@
+{
+  "archive": "jdk-official.zip",
+  "archiveSha256": "00c847d804f4a78e9f04f2683faf14fed898535b177b7fc704486cb0284e9283",
+  "expectedFiles": 431,
+  "installedFiles": 430,
+  "installedTreeSha256": "89c74360ceda69b3599a4ae3abad136e4a0aea2563e35d171a61e3742d6a84e6",
+  "missing": [
+    "lib/src.zip"
+  ],
+  "extra": [],
+  "changed": [],
+  "exactMatch": false
+}

@@ -168,6 +168,54 @@
       "file": "glswing-0.2.0-SNAPSHOT-sources.jar",
       "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-sources.jar",
       "sha256": "1df4f80179022929b9c853c41b8aa14120da5df5ce2a41c8b0131430e0fbe8af"
+    },
+    {
+      "id": "mingw-w64",
+      "url": "https://codeload.github.com/mingw-w64/mingw-w64/tar.gz/2be9e0f319990e48bfb0b2dd7b9e7045791b465f",
+      "file": "mingw-w64-2be9e0f.tar.gz",
+      "sha256": "728fa2f99a490e1ced14edc068e5cc0034ab08a8adc3c4f0318ba0746f9604c2"
+    },
+    {
+      "id": "libffi",
+      "url": "https://codeload.github.com/libffi/libffi/tar.gz/refs/tags/v3.4.6",
+      "file": "libffi-3.4.6.tar.gz",
+      "sha256": "9ac790464c1eb2f5ab5809e978a1683e9393131aede72d1b0a0703771d3c6cda"
+    },
+    {
+      "id": "lldb-mi",
+      "url": "https://codeload.github.com/lldb-tools/lldb-mi/tar.gz/2340ff25bc46201b20779bef5bc399bf994895f0",
+      "file": "lldb-mi-2340ff2.tar.gz",
+      "sha256": "bb793f77149fe372b001d0d954366274ab4e526227f6fa3a2f302b425af5b69f"
+    },
+    {
+      "id": "cpython-mingw",
+      "url": "https://codeload.github.com/msys2-contrib/cpython-mingw/tar.gz/d21f60d4a8bb03e0309fe3907b104f1878059f90",
+      "file": "cpython-mingw-d21f60d.tar.gz",
+      "sha256": "95b526d5afa1a56bf97c0844ea21ba108108a8cbd39c0fbaf2d646a9e37ce50c"
+    },
+    {
+      "id": "llvm-project",
+      "url": "https://codeload.github.com/llvm/llvm-project/tar.gz/24a30daaa559829ad079f2ff7f73eb4e18095f88",
+      "file": "llvm-project-20.1.0.tar.gz",
+      "sha256": "fda11e2841bce0818326aebb640f435d3aaa89261ee7e2147b736af20f6f5fd9"
+    },
+    {
+      "id": "gcc-12.2.0",
+      "file": "gcc-12.2.0.tar.xz",
+      "sha256": "e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff",
+      "url": "https://mirrors.kernel.org/gnu/gcc/gcc-12.2.0/gcc-12.2.0.tar.xz"
+    },
+    {
+      "id": "msys2-gcc-12.2.0-11-recipes",
+      "file": "msys2-recipes-fd5380c.tar.gz",
+      "sha256": "922c9cd78cf681e9c4568ae47e42faea3eef1f828ddfa1419f5fc9980b16eaeb",
+      "url": "https://codeload.github.com/msys2/MINGW-packages/tar.gz/fd5380c8c48c5ab7cc9bc4189961da70f0317bed"
+    },
+    {
+      "sha256": "dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3",
+      "id": "make-4.4.1",
+      "file": "make-4.4.1.tar.gz",
+      "url": "https://mirrors.kernel.org/gnu/make/make-4.4.1.tar.gz"
     }
   ],
   "binaries": [
@@ -219,9 +267,8 @@
   "runtimeReleaseSha256": "86e5e51658bb2b9cf064b3957d81ac39abdb346b2cac19867c1625dd19d440d9",
   "remainingReview": [
     "GLSwing snapshot sources are collected but not proven to match its dirty binary build; obtain matching build inputs and parent POM.",
-    "FFmpeg recipe and enabled library sources collected; verify original builder patches/configuration and static GCC 12.2.0 Rev11 / MinGW runtime provenance.",
-    "Temurin exact OpenJDK and build-script revisions collected; obtain the corresponding build configuration and check additional runtime components.",
-    "LLVM-MinGW build recipes collected; finish component-specific notice and corresponding-source review.",
+    "FFmpeg GCC 12.2.0 source and MSYS2 Rev11 recipe/patches collected. Original link map or builder package manifest is still needed to identify exact MinGW CRT/winpthreads versions and explain mixed Rev10/Rev11 strings. Do not substitute LLVM-MinGW sources for these.",
+    "Temurin official archive, source revisions, SBOM and build configuration verified. Confirm applicable redistribution terms for the included Microsoft VC/UCRT DLLs; they are not OpenJDK-licensed source components.",
     "Review project/vendored ownership, plugin SDK/generated notices and final installed package before publishing."
   ]
 }

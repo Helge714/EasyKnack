@@ -7,7 +7,7 @@
 - `EasyKnack-source-materials.zip`: that snapshot, checksum-locked upstream archives,
   the reviewed dependency inventory, runtime identity and `REVIEW.json`.
 
-The first build downloads approximately 400 MB of upstream source material. Later
+The first build downloads approximately 800 MB of upstream source material. Later
 builds reuse `target/source-materials` after checking every SHA-256. The lock file is
 `scripts/sources.lock.json`. A missing local GLSwing sources artifact is reported;
 it is not silently substituted by a newer snapshot. GLSwing remains an external
@@ -62,10 +62,12 @@ Temurin 25.0.4.1+1 identifies OpenJDK commit
 `520406d871955300957ef01e406ac2acd0f9b75c` and temurin-build commit
 `e6ba7dec3d07654074559310376a3ae89da5f4ac`; both source archives are collected.
 The local GLSwing sources JAR is collected but its correspondence to the dirty
-binary build has not been established. The toolchain recipe archive is not the
-complete LLVM toolchain source tree.
+binary build has not been established. The collection now includes full LLVM,
+MinGW, Python, libffi, LLDB-MI, GNU Make and GCC source archives, plus the MSYS2
+GCC recipe/patch tree. Official Temurin SBOM/build metadata and file-by-file native
+archive comparisons are recorded in the [native review](source-audit/NATIVE-RUNTIMES.md).
 
 Before public distribution, resolve the remaining items in `sources.lock.json`
-and [LICENSING.md](LICENSING.md), especially native runtime provenance, complete
-build configuration, toolchain obligations and the GLSwing snapshot. No release
+and [LICENSING.md](LICENSING.md), especially FFmpeg CRT/pthread provenance,
+Microsoft runtime redistribution terms and the GLSwing snapshot. No release
 or public upload is performed by these scripts.

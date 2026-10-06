@@ -1,5 +1,10 @@
 # Reviewed source provenance
 
+The [native distribution review](NATIVE-RUNTIMES.md) adds official archive
+comparisons, Temurin SBOM/configuration, GCC/MSYS2 provenance, full compiler
+component sources and native notices. It distinguishes resolved source collection
+from the remaining FFmpeg builder details and Microsoft redistribution terms.
+
 The FFmpeg outputs here were captured from the executable inside the standard
 `ffmpeg-7.1-1.5.11-windows-x86_64.jar` in the reviewed Windows image. Its SHA-256
 and the other exact JAR hashes are recorded in `scripts/sources.lock.json`.

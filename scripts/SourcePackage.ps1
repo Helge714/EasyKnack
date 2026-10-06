@@ -1,6 +1,15 @@
 #Requires -Version 7.0
 # Shared, side-effect-free helpers. ZIP order and timestamps are fixed.
 Set-StrictMode -Version Latest
+function Remove-CompilerBytecodeCaches([string]$StagedCompiler) {
+    $compilerRoot = [IO.Path]::GetFullPath($StagedCompiler)
+    foreach ($cacheFile in Get-ChildItem -LiteralPath $compilerRoot -Recurse -File -Filter '*.pyc') {
+        if ($cacheFile.Directory.Name -ne '__pycache__') { continue }
+        $resolved = [IO.Path]::GetFullPath($cacheFile.FullName)
+        if (!$resolved.StartsWith($compilerRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Compiler cache path escaped the package directory.' }
+        Remove-Item -LiteralPath $resolved
+    }
+}
 function Get-SourceSnapshot([string]$Root) {
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = [Diagnostics.ProcessStartInfo]::new('git')

@@ -1,0 +1,408 @@
+[
+  {
+    "file": "native-lame-3.100-COPYING.txt",
+    "source": "lame-3.100.tar.gz",
+    "member": "lame-3.100/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "bfe4a52dc4645385f356a8e83cc54216a293e3b6f1cb4f79f5fc0277abf937fd"
+  },
+  {
+    "file": "native-lame-3.100-LICENSE.txt",
+    "source": "lame-3.100.tar.gz",
+    "member": "lame-3.100/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "7a40cbd8818c57e5285e83c772a459a996d1662c824a879836b97b473c07cae4"
+  },
+  {
+    "file": "native-speex-1.2.1-AUTHORS.txt",
+    "source": "speex-1.2.1.tar.gz",
+    "member": "speex-1.2.1/AUTHORS",
+    "leadingCommentOnly": false,
+    "sha256": "6e5a9d92c5f9ccd28fe0b15ad59443fbf435bfc6ab2221f532006d3717ddf642"
+  },
+  {
+    "file": "native-speex-1.2.1-COPYING.txt",
+    "source": "speex-1.2.1.tar.gz",
+    "member": "speex-1.2.1/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "2654a4264b2bfe298dedc508748d140111840c315cc8eb646a3a68c13fa75b01"
+  },
+  {
+    "file": "native-opus-1.3.1-COPYING.txt",
+    "source": "opus-1.3.1.tar.gz",
+    "member": "opus-1.3.1/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "8338ce8d922bb4416ce3dd1e5680173332435e3f0755007ac7801ccd674fe682"
+  },
+  {
+    "file": "native-opus-1.3.1-AUTHORS.txt",
+    "source": "opus-1.3.1.tar.gz",
+    "member": "opus-1.3.1/AUTHORS",
+    "leadingCommentOnly": false,
+    "sha256": "f9fd849e652219ce98e008303370b352d37663d0ffb27b8dc514ad93c9c7438b"
+  },
+  {
+    "file": "native-opencore-amr-0.1.6-LICENSE.txt",
+    "source": "opencore-amr-0.1.6.tar.gz",
+    "member": "opencore-amr-0.1.6/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "8b3f1762349248d444ab9acbafe73941254e36e1064954da56bb9ddbd5873ddb"
+  },
+  {
+    "file": "native-opencore-amr-0.1.6-opencore_NOTICE.txt",
+    "source": "opencore-amr-0.1.6.tar.gz",
+    "member": "opencore-amr-0.1.6/opencore/NOTICE",
+    "leadingCommentOnly": false,
+    "sha256": "d106802b5e406073c1d10fbe9f638234c6973ebce37df71773179642085eb489"
+  },
+  {
+    "file": "native-vo-amrwbenc-0.1.3-common_NOTICE.txt",
+    "source": "vo-amrwbenc-0.1.3.tar.gz",
+    "member": "vo-amrwbenc-0.1.3/common/NOTICE",
+    "leadingCommentOnly": false,
+    "sha256": "38751245389e1e23f73e6f5384b5cbe7fa972cc4410c5adc9c04b082a0b9561a"
+  },
+  {
+    "file": "native-vo-amrwbenc-0.1.3-amrwbenc_NOTICE.txt",
+    "source": "vo-amrwbenc-0.1.3.tar.gz",
+    "member": "vo-amrwbenc-0.1.3/amrwbenc/NOTICE",
+    "leadingCommentOnly": false,
+    "sha256": "38751245389e1e23f73e6f5384b5cbe7fa972cc4410c5adc9c04b082a0b9561a"
+  },
+  {
+    "file": "native-vo-amrwbenc-0.1.3-NOTICE.txt",
+    "source": "vo-amrwbenc-0.1.3.tar.gz",
+    "member": "vo-amrwbenc-0.1.3/NOTICE",
+    "leadingCommentOnly": false,
+    "sha256": "e2ae60e14bece975eeab49210fcaf4ee529b77e6ca13e7d6556b6bb203897b31"
+  },
+  {
+    "file": "native-vo-amrwbenc-0.1.3-COPYING.txt",
+    "source": "vo-amrwbenc-0.1.3.tar.gz",
+    "member": "vo-amrwbenc-0.1.3/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "8b3f1762349248d444ab9acbafe73941254e36e1064954da56bb9ddbd5873ddb"
+  },
+  {
+    "file": "native-zlib-1.3.1-LICENSE.txt",
+    "source": "zlib-1.3.1.tar.gz",
+    "member": "zlib-1.3.1/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+  },
+  {
+    "file": "native-openssl-3.3.2-AUTHORS.md.txt",
+    "source": "openssl-3.3.2.tar.gz",
+    "member": "openssl-3.3.2/AUTHORS.md",
+    "leadingCommentOnly": false,
+    "sha256": "5076ca441daef7fb35e904c2ac070880c7b3d58300a5a6aecac41e8f525f4412"
+  },
+  {
+    "file": "native-openssl-3.3.2-LICENSE.txt.txt",
+    "source": "openssl-3.3.2.tar.gz",
+    "member": "openssl-3.3.2/LICENSE.txt",
+    "leadingCommentOnly": false,
+    "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+  },
+  {
+    "file": "native-openh264-2.4.1-LICENSE.txt",
+    "source": "openh264-2.4.1.tar.gz",
+    "member": "openh264-2.4.1/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "dd5c1c9668512530fa5a96e4c29ac4033d70a7eeb0eed7a42fddb6dd794ebdbb"
+  },
+  {
+    "file": "native-libvpx-1.14.1-AUTHORS.txt",
+    "source": "libvpx-1.14.1.tar.gz",
+    "member": "libvpx-1.14.1/AUTHORS",
+    "leadingCommentOnly": false,
+    "sha256": "79706c9cea2e0b09e350af1af60f7adbd3cf6cb3cea5423a9640b5051921bb22"
+  },
+  {
+    "file": "native-libvpx-1.14.1-LICENSE.txt",
+    "source": "libvpx-1.14.1.tar.gz",
+    "member": "libvpx-1.14.1/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "8267348d5af1262c11d1a08de2f5afc77457755f1ac658627dd9acf71011d615"
+  },
+  {
+    "file": "native-libvpx-1.14.1-PATENTS.txt",
+    "source": "libvpx-1.14.1.tar.gz",
+    "member": "libvpx-1.14.1/PATENTS",
+    "leadingCommentOnly": false,
+    "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c"
+  },
+  {
+    "file": "native-freetype-2.13.3-docs_GPLv2.TXT.txt",
+    "source": "freetype-2.13.3.tar.xz",
+    "member": "freetype-2.13.3/docs/GPLv2.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "c4120c6752c910c299e3bd9cb3a46ff262c268303ca2069b61f92f10a5656c18"
+  },
+  {
+    "file": "native-freetype-2.13.3-docs_FTL.TXT.txt",
+    "source": "freetype-2.13.3.tar.xz",
+    "member": "freetype-2.13.3/docs/FTL.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+  },
+  {
+    "file": "native-freetype-2.13.3-LICENSE.TXT.txt",
+    "source": "freetype-2.13.3.tar.xz",
+    "member": "freetype-2.13.3/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b"
+  },
+  {
+    "file": "native-mfx-dispatch-1.35.1-LICENSE.txt",
+    "source": "mfx-dispatch-1.35.1.tar.gz",
+    "member": "mfx_dispatch-1.35.1/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "f03bff2bd2f916104d12d50caeaab41875086943ea8b88983eafa5d84890593c"
+  },
+  {
+    "file": "native-libxml2-2.9.12-COPYING.txt",
+    "source": "libxml2-2.9.12.tar.xz",
+    "member": "libxml2-2.9.12/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "c5c63674f8a83c4d2e385d96d1c670a03cb871ba2927755467017317878574bd"
+  },
+  {
+    "file": "native-libxml2-2.9.12-Copyright.txt",
+    "source": "libxml2-2.9.12.tar.xz",
+    "member": "libxml2-2.9.12/Copyright",
+    "leadingCommentOnly": false,
+    "sha256": "c5c63674f8a83c4d2e385d96d1c670a03cb871ba2927755467017317878574bd"
+  },
+  {
+    "file": "native-libxml2-2.9.12-AUTHORS.txt",
+    "source": "libxml2-2.9.12.tar.xz",
+    "member": "libxml2-2.9.12/AUTHORS",
+    "leadingCommentOnly": false,
+    "sha256": "863cc6d983b8a1c7c22d7a1f40bfeb8a5f33163a2d27711b147bb00dd710ac9b"
+  },
+  {
+    "file": "native-srt-1.5.3-LICENSE.txt",
+    "source": "srt-1.5.3.tar.gz",
+    "member": "srt-1.5.3/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+  },
+  {
+    "file": "native-libwebp-1.4.0-AUTHORS.txt",
+    "source": "libwebp-1.4.0.tar.gz",
+    "member": "libwebp-1.4.0/AUTHORS",
+    "leadingCommentOnly": false,
+    "sha256": "f9681940f35ab74858ac2717a511fa6237b67f65e99f457c21223e60a851c85a"
+  },
+  {
+    "file": "native-libwebp-1.4.0-COPYING.txt",
+    "source": "libwebp-1.4.0.tar.gz",
+    "member": "libwebp-1.4.0/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf"
+  },
+  {
+    "file": "native-libwebp-1.4.0-PATENTS.txt",
+    "source": "libwebp-1.4.0.tar.gz",
+    "member": "libwebp-1.4.0/PATENTS",
+    "leadingCommentOnly": false,
+    "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c"
+  },
+  {
+    "file": "native-libaom-3.9.1-AUTHORS.txt",
+    "source": "libaom-3.9.1.tar.gz",
+    "member": "libaom-3.9.1/AUTHORS",
+    "leadingCommentOnly": false,
+    "sha256": "14bd9306bb3e86225c12fd432749030c07406bb5566fd2a8098676294bc827ae"
+  },
+  {
+    "file": "native-libaom-3.9.1-LICENSE.txt",
+    "source": "libaom-3.9.1.tar.gz",
+    "member": "libaom-3.9.1/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "4764a286d8b2faeaf42f4418e7d7a28d58fc8fd4d00a3d0a7f44b0a4099de7f2"
+  },
+  {
+    "file": "native-libaom-3.9.1-PATENTS.txt",
+    "source": "libaom-3.9.1.tar.gz",
+    "member": "libaom-3.9.1/PATENTS",
+    "leadingCommentOnly": false,
+    "sha256": "661fb8e504744e95587b556b94a58343448300606a41bea8c7a9b97125696e61"
+  },
+  {
+    "file": "native-svt-av1-2.2.1-LICENSE-BSD2.md.txt",
+    "source": "svt-av1-2.2.1.tar.gz",
+    "member": "SVT-AV1-v2.2.1/LICENSE-BSD2.md",
+    "leadingCommentOnly": false,
+    "sha256": "c582fcbeb9cf972a60d298bfaf41dc5adff2dd14208946edcb9bb56a281e8438"
+  },
+  {
+    "file": "native-svt-av1-2.2.1-LICENSE.md.txt",
+    "source": "svt-av1-2.2.1.tar.gz",
+    "member": "SVT-AV1-v2.2.1/LICENSE.md",
+    "leadingCommentOnly": false,
+    "sha256": "0acc2fcb27472bdc9aaf8b71f37055bbdac4f54671b7d922f241bd7fcd0dd3e6"
+  },
+  {
+    "file": "native-svt-av1-2.2.1-PATENTS.md.txt",
+    "source": "svt-av1-2.2.1.tar.gz",
+    "member": "SVT-AV1-v2.2.1/PATENTS.md",
+    "leadingCommentOnly": false,
+    "sha256": "20678ab10402659106dc4c147c97b2a6e94b5c0695415e15a8f195ebc3547922"
+  },
+  {
+    "file": "native-zimg-3.0.5-COPYING.txt",
+    "source": "zimg-3.0.5.tar.gz",
+    "member": "zimg-release-3.0.5/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "7637386b5f81e8a719ca336233149005e5fa28b5e6054ea7b67de49355b0ad40"
+  },
+  {
+    "file": "native-nv-codec-headers-12.2.72.0-include_ffnvcodec_dynlink_cuda.h.txt",
+    "source": "nv-codec-headers-12.2.72.0.tar.gz",
+    "member": "nv-codec-headers-n12.2.72.0/include/ffnvcodec/dynlink_cuda.h",
+    "leadingCommentOnly": true,
+    "sha256": "6f0d5ad2609c6fda3e0fb07fa286e7b46c2ea7b87ab12d926ab7a82c69ffe09d"
+  },
+  {
+    "file": "native-nv-codec-headers-12.2.72.0-include_ffnvcodec_dynlink_cuviddec.h.txt",
+    "source": "nv-codec-headers-12.2.72.0.tar.gz",
+    "member": "nv-codec-headers-n12.2.72.0/include/ffnvcodec/dynlink_cuviddec.h",
+    "leadingCommentOnly": true,
+    "sha256": "72b60be67644d841bfd54a042875b5846294d357040dd7ac8e38bde20d9e8f97"
+  },
+  {
+    "file": "native-nv-codec-headers-12.2.72.0-include_ffnvcodec_dynlink_loader.h.txt",
+    "source": "nv-codec-headers-12.2.72.0.tar.gz",
+    "member": "nv-codec-headers-n12.2.72.0/include/ffnvcodec/dynlink_loader.h",
+    "leadingCommentOnly": true,
+    "sha256": "6f0d5ad2609c6fda3e0fb07fa286e7b46c2ea7b87ab12d926ab7a82c69ffe09d"
+  },
+  {
+    "file": "native-nv-codec-headers-12.2.72.0-include_ffnvcodec_dynlink_nvcuvid.h.txt",
+    "source": "nv-codec-headers-12.2.72.0.tar.gz",
+    "member": "nv-codec-headers-n12.2.72.0/include/ffnvcodec/dynlink_nvcuvid.h",
+    "leadingCommentOnly": true,
+    "sha256": "72b60be67644d841bfd54a042875b5846294d357040dd7ac8e38bde20d9e8f97"
+  },
+  {
+    "file": "native-nv-codec-headers-12.2.72.0-include_ffnvcodec_nvEncodeAPI.h.txt",
+    "source": "nv-codec-headers-12.2.72.0.tar.gz",
+    "member": "nv-codec-headers-n12.2.72.0/include/ffnvcodec/nvEncodeAPI.h",
+    "leadingCommentOnly": true,
+    "sha256": "72b60be67644d841bfd54a042875b5846294d357040dd7ac8e38bde20d9e8f97"
+  },
+  {
+    "file": "native-gcc-12.2.0-COPYING.RUNTIME.txt",
+    "source": "gcc-12.2.0.tar.xz",
+    "member": "gcc-12.2.0/COPYING.RUNTIME",
+    "leadingCommentOnly": false,
+    "sha256": "9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74"
+  },
+  {
+    "file": "native-gcc-12.2.0-COPYING3.txt",
+    "source": "gcc-12.2.0.tar.xz",
+    "member": "gcc-12.2.0/COPYING3",
+    "leadingCommentOnly": false,
+    "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "file": "native-make-4.4.1-COPYING.txt",
+    "source": "make-4.4.1.tar.gz",
+    "member": "make-4.4.1/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "e79e9c8a0c85d735ff98185918ec94ed7d175efc377012787aebcf3b80f0d90b"
+  },
+  {
+    "file": "native-libffi-LICENSE.txt",
+    "source": "libffi-3.4.6.tar.gz",
+    "member": "libffi-3.4.6/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "67894089811f93fca47a76f85e017da6f8582d4ba0905963c6e0f1ad6df7a195"
+  },
+  {
+    "file": "native-lldb-mi-LICENSE.TXT.txt",
+    "source": "lldb-mi-2340ff2.tar.gz",
+    "member": "lldb-mi-2340ff25bc46201b20779bef5bc399bf994895f0/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "76be4deddeef87f6fa9940f4992a9506c7bb222af60eb3b2a47cf65719528bbe"
+  },
+  {
+    "file": "native-cpython-mingw-LICENSE.txt",
+    "source": "cpython-mingw-d21f60d.tar.gz",
+    "member": "cpython-mingw-d21f60d4a8bb03e0309fe3907b104f1878059f90/LICENSE",
+    "leadingCommentOnly": false,
+    "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+  },
+  {
+    "file": "native-llvm-project-clang-tools-extra_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/clang-tools-extra/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47"
+  },
+  {
+    "file": "native-llvm-project-clang_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/clang/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47"
+  },
+  {
+    "file": "native-llvm-project-compiler-rt_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/compiler-rt/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+  },
+  {
+    "file": "native-llvm-project-libcxx_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/libcxx/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+  },
+  {
+    "file": "native-llvm-project-libcxxabi_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/libcxxabi/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+  },
+  {
+    "file": "native-llvm-project-libunwind_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/libunwind/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d"
+  },
+  {
+    "file": "native-llvm-project-lld_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/lld/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "f7891568956e34643eb6a0db1462db30820d40d7266e2a78063f2fe233ece5a0"
+  },
+  {
+    "file": "native-llvm-project-lldb_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/lldb/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "76be4deddeef87f6fa9940f4992a9506c7bb222af60eb3b2a47cf65719528bbe"
+  },
+  {
+    "file": "native-llvm-project-llvm_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/llvm/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+  },
+  {
+    "file": "native-llvm-project-openmp_LICENSE.TXT.txt",
+    "source": "llvm-project-20.1.0.tar.gz",
+    "member": "llvm-project-24a30daaa559829ad079f2ff7f73eb4e18095f88/openmp/LICENSE.TXT",
+    "leadingCommentOnly": false,
+    "sha256": "fdad1758a9e1f9d5a81e18879b3406772115edc92c24bfa36b70c654f325e8e4"
+  }
+]

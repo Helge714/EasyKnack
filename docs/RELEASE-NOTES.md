@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Expanded Windows native-source and license coverage, including GNU Make,
+  MinGW gendef and FFmpeg dependencies. Recorded official runtime/toolchain
+  comparisons and remaining provenance limits; exclude generated compiler Python
+  caches from future installers. No DSP, document or plugin-contract change.
+
 - Added Help with an offline English handbook, selectable application/Core build
   details and license notices. Installer builds capture local sources and collect
   checksum-locked upstream materials beside the installer; incomplete provenance
