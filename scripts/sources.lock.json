@@ -2,6 +2,18 @@
   "format": 1,
   "sources": [
     {
+      "id": "ffmpeg-mingw-msys2-recipes",
+      "url": "https://codeload.github.com/msys2/MINGW-packages/tar.gz/a5f114dba5dcc0511d792b31dc4b713c91367ed7",
+      "file": "msys2-recipes-a5f114d.tar.gz",
+      "sha256": "39582c5dc2b76154faa4a7f26b5a55aad220b9e545a91cbde647f71f7a89c020"
+    },
+    {
+      "id": "ffmpeg-mingw-w64",
+      "url": "https://codeload.github.com/mingw-w64/mingw-w64/tar.gz/530c58e17adc5bfa1347a71453eca95b248ec683",
+      "file": "mingw-w64-530c58e.tar.gz",
+      "sha256": "f840fb43be69ef44757f7aa14468ba525b6a7d04a1781cdf71c5a50fc037d338"
+    },
+    {
       "id": "antlr-2.7.7",
       "url": "https://www.antlr2.org/download/antlr-2.7.7.tar.gz",
       "file": "antlr-2.7.7.tar.gz",
@@ -267,7 +279,7 @@
   "runtimeReleaseSha256": "86e5e51658bb2b9cf064b3957d81ac39abdb346b2cac19867c1625dd19d440d9",
   "remainingReview": [
     "GLSwing snapshot sources are collected but not proven to match its dirty binary build; obtain matching build inputs and parent POM.",
-    "FFmpeg GCC 12.2.0 source and MSYS2 Rev11 recipe/patches collected. Original link map or builder package manifest is still needed to identify exact MinGW CRT/winpthreads versions and explain mixed Rev10/Rev11 strings. Do not substitute LLVM-MinGW sources for these.",
+    "FFmpeg release-tree Windows recipe pins CRT/winpthreads 10.0.0.r258.g530c58e17-1; matching upstream sources and notices are collected. Confirm the actual release used this recipe: its workflow references the mutable actions branch. Upstream inquiry is prepared in docs/development/source-audit/UPSTREAM-QUESTIONS.md.",
     "Temurin official archive, source revisions, SBOM and build configuration verified. Confirm applicable redistribution terms for the included Microsoft VC/UCRT DLLs; they are not OpenJDK-licensed source components.",
     "Review project/vendored ownership, plugin SDK/generated notices and final installed package before publishing."
   ]

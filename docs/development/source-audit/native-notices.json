@@ -1,5 +1,33 @@
 [
   {
+    "file": "native-ffmpeg-mingw-w64-COPYING.txt",
+    "source": "mingw-w64-530c58e.tar.gz",
+    "member": "mingw-w64-530c58e17adc5bfa1347a71453eca95b248ec683/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f"
+  },
+  {
+    "file": "native-ffmpeg-mingw-w64-COPYING.MinGW-w64-runtime_COPYING.MinGW-w64-runtime.txt.txt",
+    "source": "mingw-w64-530c58e.tar.gz",
+    "member": "mingw-w64-530c58e17adc5bfa1347a71453eca95b248ec683/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+    "leadingCommentOnly": false,
+    "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd"
+  },
+  {
+    "file": "native-ffmpeg-mingw-w64-COPYING.MinGW-w64_COPYING.MinGW-w64.txt.txt",
+    "source": "mingw-w64-530c58e.tar.gz",
+    "member": "mingw-w64-530c58e17adc5bfa1347a71453eca95b248ec683/COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+    "leadingCommentOnly": false,
+    "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1"
+  },
+  {
+    "file": "native-ffmpeg-mingw-w64-mingw-w64-libraries_winpthreads_COPYING.txt",
+    "source": "mingw-w64-530c58e.tar.gz",
+    "member": "mingw-w64-530c58e17adc5bfa1347a71453eca95b248ec683/mingw-w64-libraries/winpthreads/COPYING",
+    "leadingCommentOnly": false,
+    "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177"
+  },
+  {
     "file": "native-lame-3.100-COPYING.txt",
     "source": "lame-3.100.tar.gz",
     "member": "lame-3.100/COPYING",

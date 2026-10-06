@@ -1,0 +1,21 @@
+{
+  "checked": "2026-10-06",
+  "microsoftRuntimeTerms": {
+    "url": "https://visualstudio.microsoft.com/wp-content/uploads/2021/09/Visual-C-Runtime-2015-2022-License-1.docx",
+    "sha256": "f1e3d56ceb2ad68aae0711b910375009e651ac5530fa0760f0dea6e81e54fae1",
+    "eulaId": "Cpp_2015-2022_ENU.1033",
+    "finding": "End-user installation/use terms; not itself a redistribution grant."
+  },
+  "temurinBundlingAnswer": "https://github.com/adoptium/temurin-build/issues/1268#issuecomment-529919279",
+  "ffmpegRecipe": {
+    "archive": "javacpp-presets-1.5.11.tar.gz",
+    "actionMember": "javacpp-presets-1.5.11/.github/actions/deploy-windows/action.yml",
+    "workflowMember": "javacpp-presets-1.5.11/.github/workflows/ffmpeg.yml",
+    "gcc": "12.2.0-11",
+    "crtAndWinpthreads": "10.0.0.r258.g530c58e17-1",
+    "sourceCommit": "530c58e17adc5bfa1347a71453eca95b248ec683",
+    "msys2Recipes": "a5f114dba5dcc0511d792b31dc4b713c91367ed7",
+    "actualReleaseActionConfirmed": false
+  },
+  "inquiriesSubmitted": false
+}

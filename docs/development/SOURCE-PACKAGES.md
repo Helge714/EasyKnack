@@ -68,6 +68,6 @@ GCC recipe/patch tree. Official Temurin SBOM/build metadata and file-by-file nat
 archive comparisons are recorded in the [native review](source-audit/NATIVE-RUNTIMES.md).
 
 Before public distribution, resolve the remaining items in `sources.lock.json`
-and [LICENSING.md](LICENSING.md), especially FFmpeg CRT/pthread provenance,
+and [LICENSING.md](LICENSING.md), especially FFmpeg release-action confirmation,
 Microsoft runtime redistribution terms and the GLSwing snapshot. No release
 or public upload is performed by these scripts.

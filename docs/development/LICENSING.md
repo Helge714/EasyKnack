@@ -32,8 +32,11 @@ used under its GPLv3 alternative, not the proprietary agreement.
   enabled libraries; verify -L and -buildconf for the artifact being distributed.
 - [x] Collect the identified OpenJDK build sources/configuration and LLVM-MinGW
   component sources/notices, including GNU Make and gendef.
-- [ ] Resolve the remaining FFmpeg CRT/pthread provenance and applicable Microsoft
-  runtime redistribution terms documented in the native review.
+- [x] Identify the CRT/pthread versions pinned by the FFmpeg release-tree recipe;
+  collect matching upstream sources, MSYS2 package recipes/patches and notices.
+- [ ] Confirm the actual FFmpeg release action revision and applicable Microsoft
+  runtime redistribution terms. See the ready-to-submit
+  [upstream questions](source-audit/UPSTREAM-QUESTIONS.md); neither has been sent.
 - [ ] Build from an identified release revision and archive corresponding EasyKnack
   sources and build scripts. Include uncommitted changes if distributing a local build;
   an archive of HEAD alone does not describe a dirty binary.

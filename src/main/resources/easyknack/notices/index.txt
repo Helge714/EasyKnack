@@ -8,6 +8,10 @@ jogl-2.6.0-Apache.LICENSE-2.0
 jogl-2.6.0-LICENSE.txt
 jogl-2.6.0-ubuntu-font-licence-1.0.txt
 native-cpython-mingw-LICENSE.txt
+native-ffmpeg-mingw-w64-COPYING.MinGW-w64-runtime_COPYING.MinGW-w64-runtime.txt.txt
+native-ffmpeg-mingw-w64-COPYING.MinGW-w64_COPYING.MinGW-w64.txt.txt
+native-ffmpeg-mingw-w64-COPYING.txt
+native-ffmpeg-mingw-w64-mingw-w64-libraries_winpthreads_COPYING.txt
 native-freetype-2.13.3-LICENSE.TXT.txt
 native-freetype-2.13.3-docs_FTL.TXT.txt
 native-freetype-2.13.3-docs_GPLv2.TXT.txt

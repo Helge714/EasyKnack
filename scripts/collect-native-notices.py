@@ -11,6 +11,9 @@ import tarfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RULES = {
+    "ffmpeg-mingw-w64": ["COPYING", "COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+        "COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+        "mingw-w64-libraries/winpthreads/COPYING"],
     "lame-3.100": ["COPYING", "LICENSE"],
     "speex-1.2.1": ["COPYING", "AUTHORS"],
     "opus-1.3.1": ["COPYING", "AUTHORS"],

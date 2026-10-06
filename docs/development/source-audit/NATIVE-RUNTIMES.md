@@ -10,7 +10,7 @@ opinion or a claim of independently reproduced upstream binaries.
 |---|---|---|
 | Temurin 25.0.4.1+1 | Official archive hash matches release metadata; all 431 files in the local JDK match. The packaged runtime contains 430 unchanged files; only `lib/src.zip` is absent. Exact OpenJDK source, build-script commit, SBOM and configure/build arguments are collected. | Microsoft VC/UCRT files have their own redistribution terms; they are not covered by the OpenJDK source archive. |
 | LLVM-MinGW 20250305 | All 9,015 upstream files match in both the local compiler and packaged copy. Four extra Python bytecode cache files were found, with no modified upstream files. Future packages exclude these generated caches. | Source mapping uses the pinned release build recipes, not a fresh independent rebuild. |
-| FFmpeg 7.1 / Bytedeco 1.5.11 | Exact JAR hash and FFmpeg configuration recorded. GCC 12.2.0 and the MSYS2 12.2.0-11 build recipe/patch tree collected; GCC archive hash agrees with that recipe. | The original builder's package manifest or link map is unavailable. Exact MinGW CRT/winpthreads versions cannot be established from compiler version output alone. |
+| FFmpeg 7.1 / Bytedeco 1.5.11 | Exact JAR hash/configuration and GCC sources recorded. The release-tree Windows recipe pins MinGW CRT/winpthreads to 10.0.0.r258.g530c58e17-1; that upstream source and its notices are now collected separately from LLVM-MinGW. | The workflow calls a mutable `actions` branch. Confirmation of the recipe actually executed for the published JAR remains outstanding. |
 
 The machine-readable comparison results are `jdk-match.json`, `llvm-match.json`,
 `packaged-jdk-match.json` and `packaged-llvm-match.json`. Their `exactMatch` field
@@ -56,6 +56,26 @@ recipe/patch tree is collected, as is GCC 12.2.0 with SHA-256
 `e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff`.
 Do not substitute the much newer LLVM-MinGW CRT source for the FFmpeg build's CRT.
 
+Follow-up: the archived JavaCPP Presets 1.5.11 Windows action explicitly installs
+CRT, headers, libwinpthread and winpthreads package version
+`10.0.0.r258.g530c58e17-1`, together with GCC 12.2.0-11. This resolves the earlier
+absence of a recipe-level MinGW version. The full upstream revision is
+`530c58e17adc5bfa1347a71453eca95b248ec683`; its checksum-locked source archive and
+four original license documents are now collected. The winpthreads notice grants
+MIT/BSD-style permissions and requires attribution; static use is not, by itself,
+a requirement to publish EasyKnack under LGPL.
+
+MSYS2 recipe/patch tree `a5f114dba5dcc0511d792b31dc4b713c91367ed7` contains
+the matching `pkgrel=1` CRT and winpthreads recipes and is collected separately.
+The previously collected GCC recipe tree has CRT `pkgrel=2`; it must not be used
+as the exact CRT package recipe merely because it has the same source revision.
+
+This is not a recovered release log. `ffmpeg.yml` uses
+`bytedeco/javacpp-presets/.github/actions/deploy-windows@actions`, not the tag's
+immutable action content. The upstream question below asks which revision actually
+ran, or for the logged `pacman -Q` inventory. Keep the binary-to-recipe confirmation
+open; do not label a source collection as a reproducible-build verification.
+
 GCC's Runtime Library Exception matters: eligible combinations with independent
 modules can be distributed under the independent modules' terms. Static GCC
 runtime use is therefore **not automatically** a requirement to license an entire
@@ -86,6 +106,25 @@ permission/terms for downstream distribution of this bundle; this review does no
 infer them solely from Temurin's GPL notice. No runtime files were removed or
 replaced, and no prerequisite installer was silently introduced.
 
+Follow-up: Microsoft's official Visual C++ 2015–2022 Runtime **end-user** agreement
+was inspected (EULA ID `Cpp_2015-2022_ENU.1033`). It permits installation/use, but
+does not itself grant redistribution. Microsoft's redistribution documentation
+points instead to the applicable Visual Studio terms and REDIST list. Therefore,
+adding that runtime EULA alone would not resolve the outstanding permission chain.
+The document URL and downloaded SHA-256 are recorded in `followup-evidence.json`.
+
+Adoptium's public response in issue 1268 permits bundling its runtime in principle,
+but does not specifically explain the Microsoft VC/UCRT terms for this release.
+This is an unanswered documentation question, not a finding that Temurin cannot
+be redistributed. No purchase or replacement runtime is established as necessary.
+The prepared [upstream questions](UPSTREAM-QUESTIONS.md) request the relevant
+permission and required notices. They have **not been submitted**.
+
+If that route cannot be confirmed, a separately verified Visual Studio/SDK
+redistribution route or installer download from Microsoft can be evaluated.
+Either changes the packaging assumptions and requires installation testing;
+silently removing DLLs from the working runtime is not a solution.
+
 ## Repeating the checks
 
 Download the official ZIPs at the URLs in `official-archive-origins.json`, then run:
@@ -109,3 +148,7 @@ the Help license index. Ordinary installer builds do not require Python.
 - [MSYS2 GCC recipe](https://github.com/msys2/MINGW-packages/blob/fd5380c8c48c5ab7cc9bc4189961da70f0317bed/mingw-w64-gcc/PKGBUILD)
 - [GCC Runtime Library Exception](https://www.gnu.org/licenses/gcc-exception-3.1.en.html)
 - [Microsoft redistribution conditions](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files?view=msvc-170)
+- [Microsoft Visual C++ 2015–2022 end-user terms](https://visualstudio.microsoft.com/license-terms/vs2022-cruntime/)
+- [Adoptium bundling response](https://github.com/adoptium/temurin-build/issues/1268#issuecomment-529919279)
+- [Release-tree Windows action](https://github.com/bytedeco/javacpp-presets/blob/1.5.11/.github/actions/deploy-windows/action.yml)
+- [Release-tree FFmpeg workflow](https://github.com/bytedeco/javacpp-presets/blob/1.5.11/.github/workflows/ffmpeg.yml)
