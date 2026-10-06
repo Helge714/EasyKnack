@@ -7,6 +7,12 @@ Each build uses a new folder under `target/distribution` and includes the shortc
 selection dialog. Native compilation and installer compression can take several
 minutes; detailed logs are referenced by the build scripts.
 
+Each build also creates `EasyKnack-project-sources.zip` and
+`EasyKnack-source-materials.zip` beside the installer. The latter downloads pinned
+upstream sources on its first run and reuses a checksum-verified cache thereafter.
+Its `REVIEW.json` lists incomplete provenance checks; it is not yet a public-release
+clearance. See [source packaging](development/SOURCE-PACKAGES.md).
+
 The launcher detects PowerShell 7, a JDK from `JAVA_HOME`, PATH or `~/.jdks`,
 LLVM-MinGW and WiX from `target/tools`, and Maven from PATH or the local Eclipse
 Maven runtime. It does not download tools. GLSwing must already be available as

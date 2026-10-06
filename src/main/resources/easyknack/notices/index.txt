@@ -1,0 +1,9 @@
+antlr-2.7.7-LICENSE.txt
+gluegen-2.6.0-Apache.LICENSE-2.0
+gluegen-2.6.0-LICENSE.txt
+javacpp-1.5.11-LICENSE.txt
+javacpp-presets-1.5.11-LICENSE.txt
+jogl-2.6.0-Apache.LICENSE-1.1
+jogl-2.6.0-Apache.LICENSE-2.0
+jogl-2.6.0-LICENSE.txt
+jogl-2.6.0-ubuntu-font-licence-1.0.txt

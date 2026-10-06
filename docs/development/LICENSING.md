@@ -11,6 +11,12 @@ used under its GPLv3 alternative, not the proprietary agreement.
 - Project license and third-party overview included in application JARs.
 - Windows package includes project license, overview, native notices and FFmpeg
   license information, in addition to JAR, runtime and toolchain notices.
+- Missing JavaCPP, JogAmp and ANTLR notices are supplied from the pinned upstream
+  source releases, including JogAmp's referenced license documents.
+- Packaging captures the actual working-tree sources, detects edits during the
+  build and adds a deterministic sources archive plus collected upstream materials.
+- Exact JAR hashes, FFmpeg build configuration and Temurin source revisions are
+  recorded. See [source package instructions](SOURCE-PACKAGES.md).
 
 ## Before publishing any binary
 
@@ -32,8 +38,9 @@ used under its GPLv3 alternative, not the proprietary agreement.
   linking exception. Review combinations before promising proprietary-plugin support.
 - [ ] Verify notices and source links in the final installed package and download page.
 
-The local packaging script collects available notices; it does not download or verify
-complete corresponding sources and is not a public-release compliance certification.
+The local packaging script downloads checksum-locked source materials, but matching
+all upstream build inputs remains under review. `REVIEW.json` records these gaps;
+the package is not a public-release compliance certification.
 No release tags, public uploads or source-offer commitments are created by this change.
 
 References: [third-party overview](../../THIRD-PARTY.md),

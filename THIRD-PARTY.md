@@ -25,7 +25,8 @@ that all corresponding-source obligations have already been fulfilled.
 
 Windows packages place LICENSE and this file in the application's app directory.
 The licenses directory contains extracted runtime-JAR notices, native component
-notices and FFmpeg information. The JDK legal directory and the complete compiler
+notices and FFmpeg information. Its upstream subdirectory supplements missing JAR
+notices with the JavaCPP, JogAmp and ANTLR release license documents. The JDK legal directory and the complete compiler
 distribution retain their own notices. Application JARs also contain the project
 license and this overview under META-INF.
 
@@ -44,6 +45,9 @@ Bytedeco build recipes: https://github.com/bytedeco/javacpp-presets/tree/1.5.11/
 These reference links are not an already fulfilled source offer or a complete
 source archive matching any particular installer. The release checklist in
 `docs/development/LICENSING.md` records what remains to prepare.
+New installer builds include project and upstream source-material archives with
+checksums and a REVIEW.json report. Remaining provenance checks are documented in
+`docs/development/SOURCE-PACKAGES.md`; review them before public distribution.
 
 ## Plugins and generated code
 

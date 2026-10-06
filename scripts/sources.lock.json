@@ -1,0 +1,227 @@
+{
+  "format": 1,
+  "sources": [
+    {
+      "id": "antlr-2.7.7",
+      "url": "https://www.antlr2.org/download/antlr-2.7.7.tar.gz",
+      "file": "antlr-2.7.7.tar.gz",
+      "sha256": "853aeb021aef7586bda29e74a6b03006bcb565a755c86b66032d8ec31b67dbb9"
+    },
+    {
+      "id": "ffmpeg-7.1",
+      "url": "https://ffmpeg.org/releases/ffmpeg-7.1.tar.bz2",
+      "file": "ffmpeg-7.1.tar.bz2",
+      "sha256": "fd59e6160476095082e94150ada5a6032d7dcc282fe38ce682a00c18e7820528"
+    },
+    {
+      "id": "freetype-2.13.3",
+      "url": "https://ftp.osuosl.org/pub/blfs/conglomeration/freetype/freetype-2.13.3.tar.xz",
+      "file": "freetype-2.13.3.tar.xz",
+      "sha256": "0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289"
+    },
+    {
+      "id": "gluegen-2.6.0",
+      "url": "https://codeload.github.com/sgothel/gluegen/tar.gz/refs/tags/v2.6.0",
+      "file": "gluegen-2.6.0.tar.gz",
+      "sha256": "9071eb48aa5432a0e51c995ad3bf0c5eec984a017dc197d594c5ffe0c34c2480"
+    },
+    {
+      "id": "javacpp-1.5.11",
+      "url": "https://codeload.github.com/bytedeco/javacpp/tar.gz/refs/tags/1.5.11",
+      "file": "javacpp-1.5.11.tar.gz",
+      "sha256": "cb93bc13a9b7ea82fc0d3d4fc19721116b083ec33a11bdf2afba21c67ddcb474"
+    },
+    {
+      "id": "javacpp-presets-1.5.11",
+      "url": "https://codeload.github.com/bytedeco/javacpp-presets/tar.gz/refs/tags/1.5.11",
+      "file": "javacpp-presets-1.5.11.tar.gz",
+      "sha256": "b755361209780ee08cdef426c1b4bf5942e53a204575e472148f388ddec5068f"
+    },
+    {
+      "id": "jdk-25.0.4.1",
+      "url": "https://codeload.github.com/adoptium/jdk25u/tar.gz/520406d871955300957ef01e406ac2acd0f9b75c",
+      "file": "jdk-25.0.4.1.tar.gz",
+      "sha256": "83ee12f7a58904436f04fd9179aa1286c7e5a98d1113671b08b64aebf9865444"
+    },
+    {
+      "id": "jogl-2.6.0",
+      "url": "https://codeload.github.com/sgothel/jogl/tar.gz/refs/tags/v2.6.0",
+      "file": "jogl-2.6.0.tar.gz",
+      "sha256": "8c389d9f51f1dc7838fbb604165ff4a39e91897d9a5eccbe1c680f5b5a6eaa46"
+    },
+    {
+      "id": "lame-3.100",
+      "url": "https://ftp.osuosl.org/pub/blfs/conglomeration/lame/lame-3.100.tar.gz",
+      "file": "lame-3.100.tar.gz",
+      "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
+    },
+    {
+      "id": "libaom-3.9.1",
+      "url": "https://storage.googleapis.com/aom-releases/libaom-3.9.1.tar.gz",
+      "file": "libaom-3.9.1.tar.gz",
+      "sha256": "dba99fc1c28aaade28dda59821166b2fa91c06162d1bc99fde0ddaad7cecc50e"
+    },
+    {
+      "id": "libvpx-1.14.1",
+      "url": "https://codeload.github.com/webmproject/libvpx/tar.gz/refs/tags/v1.14.1",
+      "file": "libvpx-1.14.1.tar.gz",
+      "sha256": "901747254d80a7937c933d03bd7c5d41e8e6c883e0665fadcb172542167c7977"
+    },
+    {
+      "id": "libwebp-1.4.0",
+      "url": "https://codeload.github.com/webmproject/libwebp/tar.gz/refs/tags/v1.4.0",
+      "file": "libwebp-1.4.0.tar.gz",
+      "sha256": "12af50c45530f0a292d39a88d952637e43fb2d4ab1883c44ae729840f7273381"
+    },
+    {
+      "id": "libxml2-2.9.12",
+      "url": "https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.12.tar.xz",
+      "file": "libxml2-2.9.12.tar.xz",
+      "sha256": "28a92f6ab1f311acf5e478564c49088ef0ac77090d9c719bbc5d518f1fe62eb9"
+    },
+    {
+      "id": "llvm-mingw-20250305",
+      "url": "https://codeload.github.com/mstorsjo/llvm-mingw/tar.gz/refs/tags/20250305",
+      "file": "llvm-mingw-20250305.tar.gz",
+      "sha256": "a4d1a78a6b84304942e2cea22a9510d32e4795dcc56a335d38901dacfc35be10"
+    },
+    {
+      "id": "mfx-dispatch-1.35.1",
+      "url": "https://codeload.github.com/lu-zero/mfx_dispatch/tar.gz/refs/tags/1.35.1",
+      "file": "mfx-dispatch-1.35.1.tar.gz",
+      "sha256": "673636da98a4fd5c3e3dc5267da5429e986f53089ed6c33cdca5751f56d9416b"
+    },
+    {
+      "id": "nv-codec-headers-12.2.72.0",
+      "url": "https://codeload.github.com/FFmpeg/nv-codec-headers/tar.gz/refs/tags/n12.2.72.0",
+      "file": "nv-codec-headers-12.2.72.0.tar.gz",
+      "sha256": "dbeaec433d93b850714760282f1d0992b1254fc3b5a6cb7d76fc1340a1e47563"
+    },
+    {
+      "id": "opencore-amr-0.1.6",
+      "url": "https://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.6.orig.tar.gz",
+      "file": "opencore-amr-0.1.6.tar.gz",
+      "sha256": "483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1"
+    },
+    {
+      "id": "openh264-2.4.1",
+      "url": "https://codeload.github.com/cisco/openh264/tar.gz/refs/tags/v2.4.1",
+      "file": "openh264-2.4.1.tar.gz",
+      "sha256": "8ffbe944e74043d0d3fb53d4a2a14c94de71f58dbea6a06d0dc92369542958ea"
+    },
+    {
+      "id": "openssl-3.3.2",
+      "url": "https://github.com/openssl/openssl/releases/download/openssl-3.3.2/openssl-3.3.2.tar.gz",
+      "file": "openssl-3.3.2.tar.gz",
+      "sha256": "2e8a40b01979afe8be0bbfb3de5dc1c6709fedb46d6c89c10da114ab5fc3d281"
+    },
+    {
+      "id": "opus-1.3.1",
+      "url": "https://archive.mozilla.org/pub/opus/opus-1.3.1.tar.gz",
+      "file": "opus-1.3.1.tar.gz",
+      "sha256": "65b58e1e25b2a114157014736a3d9dfeaad8d41be1c8179866f144a2fb44ff9d"
+    },
+    {
+      "id": "speex-1.2.1",
+      "url": "https://ftp.osuosl.org/pub/xiph/releases/speex/speex-1.2.1.tar.gz",
+      "file": "speex-1.2.1.tar.gz",
+      "sha256": "4b44d4f2b38a370a2d98a78329fefc56a0cf93d1c1be70029217baae6628feea"
+    },
+    {
+      "id": "srt-1.5.3",
+      "url": "https://codeload.github.com/Haivision/srt/tar.gz/refs/tags/v1.5.3",
+      "file": "srt-1.5.3.tar.gz",
+      "sha256": "befaeb16f628c46387b898df02bc6fba84868e86a6f6d8294755375b9932d777"
+    },
+    {
+      "id": "svt-av1-2.2.1",
+      "url": "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v2.2.1/SVT-AV1-v2.2.1.tar.gz",
+      "file": "svt-av1-2.2.1.tar.gz",
+      "sha256": "d02b54685542de0236bce4be1b50912aba68aff997c43b350d84a518df0cf4e5"
+    },
+    {
+      "id": "temurin-build",
+      "url": "https://codeload.github.com/adoptium/temurin-build/tar.gz/e6ba7dec3d07654074559310376a3ae89da5f4ac",
+      "file": "temurin-build.tar.gz",
+      "sha256": "b1340378b9ed62b32acfacd012dd069ec2b9d940fc39d3c73f32142d64e89713"
+    },
+    {
+      "id": "vo-amrwbenc-0.1.3",
+      "url": "https://deb.debian.org/debian/pool/main/v/vo-amrwbenc/vo-amrwbenc_0.1.3.orig.tar.gz",
+      "file": "vo-amrwbenc-0.1.3.tar.gz",
+      "sha256": "5652b391e0f0e296417b841b02987d3fd33e6c0af342c69542cbb016a71d9d4e"
+    },
+    {
+      "id": "zimg-3.0.5",
+      "url": "https://codeload.github.com/sekrit-twc/zimg/tar.gz/refs/tags/release-3.0.5",
+      "file": "zimg-3.0.5.tar.gz",
+      "sha256": "a9a0226bf85e0d83c41a8ebe4e3e690e1348682f6a2a7838f1b8cbff1b799bcf"
+    },
+    {
+      "id": "zlib-1.3.1",
+      "url": "https://zlib.net/fossils/zlib-1.3.1.tar.gz",
+      "file": "zlib-1.3.1.tar.gz",
+      "sha256": "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
+    },
+    {
+      "id": "glswing-0.2.0-SNAPSHOT",
+      "file": "glswing-0.2.0-SNAPSHOT-sources.jar",
+      "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-sources.jar",
+      "sha256": "1df4f80179022929b9c853c41b8aa14120da5df5ce2a41c8b0131430e0fbe8af"
+    }
+  ],
+  "binaries": [
+    {
+      "file": "antlr-2.7.7.jar",
+      "sha256": "88fbda4b912596b9f56e8e12e580cc954bacfb51776ecfddd3e18fc1cf56dc4c"
+    },
+    {
+      "file": "ffmpeg-7.1-1.5.11-windows-x86_64.jar",
+      "sha256": "63205da750f3fbb7fa0e5d23b9e00fc1257e478c33d02dcee9299268309d594b"
+    },
+    {
+      "file": "ffmpeg-7.1-1.5.11.jar",
+      "sha256": "44d832a8658fe415b9106e94fb270c8a9a59188d68449be7760c7396dd19cd71"
+    },
+    {
+      "file": "glswing-0.2.0-SNAPSHOT.jar",
+      "sha256": "82c0dbbc4561e155fa4c14b227c314a1c22de41a40493c9ac104201383c7766d"
+    },
+    {
+      "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",
+      "sha256": "c7c9138606858fed0b1650a2444cc1bc96599cc635a8d879979a37646e8594b1"
+    },
+    {
+      "file": "gluegen-rt-2.6.0.jar",
+      "sha256": "465bbc8d410b872a76b5b901cdb9c2c07905edd5e61a7120dc6a4d007880ec2f"
+    },
+    {
+      "file": "gluegen-rt-main-2.6.0.jar",
+      "sha256": "cc114f4c0b29b2fe4d06a5c7931838814452a04cc9789e27b21ab05d3541c107"
+    },
+    {
+      "file": "javacpp-1.5.11.jar",
+      "sha256": "2e3cc3c5d75f06d63dfaea839c4f1abc973fb72d518186016571c7467cdf8434"
+    },
+    {
+      "file": "jogl-all-2.6.0-natives-windows-amd64.jar",
+      "sha256": "33081ebfac520d7d283830a614f458f728104bef4eff56b52f604ee8c5af90c8"
+    },
+    {
+      "file": "jogl-all-2.6.0.jar",
+      "sha256": "34c919bc6073c2d9e73cbe7558c4e9de6b5c58146f3658e2bcc5f23ec3fccc9f"
+    },
+    {
+      "file": "jogl-all-main-2.6.0.jar",
+      "sha256": "cc114f4c0b29b2fe4d06a5c7931838814452a04cc9789e27b21ab05d3541c107"
+    }
+  ],
+  "runtimeReleaseSha256": "86e5e51658bb2b9cf064b3957d81ac39abdb346b2cac19867c1625dd19d440d9",
+  "remainingReview": [
+    "GLSwing snapshot sources are collected but not proven to match its dirty binary build; obtain matching build inputs and parent POM.",
+    "FFmpeg recipe and enabled library sources collected; verify original builder patches/configuration and static GCC 12.2.0 Rev11 / MinGW runtime provenance.",
+    "Temurin exact OpenJDK and build-script revisions collected; obtain the corresponding build configuration and check additional runtime components.",
+    "LLVM-MinGW build recipes collected; finish component-specific notice and corresponding-source review.",
+    "Review project/vendored ownership, plugin SDK/generated notices and final installed package before publishing."
+  ]
+}

@@ -10,6 +10,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = Split-Path -Parent $PSScriptRoot
+. "$PSScriptRoot/SourcePackage.ps1"
 if (!$JdkHome) { $JdkHome = Split-Path -Parent (Split-Path -Parent (Get-Command javac.exe).Source) }
 $JdkHome = (Resolve-Path -LiteralPath $JdkHome).Path
 $Toolchain = (Resolve-Path -LiteralPath $Toolchain).Path
@@ -28,6 +29,9 @@ if (Test-Path -LiteralPath "$Destination/EasyKnack") { throw 'Destination alread
 $work = Join-Path $root "target/package-work/$([guid]::NewGuid().ToString('N'))"
 $inputDir = Join-Path $work 'input'
 New-Item -ItemType Directory -Force -Path $inputDir, $Destination | Out-Null
+$sourceSnapshot = Get-SourceSnapshot $root
+$projectSources = Join-Path $Destination 'EasyKnack-project-sources.zip'
+Write-ProjectSources $root $projectSources $sourceSnapshot
 Push-Location $root
 try {
     Write-Host 'Building and testing Java application...'
@@ -67,6 +71,7 @@ try {
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/user" -Destination "$inputDir/user" -Recurse
     Copy-Item -LiteralPath "$root/LICENSE", "$root/THIRD-PARTY.md" -Destination $inputDir
+    Copy-Item -LiteralPath "$root/src/main/resources/easyknack/notices" -Destination "$inputDir/licenses/upstream" -Recurse
     New-Item -ItemType Directory -Path "$inputDir/licenses/asio", "$inputDir/licenses/miniaudio", "$inputDir/licenses/ffmpeg" | Out-Null
     Copy-Item -LiteralPath "$root/native/audio-host/third_party/asio/LICENSE.txt", "$root/native/audio-host/third_party/asio/COPYING" -Destination "$inputDir/licenses/asio"
     $miniaudio = [IO.File]::ReadAllText("$root/native/audio-host/third_party/miniaudio.h")
@@ -74,7 +79,7 @@ try {
     if ($licenseStart -lt 0) { throw 'miniaudio license section not found.' }
     $miniaudio.Substring($licenseStart).Replace('*/','').Trim() | Set-Content -LiteralPath "$inputDir/licenses/miniaudio/LICENSE.txt" -Encoding utf8
     Copy-Item -Path "$root/src/main/resources/easyknack/third-party/*" -Destination "$inputDir/licenses/ffmpeg"
-    @('format=1', "product.version=$version", "platform=windows-x86_64", 'toolchain=tools/llvm-mingw/bin/clang++.exe') | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
+    @('format=1', "product.version=$version", "platform=windows-x86_64", 'toolchain=tools/llvm-mingw/bin/clang++.exe', "sources.sha256=$((Get-FileHash -LiteralPath $projectSources -Algorithm SHA256).Hash.ToLowerInvariant())") | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     foreach ($library in Get-ChildItem -LiteralPath "$inputDir/lib" -Filter '*.jar') {
         $archive = [IO.Compression.ZipFile]::OpenRead($library.FullName)
@@ -98,8 +103,11 @@ try {
     $image = Join-Path $Destination 'EasyKnack'
     if (!(Test-Path -LiteralPath "$image/runtime/bin/javac.exe")) { throw 'Bundled Java compiler is missing.' }
     Write-Host "Portable application: $image/EasyKnack.exe"
+    Assert-SourceSnapshot $root $sourceSnapshot
+    & "$PSScriptRoot/package-sources.ps1" -Image $image -ProjectSources $projectSources -Destination $Destination -Download
     if ($Type -ne 'app-image') {
         & "$PSScriptRoot/package-installer.ps1" -Image $image -JdkHome $JdkHome -Type $Type -Destination $Destination
     }
+    Assert-SourceSnapshot $root $sourceSnapshot
     Write-Host "Build logs: $work"
 } finally { Pop-Location }
