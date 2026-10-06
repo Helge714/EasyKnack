@@ -2,6 +2,10 @@
 
 This guide describes the English interface of the Windows application. Choose
 English in **Settings → Preferences** if you want menu names to match the guide.
+Open this offline guide from **Help → User guide (English)**. **Help → About
+EasyKnack** shows the application and GLSwing build identities; the text is
+selectable for copying into a bug report. License notices are available in the
+same menu.
 
 | Task | Read |
 |---|---|

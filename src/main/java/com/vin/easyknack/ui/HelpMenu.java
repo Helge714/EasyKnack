@@ -1,0 +1,39 @@
+package com.vin.easyknack.ui;
+
+import com.vin.easyknack.BuildInfo;
+import com.vingame.glswing.component.GLContainer;
+import com.vingame.glswing.component.GLDialog;
+import com.vingame.glswing.rendering.GLContext2D;
+import com.vingame.glswing.ui.*;
+
+final class HelpMenu {
+    private HelpMenu() { }
+    static GLPopupMenu create(WorkspaceView owner) {
+        var menu = new GLPopupMenu();
+        menu.addItem(AppText.text("help.manual"), e -> {
+            try { java.awt.Desktop.getDesktop().browse(HelpDocuments.manual().toUri()); }
+            catch (Exception failure) { show(owner, "help.manual", failure.getMessage()); }
+        });
+        menu.addItem(AppText.text("help.about"), e -> show(owner, "help.about",
+                "EasyKnack\n" + BuildInfo.application().display() + "\n\nGLSwing\n" + BuildInfo.core().display()
+                + "\n\nJava " + System.getProperty("java.runtime.version") + " — " + System.getProperty("java.vendor")
+                + "\n" + System.getProperty("os.name") + " / " + System.getProperty("os.arch") + "\n\nGPL-3.0-only"));
+        menu.addItem(AppText.text("help.licenses"), e -> {
+            try { show(owner, "help.licenses", HelpDocuments.licenses()); }
+            catch (Exception failure) { show(owner, "help.licenses", failure.getMessage()); }
+        });
+        return menu;
+    }
+    private static void show(WorkspaceView owner, String title, String text) {
+        var dialog = new GLDialog[1];
+        var panel = new GLContainer() {
+            final GLTextArea content = new GLTextArea(text == null ? "" : text);
+            final GLButton close = new GLButton(AppText.text("help.close"));
+            { content.setEditable(false); content.setLineWrap(true); addGL(content); addGL(close); close.addActionListener(e -> dialog[0].close()); }
+            protected void record(GLContext2D context) { }
+            protected void resized(float w, float h) { content.setBounds(16,16,Math.max(1,w-32),Math.max(1,h-76)); close.setBounds(w-116,h-44,100,28); }
+        };
+        dialog[0] = new GLDialog(AppText.text(title), panel);
+        dialog[0].setDecoration(GLDialog.Decoration.THEMED); dialog[0].setSize(760,560); dialog[0].show(owner);
+    }
+}

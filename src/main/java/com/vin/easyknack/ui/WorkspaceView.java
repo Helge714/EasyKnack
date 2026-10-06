@@ -145,6 +145,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Ansicht"), view);
 
         var settings=new GLPopupMenu();settings.addItem(AppText.text("settings.preferences"),e->SettingsDialog.show(this));menuBar.addMenu(AppText.text("settings"),settings);
+        menuBar.addMenu(AppText.text("help"), HelpMenu.create(this));
         addGL(workspace);
         addGL(analysisFocus);
 

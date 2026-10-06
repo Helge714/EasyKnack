@@ -19,7 +19,9 @@ currently use a local-style ID. Published release versions/tags remain deliberat
 diagnostics. Class-directory launches explicitly show `IDE / unpackaged` rather
 than old metadata left behind by a previous package build. Missing metadata in an
 older dependency is reported as unavailable. The audio diagnostics CSV includes
-both identities. About-dialog integration and installer version mapping remain TODOs.
+both identities. Help → About EasyKnack shows both identities in a selectable text
+view. Installer versions use the numeric Maven product version; CI release identity
+and publication remain separate work.
 
 The generator requires a JDK with Java source-file launching (17 or newer here).
 It only writes into the build output. Each package invocation creates a fresh

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added Help with an offline English handbook, selectable application/Core build
+  details and license notices. Installer builds capture local sources and collect
+  checksum-locked upstream materials beside the installer; incomplete provenance
+  review is explicitly reported. No document, plugin ABI or audio protocol change.
+
 - Declared EasyKnack GPL-3.0-only; GLSwing and third-party licenses remain unchanged.
   Packages include project and native-component notices. Corresponding-source
   preparation remains a release requirement. No runtime or document-format change.
