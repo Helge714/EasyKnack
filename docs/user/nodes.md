@@ -7,6 +7,9 @@ context-sensitive: some nodes are available only inside the appropriate group.
 Hover ports and controls for the current range and unit; the Inspector exposes
 settings that are not shown on the node itself.
 
+See [Vectors and spatial audio](../SPATIAL-AUDIO.md) for XYZ editing,
+vector calculations, and positioning sound relative to a mono or stereo receiver.
+
 ## Signals, rates and units
 
 | Port/rate | Meaning |

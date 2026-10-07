@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added Audio/Control vector signals, grouped XYZ editors with length units,
+  vector operations and scalar measurements, and a mono/stereo Spatial Receiver
+  with channel-specific distances, yaw, spacing and optional propagation.
+  Vector group boundaries support bake/export. Existing documents retain their
+  behavior; documents using these nodes require this build or newer.
+
 - Explorer startup opens the requested document before showing the workspace,
   without asking to discard the default graph. The splash shows the packaged
   application version (or development status for unpackaged IDE launches).

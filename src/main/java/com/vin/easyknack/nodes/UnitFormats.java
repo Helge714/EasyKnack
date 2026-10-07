@@ -2,6 +2,7 @@ package com.vin.easyknack.nodes;
 import java.util.List;
 /** Reusable format sets can be attached to any numeric row with Row.formats(...). */
 public record UnitFormats(UnitFormat stored,UnitFormat initial,List<UnitFormat> choices) {
+    public static final UnitFormats LENGTH=new UnitFormats(UnitFormat.METRE,UnitFormat.METRE,List.of(UnitFormat.METRE,UnitFormat.KILOMETRE,UnitFormat.CENTIMETRE,UnitFormat.MILLIMETRE));
     public static final UnitFormats GAIN_DB=new UnitFormats(UnitFormat.DB,UnitFormat.FACTOR,List.of(UnitFormat.FACTOR,UnitFormat.PERCENT,UnitFormat.DB));
     public static final UnitFormats PITCH_CENT=pitch(UnitFormat.CENT),PITCH_SEMITONE=pitch(UnitFormat.SEMITONE);
     public static final UnitFormats FREQUENCY=new UnitFormats(UnitFormat.HZ,UnitFormat.HZ,List.of(UnitFormat.HZ,UnitFormat.KHZ));

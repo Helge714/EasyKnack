@@ -66,3 +66,7 @@ curve.hitRadius=7
 
 @COLOR easyknack.buffer.selection=#26445A
 @COLOR easyknack.buffer.boundary=#50C3F0
+
+@COLOR easyknack.signal.VECTOR=#66B8DB
+@COLOR easyknack.node.VECTOR.title.light=#66B8DB
+@COLOR easyknack.node.VECTOR.title.dark=#365A78

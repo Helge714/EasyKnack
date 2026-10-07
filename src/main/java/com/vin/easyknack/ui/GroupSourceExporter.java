@@ -15,11 +15,11 @@ import com.vingame.glswing.node.model.*;
 /** Source bake: flatten once, prune dead branches, emit a statically wired native processor. */
 final class GroupSourceExporter {
     record Port(GLCompositePortMapping mapping,PropertyId id,Editor editor,SignalCategory signal,Map<String,Double> choiceValues){
-        PortDataType dataType(){return switch(signal){case TRIGGER->PortDataType.TRIGGER;case MIDI->PortDataType.MIDI;case WAVETABLE->PortDataType.WAVEFORM;case HISTORY->PortDataType.HISTORY;case ANALYSIS->PortDataType.ANALYSIS;case SPECTRUM->PortDataType.SPECTRUM;default->PortDataType.SIGNAL;};}
-        int nativeKind(){return switch(signal){case MIDI->1;case HISTORY->2;case ANALYSIS->3;case SPECTRUM->4;case TRIGGER->5;default->0;};}
+        PortDataType dataType(){return switch(signal){case TRIGGER->PortDataType.TRIGGER;case MIDI->PortDataType.MIDI;case WAVETABLE->PortDataType.WAVEFORM;case HISTORY->PortDataType.HISTORY;case ANALYSIS->PortDataType.ANALYSIS;case SPECTRUM->PortDataType.SPECTRUM;case VECTOR->PortDataType.VECTOR;default->PortDataType.SIGNAL;};}
+        int nativeKind(){return switch(signal){case MIDI->1;case HISTORY->2;case ANALYSIS->3;case SPECTRUM->4;case TRIGGER->5;case VECTOR->6;default->0;};}
         boolean resource(){return nativeKind()>=2&&nativeKind()<=4;}
-        BasicNode sentinel(boolean input){return input?switch(signal){case TRIGGER->new TriggerInputNode();case MIDI->new MidiInputNode();case HISTORY->new HistoryBufferNode();case ANALYSIS->new FFTAnalysisNode();case SPECTRUM->new FFTStreamNode();default->new OscillatorNode();}:switch(signal){case TRIGGER->new TriggerPulseNode();case MIDI->new MidiTransposeNode();case HISTORY->new HistoryReaderNode();case ANALYSIS->new AnalysisViewerNode();case SPECTRUM->new IFFTNode();default->new GainNode();};}
-        String endpoint(boolean input){return switch(signal){case TRIGGER->input?"trigger-out":"trigger";case MIDI->input?"midi-out":"midi-in";case HISTORY->"history";case ANALYSIS->"analysis";case SPECTRUM->"spectrum";default->input?"audio-out":"audio-in";};}
+        BasicNode sentinel(boolean input){return input?switch(signal){case TRIGGER->new TriggerInputNode();case MIDI->new MidiInputNode();case HISTORY->new HistoryBufferNode();case ANALYSIS->new FFTAnalysisNode();case SPECTRUM->new FFTStreamNode();case VECTOR->new VectorNode();default->new OscillatorNode();}:switch(signal){case TRIGGER->new TriggerPulseNode();case MIDI->new MidiTransposeNode();case HISTORY->new HistoryReaderNode();case ANALYSIS->new AnalysisViewerNode();case SPECTRUM->new IFFTNode();case VECTOR->new VectorSeparateNode();default->new GainNode();};}
+        String endpoint(boolean input){return switch(signal){case TRIGGER->input?"trigger-out":"trigger";case MIDI->input?"midi-out":"midi-in";case HISTORY->"history";case ANALYSIS->"analysis";case SPECTRUM->"spectrum";case VECTOR->"vector";default->input?"audio-out":"audio-in";};}
     }
     record ChoiceParameter(String property,String label,PropertyId id,Editor.ComboBox<GroupChoices.Option> editor){}
     record Export(String className,String displayName,BasicNode definition,Map<String,String> files,GLNodeGraphDocument source,Map<String,List<String>> manualTargets){
@@ -210,6 +210,7 @@ final class GroupSourceExporter {
     private static GLGraphConnection wire(GLNodeEndpoint out,GLNodeEndpoint in){return new GLGraphConnection(GLNodeConnectionId.random(),out,in);}
     private static ProcessingRate rate(BasicNode d,GLGraphNode n){return d.layout(new NodeState(n.properties())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(NodeBuilder.Row::rate).reduce(ProcessingRate.CONTROL,GroupPortRates::maximum);}
     static String outputPolicy(GLGraphNode node){
+        if(NodeRegistry.require(node.typeId()) instanceof SpatialReceiverNode)return "a?";
         var state=new NodeState(node.properties());
         return String.join("",NodeRegistry.require(node.typeId()).layout(state).rows().stream()
             .filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT)
@@ -313,7 +314,7 @@ final class GroupSourceExporter {
         return s.append("}\n").toString();
     }
     private static PortRates inputRates(Port p){
-        if(p.dataType()!=PortDataType.SIGNAL&&p.dataType()!=PortDataType.WAVEFORM)return null;
+        if(p.dataType()!=PortDataType.SIGNAL&&p.dataType()!=PortDataType.WAVEFORM&&p.dataType()!=PortDataType.VECTOR)return null;
         return switch(GroupInputSettings.selectedRate(p.mapping)){case CONTROL->PortRates.CONTROL;case AUDIO->PortRates.AUDIO;default->PortRates.AUDIO_CONTROL;};
     }
     private static List<String> editorOrder(GLNodeGraphAsset asset,List<Port> inputs,List<ChoiceParameter> choices){

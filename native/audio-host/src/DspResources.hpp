@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <cassert>
 namespace easyknack {
-enum class ResourceKind { none, history, analysis, spectrum };
+enum class ResourceKind { none, history, analysis, spectrum, vector };
 struct DspResource { virtual ~DspResource()=default; virtual ResourceKind kind()const noexcept=0; };
 /** Graph-owned, channel/voice-local ring. Only the scheduled DSP writer mutates it. */
 struct HistoryResource final : DspResource {

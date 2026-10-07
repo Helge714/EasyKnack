@@ -4,14 +4,14 @@
 #include <algorithm>
 #include <sstream>
 namespace easyknack {
-enum class UnitFormat { factor,percent,db,cent,semitone,octave,hz,khz,second,ms,turn,degree,radian,q,sample,bpm };
+enum class UnitFormat { factor,percent,db,cent,semitone,octave,hz,khz,second,ms,turn,degree,radian,q,sample,bpm,metre,kilometre,centimetre,millimetre };
 inline UnitFormat readUnit(std::istream& in){
     std::string name;in>>name;
-    const char* names[]={"factor","percent","db","cent","semitone","octave","hz","khz","second","ms","turn","degree","radian","q","sample","bpm"};
-    for(int i=0;i<16;i++)if(name==names[i])return static_cast<UnitFormat>(i);
+    const char* names[]={"factor","percent","db","cent","semitone","octave","hz","khz","second","ms","turn","degree","radian","q","sample","bpm","metre","kilometre","centimetre","millimetre"};
+    for(int i=0;i<20;i++)if(name==names[i])return static_cast<UnitFormat>(i);
     throw std::runtime_error("Unknown unit");
 }
-inline int unitDimension(UnitFormat u){if(u==UnitFormat::bpm)return 1;if(u==UnitFormat::sample)return 2;int i=static_cast<int>(u);return i<6?0:i<8?1:i<10?2:i<13?3:4;}
+inline int unitDimension(UnitFormat u){if(u>=UnitFormat::metre)return 5;if(u==UnitFormat::bpm)return 1;if(u==UnitFormat::sample)return 2;int i=static_cast<int>(u);return i<6?0:i<8?1:i<10?2:i<13?3:4;}
 inline double unitToBase(double v,UnitFormat u,double rate=48000) noexcept {
     switch(u){
         case UnitFormat::percent:return v/100;
@@ -19,6 +19,7 @@ inline double unitToBase(double v,UnitFormat u,double rate=48000) noexcept {
         case UnitFormat::cent:return std::exp2(std::clamp(v/1200.,-100.,100.));
         case UnitFormat::semitone:return std::exp2(std::clamp(v/12.,-100.,100.));
         case UnitFormat::octave:return std::exp2(std::clamp(v,-100.,100.));
+        case UnitFormat::kilometre:return v*1000;case UnitFormat::centimetre:return v/100;case UnitFormat::millimetre:return v/1000;
         case UnitFormat::khz:return v*1000; case UnitFormat::bpm:return v/60;
         case UnitFormat::ms:return v/1000;
         case UnitFormat::sample:return v/rate;
@@ -34,6 +35,7 @@ inline double unitFromBase(double v,UnitFormat u,double rate=48000) noexcept {
         case UnitFormat::cent:return 1200*std::log2(std::max(v,1e-8));
         case UnitFormat::semitone:return 12*std::log2(std::max(v,1e-8));
         case UnitFormat::octave:return std::log2(std::max(v,1e-8));
+        case UnitFormat::kilometre:return v/1000;case UnitFormat::centimetre:return v*100;case UnitFormat::millimetre:return v*1000;
         case UnitFormat::khz:return v/1000; case UnitFormat::bpm:return v*60;
         case UnitFormat::ms:return v*1000;
         case UnitFormat::sample:return v*rate;

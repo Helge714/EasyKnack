@@ -9,7 +9,7 @@ public enum UnitFormat implements com.vingame.glswing.ui.GLUnit {
     CENT("ratio","Cent","cent"), SEMITONE("ratio","Semitones","st"), OCTAVE("ratio","Octaves","oct"),
     HZ("frequency","Hertz","Hz"), KHZ("frequency","Kilohertz","kHz"), BPM("frequency","Beats per minute","BPM"),
     SECOND("time","Seconds","s"), MS("time","Milliseconds","ms"), SAMPLE("time","Samples","smp"),
-    TURN("angle","Turns","turn"), DEGREE("angle","Degrees","°"), RADIAN("angle","Radians","rad"), Q("quality","Quality factor","Q");
+    TURN("angle","Turns","turn"), DEGREE("angle","Degrees","°"), RADIAN("angle","Radians","rad"), Q("quality","Quality factor","Q"), METRE("length","Metres","m"), KILOMETRE("length","Kilometres","km"), CENTIMETRE("length","Centimetres","cm"), MILLIMETRE("length","Millimetres","mm");
     private final String dimension,label,suffix;
     UnitFormat(String dimension,String label,String suffix) { this.dimension=dimension;this.label=label;this.suffix=suffix; }
     public String id() { return name().toLowerCase(java.util.Locale.ROOT); }
@@ -23,12 +23,15 @@ public enum UnitFormat implements com.vingame.glswing.ui.GLUnit {
     @Override public String toString() { return NodeText.text("unit."+id(),label); }
     public double toBase(double value) {
         return switch(this) {
-            case FACTOR,HZ,SECOND,TURN,Q -> value;
+            case FACTOR,HZ,SECOND,TURN,Q,METRE -> value;
             case PERCENT -> value/100;
             case DB -> value<=-160?0:Math.pow(10,value/20);
             case CENT -> Math.pow(2,value/1200);
             case SEMITONE -> Math.pow(2,value/12);
             case OCTAVE -> Math.pow(2,value);
+            case KILOMETRE -> value*1000;
+            case CENTIMETRE -> value/100;
+            case MILLIMETRE -> value/1000;
             case KHZ -> value*1000;
             case BPM -> value/60;
             case MS -> value/1000;
@@ -39,12 +42,15 @@ public enum UnitFormat implements com.vingame.glswing.ui.GLUnit {
     }
     public double fromBase(double value) {
         return switch(this) {
-            case FACTOR,HZ,SECOND,TURN,Q -> value;
+            case FACTOR,HZ,SECOND,TURN,Q,METRE -> value;
             case PERCENT -> value*100;
             case DB -> Math.max(-160,20*Math.log10(Math.max(value,1e-8)));
             case CENT -> 1200*Math.log(Math.max(value,1e-8))/Math.log(2);
             case SEMITONE -> 12*Math.log(Math.max(value,1e-8))/Math.log(2);
             case OCTAVE -> Math.log(Math.max(value,1e-8))/Math.log(2);
+            case KILOMETRE -> value/1000;
+            case CENTIMETRE -> value*100;
+            case MILLIMETRE -> value*1000;
             case KHZ -> value/1000;
             case BPM -> value*60;
             case MS -> value*1000;

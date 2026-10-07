@@ -17,6 +17,10 @@ public final class NodeBuilder {
         private UnitFormats formats;
         public Row formats(UnitFormats value) { formats=value;return this; }
         private boolean alwaysVisible;
+        private boolean editorCopyable=true;
+        /** Disable for editors whose behavior depends on a custom node view. */
+        public Row editorCopyable(boolean value){editorCopyable=value;return this;}
+        public boolean isEditorCopyable(){return editorCopyable;}
         private boolean socketVisible=true;
         public boolean socketVisible(){return socketVisible;}
         public Row socketVisible(boolean value){requirePort();socketVisible=value;return this;}
@@ -91,7 +95,7 @@ public final class NodeBuilder {
         String requested=state.text("rate","auto");
         for(var row:rows){
             if(row.rates!=null){
-                if(row.dataType!=PortDataType.SIGNAL&&row.dataType!=PortDataType.WAVEFORM)
+                if(row.dataType!=PortDataType.SIGNAL&&row.dataType!=PortDataType.WAVEFORM&&row.dataType!=PortDataType.VECTOR)
                     throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Numeric rates cannot be assigned to ")+row.dataType);
                 row.adaptive=row.rates==PortRates.AUDIO_CONTROL&&requested.equals("auto");
                 var selected=row.adaptive?ProcessingRate.fromId(state.text(row.kind==RowKind.INPUT
