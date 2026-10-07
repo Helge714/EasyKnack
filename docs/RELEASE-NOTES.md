@@ -1,6 +1,9 @@
 # Release notes
 
 ## Unreleased
+- Unconnected numeric group inputs retain editable defaults without blocking audio,
+  including newly added Formula inputs awaiting a valid code update.
+
 
 - Vector ports now align with the first XYZ slider and collapse while connected.
   Vector Math and Vector Mapping can be inserted directly into vector connections.

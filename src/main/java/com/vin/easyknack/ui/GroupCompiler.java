@@ -29,6 +29,19 @@ final class GroupCompiler {
                     properties.add(new GLCompositePropertyDescriptor(unit,"text",GLCompositeValueKind.TEXT,GLNodeValue.of("factor")));
                     bindings.add(new Adapter(p,UnitFormat.FACTOR,key,unit));ports.add(p.withEndpoints(List.of()));continue;
                 }
+                // Unbound inputs still own their editor values (including pending Formula ports).
+                // Declare them without creating DSP adapters until an internal target exists.
+                if(p.publicPort().direction()==GLPortDirection.INPUT && !p.isBound() && Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId())
+                        && (p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER)
+                            || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE))) {
+                    String key=GroupUnits.key(p.publicPort().id()),unit=GroupUnits.unitKey(p.publicPort().id());
+                    double fallback=new NodeState(p.presentation().editorOptions()).number("default",0);
+                    var base=GroupUnits.base(original,d,p);
+                    properties.removeIf(v->v.id().equals(key)||v.id().equals(unit));
+                    properties.add(new GLCompositePropertyDescriptor(key,"number",GLCompositeValueKind.DECIMAL,GLNodeValue.of(fallback)));
+                    properties.add(new GLCompositePropertyDescriptor(unit,"text",GLCompositeValueKind.TEXT,GLNodeValue.of(base.id())));
+                    ports.add(p);continue;
+                }
                 var requested=GroupInputSettings.selectedRate(p);
                 if(p.publicPort().direction()==GLPortDirection.INPUT&&p.isBound()&&GroupInputs.template(p)!=null&&!p.publicPort().valueTypeId().equals(SignalCategory.WAVETABLE.valueTypeId())&&(requested==ProcessingRate.AUDIO||requested==ProcessingRate.CONTROL)){
                     var endpoints=new ArrayList<GLNodeEndpoint>();var template=GroupInputs.template(p);
