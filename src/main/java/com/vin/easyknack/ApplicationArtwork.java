@@ -1,6 +1,6 @@
 package com.vin.easyknack;
 
-import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Window;
@@ -8,6 +8,7 @@ import java.awt.event.HierarchyEvent;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -29,7 +30,7 @@ public final class ApplicationArtwork {
 
     public static JComponent splash(GLSplashViewContext context) {
         Image background = image("EKSplash.png");
-        JPanel content = new JPanel(new BorderLayout()) {
+        JPanel content = new JPanel(new GridBagLayout()) {
             @Override protected void paintComponent(Graphics graphics) {
                 super.paintComponent(graphics);
                 graphics.drawImage(background, 0, 0, getWidth(), getHeight(), this);
@@ -44,13 +45,22 @@ public final class ApplicationArtwork {
         });
         JPanel status = new JPanel();
         status.setLayout(new BoxLayout(status, BoxLayout.Y_AXIS));
-        status.setBackground(context.configuration().background());
-        status.setBorder(BorderFactory.createEmptyBorder(12, 20, 14, 20));
-        status.add(context.title("EasyKnack"));
+        status.setOpaque(false);
+        int padding = context.configuration().padding();
+        content.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
+        // Match Core's standard splash recipe, with transparent content over the artwork.
+        status.add(context.title());
+        status.add(Box.createVerticalStrut(4));
+        status.add(context.subtitle("Starting application"));
+        status.add(Box.createVerticalStrut(22));
         status.add(context.currentTask());
-        status.add(context.taskHistory(2, 0, 0.6, false));
-        status.add(context.progressBar());
-        content.add(status, BorderLayout.SOUTH);
+        status.add(Box.createVerticalStrut(8));
+        status.add(context.progressBar(400));
+        status.add(Box.createVerticalStrut(16));
+        status.add(context.taskHistory(400, 5, 0, 1, true));
+        for (var component : status.getComponents())
+            if (component instanceof JComponent child) child.setAlignmentX(0f);
+        content.add(status);
         return content;
     }
 }
