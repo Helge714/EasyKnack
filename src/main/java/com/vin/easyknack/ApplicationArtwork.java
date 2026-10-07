@@ -1,6 +1,8 @@
 package com.vin.easyknack;
 
 import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Window;
@@ -30,7 +32,7 @@ public final class ApplicationArtwork {
 
     public static JComponent splash(GLSplashViewContext context) {
         Image background = image("EKSplash.png");
-        JPanel content = new JPanel(new GridBagLayout()) {
+        JPanel content = new JPanel(new BorderLayout()) {
             @Override protected void paintComponent(Graphics graphics) {
                 super.paintComponent(graphics);
                 graphics.drawImage(background, 0, 0, getWidth(), getHeight(), this);
@@ -47,7 +49,9 @@ public final class ApplicationArtwork {
         status.setLayout(new BoxLayout(status, BoxLayout.Y_AXIS));
         status.setOpaque(false);
         int padding = context.configuration().padding();
-        content.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
+        JPanel textArea = new JPanel(new GridBagLayout());
+        textArea.setOpaque(false);
+        textArea.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
         // Match Core's standard splash recipe, with transparent content over the artwork.
         status.add(context.title());
         status.add(Box.createVerticalStrut(4));
@@ -55,12 +59,15 @@ public final class ApplicationArtwork {
         status.add(Box.createVerticalStrut(22));
         status.add(context.currentTask());
         status.add(Box.createVerticalStrut(8));
-        status.add(context.progressBar(400));
-        status.add(Box.createVerticalStrut(16));
-        status.add(context.taskHistory(400, 5, 0, 1, true));
+        status.add(context.taskHistory(5, 0, 1, true));
         for (var component : status.getComponents())
             if (component instanceof JComponent child) child.setAlignmentX(0f);
-        content.add(status);
+        var constraints = new GridBagConstraints();
+        constraints.weightx = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        textArea.add(status, constraints);
+        content.add(textArea, BorderLayout.CENTER);
+        content.add(context.progressBar(), BorderLayout.SOUTH);
         return content;
     }
 }
