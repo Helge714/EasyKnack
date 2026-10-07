@@ -109,3 +109,8 @@ Current external-JDK validation: Maven and functional package tests pass, and th
 real launcher opens the workspace. Automated graceful close remains unverified:
 the initial document is marked modified and opens a save confirmation. JDK
 download/setup and installer upgrade/uninstall still need clean-machine testing.
+
+The reviewed Windows installer toolchain is pinned to WiX 3.14.1 by component
+hashes in scripts/sources.lock.json. Replacing it requires reviewing its source
+archive/license and updating the lock. Current candidate evidence and outstanding
+clean-machine checks are recorded in development/source-audit/RELEASE-CANDIDATE.md.

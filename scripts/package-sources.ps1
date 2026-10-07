@@ -56,8 +56,10 @@ $runtimeMatches = if ($runtimeBundled) { (Get-FileHash -LiteralPath $runtime -Al
 $sourceHash = (Get-FileHash -LiteralPath $ProjectSources -Algorithm SHA256).Hash.ToLowerInvariant()
 $installation = Get-Content -LiteralPath "$Image/app/installation.properties" -Raw
 $sourceMatchesBuild = $installation -match "(?m)^sources.sha256=$sourceHash\s*$"
+$sourceReviewComplete = $missing.Count -eq 0 -and $unreviewed.Count -eq 0 -and (!$runtimeBundled -or $runtimeMatches) -and $sourceMatchesBuild -and @($remainingReview).Count -eq 0
+$pendingDistribution = @($lock.pendingDistributionChecks)
 $report = [ordered]@{
-    format=1; releaseReady=($missing.Count -eq 0 -and $unreviewed.Count -eq 0 -and (!$runtimeBundled -or $runtimeMatches) -and $sourceMatchesBuild -and @($remainingReview).Count -eq 0); sourceArchiveSha256=$sourceHash; sourceMatchesBuild=$sourceMatchesBuild
+    format=2; releaseReady=($sourceReviewComplete -and $pendingDistribution.Count -eq 0); sourceReviewComplete=$sourceReviewComplete; pendingDistributionChecks=$pendingDistribution; sourceArchiveSha256=$sourceHash; sourceMatchesBuild=$sourceMatchesBuild
     binaries=$binaries; unreviewedBinaries=$unreviewed; runtimeBundled=$runtimeBundled; runtimeMatchesReviewedBuild=$runtimeMatches
     missingSources=@($missing.ToArray()); remainingReview=$remainingReview
 }
@@ -69,6 +71,6 @@ Write-DeterministicZip $archive $entries
 Write-Host "Source materials: $archive"
 if (!$report.releaseReady) {
     Write-Warning "Public-release review remains open; see REVIEW.json. Missing sources: $($missing.Count); unreviewed JARs: $($unreviewed.Count)."
-    if ($RequireComplete) { throw 'Corresponding-source review is incomplete. See REVIEW.json in the source materials archive.' }
+    if ($RequireComplete) { throw 'Source or distribution review is incomplete. See REVIEW.json in the source materials archive.' }
 }
 

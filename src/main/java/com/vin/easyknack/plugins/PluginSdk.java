@@ -45,6 +45,11 @@ public final class PluginSdk {
     private static byte[] archive(Path source) throws IOException {
         var bytes = new ByteArrayOutputStream();
         try (var zip = new ZipOutputStream(bytes); var paths = Files.walk(source)) {
+            for (var notice : new TreeMap<>(PluginLicensing.files()).entrySet()) {
+                var entry = new ZipEntry(notice.getKey()); entry.setTime(0); zip.putNextEntry(entry);
+                zip.write(notice.getValue().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                zip.closeEntry();
+            }
             for (var path : paths.filter(Files::isRegularFile).sorted().toList()) {
                 String name = source.relativize(path).toString().replace('\\', '/');
                 if (!(name.startsWith("src/") || name.startsWith("third_party/"))) continue;

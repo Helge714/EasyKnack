@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Release packaging now includes verified GLSwing build inputs and WiX sources/
+  notices. SDK and source-plugin exports carry license notices; existing plugins
+  may rebuild once because the SDK archive changed. Source review and installation
+  validation are reported separately.
+
 - Added product splash artwork and application icons for windows, launcher,
   installer, shortcuts and .knack documents. The splash retains its standard
   text layout directly over the artwork, with narrower text margins and a

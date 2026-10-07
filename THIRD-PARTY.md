@@ -57,3 +57,12 @@ distribution. No blanket permission for proprietary plugins is granted here.
 The Microsoft component origin, exact SDK license and conditional redistribution
 routes are recorded in `docs/development/source-audit/MICROSOFT-RUNTIME.md`.
 Those component terms do not replace the licenses of EasyKnack or OpenJDK.
+
+## Installer and artwork
+
+The EXE installer embeds WiX 3.14.1 Burn/WixStdBA under the Microsoft Reciprocal
+License (MS-RL). Its original notice is under licenses/upstream and its complete
+release-tag sources are included in the matching source-material download. This
+installer code retains its own license, separate from the EasyKnack application.
+EKSplash and EKIcon are original author-provided assets distributed under
+GPL-3.0-only with the author's permission.

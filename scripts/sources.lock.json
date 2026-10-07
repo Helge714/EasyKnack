@@ -78,6 +78,18 @@
       "id": "make-4.4.1",
       "file": "make-4.4.1.tar.gz",
       "url": "https://mirrors.kernel.org/gnu/make/make-4.4.1.tar.gz"
+    },
+    {
+      "id": "glswing-build-inputs",
+      "file": "glswing-0.2.0-SNAPSHOT-build-inputs.zip",
+      "sha256": "bd366ff2f17b4b1d5954cdd60ec6d325d04cf864fe08190006047a9add882f6d",
+      "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-build-inputs.zip"
+    },
+    {
+      "id": "wix-3.14.1",
+      "file": "wix3-wix3141rtm.tar.gz",
+      "sha256": "374ec1923954c0df5874964d845c09d887012fbab5aa13d000201d0b9f789d96",
+      "url": "https://codeload.github.com/wixtoolset/wix3/tar.gz/refs/tags/wix3141rtm"
     }
   ],
   "binaries": [
@@ -116,8 +128,36 @@
   ],
   "runtimeReleaseSha256": "86e5e51658bb2b9cf064b3957d81ac39abdb346b2cac19867c1625dd19d440d9",
   "remainingReview": [
-    "GLSwing snapshot sources are collected but not proven to match its dirty binary build; obtain matching build inputs and parent POM.",
-    "Temurin official archive, source revisions, SBOM and build configuration verified. Exact SDK license and VC/UCRT REDIST origins reviewed; establish downstream authorization and recipient agreement requirements. See MICROSOFT-RUNTIME.md. Microsoft DLLs are not OpenJDK-licensed source components.",
-    "Review project/vendored ownership, plugin SDK/generated notices and final installed package before publishing."
-  ]
+    "Temurin official archive, source revisions, SBOM and build configuration verified. Exact SDK license and VC/UCRT REDIST origins reviewed; establish downstream authorization and recipient agreement requirements. See MICROSOFT-RUNTIME.md. Microsoft DLLs are not OpenJDK-licensed source components."
+  ],
+  "pendingDistributionChecks": [
+    "Clean Windows installation without Java, including interactive JDK installation/cancellation/offline handling.",
+    "Installer upgrade and uninstall on a clean test system; verify shortcuts, file association and installed notices.",
+    "Publish matching source-material downloads alongside the binary; no publication has been performed."
+  ],
+  "installerTools": {
+    "version": "3.14.1",
+    "files": [
+      {
+        "path": "candle.exe",
+        "sha256": "a464676e2a2191d58e6ca643e89505bfb9628d3e721873a14994d3f4667987e5"
+      },
+      {
+        "path": "light.exe",
+        "sha256": "8ee3d7fa5592511152a4d1fc605780eae1b27ac7b41d75d518c958515de39529"
+      },
+      {
+        "path": "WixUIExtension.dll",
+        "sha256": "c6b8227782a7268b54c0c161ca300fae869a53ce9889d19c16b6b900ac468dc3"
+      },
+      {
+        "path": "WixBalExtension.dll",
+        "sha256": "f7b81455cd8ba27aa3e6b3a9ee29e7506427af972685c80acb0a4a7f8792aea3"
+      },
+      {
+        "path": "x86/burn.exe",
+        "sha256": "07daef9f80ad388b1a97041b8a0693d145eaaea27b0023b12111e72ef78d93ef"
+      }
+    ]
+  }
 }

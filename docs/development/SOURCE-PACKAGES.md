@@ -65,11 +65,31 @@ The old lock entries are retained for inspecting older bundled images.
 For those older images, Temurin 25.0.4.1+1 identifies OpenJDK commit
 `520406d871955300957ef01e406ac2acd0f9b75c` and temurin-build commit
 `e6ba7dec3d07654074559310376a3ae89da5f4ac`; both source archives are collected.
-The local GLSwing sources JAR is collected but its correspondence to the dirty
-binary build has not been established. The collection now includes full LLVM,
+The earlier GLSwing source correspondence gap is resolved by the isolated rebuild
+documented below; the full build-input archive accompanies the sources JAR. The collection now includes full LLVM,
 MinGW, Python, libffi, LLDB-MI, GNU Make source archives. Official Temurin SBOM/build metadata and file-by-file native
 archive comparisons are recorded in the [native review](source-audit/NATIVE-RUNTIMES.md).
 
 Before public distribution, resolve the remaining items in `sources.lock.json`
-and [LICENSING.md](LICENSING.md), especially the GLSwing snapshot (and Microsoft runtime redistribution terms if bundling Java again). No release
+and [LICENSING.md](LICENSING.md), including Microsoft runtime redistribution terms only if bundling Java again. No release
 or public upload is performed by these scripts.
+
+## Candidate source match (2026-10-07)
+
+The former GLSwing source mismatch review is resolved: an isolated rebuild of
+907 captured source/build files produced all 927 runtime classes and resources
+identically. Only generated build identity and Eclipse-specific Maven metadata
+differ. The full build-input ZIP and parent POM are now included alongside the
+sources JAR. See source-audit/RELEASE-CANDIDATE.md and glswing-comparison.json.
+
+WiX 3.14.1 sources are included because the EXE embeds its Burn bootstrapper.
+REVIEW.json format 2 distinguishes `sourceReviewComplete` from `releaseReady`;
+clean-machine validation and actual source publication remain distribution tasks.
+
+To rebuild from a published source-material ZIP, extract `easyknack-sources.zip`
+(the project snapshot), copy the files under `upstream/` into the project's
+`target/source-materials`, and unpack the pinned GLSwing build-input ZIP in a
+separate directory. Install GLSwing using `mvn -pl glswing-core -am install` there
+before building EasyKnack. Keep GLSwing as a Maven dependency. Newly rebuilt JAR
+metadata changes hashes; compare classes/resources before updating a source lock,
+and do not label that newly built artifact as the original distributed binary.

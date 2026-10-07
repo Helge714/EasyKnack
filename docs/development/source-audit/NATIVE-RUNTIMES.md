@@ -2,7 +2,8 @@
 
 > Update 2026-10-07: FFmpeg/JavaCPP have been removed from new EasyKnack builds.
 > Their findings/questions below are historical and need no upstream inquiry for
-> the new package. Temurin and compiler findings still apply. The current source
+> the new package. Compiler findings still apply. Temurin is no longer bundled
+> in current external-JDK images; its findings apply only if bundling Java again. The current source
 > lock intentionally excludes the old FFmpeg dependencies.
 
 

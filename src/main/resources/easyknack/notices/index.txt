@@ -19,3 +19,5 @@ native-llvm-project-lldb_LICENSE.TXT.txt
 native-llvm-project-llvm_LICENSE.TXT.txt
 native-llvm-project-openmp_LICENSE.TXT.txt
 native-make-4.4.1-COPYING.txt
+
+wix-3.14.1-LICENSE.txt

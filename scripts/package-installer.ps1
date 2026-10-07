@@ -19,6 +19,13 @@ if (!$WixDirectory) {
 foreach ($name in @('candle.exe','light.exe','WixUIExtension.dll','WixBalExtension.dll')) {
     if (!(Test-Path -LiteralPath "$WixDirectory/$name")) { throw "WiX 3 is required: missing $name" }
 }
+$reviewedTools = (Get-Content -LiteralPath "$PSScriptRoot/sources.lock.json" -Raw | ConvertFrom-Json).installerTools
+foreach ($file in $reviewedTools.files) {
+    $path = Join-Path $WixDirectory $file.path
+    if (!(Test-Path -LiteralPath $path) -or (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ine $file.sha256) {
+        throw "Unreviewed WiX component: $($file.path). Review its version, sources and license before packaging."
+    }
+}
 $line = @(Get-Content -LiteralPath "$Image/app/installation.properties" | Where-Object { $_ -like 'product.version=*' })
 if ($line.Count -ne 1) { throw 'Missing or ambiguous packaged product version.' }
 $version = ($line[0].Substring('product.version='.Length)) -replace '-.*$', ''

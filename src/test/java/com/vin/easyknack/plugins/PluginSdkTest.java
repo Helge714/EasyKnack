@@ -16,6 +16,8 @@ class PluginSdkTest {
         assertArrayEquals(Files.readAllBytes(zip), PluginSdk.bytes());
         PluginSdk.unpack(new java.io.ByteArrayInputStream(PluginSdk.bytes()), directory.resolve("unpacked"));
         assertTrue(Files.isRegularFile(directory.resolve("unpacked/src/NodeProcessor.hpp")));
+        assertTrue(Files.readString(directory.resolve("unpacked/LICENSE")).contains("GNU GENERAL PUBLIC LICENSE"));
+        assertTrue(Files.readString(directory.resolve("unpacked/LICENSING.md")).contains("GPL-3.0-only"));
     }
 
     @Test void onlyAnActualDevelopmentClassDirectoryEnablesSourceLoading() throws Exception {
@@ -31,6 +33,14 @@ class PluginSdkTest {
         Files.createDirectories(classFile.getParent());
         try (var input = PluginSdk.class.getResourceAsStream("PluginSdk.class")) {
             Files.copy(input, classFile);
+        }
+        try (var input = PluginLicensing.class.getResourceAsStream("PluginLicensing.class")) {
+            Files.copy(input, classFile.resolveSibling("PluginLicensing.class"));
+        }
+        var license = classes.resolve("META-INF/easyknack/legal/LICENSE");
+        Files.createDirectories(license.getParent());
+        try (var input = PluginLicensing.class.getResourceAsStream("/META-INF/easyknack/legal/LICENSE")) {
+            Files.copy(input, license);
         }
         Files.writeString(directory.resolve("pom.xml"), "<project/>");
         var javaSource = directory.resolve("src/main/java/com/vin/easyknack/plugins/PluginSdk.java");

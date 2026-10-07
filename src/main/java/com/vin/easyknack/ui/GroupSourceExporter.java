@@ -127,6 +127,7 @@ final class GroupSourceExporter {
         String java=javaSource(className,processor,asset,inputs,outputs,ratePlan,choices,monitorPath);
         String cpp=nativeSource(className,processor,definition,order,sources,inputIds,outputIds,inputs,outputs,boundaryRate,dynamic,choices.isEmpty());
         var files=new LinkedHashMap<String,String>();
+        files.putAll(com.vin.easyknack.plugins.PluginLicensing.files());
         files.put(com.vin.easyknack.plugins.PluginManifest.FILE,new com.vin.easyknack.plugins.PluginManifest(
                 processor,"1.0.0",List.of("com.vin.easyknack.nodes."+className)).text());
         files.put("java/com/vin/easyknack/nodes/"+className+".java",java);

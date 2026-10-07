@@ -1,0 +1,10 @@
+{
+  "binarySha256": "82c0dbbc4561e155fa4c14b227c314a1c22de41a40493c9ac104201383c7766d",
+  "rebuiltSha256": "2d800a5d23be1d67f9a9a199d5cda073bc00191e2c479e87693488833f5834dd",
+  "classCount": 927,
+  "differences": [
+    "META-INF/glswing/build.properties",
+    "META-INF/maven/com.vingame/glswing/pom.properties"
+  ],
+  "classDifferences": []
+}
