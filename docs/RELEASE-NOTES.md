@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added product splash artwork and application icons for windows, launcher,
+  installer, shortcuts and .knack documents.
+
 - Windows packages now require a separately installed x64 JDK 25. The launcher
   detects Java and offers interactive Microsoft OpenJDK installation or folder
   selection. LLVM-MinGW remains included for Bake/plugins; Java is not removed
