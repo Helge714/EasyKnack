@@ -15,6 +15,19 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     private boolean openingExternal;
     public void acceptLaunches(com.vin.easyknack.DocumentLaunch launches, JFrame window) {
         var pending = new java.util.ArrayDeque<java.nio.file.Path>();
+        // Consume the first startup document before showing the default workspace.
+        // Later requests still use the normal unsaved-change confirmation.
+        try {
+            var request = launches.poll();
+            if (request != null) pending.addAll(request);
+            if (!pending.isEmpty()) {
+                documents.openInitial(pending.getFirst());
+                pending.removeFirst();
+            }
+        } catch (Exception failure) {
+            // Keep failed files queued so the regular open action displays its error.
+            failure.printStackTrace();
+        }
         launchTimer = new javax.swing.Timer(300, event -> {
             if (!window.isShowing() || openingExternal || !documents.canOpenExternal()) return;
             try {

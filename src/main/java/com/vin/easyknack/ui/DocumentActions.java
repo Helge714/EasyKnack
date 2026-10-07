@@ -36,6 +36,15 @@ final class DocumentActions implements AutoCloseable {
     }
     private boolean modified() { return !checkpoint.equals(NodeDocuments.comparable(controller.snapshotDocument())); }
     boolean canOpenExternal() { return !busy && !closed && closeDecision == null; }
+    /** Startup only: no user document exists to discard before the window is shown. */
+    void openInitial(Path source) {
+        if (window.isShowing()) throw new IllegalStateException("Initial document must load before showing the workspace");
+        var document = files.read(source).toCompletableFuture().join();
+        controller.openDocument(source.getFileName().toString(), document);
+        path = source;
+        checkpoint = NodeDocuments.comparable(controller.snapshotDocument());
+        updateTitle();
+    }
     CompletionStage<Boolean> openExternal(Path source) {
         var result = new CompletableFuture<Boolean>();
         if (!canOpenExternal()) return CompletableFuture.completedFuture(false);

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Explorer startup opens the requested document before showing the workspace,
+  without asking to discard the default graph. The splash shows the packaged
+  application version (or development status for unpackaged IDE launches).
+
 - Release packaging now includes verified GLSwing build inputs and WiX sources/
   notices. SDK and source-plugin exports carry license notices; existing plugins
   may rebuild once because the SDK archive changed. Source review and installation
