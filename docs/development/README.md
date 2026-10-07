@@ -7,7 +7,7 @@ requirements for packaged users.
 ## Build from source
 
 Use a JDK compatible with the current dependencies, Maven 3.9 and a graphics-capable
-desktop. The packaging scripts use JDK 25 with jpackage. Check `pom.xml` for the
+desktop. The packaging scripts use JDK 25 and WiX 3, with an external-JDK launcher. Check `pom.xml` for the
 required external GLSwing artifact/version and make it available through Maven.
 EasyKnack must not depend on a checkout or source folder of GLSwingNext.
 

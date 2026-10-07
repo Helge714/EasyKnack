@@ -31,7 +31,7 @@ try {
             @(Get-ChildItem "$env:USERPROFILE/.jdks" -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | ForEach-Object FullName)
         ) | ForEach-Object { $_ }
         $JdkHome = $candidates | Where-Object {
-            $_ -and (Test-Path -LiteralPath "$_/bin/jpackage.exe") -and (Test-Path -LiteralPath "$_/bin/javac.exe")
+            $_ -and (Test-Path -LiteralPath "$_/bin/java.exe") -and (Test-Path -LiteralPath "$_/bin/javac.exe")
         } | Select-Object -First 1
     }
     if (!$Toolchain) {
@@ -49,7 +49,7 @@ try {
         }
     }
     foreach ($entry in @(
-        @('JDK', $JdkHome, 'bin/jpackage.exe'),
+        @('JDK', $JdkHome, 'bin/javac.exe'),
         @('LLVM-MinGW', $Toolchain, 'bin/clang++.exe'),
         @('WiX', $WixDirectory, 'light.exe')
     )) {
@@ -88,7 +88,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Maven tool check failed.' }
     if ($CheckTools) { Write-Host 'All build tools found. No installer was built.'; exit 0 }
     $destination = Join-Path $root "target/distribution/$(Get-Date -Format 'yyyyMMdd-HHmmss-fff')"
-    $arguments = @{JdkHome=$JdkHome; Toolchain=$Toolchain; Destination=$destination; Type='exe'}
+    $arguments = @{JdkHome=$JdkHome; Toolchain=$Toolchain; WixDirectory=$WixDirectory; Destination=$destination; Type='exe'}
     if ($MavenClasspath) { $arguments.MavenClasspath = $MavenClasspath }
     else { $arguments.Maven = $Maven }
     Write-Host "Output: $destination"

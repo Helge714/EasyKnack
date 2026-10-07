@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Windows packages now require a separately installed x64 JDK 25. The launcher
+  detects Java and offers interactive Microsoft OpenJDK installation or folder
+  selection. LLVM-MinGW remains included for Bake/plugins; Java is not removed
+  when EasyKnack is uninstalled. Bundled Temurin is deferred.
+
+
 - Replaced bundled FFmpeg/JavaCPP with the existing miniaudio decoder for WAV and
   MP3 import. Other formats must be converted before import; existing PCM caches
   remain readable. Player/Buffer behavior and the audio-host protocol are unchanged.

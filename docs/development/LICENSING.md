@@ -21,6 +21,15 @@ used under its GPLv3 alternative, not the proprietary agreement.
   native-library notices with source-member checksums.
   See [verified findings and remaining boundaries](source-audit/NATIVE-RUNTIMES.md).
 
+## Current packaging scope
+
+New Windows packages require an externally installed JDK 25 x64. They do not
+bundle Java or its Microsoft DLLs. The Temurin findings below apply to previous
+images and a possible future bundled option, not the current external-JDK image.
+The compiler and its source/notice obligations remain in scope. The launcher
+only assists a user-requested provider installation; this does not transfer
+EasyKnack distribution responsibilities to the user.
+
 ## Before publishing any binary
 
 - [ ] Check rights and existing notices for all project and vendored files,

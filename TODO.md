@@ -569,3 +569,14 @@ Dabei bleibt der A4-Nachweis unveränderter Spitzenlatenz unter realer Last offe
 - Formula sineWave(phase) umgesetzt: vorhandene 2048-Punkte-Sinustabelle, lineare Interpolation, Phase in Perioden, Vorbereitung außerhalb des Audiothreads; sin bleibt mathematisch unverändert.
 - Formula-Editorhilfe umgesetzt: Gültigkeitsbereiche und Deklarationsreihenfolge, Typ-/State-Hover, empfängerabhängige Memberhilfe, Funktionssignaturen mit aktivem Parameter, Klammervervollständigung; auch für unvollständigen Code.
 - Nächste Formula-Ausbaustufen: eigene Hilfsfunktionen ohne Rekursion; begrenzte state-Arrays und Schleifen mit fester Obergrenze für Filter und kleine Delays.
+
+
+## Future bundled Java option
+
+- Revisit optional bundled Temurin only after Microsoft downstream runtime terms
+  and recipient requirements are resolved; current Windows packages use an
+  externally installed x64 JDK 25 with interactive setup assistance.
+- Validate external-JDK installer on a clean Windows machine: missing Java,
+  winget absent/offline, cancelled UAC/install, upgrade and uninstall.
+- Investigate the untouched startup document becoming modified before interaction;
+  its save confirmation currently prevents unattended package window-close tests.

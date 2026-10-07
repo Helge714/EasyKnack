@@ -24,7 +24,7 @@ public final class WindowsPackageSmoke {
     private static void run(Path work) throws Exception {
         System.out.println("Runtime: " + System.getProperty("java.home"));
         System.out.println("Application: " + com.vin.easyknack.InstallationPaths.applicationDirectory());
-        check(Files.isRegularFile(Path.of(System.getProperty("java.home"), "bin/javac.exe")), "No bundled javac");
+        check(Files.isRegularFile(Path.of(System.getProperty("java.home"), "bin/javac.exe")), "No external javac");
         ApplicationTheme.current();
         ExampleLibrary.initialize();
         var plugins = new PluginManager(work.resolve("plugins"));

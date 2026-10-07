@@ -16,19 +16,18 @@ that all corresponding-source obligations have already been fulfilled.
 | Steinberg ASIO SDK | The vendored SDK offers GPLv3 or a separate proprietary agreement. EasyKnack uses the GPLv3 option. Preserve the SDK notices and COPYING. |
 | miniaudio 0.11.21 | MIT-0 option, copyright David Reid; license text is in the vendored header and packaged notices. |
 | JogAmp JOGL / GlueGen and transitive JARs | Preserve the notices/licenses from each exact artifact; review bundled native components too. |
-| Bundled JDK | Retain the runtime's legal directory. OpenJDK GPLv2 with Classpath Exception and additional component notices require review against the exact JDK distribution. |
+| External JDK | New packages do not distribute Java. Users install a Windows x64 JDK 25 separately under its provider terms; the launcher can assist via winget. |
 | LLVM-MinGW toolchain | LLVM Apache-2.0 with LLVM exceptions plus separately licensed toolchain components; retain all supplied notices, not only the top-level LICENSE.TXT. |
 | GNU Make 4.4.1 and MinGW gendef (inside the compiler bundle) | GPL-3.0-or-later; matching source trees, build recipes and license notices are collected. |
 | Compiler's Python, libffi and LLDB-MI | Separate licenses; preserve their notices. Their pinned source archives are collected too. |
-| Microsoft VC/UCRT DLLs included in Temurin | Microsoft redistribution terms apply; these files are not relicensed as OpenJDK code. MSVC provides the three VC runtime DLLs; the Windows SDK provides UCRT/API-set DLLs. See the manual Microsoft runtime review before publication. |
+| Microsoft VC/UCRT DLLs included in older Temurin-bundled packages | Microsoft redistribution terms apply; these files are not relicensed as OpenJDK code. MSVC provides the three VC runtime DLLs; the Windows SDK provides UCRT/API-set DLLs. See the manual Microsoft runtime review before publication. |
 
 ## Where notices are installed
 
 Windows packages place LICENSE and this file in the application's app directory.
 The licenses directory contains extracted runtime-JAR notices, native component
 notices. Its upstream subdirectory supplements missing JAR
-notices with the JogAmp and ANTLR release license documents. The JDK legal directory and the complete compiler
-distribution retain their own notices. Application JARs also contain the project
+notices with the JogAmp and ANTLR release license documents. The complete compiler distribution retains its own notices. Application JARs also contain the project
 license and this overview under META-INF.
 
 ## Source availability before public distribution
@@ -36,7 +35,7 @@ license and this overview under META-INF.
 For each published binary, assemble a corresponding-source download from its exact
 source revision, including local modifications, build scripts and required materials.
 Provide exact required source/build materials for bundled copyleft components too,
-including the bundled JDK and compiler toolchain. Preserve upstream notices for permissively licensed components.
+including the compiler toolchain (and JDK only for older images that bundled it). Preserve upstream notices for permissively licensed components.
 
 Project repository: https://github.com/Helge97/EasyKnack
 

@@ -12,7 +12,7 @@ public final class EasyKnack {
     public static void main(String[] args) {
         final DocumentLaunch launches;
         try {
-            launches = DocumentLaunch.start(args);
+            launches = DocumentLaunch.start(LaunchArguments.decode(args));
             if (launches == null) return;
         } catch (Exception failure) {
             failure.printStackTrace();

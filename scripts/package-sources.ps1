@@ -18,7 +18,10 @@ $cache = Join-Path $root 'target/source-materials'
 New-Item -ItemType Directory -Force -Path $cache, $Destination | Out-Null
 $entries = [ordered]@{ 'easyknack-sources.zip'=$ProjectSources; 'sources.lock.json'=$lockPath }
 $missing = [Collections.Generic.List[string]]::new()
+$runtimeBundled = Test-Path -LiteralPath "$Image/runtime/release"
+$remainingReview = @($lock.remainingReview | Where-Object { $runtimeBundled -or $_ -notlike 'Temurin *' })
 foreach ($source in $lock.sources) {
+    if (!$runtimeBundled -and $source.id -in @('jdk-25.0.4.1', 'temurin-build')) { continue }
     if ($source.file -notmatch '^[a-zA-Z0-9._-]+$') { throw 'Unsafe source filename in lock file.' }
     $path = Join-Path $cache $source.file
     if (!(Test-Path -LiteralPath $path) -and $source.PSObject.Properties['localMavenPath']) {
@@ -46,20 +49,20 @@ $binaries = @(Get-ChildItem -LiteralPath "$Image/app/lib" -Filter '*.jar' | Sort
 })
 $unreviewed = @($binaries | Where-Object { $binary=$_; !($lock.binaries | Where-Object { $_.file -ceq $binary.file -and $_.sha256 -ceq $binary.sha256 }) } | ForEach-Object file)
 $runtime = Join-Path $Image 'runtime/release'
-$entries['evidence/runtime-release.txt'] = $runtime
+if ($runtimeBundled) { $entries['evidence/runtime-release.txt'] = $runtime }
 if (Test-Path -LiteralPath "$Image/app/inventory.json") { $entries['evidence/package-inventory.json'] = "$Image/app/inventory.json" }
 foreach ($file in Get-ChildItem -LiteralPath "$root/docs/development/source-audit" -File) { $entries['evidence/' + $file.Name] = $file.FullName }
-$runtimeMatches = (Get-FileHash -LiteralPath $runtime -Algorithm SHA256).Hash -ieq $lock.runtimeReleaseSha256
+$runtimeMatches = if ($runtimeBundled) { (Get-FileHash -LiteralPath $runtime -Algorithm SHA256).Hash -ieq $lock.runtimeReleaseSha256 } else { $null }
 $sourceHash = (Get-FileHash -LiteralPath $ProjectSources -Algorithm SHA256).Hash.ToLowerInvariant()
 $installation = Get-Content -LiteralPath "$Image/app/installation.properties" -Raw
 $sourceMatchesBuild = $installation -match "(?m)^sources.sha256=$sourceHash\s*$"
 $report = [ordered]@{
-    format=1; releaseReady=($missing.Count -eq 0 -and $unreviewed.Count -eq 0 -and $runtimeMatches -and $sourceMatchesBuild -and @($lock.remainingReview).Count -eq 0); sourceArchiveSha256=$sourceHash; sourceMatchesBuild=$sourceMatchesBuild
-    binaries=$binaries; unreviewedBinaries=$unreviewed; runtimeMatchesReviewedBuild=$runtimeMatches
-    missingSources=@($missing.ToArray()); remainingReview=$lock.remainingReview
+    format=1; releaseReady=($missing.Count -eq 0 -and $unreviewed.Count -eq 0 -and (!$runtimeBundled -or $runtimeMatches) -and $sourceMatchesBuild -and @($remainingReview).Count -eq 0); sourceArchiveSha256=$sourceHash; sourceMatchesBuild=$sourceMatchesBuild
+    binaries=$binaries; unreviewedBinaries=$unreviewed; runtimeBundled=$runtimeBundled; runtimeMatchesReviewedBuild=$runtimeMatches
+    missingSources=@($missing.ToArray()); remainingReview=$remainingReview
 }
 $entries['REVIEW.json'] = [Text.Encoding]::UTF8.GetBytes(($report | ConvertTo-Json -Depth 6))
-$entries['README.txt'] = [Text.Encoding]::UTF8.GetBytes("EasyKnack source materials`n`nIncludes the working-tree project snapshot and checksum-locked upstream archives.`nRead REVIEW.json and evidence before public distribution. This collection is not yet`na certification of complete corresponding sources. Unreviewed binary hashes or a`ndifferent runtime require a new audit. Upstream archives may include their own build-support binaries.`n`nRebuild the project using scripts/build-installer.ps1. Preserve its external Maven`ndependencies. Upstream recipes are in the LLVM-MinGW and temurin-build archives.`n")
+$entries['README.txt'] = [Text.Encoding]::UTF8.GetBytes("EasyKnack source materials`n`nIncludes the working-tree project snapshot and checksum-locked upstream archives.`nRead REVIEW.json and evidence before public distribution. This collection is not yet`na certification of complete corresponding sources. Unreviewed binary hashes or a`ndifferent runtime require a new audit. Upstream archives may include their own build-support binaries.`n`nRebuild the project using scripts/build-installer.ps1. Preserve its external Maven`ndependencies. Upstream recipes are in the LLVM-MinGW archive; Temurin sources are included only for an image bundling Java.`n")
 $archive = Join-Path $Destination 'EasyKnack-source-materials.zip'
 Write-Host "Bundling $($entries.Count) source archives and evidence files..."
 Write-DeterministicZip $archive $entries

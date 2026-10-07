@@ -1,4 +1,16 @@
-# EasyKnack for Windows
+# Windows quick start
+
+Install EasyKnack and choose whether to create Start Menu/Desktop shortcuts.
+On the final page, keep **Check Java prerequisites and start EasyKnack** selected.
+If Java is missing, EasyKnack offers to install Microsoft OpenJDK 25 through
+Windows Package Manager, select an existing JDK folder, or cancel. The Java
+provider handles its own installation and license prompts; Internet access and
+administrator approval may be required. Without Windows Package Manager, follow
+the official download instructions opened by EasyKnack.
+
+Use a **Windows x64 JDK 25**, including `javac`, not a JRE or ARM64 JDK.
+Java is installed separately and remains installed when EasyKnack is removed.
+The C++ compiler for Bake and plugins is included in EasyKnack.
 
 ## Install or open
 
@@ -7,9 +19,9 @@ shortcuts are independently selectable. Alternatively, open `EasyKnack.exe` in
 the portable application folder. Keep that entire folder together; copying only
 the EXE is not sufficient.
 
-Java, the audio host, media decoding and the tools for Formula, Bake and source
-plugins are included in packaged builds. No separate Java or compiler installation
-is needed. These development builds are unsigned.
+The audio host, media decoding and C++ tools for Formula, Bake and source plugins
+are included. Java is installed separately as described above. These development
+builds are unsigned.
 
 The installer registers `.knack` documents. Double-click one to open it; if Windows
 asks which application to use, select EasyKnack. An existing EasyKnack window

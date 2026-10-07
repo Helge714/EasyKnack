@@ -4,6 +4,7 @@ param(
     [Parameter(Mandatory=$true)][string]$Toolchain,
     [string]$Maven = 'mvn.cmd',
     [string]$MavenClasspath,
+    [string]$WixDirectory,
     [string]$Destination,
     [ValidateSet('app-image','exe','msi')][string]$Type = 'app-image'
 )
@@ -16,7 +17,7 @@ $JdkHome = (Resolve-Path -LiteralPath $JdkHome).Path
 $Toolchain = (Resolve-Path -LiteralPath $Toolchain).Path
 $java = Join-Path $JdkHome 'bin/java.exe'
 $cxx = Join-Path $Toolchain 'bin/clang++.exe'
-foreach ($file in @($java, $cxx, "$JdkHome/bin/javac.exe", "$JdkHome/bin/jpackage.exe")) {
+foreach ($file in @($java, $cxx, "$JdkHome/bin/javac.exe")) {
     if (!(Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing build tool: $file" }
 }
 [xml]$pom = Get-Content -LiteralPath "$root/pom.xml" -Raw
@@ -81,7 +82,7 @@ try {
     $licenseStart = $miniaudio.LastIndexOf('This software is available as a choice of the following licenses.')
     if ($licenseStart -lt 0) { throw 'miniaudio license section not found.' }
     $miniaudio.Substring($licenseStart).Replace('*/','').Trim() | Set-Content -LiteralPath "$inputDir/licenses/miniaudio/LICENSE.txt" -Encoding utf8
-    @('format=1', "product.version=$version", "platform=windows-x86_64", 'toolchain=tools/llvm-mingw/bin/clang++.exe', "sources.sha256=$((Get-FileHash -LiteralPath $projectSources -Algorithm SHA256).Hash.ToLowerInvariant())") | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
+    @('format=1', "product.version=$version", "platform=windows-x86_64", 'java=external', 'java.major=25', 'java.arch=x64', 'toolchain=tools/llvm-mingw/bin/clang++.exe', "sources.sha256=$((Get-FileHash -LiteralPath $projectSources -Algorithm SHA256).Hash.ToLowerInvariant())") | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     foreach ($library in Get-ChildItem -LiteralPath "$inputDir/lib" -Filter '*.jar') {
         $archive = [IO.Compression.ZipFile]::OpenRead($library.FullName)
@@ -94,21 +95,25 @@ try {
             }
         } finally { $archive.Dispose() }
     }
+    Copy-Item -LiteralPath "$PSScriptRoot/windows/Start-EasyKnack.ps1", "$PSScriptRoot/windows/JavaPrerequisite.ps1" -Destination $inputDir
     Write-Host 'Recording package file hashes...'
     $inventory = @(Get-ChildItem -LiteralPath $inputDir -File -Recurse | ForEach-Object {
         [pscustomobject]@{path=$_.FullName.Substring($inputDir.Length+1); bytes=$_.Length; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
     })
     $inventory | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath "$inputDir/inventory.json" -Encoding utf8
-    Write-Host 'Creating EasyKnack.exe and its bundled Java runtime...'
-    & "$JdkHome/bin/jpackage.exe" --type app-image --name EasyKnack --input $inputDir --main-jar $jar --main-class com.vin.easyknack.EasyKnack --dest $Destination --runtime-image $JdkHome --app-version $installerVersion --vendor EasyKnack --description 'Node-based audio workspace' --java-options '--enable-native-access=ALL-UNNAMED' --java-options '--add-opens=java.base/java.lang=ALL-UNNAMED' --java-options '--add-opens=java.desktop/sun.awt=ALL-UNNAMED' --java-options '--add-opens=java.desktop/sun.java2d=ALL-UNNAMED' *> "$work/jpackage.log"
-    if ($LASTEXITCODE -ne 0) { throw "jpackage failed: $work/jpackage.log" }
+    Write-Host 'Creating launcher for a separately installed JDK (no runtime bundled)...'
     $image = Join-Path $Destination 'EasyKnack'
-    if (!(Test-Path -LiteralPath "$image/runtime/bin/javac.exe")) { throw 'Bundled Java compiler is missing.' }
+    New-Item -ItemType Directory -Path $image | Out-Null
+    Move-Item -LiteralPath $inputDir -Destination "$image/app"
+    $csc = "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/csc.exe"
+    if (!(Test-Path -LiteralPath $csc)) { throw 'Windows .NET Framework C# compiler not found.' }
+    & $csc /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll "/out:$image/EasyKnack.exe" (Resolve-Path "$PSScriptRoot/windows/Launcher.cs").Path *> "$work/launcher.log"
+    if ($LASTEXITCODE -ne 0) { throw "Launcher build failed: $work/launcher.log" }
     Write-Host "Portable application: $image/EasyKnack.exe"
     Assert-SourceSnapshot $root $sourceSnapshot
     & "$PSScriptRoot/package-sources.ps1" -Image $image -ProjectSources $projectSources -Destination $Destination -Download
     if ($Type -ne 'app-image') {
-        & "$PSScriptRoot/package-installer.ps1" -Image $image -JdkHome $JdkHome -Type $Type -Destination $Destination
+        & "$PSScriptRoot/package-installer.ps1" -Image $image -WixDirectory $WixDirectory -Type $Type -Destination $Destination
     }
     Assert-SourceSnapshot $root $sourceSnapshot
     Write-Host "Build logs: $work"

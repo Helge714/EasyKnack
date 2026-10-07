@@ -5,9 +5,9 @@
 - `EasyKnack-project-sources.zip`: project source, vendored source, documentation,
   examples and build scripts, including local modifications and new unignored files.
 - `EasyKnack-source-materials.zip`: that snapshot, checksum-locked upstream archives,
-  the reviewed dependency inventory, runtime identity and `REVIEW.json`.
+  the reviewed dependency inventory and `REVIEW.json` (runtime identity only when bundled).
 
-The first build downloads approximately 510 MiB of upstream source material. Later
+The first build downloads several hundred MiB of upstream source material. Later
 builds reuse `target/source-materials` after checking every SHA-256. The lock file is
 `scripts/sources.lock.json`. A missing local GLSwing sources artifact is reported;
 it is not silently substituted by a newer snapshot. GLSwing remains an external
@@ -57,7 +57,12 @@ their exclusive transitive sources. Audio import now uses the vendored miniaudio
 header in the project source snapshot. The earlier native audit remains historical
 evidence for older images; it is not the dependency list of new packages.
 
-Temurin 25.0.4.1+1 identifies OpenJDK commit
+New Windows images use an external JDK: the source packager omits OpenJDK and
+Temurin build archives and records `runtimeBundled: false`. It excludes the
+Temurin-specific open review item for those images only; other obligations remain.
+The old lock entries are retained for inspecting older bundled images.
+
+For those older images, Temurin 25.0.4.1+1 identifies OpenJDK commit
 `520406d871955300957ef01e406ac2acd0f9b75c` and temurin-build commit
 `e6ba7dec3d07654074559310376a3ae89da5f4ac`; both source archives are collected.
 The local GLSwing sources JAR is collected but its correspondence to the dirty
@@ -66,5 +71,5 @@ MinGW, Python, libffi, LLDB-MI, GNU Make source archives. Official Temurin SBOM/
 archive comparisons are recorded in the [native review](source-audit/NATIVE-RUNTIMES.md).
 
 Before public distribution, resolve the remaining items in `sources.lock.json`
-and [LICENSING.md](LICENSING.md), especially Microsoft runtime redistribution terms and the GLSwing snapshot. No release
+and [LICENSING.md](LICENSING.md), especially the GLSwing snapshot (and Microsoft runtime redistribution terms if bundling Java again). No release
 or public upload is performed by these scripts.
