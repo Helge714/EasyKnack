@@ -96,6 +96,7 @@ try {
         } finally { $archive.Dispose() }
     }
     Copy-Item -LiteralPath "$PSScriptRoot/windows/Start-EasyKnack.ps1", "$PSScriptRoot/windows/JavaPrerequisite.ps1" -Destination $inputDir
+    Copy-Item -LiteralPath "$root/src/main/resources/branding/EKIcon.ico" -Destination "$inputDir/EKIcon.ico"
     Write-Host 'Recording package file hashes...'
     $inventory = @(Get-ChildItem -LiteralPath $inputDir -File -Recurse | ForEach-Object {
         [pscustomobject]@{path=$_.FullName.Substring($inputDir.Length+1); bytes=$_.Length; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
@@ -107,7 +108,7 @@ try {
     Move-Item -LiteralPath $inputDir -Destination "$image/app"
     $csc = "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/csc.exe"
     if (!(Test-Path -LiteralPath $csc)) { throw 'Windows .NET Framework C# compiler not found.' }
-    & $csc /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll "/out:$image/EasyKnack.exe" (Resolve-Path "$PSScriptRoot/windows/Launcher.cs").Path *> "$work/launcher.log"
+    & $csc /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll "/win32icon:$image/app/EKIcon.ico" "/out:$image/EasyKnack.exe" (Resolve-Path "$PSScriptRoot/windows/Launcher.cs").Path *> "$work/launcher.log"
     if ($LASTEXITCODE -ne 0) { throw "Launcher build failed: $work/launcher.log" }
     Write-Host "Portable application: $image/EasyKnack.exe"
     Assert-SourceSnapshot $root $sourceSnapshot

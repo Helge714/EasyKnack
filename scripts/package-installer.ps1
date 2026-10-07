@@ -48,6 +48,8 @@ function DirectoryXml([string]$folder) {
 }
 $tree = DirectoryXml $Image
 $refs = ($components | ForEach-Object { "<ComponentRef Id='$_'/>" }) -join ''
+$icon = Join-Path $Image 'app/EKIcon.ico'
+if (!(Test-Path -LiteralPath $icon)) { throw "Missing packaged application icon: $icon" }
 $launcher = Id 'F' 'EasyKnack.exe'
 # Separate optional features provide persistent, independent shortcut choices.
 $xml = @"
@@ -56,19 +58,21 @@ $xml = @"
 <Package InstallerVersion='500' Compressed='yes' InstallScope='perUser' Platform='x64'/>
 <MajorUpgrade AllowSameVersionUpgrades='yes' DowngradeErrorMessage='A newer EasyKnack version is already installed.'/>
 <MediaTemplate EmbedCab='yes'/>
+<Icon Id='EasyKnackIcon' SourceFile='$(Xml $icon)'/><Property Id='ARPPRODUCTICON' Value='EasyKnackIcon'/>
 <Condition Message='EasyKnack requires 64-bit Windows.'>VersionNT64</Condition>
 <Directory Id='TARGETDIR' Name='SourceDir'>
 <Directory Id='LocalAppDataFolder'><Directory Id='ProgramsFolder' Name='Programs'><Directory Id='INSTALLDIR' Name='EasyKnack'>$tree
 <Component Id='FileAssociation' Guid='*' Win64='yes'>
 <RegistryValue Root='HKCU' Key='Software\Classes\.knack' Value='EasyKnack.Document' Type='string' KeyPath='yes'/>
 <RegistryValue Root='HKCU' Key='Software\Classes\EasyKnack.Document' Value='EasyKnack document' Type='string'/>
+<RegistryValue Root='HKCU' Key='Software\Classes\EasyKnack.Document\DefaultIcon' Value='&quot;[INSTALLDIR]EasyKnack.exe&quot;,0' Type='string'/>
 <RegistryValue Root='HKCU' Key='Software\Classes\EasyKnack.Document\shell\open\command' Value='&quot;[INSTALLDIR]EasyKnack.exe&quot; &quot;%1&quot;' Type='string'/>
 </Component>
 </Directory></Directory></Directory>
 <Directory Id='ProgramMenuFolder'><Directory Id='EasyKnackMenu' Name='EasyKnack'>
-<Component Id='MenuShortcut' Guid='*' Win64='yes'><Shortcut Id='MenuLink' Name='EasyKnack' Target='[INSTALLDIR]EasyKnack.exe' WorkingDirectory='INSTALLDIR'/><RemoveFolder Id='RemoveMenu' On='uninstall'/><RegistryValue Root='HKCU' Key='Software\EasyKnack\Installer' Name='StartMenu' Type='integer' Value='1' KeyPath='yes'/></Component>
+<Component Id='MenuShortcut' Guid='*' Win64='yes'><Shortcut Id='MenuLink' Name='EasyKnack' Target='[INSTALLDIR]EasyKnack.exe' WorkingDirectory='INSTALLDIR' Icon='EasyKnackIcon' IconIndex='0'/><RemoveFolder Id='RemoveMenu' On='uninstall'/><RegistryValue Root='HKCU' Key='Software\EasyKnack\Installer' Name='StartMenu' Type='integer' Value='1' KeyPath='yes'/></Component>
 </Directory></Directory>
-<Directory Id='DesktopFolder'><Component Id='DesktopShortcut' Guid='*' Win64='yes'><Shortcut Id='DesktopLink' Name='EasyKnack' Target='[INSTALLDIR]EasyKnack.exe' WorkingDirectory='INSTALLDIR'/><RegistryValue Root='HKCU' Key='Software\EasyKnack\Installer' Name='Desktop' Type='integer' Value='1' KeyPath='yes'/></Component></Directory>
+<Directory Id='DesktopFolder'><Component Id='DesktopShortcut' Guid='*' Win64='yes'><Shortcut Id='DesktopLink' Name='EasyKnack' Target='[INSTALLDIR]EasyKnack.exe' WorkingDirectory='INSTALLDIR' Icon='EasyKnackIcon' IconIndex='0'/><RegistryValue Root='HKCU' Key='Software\EasyKnack\Installer' Name='Desktop' Type='integer' Value='1' KeyPath='yes'/></Component></Directory>
 </Directory>
 <Feature Id='Application' Title='EasyKnack and C++ compiler' Description='Required application files and LLVM-MinGW for Bake and plugins. Java is installed separately.' Level='1' Absent='disallow' ConfigurableDirectory='INSTALLDIR'>$refs<ComponentRef Id='FileAssociation'/>
 <Feature Id='StartMenu' Title='Start Menu shortcut' Level='1'><ComponentRef Id='MenuShortcut'/></Feature>
@@ -98,7 +102,7 @@ if ($LASTEXITCODE -ne 0) { throw "WiX link failed: $log" }
 if ($Type -eq 'exe') {
     @"
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:bal='http://schemas.microsoft.com/wix/BalExtension'>
-<Bundle Name='EasyKnack' Version='$version' Manufacturer='EasyKnack' UpgradeCode='e393418e-2805-43c3-b492-e32794465778'>
+<Bundle IconSourceFile='$(Xml $icon)' Name='EasyKnack' Version='$version' Manufacturer='EasyKnack' UpgradeCode='e393418e-2805-43c3-b492-e32794465778'>
 <BootstrapperApplicationRef Id='WixStandardBootstrapperApplication.HyperlinkLicense'><bal:WixStandardBootstrapperApplication LicenseUrl='' SuppressOptionsUI='yes'/></BootstrapperApplicationRef>
 <Chain><MsiPackage SourceFile='$(Xml $msi)' DisplayInternalUI='yes' /></Chain>
 </Bundle></Wix>

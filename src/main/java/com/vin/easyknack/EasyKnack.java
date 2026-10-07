@@ -24,6 +24,8 @@ public final class EasyKnack {
                 .locale(com.vin.easyknack.ui.ApplicationSettings.locale())
                 .title(com.vin.easyknack.ui.AppText.literal("EasyKnack — Audio Workspace"))
                 .backend(GLBackend.CANVAS)
+                .splash(splash -> splash.size(560, 392))
+                .splashView(ApplicationArtwork::splash)
                 .size(1280, 800)
                 .minimumSize(900, 600)
                 .prepare(plan -> plan
@@ -47,6 +49,7 @@ public final class EasyKnack {
                             return null;
                         }))
                 .surface(context -> {
+                    ApplicationArtwork.icon(context.window());
                     context.parent().setGLTheme(ApplicationTheme.current().theme());
                     var view = new WorkspaceView(context.window());
                     view.acceptLaunches(launches, context.window());
