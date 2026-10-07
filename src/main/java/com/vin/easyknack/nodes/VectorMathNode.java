@@ -1,6 +1,7 @@
 package com.vin.easyknack.nodes;
 @RegisterNode(id="easyknack.vector.math",title="Vector Math",category=NodeCategory.VECTOR,kind=NodeKind.VECTOR)
 public final class VectorMathNode extends BasicNode {
+    @Override public void insert(InsertionRouting routing,NodeState state){routing.connect(A,OUT);}
     public static final PropertyId A=new PropertyId("a"),B=new PropertyId("b"),FACTOR=new PropertyId("factor"),OP=new PropertyId("operation"),OUT=new PropertyId("vector");
     public enum Operation {
         ADD, SUBTRACT, MULTIPLY, DIVIDE, SCALE, NORMALIZE, NEGATE, ABSOLUTE, MINIMUM, MAXIMUM, CROSS;

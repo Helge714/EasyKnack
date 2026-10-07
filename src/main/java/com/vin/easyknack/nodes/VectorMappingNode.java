@@ -3,6 +3,7 @@ package com.vin.easyknack.nodes;
 /** Component scale followed by Euler X, Y, Z rotation about the origin. */
 @RegisterNode(id="easyknack.vector.mapping", title="Vector Mapping", category=NodeCategory.VECTOR, kind=NodeKind.VECTOR)
 public final class VectorMappingNode extends BasicNode {
+    @Override public void insert(InsertionRouting routing,NodeState state){routing.connect(IN,OUT);}
     public static final PropertyId IN=new PropertyId("input"), SCALE=new PropertyId("scale"),
             ROTATION=new PropertyId("rotation"), OUT=new PropertyId("vector");
     public void define(NodeBuilder n, NodeState s) {

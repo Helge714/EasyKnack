@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Vector ports now align with the first XYZ slider and collapse while connected.
+  Vector Math and Vector Mapping can be inserted directly into vector connections.
   Vector Input is listed under Inputs; Spatial Receiver is under Routing.
   Added Vector Mapping (vector scale and Euler rotation) and Context Time output
   in seconds at audio rate. Existing port indices are retained. New nodes and the
