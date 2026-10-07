@@ -1,6 +1,6 @@
 # Vectors and spatial audio
 
-Use **Effects → Spatial Receiver** to place one point source relative to a listener.
+Use **Routing → Spatial Receiver** to place one point source relative to a listener.
 Connect the sound to **Audio In**, and connect Vector nodes to **Source Position**
 and **Receiver Position**. Unconnected position inputs have their own XYZ editor.
 
@@ -39,11 +39,11 @@ the mono downmix.
 
 ## Vector nodes
 
-The **Vector** menu contains:
+**Inputs → Vector Input** supplies a manually edited XYZ value. The **Vector** menu contains:
 
 | Node | Purpose |
 | --- | --- |
-| Vector | A manually edited XYZ value |
+| Vector Mapping | Component scale followed by X/Y/Z rotation |
 | Vector Combine | Three scalar inputs become one vector |
 | Vector Separate | Split a vector into X, Y and Z scalar outputs |
 | Vector Math | Add, subtract, multiply/divide components, scale, normalize, negate, absolute components, min/max components, or cross product |
@@ -71,3 +71,27 @@ Vector sockets can cross normal group boundaries and are included in group bake
 and source export. The compound XYZ editor is currently edited on its own node;
 it is not offered as a copied scalar group editor. Vector/spatial processors do
 not opt into sample-feedback regions or per-bin spectral evaluation.
+
+## Vector mapping
+
+Vector Mapping scales X/Y/Z componentwise, then rotates about the origin in X,
+Y, Z order (right-handed Euler angles). Scale defaults to (1, 1, 1); rotation
+defaults to zero. Scale uses factors or percent, rotation uses degrees, radians
+or turns. Connected rotation vectors contain degrees; connected scale vectors
+contain factors. Display-unit choices do not change these contracts.
+Use Vector Combine to assemble externally controlled component values.
+
+Vector input sockets align with the first component slider. A connected vector
+input replaces its three sliders with one compact labelled row.
+
+## Continuous rotation
+
+Connect **Context Input → Time [s]** to Math (Multiply), multiply by the desired
+degrees per second, and connect the result to Receiver Yaw. For example, 36 gives
+one revolution every ten seconds. No wrapping or Map Range is needed. Time runs
+per sample while that Context Input is processed and survives graph edits; it
+pauses when the node is inactive. The signal uses the usual floating-point audio
+format, so very long-running absolute time has less fractional precision.
+
+Avoid using an audio sawtooth as a phase ramp: its band-limited reset has ringing
+and a transition which cause a brief, unintended rotation after mapping to angles.

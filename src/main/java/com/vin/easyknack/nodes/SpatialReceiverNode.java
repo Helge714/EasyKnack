@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 import java.util.*;
-@RegisterNode(id="easyknack.spatial.receiver",title="Spatial Receiver",category=NodeCategory.EFFECT,kind=NodeKind.AUDIO)
+@RegisterNode(id="easyknack.spatial.receiver",title="Spatial Receiver",category=NodeCategory.ROUTING,kind=NodeKind.AUDIO)
 public final class SpatialReceiverNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("audio-in"),OUT=new PropertyId("audio-out"),DISTANCE=new PropertyId("distance"),SOURCE=new PropertyId("source"),RECEIVER=new PropertyId("receiver"),ANGLE=new PropertyId("angle"),SPACING=new PropertyId("spacing"),MODE=new PropertyId("mode"),ATTENUATION=new PropertyId("attenuation"),REFERENCE=new PropertyId("reference"),PROPAGATION=new PropertyId("propagation");
     public void define(NodeBuilder n,NodeState s){

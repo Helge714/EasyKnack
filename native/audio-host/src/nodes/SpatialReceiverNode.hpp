@@ -25,7 +25,7 @@ struct SpatialReceiverNode:NodeProcessor {
         double distance=0,gain=1;
         for(std::size_t i=0;i<c.bufferSize;i++){
             if(i==0||moving){
-            auto src=vectorInput(c,1,i,source),center=vectorInput(c,2,i,receiver);double yaw=c.numericInput(3,static_cast<float>(angle))[i]*.017453292519943295;
+            auto src=vectorInput(c,1,i,source),center=vectorInput(c,2,i,receiver);double yaw=std::remainder(static_cast<double>(c.numericInput(3,static_cast<float>(angle))[i]),360.0)*.017453292519943295;
             if(!std::isfinite(yaw))yaw=0;Vector3 right{std::cos(yaw),0,-std::sin(yaw)};
             double width=stereo?std::max(0.f,c.numericInput(4,static_cast<float>(spacing))[i]):0;if(!std::isfinite(width))width=0;
             auto ear=center;for(std::size_t axis=0;axis<3;axis++)ear[axis]+=(c.channelIndex==0?-.5:.5)*width*right[axis];

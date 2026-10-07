@@ -12,6 +12,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 class VectorSpatialTest {
+    @Test void compoundPortsAnchorAndCollapseWithoutChangingGroupValues(){
+        var graph=new com.vingame.glswing.node.GLNodeEditor();
+        var source=new com.vingame.glswing.node.GLNode("source");
+        var output=source.addOutput("out",new com.vingame.glswing.ui.GLLabel("Out"));
+        var sink=new com.vingame.glswing.node.GLNode("sink");
+        var group=(com.vingame.glswing.ui.GLSliderGroup)new VectorEditor(1,2,3).create("Position",v->{}).component();
+        var input=sink.addInput("in",group);input.setContentHiddenWhenConnected(true);
+        sink.setContentPortAnchor(group,group.getSliders().get(0));
+        graph.addNode(source,0,0);graph.addNode(sink,200,0);
+        float full=sink.getPreferredGLSize().height(),single=group.getSliders().get(0).getPreferredGLSize().height();
+        assertEquals(group.getY()+single/2,input.getY()+input.getHeight()/2,.01);
+        var link=graph.connect(output,input);
+        assertEquals(full-2*single,sink.getPreferredGLSize().height(),.01);
+        assertEquals(full-2*single,sink.getHeight(),.01);
+        graph.removeConnection(link);
+        assertEquals(full,sink.getPreferredGLSize().height(),.01);
+        assertEquals(full,sink.getHeight(),.01);
+        assertEquals(2,group.getSliders().get(1).getValue());
+    }
+    @Test void vectorViewShrinksAndRestoresAfterBindingRefresh(){
+        var definition=new VectorSeparateNode();var model=new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults());
+        var sink=new BasicNodeView(definition,new NodeViewContext((n,k,v)->{},new com.vingame.glswing.history.GLHistoryManager()),model);
+        var editor=new com.vingame.glswing.node.GLNodeEditor();var source=new com.vingame.glswing.node.GLNode("Source");
+        var output=source.addOutput("out",new com.vingame.glswing.ui.GLLabel("Vector"));
+        editor.addNode(source,0,0);editor.addNode(sink,200,0);float original=sink.getHeight();
+        var port=sink.findPort("vector");var link=editor.connect(output,port);sink.update(model);
+        assertTrue(sink.getHeight()<original);assertEquals(sink.getHeight(),sink.getPreferredGLSize().height(),.01);
+        editor.removeConnection(link);sink.update(model);assertEquals(original,sink.getHeight(),.01);
+    }
+    @Test void mappingHasTypedScaleAndRotation(){
+        var mapping=new VectorMappingNode();var layout=mapping.layout(new NodeState(mapping.defaults()));
+        var editors=layout.rows().stream().map(r->r.editor()).filter(VectorEditor.class::isInstance).map(VectorEditor.class::cast).toList();
+        assertEquals(3,editors.size());assertEquals(UnitFormat.FACTOR,editors.get(1).formats().stored());
+        assertEquals(UnitFormat.DEGREE,editors.get(2).formats().stored());
+        assertEquals(NodeCategory.INPUT,new VectorNode().registration().category());
+        assertEquals(NodeCategory.ROUTING,new SpatialReceiverNode().registration().category());
+    }
     @Test void vectorRatesTypesUnitsAndStereoControls(){
         var combine=new VectorCombineNode();var state=AutomaticRates.resolveProperties(combine,combine.defaults(),Map.of(VectorCombineNode.X,ProcessingRate.AUDIO));
         var layout=combine.layout(new NodeState(state));

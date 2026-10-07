@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Vector ports now align with the first XYZ slider and collapse while connected.
+  Vector Input is listed under Inputs; Spatial Receiver is under Routing.
+  Added Vector Mapping (vector scale and Euler rotation) and Context Time output
+  in seconds at audio rate. Existing port indices are retained. New nodes and the
+  Time output require the updated host and SDK.
+
+
 - Added Audio/Control vector signals, grouped XYZ editors with length units,
   vector operations and scalar measurements, and a mono/stereo Spatial Receiver
   with channel-specific distances, yaw, spacing and optional propagation.

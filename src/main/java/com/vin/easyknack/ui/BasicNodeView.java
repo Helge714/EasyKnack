@@ -67,6 +67,8 @@ public class BasicNodeView extends GLNode {
                 setAlwaysVisible(content, row.alwaysVisible());
                 setContentVerticalGrow(content,row.verticalGrow());
                 if (port != null) {
+                    if(row.editor() instanceof VectorEditor && content instanceof GLSliderGroup group)
+                        setContentPortAnchor(content,group.getSliders().get(0));
                     port.setToolTipText(content instanceof GLControl control && control.getToolTipText()!=null ? control.getToolTipText() : row.label());
                     port.setColor(ApplicationTheme.current().signal(row.signal()));
                     port.setShape(row.rate().shape());
@@ -185,10 +187,11 @@ public class BasicNodeView extends GLNode {
                         .filter(row -> findPort(row.id()) != null && findPort(row.id()).getActiveConnectionCount() > 0)
                         .map(NodeBuilder.Row::key).collect(java.util.stream.Collectors.toSet());
                 if(model.equals(lastModel) && connected.equals(lastConnected)) return;
+                boolean vectorConnectionsChanged=!connected.equals(lastConnected) && definition.layout(new NodeState(model.properties())).rows().stream().anyMatch(r->r.editor() instanceof VectorEditor);
                 lastModel=model;lastConnected=connected;
                 var state = new NodeState(model.properties(), connected);
                 var layout=definition.layout(state);
-                boolean geometryChanged=layout.rows().stream().anyMatch(row -> {
+                boolean geometryChanged=vectorConnectionsChanged || layout.rows().stream().anyMatch(row -> {
                     var content=controls.get(row.key());
                     return content!=null && !Objects.equals(rowVisibility.get(row.key()),row.isVisible());
                 });

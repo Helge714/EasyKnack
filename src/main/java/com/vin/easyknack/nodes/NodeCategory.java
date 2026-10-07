@@ -2,7 +2,7 @@ package com.vin.easyknack.nodes;
 
 /** Built-in palette categories are checked by javac, not looked up by name. */
 public enum NodeCategory {
-    ANALYSIS("Analysis"), SPECTRAL("Spectral"), GENERATOR("Generators"), EFFECT("Effects"), MATH("Math & Mapping"), IO("Input / Output"), MIDI("MIDI"), CONVERTER("Converters"), ROUTING("Mixing & Routing"), MODULATION("Modulation"), VECTOR("Vector"), BUFFER("Buffers");
+    ANALYSIS("Analysis"), SPECTRAL("Spectral"), GENERATOR("Generators"), EFFECT("Effects"), MATH("Math & Mapping"), IO("Input / Output"), INPUT("Inputs"), MIDI("MIDI"), CONVERTER("Converters"), ROUTING("Mixing & Routing"), MODULATION("Modulation"), VECTOR("Vector"), BUFFER("Buffers");
     private final String path;
     NodeCategory(String path) { this.path = path; }
     public String path() { return NodeText.text("category." + name(), path); }
