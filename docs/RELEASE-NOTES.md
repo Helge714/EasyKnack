@@ -5,6 +5,7 @@
 - Vector ports now align with the first XYZ slider and collapse while connected.
   Vector Math and Vector Mapping can be inserted directly into vector connections.
   Vector Input is listed under Inputs; Spatial Receiver is under Routing.
+  Receiver yaw is hidden and disconnected from processing in Mono mode.
   Added Vector Mapping (vector scale and Euler rotation) and Context Time output
   in seconds at audio rate. Existing port indices are retained. New nodes and the
   Time output require the updated host and SDK.

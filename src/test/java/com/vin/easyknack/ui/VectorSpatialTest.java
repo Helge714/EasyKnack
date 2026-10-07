@@ -59,6 +59,8 @@ class VectorSpatialTest {
         assertFalse(UnitFormat.METRE.compatible(UnitFormat.SECOND));
         var receiver=new SpatialReceiverNode();var mono=new HashMap<>(receiver.defaults());mono.put("mode",GLNodeValue.of("mono"));
         assertFalse(receiver.layout(new NodeState(mono)).rows().stream().anyMatch(r->r.key().equals(SpatialReceiverNode.SPACING)));
+        assertFalse(receiver.layout(new NodeState(mono)).rows().stream().anyMatch(r->r.key().equals(SpatialReceiverNode.ANGLE)));
+        assertEquals(ProcessingRate.CONTROL,receiver.resolveAutomaticOutputRates(new NodeState(mono),Map.of(SpatialReceiverNode.ANGLE,ProcessingRate.AUDIO)).get(1));
         var resolved=AutomaticRates.resolveProperties(receiver,receiver.defaults(),Map.of(SpatialReceiverNode.IN,ProcessingRate.AUDIO));
         assertEquals(ProcessingRate.CONTROL,receiver.layout(new NodeState(resolved)).rows().get(1).rate());
         resolved=AutomaticRates.resolveProperties(receiver,receiver.defaults(),Map.of(SpatialReceiverNode.SOURCE,ProcessingRate.AUDIO));

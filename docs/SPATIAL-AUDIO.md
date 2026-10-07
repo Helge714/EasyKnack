@@ -15,7 +15,7 @@ changing the display unit preserves the position.
 - **Mono** uses the receiver centre. **Stereo** uses two receiving points, separated
   by **Receiver Spacing**. Spacing is shown only in Stereo; its value is retained
   while Mono is selected.
-- **Yaw** rotates the receiver around the vertical axis. At 0° it faces +Z; at
+- **Yaw**, shown only in Stereo, rotates the receiver around the vertical axis. At 0° it faces +Z; at
   90° it faces +X. Positive source X is initially heard on the right.
 - **Distance** outputs metres: one distance in Mono, or the distance to each
   receiving point in its corresponding stereo channel. Connect it to Math,
