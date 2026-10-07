@@ -21,7 +21,7 @@ public final class FormulaNode extends BasicNode {
             if((buffers&(1<<i))!=0){n.addInput(input(i),"Buffer "+(i+1)).dataType(PortDataType.HISTORY).signal(SignalCategory.HISTORY).rate(ProcessingRate.CONTROL).visible(i<inputs);continue;}
             var row=(inMask&(1<<i))!=0?n.addInput(input(i),"Input "+(i+1),new Editor.Trigger()).signal(SignalCategory.TRIGGER).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT):n.addInput(input(i),"Input "+(i+1),Editor.Slider.button(0,null,null)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
             row.visible(i<inputs);
-            if((inMask&(1<<i))==0){var unit=UnitFormat.fromId(s.text("unit.in"+i,"factor"));row.formats(new UnitFormats(unit,unit,List.of(unit)));}
+            if((inMask&(1<<i))==0){var unit=UnitFormat.fromId(s.text("unit.in"+i,"factor"));row.formats(new UnitFormats(unit,unit,List.of(unit))).unitProperty(new PropertyId("unit.in"+i));}
         }
         ProcessingRate.addEditor(n,new PropertyId("rate"));
     }

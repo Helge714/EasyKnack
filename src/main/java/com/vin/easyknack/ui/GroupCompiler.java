@@ -80,11 +80,16 @@ final class GroupCompiler {
             var descriptor=new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),ports,properties,mappings);
             expanded.put(asset.id(),new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(asset.graph().graphId(),asset.graph().revision(),nodes,wires),asset.viewState(),asset.metadata(),descriptor));
         }
+        var declared=new HashMap<String,Set<String>>();
+        for(var asset:expanded.values())if(asset.compositeDescriptor()!=null){
+            var d=asset.compositeDescriptor();
+            declared.put(d.nodeTypeId(),d.properties().stream().map(GLCompositePropertyDescriptor::id).collect(java.util.stream.Collectors.toSet()));
+        }
         var registry=new GLCompositeGraphRegistry();
-        for(var asset:expanded.values())registry.registerAsset(rewrite(asset,adapters));
-        return new Prepared(rewrite(GroupChoices.normalizeSelections(root,original),adapters),registry);
+        for(var asset:expanded.values())registry.registerAsset(rewrite(asset,adapters,declared));
+        return new Prepared(rewrite(GroupChoices.normalizeSelections(root,original),adapters,declared),registry);
     }
-    private static GLNodeGraphAsset rewrite(GLNodeGraphAsset asset,Map<String,List<Adapter>> adapters){
+    private static GLNodeGraphAsset rewrite(GLNodeGraphAsset asset,Map<String,List<Adapter>> adapters,Map<String,Set<String>> declared){
         var graph=asset.graph();var nodes=graph.nodes().stream().map(raw->{
             var node=raw.withoutProperty(GroupBakes.PROPERTY);
             var bindings=adapters.get(node.typeId());if(bindings==null)return node;
@@ -96,6 +101,13 @@ final class GroupCompiler {
                 if(GroupInputSettings.checkbox(binding.port))value=value==0?0:1;
                 values.put(binding.valueKey,GLNodeValue.of(binding.base.convert(value,selected)));values.put(binding.unitKey,GLNodeValue.of(selected.id()));
             }
+            // Interface edits can leave former input defaults on existing instances.
+            // Only discard our reserved input keys, never arbitrary composite properties.
+            var valid=declared.getOrDefault(node.typeId(),Set.of());
+            values.keySet().removeIf(key->{
+                String property=key.startsWith(GLGraphNode.AUTOMATIC_DEFAULT_PREFIX)?key.substring(GLGraphNode.AUTOMATIC_DEFAULT_PREFIX.length()):key.startsWith(GLGraphNode.AUTOMATIC_PREFIX)?key.substring(GLGraphNode.AUTOMATIC_PREFIX.length()):key;
+                return property.matches("easyknack\\.input\\.[0-9a-f]+(?:\\.unit)?")&&!valid.contains(property);
+            });
             return new GLGraphNode(node.id(),node.typeId(),node.typeVersion(),values);
         }).toList();
         return new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,graph.connections()),asset.viewState(),asset.metadata(),asset.compositeDescriptor());

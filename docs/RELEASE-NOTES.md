@@ -1,6 +1,9 @@
 # Release notes
 
 ## Unreleased
+
+- Removed group inputs no longer block execution through stale instance defaults.
+  Formula kernels consistently use their declared input units in spectral graphs.
 - Unconnected numeric group inputs retain editable defaults without blocking audio,
   including newly added Formula inputs awaiting a valid code update.
 
