@@ -43,7 +43,8 @@ the mono downmix.
 
 | Node | Purpose |
 | --- | --- |
-| Vector Mapping | Component scale followed by X/Y/Z rotation |
+| Vector Scale | Component scaling around an Origin |
+| Vector Rotate | X/Y/Z rotation around an Origin |
 | Vector Combine | Three scalar inputs become one vector |
 | Vector Separate | Split a vector into X, Y and Z scalar outputs |
 | Vector Math | Add, subtract, multiply/divide components, scale, normalize, negate, absolute components, min/max components, or cross product |
@@ -72,14 +73,21 @@ and source export. The compound XYZ editor is currently edited on its own node;
 it is not offered as a copied scalar group editor. Vector/spatial processors do
 not opt into sample-feedback regions or per-bin spectral evaluation.
 
-## Vector mapping
+## Vector transforms
 
-Vector Mapping scales X/Y/Z componentwise, then rotates about the origin in X,
-Y, Z order (right-handed Euler angles). Scale defaults to (1, 1, 1); rotation
-defaults to zero. Scale uses factors or percent, rotation uses degrees, radians
-or turns. Connected rotation vectors contain degrees; connected scale vectors
-contain factors. Display-unit choices do not change these contracts.
-Use Vector Combine to assemble externally controlled component values.
+Vector Scale computes `origin + scale * (vector - origin)` componentwise.
+Scale defaults to (1, 1, 1) and supports factors or percent.
+Vector Rotate computes `origin + rotation(vector - origin)` in X, Y, Z order
+(right-handed Euler angles). Rotation defaults to zero and supports degrees,
+radians or turns. Both Origins default to (0, 0, 0) and use the XYZ group editor
+with metres, kilometres, centimetres and millimetres.
+
+All vector inputs support Audio/Control rates. Connected rotation vectors contain
+degrees; scale vectors contain factors; position and origin vectors contain metres.
+Display-unit choices do not change these contracts. Use Vector Combine to assemble
+externally controlled component values. Chain Scale then Rotate to reproduce the
+former Mapping operation, or change the order and origins for other transforms.
+Both nodes can be inserted directly into vector connections.
 
 Vector input sockets align with the first component slider. A connected vector
 input replaces its three sliders with one compact labelled row.

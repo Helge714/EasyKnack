@@ -41,11 +41,11 @@ class VectorSpatialTest {
         assertTrue(sink.getHeight()<original);assertEquals(sink.getHeight(),sink.getPreferredGLSize().height(),.01);
         editor.removeConnection(link);sink.update(model);assertEquals(original,sink.getHeight(),.01);
     }
-    @Test void mappingHasTypedScaleAndRotation(){
-        var mapping=new VectorMappingNode();var layout=mapping.layout(new NodeState(mapping.defaults()));
+    @Test void transformsHaveTypedParametersAndOrigin(){
+        for(var mapping:List.of(new VectorScaleNode(),new VectorRotateNode())){var layout=mapping.layout(new NodeState(mapping.defaults()));
         var editors=layout.rows().stream().map(r->r.editor()).filter(VectorEditor.class::isInstance).map(VectorEditor.class::cast).toList();
-        assertEquals(3,editors.size());assertEquals(UnitFormat.FACTOR,editors.get(1).formats().stored());
-        assertEquals(UnitFormat.DEGREE,editors.get(2).formats().stored());
+        assertEquals(3,editors.size());assertEquals(mapping instanceof VectorScaleNode?UnitFormat.FACTOR:UnitFormat.DEGREE,editors.get(1).formats().stored());
+        assertEquals(UnitFormat.METRE,editors.get(2).formats().stored());}
         assertEquals(NodeCategory.INPUT,new VectorNode().registration().category());
         assertEquals(NodeCategory.ROUTING,new SpatialReceiverNode().registration().category());
     }
@@ -101,11 +101,14 @@ class VectorSpatialTest {
         RateConverterTest.compileAndRun(cpp,dir.resolve("test.exe"),dir);
     }
     private static GroupSourceExporter.Export vectorExport(){
-        var math=new VectorMathNode();var inner=new GLNodeGraph();var id=GLNodeId.random();
-        var props=new HashMap<>(math.defaults());props.put("b",VectorEditor.value(1,2,3,UnitFormat.METRE));
+        return vectorExport(new VectorMathNode(),"a");
+    }
+    private static GroupSourceExporter.Export vectorExport(BasicNode math,String input){
+        var inner=new GLNodeGraph();var id=GLNodeId.random();
+        var props=new HashMap<>(math.defaults());if(math instanceof VectorMathNode)props.put("b",VectorEditor.value(1,2,3,UnitFormat.METRE));
         inner.edit("Vector",e->e.addNode(new GLGraphNode(id,math.registration().id(),props)));
         var descriptor=new GLCompositeNodeDescriptor("test.vector.group","vector.asset",1,List.of(
-            new GLCompositePortMapping(GLNodePortDescriptor.input("Position",PortDataType.VECTOR.id(),false,1),new GLNodeEndpoint(id,"a")),
+            new GLCompositePortMapping(GLNodePortDescriptor.input("Position",PortDataType.VECTOR.id(),false,1),new GLNodeEndpoint(id,input)),
             new GLCompositePortMapping(GLNodePortDescriptor.output("Vector",PortDataType.VECTOR.id()),new GLNodeEndpoint(id,"vector"))));
         var asset=new GLNodeGraphAsset("vector.asset",1,GLNodeGraphAssetKind.COMPOSITE,inner.snapshot(),GLNodeEditorViewState.empty(),Map.of(),descriptor);
         var root=new GLNodeGraph();var group=new GLGraphNode(GLNodeId.random(),descriptor.nodeTypeId(),Map.of());root.edit("Group",e->e.addNode(group));
@@ -140,4 +143,10 @@ class VectorSpatialTest {
             """.formatted(export.className(),export.className(),payload));
         RateConverterTest.compileAndRun(cpp,dir.resolve("test.exe"),dir);
     }
-}
+    @Test void atomicVectorTransformsExport(){
+        for(var definition:List.of(new VectorRotateNode(),new VectorScaleNode())){
+            var exported=vectorExport(definition,"input");
+            assertTrue(exported.files().get("native/"+exported.className()+".hpp").contains(definition.processor().id()));
+        }
+        assertTrue(NodeRegistry.find("easyknack.vector.mapping").isEmpty());
+    }}

@@ -2,7 +2,8 @@
 #include "nodes/VectorCombineNode.hpp"
 #include "nodes/VectorSeparateNode.hpp"
 #include "nodes/VectorMathNode.hpp"
-#include "nodes/VectorMappingNode.hpp"
+#include "nodes/VectorRotateNode.hpp"
+#include "nodes/VectorScaleNode.hpp"
 #include "nodes/VectorDistanceNode.hpp"
 #include "nodes/VectorLengthNode.hpp"
 #include "nodes/VectorDotNode.hpp"
@@ -29,11 +30,14 @@ int main(){
     resources[0]=nullptr;math.process(c);assert(length(math.result.at(0))==0); // Normalizing zero is defined.
     VectorDotNode dot;dot.a={1,2,3};dot.b={4,5,6};dot.process(c);assert(out[0]==32);
     assert(unitToBase(100,UnitFormat::centimetre)==1&&unitFromBase(1,UnitFormat::millimetre)==1000);
-    VectorMappingNode mapping;mapping.prepare(48000,4);mapping.input={1,0,0};mapping.scale={2,1,1};mapping.rotation={0,0,90};
+    VectorRotateNode mapping;mapping.prepare(48000,4);mapping.input={2,0,0};mapping.rotation={0,0,90};
     mapping.process(c);assert(std::abs(mapping.result.at(0)[0])<1e-12);assert(std::abs(mapping.result.at(0)[1]-2)<1e-12);
     VectorResource turns;turns.samples={Vector3{0,0,0},Vector3{0,0,90},Vector3{0,0,180},Vector3{0,0,270}};turns.count=4;
-    resources[2]=&turns;rates[2]='a';mapping.process(c);assert(std::abs(mapping.result.at(2)[0]+2)<1e-12);assert(std::abs(mapping.result.at(3)[1]+2)<1e-12);
-    rates[2]='c';mapping.process(c);assert(mapping.result.at(3)[0]==2);resources[2]=nullptr;
+    resources[1]=&turns;rates[1]='a';mapping.process(c);assert(std::abs(mapping.result.at(2)[0]+2)<1e-12);assert(std::abs(mapping.result.at(3)[1]+2)<1e-12);
+    rates[1]='c';mapping.process(c);assert(mapping.result.at(3)[0]==2);resources[1]=nullptr;
+    mapping.origin={1,0,0};mapping.process(c);assert(std::abs(mapping.result.at(0)[0]-1)<1e-12&&std::abs(mapping.result.at(0)[1]-1)<1e-12);
+    VectorScaleNode scaling;scaling.prepare(48000,4);scaling.input={3,4,5};scaling.origin={1,2,3};scaling.scale={2,0,-1};scaling.process(c);assert((scaling.result.at(0)==Vector3{5,2,1}));
+    resources[2]=&turns;rates[2]='a';scaling.process(c);assert(scaling.result.at(1)[2]==175);resources[2]=nullptr;rates[2]='c';
     SpatialReceiverNode left,right;right.shareChannelState(left);left.prepare(48000,4);right.prepare(48000,4);
     left.source=right.source={1,0,0};left.spacing=right.spacing=.2;left.attenuation=right.attenuation=false;
     const float* audio[]{x,nullptr,nullptr,nullptr,nullptr};c.inputs=audio;c.channelIndex=0;left.process(c);

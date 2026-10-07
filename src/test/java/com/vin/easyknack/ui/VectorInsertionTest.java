@@ -8,7 +8,7 @@ import com.vingame.glswing.node.model.*;
 class VectorInsertionTest {
     @Test void vectorProcessorsInsertIntoVectorConnectionsAndUndo() throws Exception {
         SwingUtilities.invokeAndWait(()-> {
-            for(BasicNode processor:List.of(new VectorMathNode(),new VectorMappingNode()))
+            for(BasicNode processor:List.of(new VectorMathNode(),new VectorRotateNode(),new VectorScaleNode()))
                 try(var controller=new WorkspaceController()) {
                     var graph=controller.workspace().currentGraph();var source=new VectorNode();var target=new VectorSeparateNode();
                     var sourceId=GLNodeId.random();var targetId=GLNodeId.random();var insertedId=GLNodeId.random();
@@ -23,7 +23,7 @@ class VectorInsertionTest {
                     var node=editor.getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(insertedId::equals).isPresent()).findFirst().orElseThrow();
                     var edge=editor.getConnections().get(0);var handler=editor.getConnectionInsertionHandler();
                     assertTrue(handler.canInsert(node,edge));assertTrue(handler.insert(node,edge,200,100));
-                    String input=processor instanceof VectorMathNode?VectorMathNode.A.value():VectorMappingNode.IN.value();
+                    String input=processor instanceof VectorMathNode?VectorMathNode.A.value():VectorRotateNode.IN.value();
                     assertEquals(2,graph.snapshot().connections().size());
                     assertTrue(graph.snapshot().connections().stream().anyMatch(c->c.input().equals(new GLNodeEndpoint(insertedId,input))));
                     assertTrue(graph.snapshot().connections().stream().anyMatch(c->c.output().equals(new GLNodeEndpoint(insertedId,"vector"))));

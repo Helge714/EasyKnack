@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Replaced Vector Mapping with Vector Scale and Vector Rotate, each with an
+  Audio/Control Origin input. Existing documents/plugins using Vector Mapping
+  must replace it with Scale followed by Rotate (both Origins zero) and rebuild.
+  Java, the audio host and plugin SDK must be updated together.
+
 - Removed group inputs no longer block execution through stale instance defaults.
   Formula kernels consistently use their declared input units in spectral graphs.
 - Unconnected numeric group inputs retain editable defaults without blocking audio,
