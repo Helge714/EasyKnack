@@ -29,8 +29,12 @@ used under its GPLv3 alternative, not the proprietary agreement.
   Record component versions, hashes, license choices and source provenance.
 - [x] Collect the identified OpenJDK build sources/configuration and LLVM-MinGW
   component sources/notices, including GNU Make and gendef.
-- [ ] Confirm applicable Microsoft runtime redistribution terms. The Adoptium
-  [upstream question](source-audit/UPSTREAM-QUESTIONS.md) remains a draft.
+- [x] Trace Temurin Microsoft DLLs to MSVC/SDK Redist origins; inspect the exact
+  SDK installer license, VS product terms and matching REDIST entries.
+- [ ] Establish downstream Microsoft authorization and how recipient agreement
+  requirements are satisfied for installer and portable packages. See the
+  [manual review](source-audit/MICROSOFT-RUNTIME.md); the narrowed
+  [upstream question](source-audit/UPSTREAM-QUESTIONS.md) remains unsent.
 - FFmpeg/JavaCPP were removed on 2026-10-07. Their historical build-provenance
   question no longer applies to new distributions; older images remain unchanged.
 - [ ] Build from an identified release revision and archive corresponding EasyKnack

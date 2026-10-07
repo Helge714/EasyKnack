@@ -20,7 +20,7 @@ that all corresponding-source obligations have already been fulfilled.
 | LLVM-MinGW toolchain | LLVM Apache-2.0 with LLVM exceptions plus separately licensed toolchain components; retain all supplied notices, not only the top-level LICENSE.TXT. |
 | GNU Make 4.4.1 and MinGW gendef (inside the compiler bundle) | GPL-3.0-or-later; matching source trees, build recipes and license notices are collected. |
 | Compiler's Python, libffi and LLDB-MI | Separate licenses; preserve their notices. Their pinned source archives are collected too. |
-| Microsoft VC/UCRT DLLs included in Temurin | Microsoft redistribution terms apply; these files are not relicensed as OpenJDK code. See the native distribution review before publication. |
+| Microsoft VC/UCRT DLLs included in Temurin | Microsoft redistribution terms apply; these files are not relicensed as OpenJDK code. MSVC provides the three VC runtime DLLs; the Windows SDK provides UCRT/API-set DLLs. See the manual Microsoft runtime review before publication. |
 
 ## Where notices are installed
 
@@ -54,3 +54,7 @@ Exported plugins can contain or depend on EasyKnack SDK/native code. Do not assu
 that generated output or native plugins are license-independent merely because
 part of their code was generated. Check the included code and dependencies before
 distribution. No blanket permission for proprietary plugins is granted here.
+
+The Microsoft component origin, exact SDK license and conditional redistribution
+routes are recorded in `docs/development/source-audit/MICROSOFT-RUNTIME.md`.
+Those component terms do not replace the licenses of EasyKnack or OpenJDK.

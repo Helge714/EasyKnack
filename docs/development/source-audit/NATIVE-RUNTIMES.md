@@ -10,6 +10,10 @@ Scope: the dependencies in `source-help-check-20261006`, built from the existing
 Windows packaging script. This is an evidence-based provenance review, not a legal
 opinion or a claim of independently reproduced upstream binaries.
 
+> Follow-up 2026-10-07: [Microsoft runtime license review](MICROSOFT-RUNTIME.md)
+> establishes the exact SDK EULA and REDIST coverage. The remaining question is
+> downstream authorization and recipient terms, not unknown DLL provenance.
+
 ## Results
 
 | Area | Verified | Remaining boundary |

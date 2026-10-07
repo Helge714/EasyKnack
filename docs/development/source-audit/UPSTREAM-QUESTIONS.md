@@ -30,19 +30,24 @@ legal directory and collect the corresponding OpenJDK/Temurin build sources.
 The runtime includes Microsoft `msvcp140.dll`, `vcruntime140.dll` and
 `vcruntime140_1.dll` (14.40.33810.0), plus UCRT/API-set files (10.0.26100.1742).
 
-We found the general bundling answer in temurin-build issue 1268. Microsoft's
-Visual C++ end-user runtime agreement does not itself grant redistribution and
-the Microsoft documentation points to Visual Studio/REDIST terms instead.
+We traced the DLL origin through your DevKit instructions (VS 17.10.3,
+MSVC 14.40.33807 and SDK 10.0.26100.1742). We extracted the license from that
+SDK installer (EULAID WIN10SDK.RTM.AUG_2018_en-US) and verified that all 16 UCRT
+filenames we bundle are on Microsoft's x64 SDK REDIST list. We also inspected
+VS 2022 Build Tools terms and Community section 4: the latter and SDK section
+2(a) allow the licensee to authorize distributors, subject to recipient terms.
 
-For these unchanged files shipped as part of Temurin:
+Could you point us to the terms/notices through which Adoptium passes that
+Microsoft redistribution permission to downstream distributors of an unchanged
+Temurin runtime? In particular, how should downstream installer and portable
+packages satisfy the requirement for protective terms agreed by recipients?
+Does Adoptium supply the applicable text or document a direct Microsoft license
+that a downstream distributor needs to hold?
 
-1. Which permission/terms apply to a downstream application distributor?
-2. Which Microsoft notices or license texts should accompany the application?
-3. Does this require any separate Visual Studio/SDK license held by the application
-   distributor, or is redistribution covered through the Temurin distribution?
-
-A link to the relevant existing documentation would be sufficient. We are not
-requesting a new license or permission to modify the Microsoft binaries.
+We are not asking where the files originate or asserting a license violation.
+The general bundling answer in issue 1268 helps, but does not identify these
+component-specific recipient terms. A link to existing documentation would be
+sufficient. No inquiry has been submitted yet.
 
 ## Bytedeco / JavaCPP Presets
 

@@ -117,7 +117,7 @@
   "runtimeReleaseSha256": "86e5e51658bb2b9cf064b3957d81ac39abdb346b2cac19867c1625dd19d440d9",
   "remainingReview": [
     "GLSwing snapshot sources are collected but not proven to match its dirty binary build; obtain matching build inputs and parent POM.",
-    "Temurin official archive, source revisions, SBOM and build configuration verified. Confirm applicable redistribution terms for the included Microsoft VC/UCRT DLLs; they are not OpenJDK-licensed source components.",
+    "Temurin official archive, source revisions, SBOM and build configuration verified. Exact SDK license and VC/UCRT REDIST origins reviewed; establish downstream authorization and recipient agreement requirements. See MICROSOFT-RUNTIME.md. Microsoft DLLs are not OpenJDK-licensed source components.",
     "Review project/vendored ownership, plugin SDK/generated notices and final installed package before publishing."
   ]
 }
