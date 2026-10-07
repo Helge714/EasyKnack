@@ -16,9 +16,10 @@ try {
     Push-Location $work
     try {
         if (!$WindowOnly) {
+        Copy-Item -LiteralPath "$root/src/test/resources/audio/tone.mp3.b64" -Destination "$work/tone.mp3.b64"
         & "$Image/runtime/bin/javac.exe" -encoding UTF-8 -proc:none -cp $classpath -d "$work/classes" "$PSScriptRoot/WindowsPackageSmoke.java"
         if ($LASTEXITCODE -ne 0) { throw 'Package smoke compilation failed.' }
-        & "$Image/runtime/bin/java.exe" --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED "-Duser.home=$work/home" "-Deasyknack.plugins=$work/plugins" "-Deasyknack.examples=$work/examples" '-Deasyknack.language=en' "-Dorg.bytedeco.javacpp.cachedir=$work/media-native" -cp "$work/classes;$classpath" com.vin.easyknack.ui.WindowsPackageSmoke $work *> "$work/smoke.log"
+        & "$Image/runtime/bin/java.exe" --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED "-Duser.home=$work/home" "-Deasyknack.plugins=$work/plugins" "-Deasyknack.examples=$work/examples" '-Deasyknack.language=en' -cp "$work/classes;$classpath" com.vin.easyknack.ui.WindowsPackageSmoke $work *> "$work/smoke.log"
         $result = $LASTEXITCODE
         Get-Content -LiteralPath "$work/smoke.log"
         if ($result -ne 0) { throw "Packaged smoke test failed: $work/smoke.log" }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Replaced bundled FFmpeg/JavaCPP with the existing miniaudio decoder for WAV and
+  MP3 import. Other formats must be converted before import; existing PCM caches
+  remain readable. Player/Buffer behavior and the audio-host protocol are unchanged.
+
 - Expanded Windows native-source and license coverage, including GNU Make,
   MinGW gendef and FFmpeg dependencies. Recorded official runtime/toolchain
   comparisons and remaining provenance limits; exclude generated compiler Python

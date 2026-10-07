@@ -47,8 +47,9 @@ internal unit conversions. File-position sliders have duration-relative conversi
 | Clock | Produce regular triggers; frequency units include Hz and BPM. |
 | Envelope | Generate an envelope from gate/trigger control with editable shape/timing. |
 
-Audio File Player accepts common WAV, MP3, FLAC, Ogg, AAC and M4A media through the
-bundled decoder. Speed 1 is normal playback; changing it also changes pitch.
+Audio File Player and File Buffer accept mono/stereo WAV and MP3 files.
+Convert other formats to WAV or MP3 before importing. For sample-exact loop
+boundaries, use WAV: MP3 imports can include encoder padding at the file edges. Speed 1 is normal playback; changing it also changes pitch.
 Unconnected position controls follow playback. Loop boundaries can click when they
 are discontinuous; no automatic crossfade is implied.
 

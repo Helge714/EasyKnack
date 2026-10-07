@@ -1,5 +1,11 @@
 # Reviewed source provenance
 
+> Update 2026-10-07: FFmpeg/JavaCPP have been removed from new EasyKnack builds.
+> Their findings/questions below are historical and need no upstream inquiry for
+> the new package. Temurin and compiler findings still apply. The current source
+> lock intentionally excludes the old FFmpeg dependencies.
+
+
 The [native distribution review](NATIVE-RUNTIMES.md) adds official archive
 comparisons, Temurin SBOM/configuration, GCC/MSYS2 provenance, full compiler
 component sources and native notices. It distinguishes resolved source collection

@@ -12,26 +12,50 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 class AudioFilePlayerTest {
     @TempDir Path temp;
-    @Test void realFormatsDecodeToFinitePcmWithoutChangingMonoGain()throws Exception{
-        for(String extension:List.of("wav","mp3","flac","ogg","m4a","aac")){
-            var source=temp.resolve("test space ä."+extension);var log=temp.resolve("encode.log");
-            var command=new ArrayList<>(List.of(AudioFileDecoder.executable(),"-nostdin","-v","error","-y","-f","lavfi","-i","sine=frequency=440:sample_rate=44100:duration=0.25"));
-            if(extension.equals("ogg"))command.addAll(List.of("-ac","2","-c:a","vorbis","-strict","-2"));
-            command.add(source.toString());var process=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
-            assertTrue(process.waitFor(30,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,process.exitValue(),Files.readString(log));
-            var asset=AudioFileDecoder.decode(source,temp.resolve("cache"));assertEquals(extension.equals("ogg")?2:1,asset.channels());assertTrue(asset.frames()>=11900&&asset.frames()<15000,extension+": "+asset.frames());
+    static byte[] wave(int channels, boolean floating) {
+        int frames=11025, sampleBytes=floating?4:2, size=frames*channels*sampleBytes;
+        var b=ByteBuffer.allocate(44+size).order(ByteOrder.LITTLE_ENDIAN);
+        b.put("RIFF".getBytes()).putInt(36+size).put("WAVEfmt ".getBytes()).putInt(16);
+        b.putShort((short)(floating?3:1)).putShort((short)channels).putInt(44100).putInt(44100*channels*sampleBytes).putShort((short)(channels*sampleBytes)).putShort((short)(sampleBytes*8));
+        b.put("data".getBytes()).putInt(size);
+        for(int i=0;i<frames;i++)for(int c=0;c<channels;c++) {
+            float v=(float)(.125*Math.sin(2*Math.PI*440*i/44100))*(c==0?1:-1);
+            if(floating)b.putFloat(v);else b.putShort((short)(v*32767));
+        }
+        return b.array();
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void realFormatsDecodeToFinitePcmWithoutChangingMonoGain()throws Exception{
+        for(String kind:List.of("mono.wav","stereo.wav","float.WAV","tone.mp3")){
+            var source=temp.resolve("test space ä 漢 "+kind);
+            if(kind.endsWith("mp3"))try(var in=getClass().getResourceAsStream("/audio/tone.mp3.b64")){
+                Files.write(source,Base64.getMimeDecoder().decode(in.readAllBytes()));
+            } else Files.write(source,wave(kind.startsWith("stereo")?2:1,kind.startsWith("float")));
+            var asset=AudioFileDecoder.decode(source,temp.resolve("cache"));assertEquals(kind.startsWith("stereo")?2:1,asset.channels());assertEquals(kind.endsWith("mp3")?15047:12000,asset.frames(),2,kind);
             var data=ByteBuffer.wrap(Files.readAllBytes(asset.pcm())).order(ByteOrder.LITTLE_ENDIAN);data.position(24);double squares=0;int n=0;
             while(data.remaining()>=4){float value=data.getFloat();assertTrue(Float.isFinite(value));squares+=value*value;n++;}
-            assertTrue(Math.sqrt(squares/n)>.045&&Math.sqrt(squares/n)<.11,extension);
-            assertFalse(AudioFileDecoder.nativePath(asset.reference()).equals("none"));
+            assertTrue(Math.sqrt(squares/n)>.045&&Math.sqrt(squares/n)<.11,kind);
+            if(asset.channels()==2){data.position(24);while(data.remaining()>=8)assertEquals(-data.getFloat(),data.getFloat(),1e-5);}
+            assertNotEquals("none",AudioFileDecoder.nativePath(asset.reference()));
             var node=new AudioFileNode();var state=new HashMap<>(node.defaults());state.put("file",com.vingame.glswing.node.model.GLNodeValue.of(asset.reference()));
             assertDoesNotThrow(()->node.encode(new NodeState(state),p->-1));
         }
     }
-    @Test void corruptMediaFailsWithoutPublishingCache()throws Exception{
-        var source=temp.resolve("bad.mp3");Files.writeString(source,"not audio");
-        assertThrows(java.io.IOException.class,()->AudioFileDecoder.decode(source,temp.resolve("cache")));
-        try(var files=Files.list(temp.resolve("cache"))){assertEquals(0,files.count());}
+    @Test void unsupportedFormatIsRejectedBeforeStartingDecoder()throws Exception{
+        var source=temp.resolve("old.flac");Files.writeString(source,"not audio");
+        assertTrue(assertThrows(java.io.IOException.class,()->AudioFileDecoder.decode(source,temp.resolve("cache"))).getMessage().contains("WAV and MP3"));
+        assertFalse(Files.exists(temp.resolve("cache")));
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void invalidMediaFailsWithoutPublishingCache()throws Exception{
+        for(String kind:List.of("bad.mp3","empty.wav","surround.wav","nonfinite.wav")) {
+            var source=temp.resolve(kind);
+            if(kind.equals("surround.wav"))Files.write(source,wave(6,false));
+            else if(kind.equals("nonfinite.wav")){var bytes=wave(1,true);ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).putFloat(44,Float.NaN);Files.write(source,bytes);}
+            else Files.writeString(source,"not audio");
+            assertThrows(java.io.IOException.class,()->AudioFileDecoder.decode(source,temp.resolve("cache")),kind);
+            try(var files=Files.list(temp.resolve("cache"))){assertEquals(0,files.count());}
+        }
     }
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void nativeStereoPlaybackSeekPauseLoopAndState()throws Exception{

@@ -49,11 +49,8 @@ public final class WindowsPackageSmoke {
             check(host.command("STATS").startsWith("OK "), "Host did not render"); host.command("STOP");
         }
         System.out.println("Document and native audio host OK");
-        Path mp3 = work.resolve("tone.mp3"), log = work.resolve("ffmpeg.log");
-        var media = new ProcessBuilder(AudioFileDecoder.executable(), "-nostdin", "-y", "-f", "lavfi", "-i",
-                "sine=frequency=440:duration=0.1", mp3.toString()).redirectErrorStream(true).redirectOutput(log.toFile()).start();
-        check(media.waitFor(30, java.util.concurrent.TimeUnit.SECONDS), "Media process timed out");
-        check(media.exitValue() == 0, "MP3 encoder failed: " + Files.readString(log));
+        Path mp3 = work.resolve("tone.mp3");
+        Files.write(mp3,Base64.getMimeDecoder().decode(Files.readAllBytes(work.resolve("tone.mp3.b64"))));
         check(AudioFileDecoder.decode(mp3, work.resolve("media")).frames() > 0, "MP3 decode failed");
         System.out.println("MP3 media support OK");
         var program = FormulaCompiler.compile("result = sin(tau * 440 * (double) samplePosition / sampleRate);",

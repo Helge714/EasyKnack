@@ -29,7 +29,7 @@ public record AudioFileEditor() implements Editor {
             String reference="",attempted="";boolean busy;
             FileButton(){super(AppText.text("player.choose"));addActionListener(e->{
                 var files=new RememberingFileDialogs();
-                files.show("audio.open",GLFileDialogRequest.open().title(AppText.text("player.choose")).filter("Audio","wav","mp3","flac","ogg","oga","m4a","aac").build(),getGLParent())
+                files.show("audio.open",GLFileDialogRequest.open().title(AppText.text("player.choose")).filter("Audio","wav","mp3").build(),getGLParent())
                     .whenComplete((choice,error)->EventQueue.invokeLater(()->{files.close();if(error!=null)failed(error);else if(choice.approved())load(choice.selectedPath());}));
             });}
             void failed(Throwable error){

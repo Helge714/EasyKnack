@@ -59,7 +59,7 @@ $report = [ordered]@{
     missingSources=@($missing.ToArray()); remainingReview=$lock.remainingReview
 }
 $entries['REVIEW.json'] = [Text.Encoding]::UTF8.GetBytes(($report | ConvertTo-Json -Depth 6))
-$entries['README.txt'] = [Text.Encoding]::UTF8.GetBytes("EasyKnack source materials`n`nIncludes the working-tree project snapshot and checksum-locked upstream archives.`nRead REVIEW.json and evidence before public distribution. This collection is not yet`na certification of complete corresponding sources. Unreviewed binary hashes or a`ndifferent runtime require a new audit. Upstream archives may include their own build-support binaries.`n`nRebuild the project using scripts/build-installer.ps1. Preserve its external Maven`ndependencies. Upstream recipes are in the javacpp-presets and temurin-build archives.`n")
+$entries['README.txt'] = [Text.Encoding]::UTF8.GetBytes("EasyKnack source materials`n`nIncludes the working-tree project snapshot and checksum-locked upstream archives.`nRead REVIEW.json and evidence before public distribution. This collection is not yet`na certification of complete corresponding sources. Unreviewed binary hashes or a`ndifferent runtime require a new audit. Upstream archives may include their own build-support binaries.`n`nRebuild the project using scripts/build-installer.ps1. Preserve its external Maven`ndependencies. Upstream recipes are in the LLVM-MinGW and temurin-build archives.`n")
 $archive = Join-Path $Destination 'EasyKnack-source-materials.zip'
 Write-Host "Bundling $($entries.Count) source archives and evidence files..."
 Write-DeterministicZip $archive $entries

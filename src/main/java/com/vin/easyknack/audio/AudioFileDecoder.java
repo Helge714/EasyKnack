@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import org.bytedeco.javacpp.Loader;
 
 /** Control/background-thread media import. The native callback only sees prepared PCM. */
 public final class AudioFileDecoder {
@@ -21,32 +20,32 @@ public final class AudioFileDecoder {
         if(reference.isBlank())return "none";
         var path=cached(reference);return path!=null&&Files.isRegularFile(path)?HexFormat.of().formatHex(path.toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)):"none";
     }
-    public static String executable(){return Loader.load(org.bytedeco.ffmpeg.ffmpeg.class);}
     public static Asset decode(Path source,Path cache)throws IOException,InterruptedException{
         source=source.toAbsolutePath();if(!Files.isRegularFile(source))throw new FileNotFoundException(source.toString());
+        String name=source.getFileName().toString().toLowerCase(Locale.ROOT);
+        if(!name.endsWith(".wav")&&!name.endsWith(".mp3"))throw new IOException("Only WAV and MP3 files are supported; convert other formats before importing.");
         Files.createDirectories(cache);
-        var probe=Files.createTempFile(cache,"probe-",".txt");var raw=Files.createTempFile(cache,"decode-",".raw");var log=Files.createTempFile(cache,"decode-",".log");var pcm=Files.createTempFile(cache,"audio-",".ekpcm");
+        var log=Files.createTempFile(cache,"decode-",".log");var pcm=Files.createTempFile(cache,"audio-",".ekpcm");
         boolean success=false;
         try{
-            run(List.of(Loader.load(org.bytedeco.ffmpeg.ffprobe.class),"-v","error","-protocol_whitelist","file,pipe","-select_streams","a:0","-show_entries","stream=channels","-of","default=noprint_wrappers=1:nokey=1",source.toString()),probe,log);
-            int channels;
-            try{channels=Integer.parseInt(Files.readString(probe).trim());}catch(NumberFormatException e){throw new IOException("No readable audio stream",e);}
-            if(channels<1||channels>2)throw new IOException("Only mono/stereo audio files are currently supported");
-            run(List.of(executable(),"-nostdin","-v","error","-y","-protocol_whitelist","file,pipe","-i",source.toString(),"-map","0:a:0","-vn","-sn","-dn","-ar","48000","-ac",Integer.toString(channels),"-c:a","pcm_f32le","-f","f32le",raw.toString()),probe,log);
-            long bytes=Files.size(raw),frames=bytes/(4*channels);
-            if(frames==0||bytes%(4*channels)!=0)throw new IOException("Empty or invalid decoded audio");
-            try(var out=Files.newOutputStream(pcm)){
-                out.write(ByteBuffer.allocate(24).order(ByteOrder.LITTLE_ENDIAN).put("EKPCM001".getBytes(StandardCharsets.US_ASCII)).putInt(48000).putInt(channels).putLong(frames).array());
-                Files.copy(raw,out);
-            }
+            Path host=AudioHostClient.defaultExecutable();
+            if(!Files.isRegularFile(host))throw new IOException("Audio decoder missing; rebuild or reinstall the EasyKnack audio host.");
+            run(List.of(host.toAbsolutePath().toString(),"--decode-audio",pathHex(source),pathHex(pcm)),log);
+            byte[] header;try(var in=Files.newInputStream(pcm)){header=in.readNBytes(24);}
+            if(header.length!=24)throw new IOException("Invalid decoded audio header");
+            var data=ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN);
+            if(!new String(header,0,8,StandardCharsets.US_ASCII).equals("EKPCM001")||data.getInt(8)!=48000)throw new IOException("Invalid decoded audio format");
+            int channels=data.getInt(12);long frames=data.getLong(16),bytes=Files.size(pcm)-24;
+            if(channels<1||channels>2||frames<=0||bytes%(4*channels)!=0||frames!=bytes/(4*channels))throw new IOException("Empty or invalid decoded audio");
             success=true;return new Asset(source,pcm,channels,frames);
-        }finally{Files.deleteIfExists(probe);Files.deleteIfExists(raw);Files.deleteIfExists(log);if(!success)Files.deleteIfExists(pcm);}
+        }finally{Files.deleteIfExists(log);if(!success)Files.deleteIfExists(pcm);}
     }
-    private static void run(List<String> command,Path output,Path error)throws IOException,InterruptedException{
-        var process=new ProcessBuilder(command).redirectOutput(output.toFile()).redirectError(error.toFile()).start();
+    private static String pathHex(Path path){return HexFormat.of().formatHex(path.toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8));}
+    private static void run(List<String> command,Path error)throws IOException,InterruptedException{
+        var process=new ProcessBuilder(command).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(error.toFile()).start();
         try{
             if(!process.waitFor(30,TimeUnit.MINUTES))throw new IOException("Audio decoding timed out");
             if(process.exitValue()!=0){String detail;try(var in=Files.newInputStream(error)){detail=new String(in.readNBytes(4096),StandardCharsets.UTF_8);}throw new IOException("Audio decoding failed: "+detail.trim());}
-        }finally{if(process.isAlive())process.destroyForcibly();}
+        }finally{if(process.isAlive()){process.destroyForcibly();process.waitFor();}}
     }
 }

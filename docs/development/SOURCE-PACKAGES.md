@@ -7,7 +7,7 @@
 - `EasyKnack-source-materials.zip`: that snapshot, checksum-locked upstream archives,
   the reviewed dependency inventory, runtime identity and `REVIEW.json`.
 
-The first build downloads approximately 800 MB of upstream source material. Later
+The first build downloads approximately 510 MiB of upstream source material. Later
 builds reuse `target/source-materials` after checking every SHA-256. The lock file is
 `scripts/sources.lock.json`. A missing local GLSwing sources artifact is reported;
 it is not silently substituted by a newer snapshot. GLSwing remains an external
@@ -52,22 +52,19 @@ substitute for upstream signature verification.
 
 ## Current review boundary
 
-The initial inventory is the locally packaged Windows x64 dependency set from
-2026-10-05. FFmpeg reports version 7.1, LGPL-3.0-or-later, GCC 12.2.0 (MSYS2 Rev11),
-and no `--enable-gpl` or `--enable-nonfree`. The exact output is in `source-audit`.
-The enabled library versions are taken from the Bytedeco 1.5.11 build recipe.
-Their archives and the complete preset recipe/patch tree are collected.
+The dependency inventory was updated on 2026-10-07 to remove FFmpeg, JavaCPP and
+their exclusive transitive sources. Audio import now uses the vendored miniaudio
+header in the project source snapshot. The earlier native audit remains historical
+evidence for older images; it is not the dependency list of new packages.
 
 Temurin 25.0.4.1+1 identifies OpenJDK commit
 `520406d871955300957ef01e406ac2acd0f9b75c` and temurin-build commit
 `e6ba7dec3d07654074559310376a3ae89da5f4ac`; both source archives are collected.
 The local GLSwing sources JAR is collected but its correspondence to the dirty
 binary build has not been established. The collection now includes full LLVM,
-MinGW, Python, libffi, LLDB-MI, GNU Make and GCC source archives, plus the MSYS2
-GCC recipe/patch tree. Official Temurin SBOM/build metadata and file-by-file native
+MinGW, Python, libffi, LLDB-MI, GNU Make source archives. Official Temurin SBOM/build metadata and file-by-file native
 archive comparisons are recorded in the [native review](source-audit/NATIVE-RUNTIMES.md).
 
 Before public distribution, resolve the remaining items in `sources.lock.json`
-and [LICENSING.md](LICENSING.md), especially FFmpeg release-action confirmation,
-Microsoft runtime redistribution terms and the GLSwing snapshot. No release
+and [LICENSING.md](LICENSING.md), especially Microsoft runtime redistribution terms and the GLSwing snapshot. No release
 or public upload is performed by these scripts.

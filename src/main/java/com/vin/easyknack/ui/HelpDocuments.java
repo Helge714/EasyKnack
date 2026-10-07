@@ -27,8 +27,6 @@ final class HelpDocuments {
         var text = new StringBuilder(resource("THIRD-PARTY.md")).append("\n\n").append(resource("LICENSE"));
         for (String name : read("/easyknack/notices/index.txt").lines().filter(s -> !s.isBlank()).toList())
             text.append("\n\n----- ").append(name).append(" -----\n\n").append(read("/easyknack/notices/" + name));
-        for (String name : List.of("FFmpeg.txt", "COPYING.FFmpeg.LGPLv3"))
-            text.append("\n\n----- ").append(name).append(" -----\n\n").append(read("/easyknack/third-party/" + name));
         return text.toString();
     }
 

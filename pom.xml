@@ -10,11 +10,8 @@
     <maven.compiler.release>17</maven.compiler.release><glswing.version>0.1.0</glswing.version>
     <audio.cxx>clang++</audio.cxx>
     <easyknack.test.audio>false</easyknack.test.audio>
-    <media.platform>windows-x86_64</media.platform>
   </properties>
   <dependencies>
-    <dependency><groupId>org.bytedeco</groupId><artifactId>ffmpeg</artifactId><version>7.1-1.5.11</version></dependency>
-    <dependency><groupId>org.bytedeco</groupId><artifactId>ffmpeg</artifactId><version>7.1-1.5.11</version><classifier>${media.platform}</classifier></dependency>
     <dependency><groupId>com.vingame</groupId><artifactId>glswing</artifactId><version>${glswing.version}</version></dependency>
     <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>5.11.4</version><scope>test</scope></dependency>
   </dependencies>

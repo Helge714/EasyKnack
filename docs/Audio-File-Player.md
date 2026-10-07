@@ -8,8 +8,8 @@ effect, select a file and enable Play / Pause. The host must also be running.
 
 ## Files and controls
 
-- WAV, MP3, FLAC, Ogg Vorbis, AAC and M4A are decoded using the bundled FFmpeg
-  Maven runtime. No separately installed codec or FFmpeg executable is required.
+- WAV and MP3 are decoded using the bundled miniaudio decoder.
+  Convert other formats to WAV or MP3 before importing. No external codec is required.
 - Mono and stereo are supported. Mono retains its gain and is repeated for both
   destination channels. Multichannel files currently report an explicit error.
 - Play / Pause is a Control input: 0 pauses, 1 plays. Pause retains the position.
@@ -25,7 +25,7 @@ effect, select a file and enable Play / Pause. The host must also be running.
 
 ## Cache and realtime behavior
 
-Import runs in a background task. FFmpeg preserves channel count and converts to
+Import runs in a background task. miniaudio preserves channel count and converts to
 48 kHz floating-point PCM in `~/.easyknack/audio-cache`. The node shows decoding or
 an error while this happens. Selecting a new file preserves the old reference if
 decoding fails. Network protocols are disabled for imports.
@@ -48,7 +48,7 @@ using this node still depend on the local cache; they are not portable media pac
 
 ## Validation
 
-`AudioFilePlayerTest` generates and decodes all six listed extensions, tests Unicode
+`AudioFilePlayerTest` generates PCM/float WAV files and decodes an original MP3 test tone, tests Unicode
 paths and corrupt input, checks native stereo/seek/pause/loop/state transfer and
 sends real graph updates to a null-device audio host. The existing host client
 tests also run against the rebuilt executable. These are not a real-device
@@ -56,14 +56,16 @@ listening test or a disk-load stress benchmark.
 
 ## Dependency and distribution
 
-The pinned Bytedeco FFmpeg 7.1 / JavaCPP 1.5.11 executable is invoked through
-ProcessBuilder argument lists. Current packaged classifier: `windows-x86_64`;
-`media.platform` can select another supported artifact when porting the app.
-This does not imply that the existing native audio host is already cross-platform.
+The bundled audio-host executable also offers an isolated `--decode-audio` mode.
+It initializes only a miniaudio file decoder and writes the existing EKPCM001
+cache format in bounded chunks; it opens no device or control socket. Java invokes
+this mode in a separate process with UTF-8 paths encoded as hexadecimal arguments.
+FFmpeg and JavaCPP are no longer runtime dependencies. miniaudio's selected MIT-0
+license is retained in the vendored header and installer notices.
 
-Upstream executable integration: https://github.com/bytedeco/javacpp-presets/blob/1.5.11/ffmpeg/src/main/java/org/bytedeco/ffmpeg/ffmpeg.java
-
-License and build sources are recorded in `src/main/resources/easyknack/third-party/FFmpeg.txt`.
+Existing caches remain readable. Documents referencing other source formats can
+use their existing caches, but rebuilding those caches requires converting the
+original media and selecting the converted file.
 
 ## Playback controls
 

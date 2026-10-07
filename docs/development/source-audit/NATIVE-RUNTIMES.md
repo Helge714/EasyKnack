@@ -1,5 +1,11 @@
 # Windows native distribution review — 2026-10-06
 
+> Update 2026-10-07: FFmpeg/JavaCPP have been removed from new EasyKnack builds.
+> Their findings/questions below are historical and need no upstream inquiry for
+> the new package. Temurin and compiler findings still apply. The current source
+> lock intentionally excludes the old FFmpeg dependencies.
+
+
 Scope: the dependencies in `source-help-check-20261006`, built from the existing
 Windows packaging script. This is an evidence-based provenance review, not a legal
 opinion or a claim of independently reproduced upstream binaries.

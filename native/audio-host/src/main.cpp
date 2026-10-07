@@ -1,7 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#define MA_NO_DECODING
+#define MA_NO_FLAC
 #define MA_NO_ENCODING
 #define MA_NO_RESOURCE_MANAGER
 #define MA_NO_NODE_GRAPH
@@ -9,6 +9,7 @@
 #define MA_NO_GENERATION
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
+#include "audio/AudioFileDecode.hpp"
 #include "AudioGraph.hpp"
 #include "audio/RoutingAudioBackend.hpp"
 #include "audio/WindowsDeviceVolume.hpp"
@@ -43,6 +44,13 @@ std::string readLine(SOCKET socket) {
 }
 
 int main(int argc, char** argv) {
+    if (argc > 1 && std::string(argv[1]) == "--decode-audio") {
+        try {
+            if (argc != 4) throw std::runtime_error("Expected source and destination paths encoded as UTF-8 hex");
+            easyknack::decodeAudioFile(argv[2], argv[3]);
+            return 0;
+        } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
+    }
     if (argc < 2 || std::string(argv[1]).size() < 16) {
         std::cerr << "Usage: easyknack-audio-host <session-token> [--null]\n";
         return 2;

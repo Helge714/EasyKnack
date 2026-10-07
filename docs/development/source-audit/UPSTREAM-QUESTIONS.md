@@ -1,5 +1,11 @@
 # Native distribution questions — drafts, not submitted
 
+> Update 2026-10-07: FFmpeg/JavaCPP have been removed from new EasyKnack builds.
+> Their findings/questions below are historical and need no upstream inquiry for
+> the new package. Temurin and compiler findings still apply. The current source
+> lock intentionally excludes the old FFmpeg dependencies.
+
+
 These drafts contain public component/build details only. Submit after explicit
 authorization; retain the response URL and date in the native review. Neither
 question asserts a license violation. No runtime replacement is currently needed
