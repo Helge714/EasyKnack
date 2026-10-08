@@ -94,3 +94,5 @@
 The first published release version has not been designated yet.
 
 - Instance Groups now support internal FFT / Spectral Group / IFFT chains, with independent frame state per instance, including source export. Public Instance Group boundaries remain numeric.
+
+- Instance Groups accept shared Spectrum inputs, including source export and Bake; per-instance processing retains independent state. Existing numeric instance-input contracts remain unchanged; the host and plugin SDK include the new typed resource boundary.

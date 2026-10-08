@@ -31,6 +31,7 @@
 #include "PitchHoldNode.hpp"
 #include "InstanceContextNode.hpp"
 #include "MultipleInputNode.hpp"
+#include "MultipleSpectrumInputNode.hpp"
 #include "MultipleOutputNode.hpp"
 #include "InstanceCombineNode.hpp"
 #include "SpectrumNode.hpp"
@@ -135,6 +136,9 @@ struct MultipleGraphNode : NodeProcessor {
         return state->instances[0]->canShareChannels();
     }
     bool separatesChannels()const noexcept override{return true;}
+    ResourceKind inputResourceKind(std::size_t port)const noexcept override{
+        return state&&!state->instances.empty()?state->instances[0]->inputResourceKind(port):ResourceKind::none;
+    }
     bool supportsScalarInputs()const noexcept override{return true;}
     bool inputUsesBlockData(std::size_t port)const noexcept override{return port!=0;}
     std::size_t outputCount()const noexcept override{return outputs;}
@@ -174,6 +178,7 @@ struct MultipleGraphNode : NodeProcessor {
         if(id=="scalequantizer")return std::make_unique<ScaleQuantizerNode>();
         if(id=="pitchhold")return std::make_unique<PitchHoldNode>();
         if(id=="instancecontext")return std::make_unique<InstanceContextNode>();
+        if(id=="multiplespectruminput")return std::make_unique<MultipleSpectrumInputNode>();
         if(id=="multipleinput")return std::make_unique<MultipleInputNode>();
         if(id=="multipleoutput")return std::make_unique<MultipleOutputNode>();
         throw std::runtime_error("Unsupported Multiple Group node: "+id);

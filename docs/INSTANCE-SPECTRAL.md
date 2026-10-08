@@ -15,5 +15,11 @@ size. Instance count multiplies FFT storage and processing costs; begin with a
 small maximum count.
 
 Nested Spectral Groups work in live processing and source export / Bake.
-Instance Group public boundaries remain numeric: place the FFT inside the group,
-or perform shared spectral processing outside it.
+Instance Groups accept Spectrum inputs. Compute a shared FFT outside the group,
+connect it to a Spectrum group input, and connect that input to the Spectral Group
+inside. Finish each instance with IFFT and Instance Merge. The input shares FFT
+frames without recalculating the FFT per instance; each spectral processor keeps
+its own state. The same input can also feed a shared processor after Instance Merge.
+
+Instance Group outputs remain numeric audio/value signals: merging Spectrum
+outputs is not defined. MIDI ports are also not supported at this boundary.
