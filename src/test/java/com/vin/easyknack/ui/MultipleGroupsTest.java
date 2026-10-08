@@ -32,7 +32,7 @@ class MultipleGroupsTest {
             c.addMultipleGroup(300,150);c.actions().openSelectedComposite();assertTrue(c.isMultipleContext());
             assertTrue(c.availableNodes().stream().anyMatch(e->e.type().id().equals(new InstanceContextNode().registration().id())));
             assertTrue(c.availableNodes().stream().anyMatch(e->e.type().id().equals(new DigitalNoiseNode().registration().id())));
-            assertFalse(c.availableNodes().stream().anyMatch(e->e.type().id().equals(new SpectrumNode().registration().id())));
+            assertTrue(c.availableNodes().stream().anyMatch(e->e.type().id().equals(new SpectrumNode().registration().id())));
             assertDoesNotThrow(()->NodeDocuments.prepare(c.snapshotDocument()));
         }});
         var f=fixture(false,"mean");assertEquals(new MultipleGraphNode().registration().id(),compiled(f).typeId());assertEquals(compiled(f).properties().get("program"),compiled(f).properties().get("program"),"Stable node identities are required for state handover");assertNotNull(GroupSourceExporter.create(f.document(),f.instance()));

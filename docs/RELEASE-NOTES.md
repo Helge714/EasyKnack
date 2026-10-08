@@ -92,3 +92,5 @@
 - Local development launches are explicitly distinguished from packaged builds.
 
 The first published release version has not been designated yet.
+
+- Instance Groups now support internal FFT / Spectral Group / IFFT chains, with independent frame state per instance, including source export. Public Instance Group boundaries remain numeric.

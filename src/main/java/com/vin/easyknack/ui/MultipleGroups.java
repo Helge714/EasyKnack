@@ -9,7 +9,7 @@ import com.vingame.glswing.node.model.*;
 /** Compiles an editable group into independent scheduled instances, not cloned editor nodes. */
 final class MultipleGroups {
     static final String MARKER="easyknack.multiple",MAXIMUM="easyknack.multiple.maximum",MERGE="easyknack.multiple.merge",CREATE_TYPE="easyknack.action.multiple",COUNT_PROPERTY="easyknack.instance.count",EXECUTION="easyknack.instance.execution";
-    private static final Set<String> SUPPORTED=Set.of("math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multipleinput","multipleoutput","instancecombine");
+    private static final Set<String> SUPPORTED=Set.of("math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multipleinput","multipleoutput","instancecombine","spectrum","fftstream","spectralgraph","ifft");
     static final String COUNT_ROLE="easyknack.instance.role";
     static boolean countPort(GLCompositePortMapping port){return GLNodeValue.of("count").equals(port.presentation().editorOptions().get(COUNT_ROLE));}
     static GLCompositePortMapping countPort(String id){
@@ -62,8 +62,18 @@ final class MultipleGroups {
             for(var port:outputs){var id=stable(instance.id()+"/"+asset.id()+"/output/"+port.publicPort().id());outputIds.add(id);e.addNode(new GLGraphNode(id,new MultipleOutputNode().registration().id(),Map.of()));e.addConnection(wire(new GLNodeEndpoint(instance.id(),port.publicPort().id()),new GLNodeEndpoint(id,"in")));}
         });
         var root=new GLNodeGraphAsset("multiple-program",1,GLNodeGraphAssetKind.PROJECT,graph.snapshot(),GLNodeEditorViewState.empty());
-        // Nested ordinary groups are supported. Another execution-domain group needs explicit nesting semantics.
-        var flat=GLCompositeGraphFlattener.flatten(root,registry,limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid Multiple Group: ")+flat.diagnostics());
+        // Expand this instance boundary as an ordinary group, but compile nested
+        // spectral boundaries into their own frame processors before scheduling instances.
+        var nestedRegistry=new GLCompositeGraphRegistry();
+        for(var candidate:registry.assets()){
+            if(candidate.id().equals(asset.id())){
+                var metadata=new HashMap<>(candidate.metadata());metadata.remove(MARKER);
+                candidate=new GLNodeGraphAsset(candidate.id(),candidate.version(),candidate.kind(),candidate.graph(),candidate.viewState(),metadata,candidate.compositeDescriptor());
+            }
+            nestedRegistry.registerAsset(candidate);
+        }
+        for(var descriptor:registry.composites())if(nestedRegistry.findComposite(descriptor.nodeTypeId()).isEmpty())nestedRegistry.registerComposite(descriptor);
+        var flat=SpectralGroups.flatten(new GroupCompiler.Prepared(root,nestedRegistry),limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid Multiple Group: ")+flat.diagnostics());
         var source=flat.graph().orElseThrow();
         for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported node inside Multiple Group: ")+n.typeId());
         var types=new GLNodeTypeRegistry();var definitions=new NodeRegistry(types,new GLNodeCatalog());
@@ -160,7 +170,7 @@ final class MultipleGroups {
     private static void checkNested(GLNodeGraphAsset asset,GLCompositeGraphRegistry registry,Set<String> visited){
         if(!visited.add(asset.id()))return;
         for(var node:asset.graph().nodes())registry.findComposite(node.typeId()).flatMap(d->registry.findAsset(d.assetId())).ifPresent(child->{
-            if(multiple(child)||SpectralGroups.spectral(child))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Multiple Group currently accepts ordinary nested groups, not nested Multiple/Spectral execution groups."));
+            if(multiple(child))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Nested Instance Groups are not supported."));
             checkNested(child,registry,visited);
         });
     }

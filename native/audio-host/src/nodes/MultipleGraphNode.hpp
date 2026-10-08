@@ -33,6 +33,10 @@
 #include "MultipleInputNode.hpp"
 #include "MultipleOutputNode.hpp"
 #include "InstanceCombineNode.hpp"
+#include "SpectrumNode.hpp"
+#include "FFTStreamNode.hpp"
+#include "SpectralGraphNode.hpp"
+#include "IFFTNode.hpp"
 namespace easyknack {
 struct MultipleGraphNode : NodeProcessor {
     struct Instance : BakedGraphProcessor {
@@ -136,6 +140,10 @@ struct MultipleGraphNode : NodeProcessor {
     std::size_t outputCount()const noexcept override{return outputs;}
     void shareChannelState(NodeProcessor& other)override{state=static_cast<MultipleGraphNode&>(other).state;primary=false;}
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
+        if(id=="spectrum")return std::make_unique<SpectrumNode>();
+        if(id=="fftstream")return std::make_unique<FFTStreamNode>();
+        if(id=="spectralgraph")return std::make_unique<SpectralGraphNode>();
+        if(id=="ifft")return std::make_unique<IFFTNode>();
         if(id=="instancecombine")return std::make_unique<InstanceCombineNode>();
         if(id=="math")return std::make_unique<MathNode>();
         if(id=="maprange")return std::make_unique<MapRangeNode>();
