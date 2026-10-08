@@ -9,7 +9,7 @@ import com.vingame.glswing.node.model.*;
 /** Compiles an editable group into independent scheduled instances, not cloned editor nodes. */
 final class MultipleGroups {
     static final String MARKER="easyknack.multiple",MAXIMUM="easyknack.multiple.maximum",MERGE="easyknack.multiple.merge",CREATE_TYPE="easyknack.action.multiple",COUNT_PROPERTY="easyknack.instance.count",EXECUTION="easyknack.instance.execution";
-    private static final Set<String> SUPPORTED=Set.of("math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multipleinput","multiplespectruminput","multipleoutput","instancecombine","spectrum","fftstream","spectralgraph","ifft");
+    private static final Set<String> SUPPORTED=Set.of("math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multipleinput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate","vectorscale","vectorlength","vectordistance","vectordot","spatialreceiver","multiplevectorinput","multipleoutput","instancecombine","spectrum","fftstream","spectralgraph","ifft");
     static final String COUNT_ROLE="easyknack.instance.role";
     static boolean countPort(GLCompositePortMapping port){return GLNodeValue.of("count").equals(port.presentation().editorOptions().get(COUNT_ROLE));}
     static GLCompositePortMapping countPort(String id){
@@ -46,7 +46,7 @@ final class MultipleGroups {
         var countPort=ports.stream().filter(MultipleGroups::countPort).findFirst().orElse(null);
         var inputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&!countPort(p)).toList();
         var outputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).toList();
-        if(inputs.size()>MultipleGraphNode.MAX_INPUTS||outputs.isEmpty()||outputs.size()>8||ports.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId()).contains(p.publicPort().valueTypeId())&&!(p.publicPort().direction()==GLPortDirection.INPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group supports up to eight numeric or Spectrum inputs and eight numeric outputs, plus Count. MIDI and Spectrum outputs are not supported."));
+        if(inputs.size()>MultipleGraphNode.MAX_INPUTS||outputs.isEmpty()||outputs.size()>8||ports.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId()).contains(p.publicPort().valueTypeId())&&!(p.publicPort().direction()==GLPortDirection.INPUT&&Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.VECTOR.valueTypeId()).contains(p.publicPort().valueTypeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group supports up to eight numeric, Vector or Spectrum inputs and eight numeric outputs, plus Count. MIDI ports and nonnumeric outputs are not supported."));
         for(var p:ports){String id=p.publicPort().id();renamed.put(new GLNodeEndpoint(instance.id(),id),new GLNodeEndpoint(instance.id(),countPort(p)?"count":p.publicPort().direction()==GLPortDirection.INPUT?MultipleGraphNode.input(inputs.indexOf(p)).value():MultipleGraphNode.output(outputs.indexOf(p)).value()));}
         int maximum=Integer.parseInt(new NodeState(asset.metadata()).text(MAXIMUM,"16"));if(maximum<1||maximum>256)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximum instances must be between 1 and 256"));
         int count=(int)new NodeState(instance.properties()).number(countPort==null?COUNT_PROPERTY:GroupUnits.key(countPort.publicPort().id()),new NodeState(instance.properties()).number(COUNT_PROPERTY,8));
@@ -56,7 +56,7 @@ final class MultipleGroups {
             e.addNode(instance.withoutProperty(GLNodeState.MUTED).withoutProperty(GLNodeState.HIDDEN));
             for(int i=0;i<=inputs.size();i++){
                 String port=i==0?"__instance_count":inputs.get(i-1).publicPort().id();var id=stable(instance.id()+"/"+asset.id()+(i==0?"/execution/count":"/input/"+port));inputIds.add(id);
-                BasicNode boundary=i>0&&inputs.get(i-1).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())?new MultipleSpectrumInputNode():new MultipleInputNode();
+                BasicNode boundary=i>0&&inputs.get(i-1).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())?new MultipleSpectrumInputNode():i>0&&inputs.get(i-1).publicPort().valueTypeId().equals(SignalCategory.VECTOR.valueTypeId())?new MultipleVectorInputNode():new MultipleInputNode();
                 e.addNode(new GLGraphNode(id,boundary.registration().id(),Map.of("slot",GLNodeValue.of(i))));
                 if(i>0&&connected.contains(port))e.addConnection(wire(new GLNodeEndpoint(id,"out"),new GLNodeEndpoint(instance.id(),port)));
             }
@@ -111,8 +111,8 @@ final class MultipleGroups {
             // Boundary proxies fan out external inputs to both execution domains.
             for(int i=1;i<inputIds.size();i++){
                 var id=inputIds.get(i);if(!shared.contains(id))continue;
-                if(inputs.get(i-1).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())){
-                    var relay=new SpectrumRelayNode();extraNodes.add(new GLGraphNode(id,relay.registration().id(),relay.defaults()));
+                if(Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.VECTOR.valueTypeId()).contains(inputs.get(i-1).publicPort().valueTypeId())){
+                    BasicNode relay=inputs.get(i-1).publicPort().valueTypeId().equals(SignalCategory.VECTOR.valueTypeId())?new VectorRelayNode():new SpectrumRelayNode();extraNodes.add(new GLGraphNode(id,relay.registration().id(),relay.defaults()));
                     renamed.put(new GLNodeEndpoint(instance.id(),inputs.get(i-1).publicPort().id()),new GLNodeEndpoint(id,"in"));
                     extraWires.add(wire(new GLNodeEndpoint(id,"out"),new GLNodeEndpoint(instance.id(),MultipleGraphNode.input(i-1).value())));
                     continue;
@@ -146,7 +146,7 @@ final class MultipleGroups {
             if(policy.contains("?"))policies.add(i+" "+policy);
         }
         String program="MULT3 "+inputIds.size()+" "+outputIds.size()+" "+String.join(" ",inputIds.stream().map(id->Integer.toString(ids.indexOf(id))).toList())+" "+String.join(" ",outputIds.stream().map(id->Integer.toString(ids.indexOf(id))).toList())+" "+(marker.equals("MULT2")?1:0)+" "+policies.size()+" "+String.join(" ",policies)+" "+com.vin.easyknack.audio.AudioGraphEncoder.encode(source);
-        var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(SpectralGraphNode.hex(program)));values.put("maximum",GLNodeValue.of(maximum));values.put("count",GLNodeValue.of(Math.max(0,Math.min(256,count))));values.put("outputs",GLNodeValue.of(outputIds.size()));values.put("spectrumInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("mode",GLNodeValue.of(new NodeState(asset.metadata()).text(MERGE,"mean")));
+        var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(SpectralGraphNode.hex(program)));values.put("maximum",GLNodeValue.of(maximum));values.put("count",GLNodeValue.of(Math.max(0,Math.min(256,count))));values.put("outputs",GLNodeValue.of(outputIds.size()));values.put("spectrumInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("vectorInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.VECTOR.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("mode",GLNodeValue.of(new NodeState(asset.metadata()).text(MERGE,"mean")));
         values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(CompiledManualTargets.collect(source.nodes(),flat,n->n.id().toString())));
         for(String key:List.of(GLNodeState.MUTED,GLNodeState.HIDDEN))if(instance.properties().containsKey(key))values.put(key,instance.properties().get(key));
         extraNodes.add(0,new GLGraphNode(instance.id(),new MultipleGraphNode().registration().id(),values));

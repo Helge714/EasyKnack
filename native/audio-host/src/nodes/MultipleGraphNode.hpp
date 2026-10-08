@@ -31,6 +31,17 @@
 #include "PitchHoldNode.hpp"
 #include "InstanceContextNode.hpp"
 #include "MultipleInputNode.hpp"
+#include "VectorNode.hpp"
+#include "VectorCombineNode.hpp"
+#include "VectorSeparateNode.hpp"
+#include "VectorMathNode.hpp"
+#include "VectorRotateNode.hpp"
+#include "VectorScaleNode.hpp"
+#include "VectorLengthNode.hpp"
+#include "VectorDistanceNode.hpp"
+#include "VectorDotNode.hpp"
+#include "SpatialReceiverNode.hpp"
+#include "MultipleVectorInputNode.hpp"
 #include "MultipleSpectrumInputNode.hpp"
 #include "MultipleOutputNode.hpp"
 #include "InstanceCombineNode.hpp"
@@ -144,6 +155,17 @@ struct MultipleGraphNode : NodeProcessor {
     std::size_t outputCount()const noexcept override{return outputs;}
     void shareChannelState(NodeProcessor& other)override{state=static_cast<MultipleGraphNode&>(other).state;primary=false;}
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
+        if(id=="vector")return std::make_unique<VectorNode>();
+if(id=="vectorcombine")return std::make_unique<VectorCombineNode>();
+if(id=="vectorseparate")return std::make_unique<VectorSeparateNode>();
+if(id=="vectormath")return std::make_unique<VectorMathNode>();
+if(id=="vectorrotate")return std::make_unique<VectorRotateNode>();
+if(id=="vectorscale")return std::make_unique<VectorScaleNode>();
+if(id=="vectorlength")return std::make_unique<VectorLengthNode>();
+if(id=="vectordistance")return std::make_unique<VectorDistanceNode>();
+if(id=="vectordot")return std::make_unique<VectorDotNode>();
+if(id=="spatialreceiver")return std::make_unique<SpatialReceiverNode>();
+if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="spectrum")return std::make_unique<SpectrumNode>();
         if(id=="fftstream")return std::make_unique<FFTStreamNode>();
         if(id=="spectralgraph")return std::make_unique<SpectralGraphNode>();

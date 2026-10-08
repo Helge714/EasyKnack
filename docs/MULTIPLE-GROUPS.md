@@ -61,13 +61,19 @@ Complex Oscillator's unused Noise
 editor has been removed; old saved Noise properties are discarded when normalized.
 Its waveform/harmonic synthesis and native parameter contract are unchanged.
 
-This implementation supports ordinary nested groups and the numeric generators,
-math, filters, delays, pan/channel nodes offered in its Add menu. Feedback inside
-an instance uses the existing scheduler and requires the usual Delay. Limits are
-8 additional numeric inputs, 8 numeric outputs, and 4096 total node instances.
-MIDI/resource boundaries, nested Multiple/Spectral execution groups, and sample
-feedback crossing the Multiple Group boundary are not supported yet. Unsupported
-nodes are rejected rather than silently flattened or shared between instances.
+Instance Groups support ordinary nested groups, Spectral Groups, the Vector node
+family and Spatial Receiver, plus the numeric processors offered in the Add menu.
+Vector Combine can use Instance Context to build different positions per instance.
+A Vector group input shares an external position, rotation or scale; both Control
+and Audio rates and separate stereo channels are preserved. Vector inputs can
+also feed shared processing after Instance Merge. Convert the per-instance result
+to an audio/value signal before merging; nonnumeric outputs are not combined.
+
+Limits are eight additional numeric/Vector/Spectrum inputs, eight numeric outputs,
+and 4096 total node instances. MIDI boundaries, nested Instance Groups and sample
+feedback crossing the group boundary remain unsupported. Feedback inside an
+instance uses the existing scheduler and requires the usual Delay. Unsupported
+processors are rejected rather than silently shared between instances.
 
 Groups are stored as editable assets in .knack documents. Source/plugin export
 uses the same native instance runtime and noise-sharing rules. Supported

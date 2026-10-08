@@ -580,3 +580,7 @@ Dabei bleibt der A4-Nachweis unveränderter Spitzenlatenz unter realer Last offe
   winget absent/offline, cancelled UAC/install, upgrade and uninstall.
 - Investigate the untouched startup document becoming modified before interaction;
   its save confirmation currently prevents unattended package window-close tests.
+
+## Instance processor capabilities
+
+- [ ] Replace the separate Java supported-ID list and native instance factory list with explicit per-instance capability declarations and generated registration. Review ordinary DSP processors systematically; retain deliberate exclusions for device I/O, nested execution domains and resource outputs without a defined reduction. Cover live processing, stereo/rates and Bake/export together.

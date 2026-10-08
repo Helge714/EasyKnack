@@ -10,9 +10,11 @@ public final class MultipleGraphNode extends BasicNode {
         for(int i=0;i<(int)s.number("outputs",1);i++)n.addOutput(output(i),"Out "+(i+1));
         n.addInput(COUNT,"Count",Editor.Slider.button(8,0.0,256.0).integers()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
         var spectrum=java.util.Set.of(s.text("spectrumInputs","").split(","));
+        var vectors=java.util.Set.of(s.text("vectorInputs","").split(","));
         for(int i=0;i<MAX_INPUTS;i++){
             var row=n.addInput(input(i),"In "+(i+1));
             if(spectrum.contains(Integer.toString(i)))row.dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
+            else if(vectors.contains(Integer.toString(i)))row.dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL);
             else row.rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         }
         n.addEditor(MAXIMUM,"Maximum instances",Editor.Slider.button(16,1.0,256.0).integers());
