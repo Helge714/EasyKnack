@@ -70,10 +70,16 @@ also feed shared processing after Instance Merge. Convert the per-instance resul
 to an audio/value signal before merging; nonnumeric outputs are not combined.
 
 Limits are eight additional numeric/Vector/Spectrum inputs, eight numeric outputs,
-and 4096 total node instances. MIDI boundaries, nested Instance Groups and sample
+and 4096 total node instances across all nesting levels. MIDI boundaries and sample
 feedback crossing the group boundary remain unsupported. Feedback inside an
 instance uses the existing scheduler and requires the usual Delay. Unsupported
 processors are rejected rather than silently shared between instances.
+
+Instance Groups may contain other Instance Groups (up to 16 nested group levels).
+Each Instance Context describes its nearest Instance Group. Each outer instance
+owns independent inner states and Count; pass outer context values through inputs
+to use them inside. Maximum capacities multiply, even when fewer instances are
+currently active. Each level needs its own Instance Merge before its output.
 
 Groups are stored as editable assets in .knack documents. Source/plugin export
 uses the same native instance runtime and noise-sharing rules. Supported

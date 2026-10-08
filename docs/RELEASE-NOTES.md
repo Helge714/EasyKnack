@@ -98,3 +98,7 @@ The first published release version has not been designated yet.
 - Instance Groups accept shared Spectrum inputs, including source export and Bake; per-instance processing retains independent state. Existing numeric instance-input contracts remain unchanged; the host and plugin SDK include the new typed resource boundary.
 
 - Instance Groups support all Vector nodes and Spatial Receiver, including shared Vector inputs, sample-rate/channel preservation and Bake/source export. Group outputs still require numeric Instance Merge results.
+
+- Instance Groups can contain other Instance Groups, including in Bake and source
+  export. Counts and context indices are scoped to each level; capacity limits
+  account for the entire nested graph. Update the audio host and plugin SDK together.

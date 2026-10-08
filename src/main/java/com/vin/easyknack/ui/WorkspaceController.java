@@ -638,7 +638,7 @@ final class WorkspaceController implements AutoCloseable {
     private boolean nodeAllowedInContext(com.vingame.glswing.node.model.GLNodeCatalogEntry entry){
         if(workspace.currentAssetId()!=null&&composites.findAsset(workspace.currentAssetId()).map(FormulaGroups::isFormula).orElse(false))return false;
         var definition=NodeRegistry.find(entry.type().id()).orElse(null);
-        if(isMultipleContext()&&!isSpectralContext())return entry.type().id().equals(SpectralGroups.CREATE_TYPE)||MultipleGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(a->!MultipleGroups.multiple(a)).orElse(false);
+        if(isMultipleContext()&&!isSpectralContext())return entry.type().id().equals(SpectralGroups.CREATE_TYPE)||entry.type().id().equals(MultipleGroups.CREATE_TYPE)||MultipleGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).isPresent();
         if(isSpectralContext()){
             if(!SpectralGroups.supports(definition))return false;
             // One output is the program's root. Offer its replacement after deletion.
@@ -670,7 +670,7 @@ final class WorkspaceController implements AutoCloseable {
     }
 
     void addMultipleGroup(float x,float y){
-        if(isSpectralContext()||isMultipleContext())return;
+        if(isSpectralContext())return;
         var asset=MultipleGroups.create();var descriptor=asset.compositeDescriptor();
         composites.registerAsset(asset);types.register(descriptor.nodeType());
         catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(descriptor.nodeType(),"Multiple Group",com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"instances"));

@@ -9,7 +9,7 @@ import com.vingame.glswing.node.model.*;
 /** Compiles an editable group into independent scheduled instances, not cloned editor nodes. */
 final class MultipleGroups {
     static final String MARKER="easyknack.multiple",MAXIMUM="easyknack.multiple.maximum",MERGE="easyknack.multiple.merge",CREATE_TYPE="easyknack.action.multiple",COUNT_PROPERTY="easyknack.instance.count",EXECUTION="easyknack.instance.execution";
-    private static final Set<String> SUPPORTED=Set.of("math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multipleinput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate","vectorscale","vectorlength","vectordistance","vectordot","spatialreceiver","multiplevectorinput","multipleoutput","instancecombine","spectrum","fftstream","spectralgraph","ifft");
+    private static final Set<String> SUPPORTED=Set.of("math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multiplegraph","multipleinput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate","vectorscale","vectorlength","vectordistance","vectordot","spatialreceiver","multiplevectorinput","multipleoutput","instancecombine","spectrum","fftstream","spectralgraph","ifft");
     static final String COUNT_ROLE="easyknack.instance.role";
     static boolean countPort(GLCompositePortMapping port){return GLNodeValue.of("count").equals(port.presentation().editorOptions().get(COUNT_ROLE));}
     static GLCompositePortMapping countPort(String id){
@@ -136,7 +136,8 @@ final class MultipleGroups {
             source=new GLNodeGraphSnapshot(source.graphId(),source.revision(),source.nodes().stream().filter(n->perInstance.contains(n.id())).toList(),source.connections().stream().filter(w->perInstance.contains(w.input().nodeId())&&perInstance.contains(w.output().nodeId())).toList());
             outputIds.clear();outputIds.addAll(combines.stream().map(GLGraphNode::id).toList());
         }
-        if(source.nodes().size()*maximum>4096)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group exceeds 4096 node instances; reduce Maximum instances"));
+        long expandedNodes=source.nodes().stream().mapToLong(n->1+(NodeRegistry.require(n.typeId()) instanceof MultipleGraphNode?(long)new NodeState(n.properties()).number("instanceNodeCost",0):0)).sum()*maximum;
+        if(expandedNodes>4096)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group exceeds 4096 node instances; reduce Maximum instances"));
         var ids=source.nodes().stream().map(GLGraphNode::id).toList();
         // Preserve adaptive output policies: external boundaries only acquire their
         // actual rate in the host, including when this group is inside a bake.
@@ -146,7 +147,7 @@ final class MultipleGroups {
             if(policy.contains("?"))policies.add(i+" "+policy);
         }
         String program="MULT3 "+inputIds.size()+" "+outputIds.size()+" "+String.join(" ",inputIds.stream().map(id->Integer.toString(ids.indexOf(id))).toList())+" "+String.join(" ",outputIds.stream().map(id->Integer.toString(ids.indexOf(id))).toList())+" "+(marker.equals("MULT2")?1:0)+" "+policies.size()+" "+String.join(" ",policies)+" "+com.vin.easyknack.audio.AudioGraphEncoder.encode(source);
-        var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(SpectralGraphNode.hex(program)));values.put("maximum",GLNodeValue.of(maximum));values.put("count",GLNodeValue.of(Math.max(0,Math.min(256,count))));values.put("outputs",GLNodeValue.of(outputIds.size()));values.put("spectrumInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("vectorInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.VECTOR.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("mode",GLNodeValue.of(new NodeState(asset.metadata()).text(MERGE,"mean")));
+        var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(SpectralGraphNode.hex(program)));values.put("instanceNodeCost",GLNodeValue.of(expandedNodes));values.put("maximum",GLNodeValue.of(maximum));values.put("count",GLNodeValue.of(Math.max(0,Math.min(256,count))));values.put("outputs",GLNodeValue.of(outputIds.size()));values.put("spectrumInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("vectorInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.VECTOR.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("mode",GLNodeValue.of(new NodeState(asset.metadata()).text(MERGE,"mean")));
         values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(CompiledManualTargets.collect(source.nodes(),flat,n->n.id().toString())));
         for(String key:List.of(GLNodeState.MUTED,GLNodeState.HIDDEN))if(instance.properties().containsKey(key))values.put(key,instance.properties().get(key));
         extraNodes.add(0,new GLGraphNode(instance.id(),new MultipleGraphNode().registration().id(),values));
@@ -175,11 +176,12 @@ final class MultipleGroups {
         for(var wire:graph.connections())if(wire.input().nodeId().equals(id))ancestors(wire.output().nodeId(),graph,stop,result);
     }
     private static void checkNested(GLNodeGraphAsset asset,GLCompositeGraphRegistry registry,Set<String> visited){
-        if(!visited.add(asset.id()))return;
+        if(!visited.add(asset.id()))throw new IllegalArgumentException("Recursive Instance Group reference: "+asset.id());
+        if(visited.size()>16)throw new IllegalArgumentException("Instance Group nesting exceeds 16 levels");
         for(var node:asset.graph().nodes())registry.findComposite(node.typeId()).flatMap(d->registry.findAsset(d.assetId())).ifPresent(child->{
-            if(multiple(child))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Nested Instance Groups are not supported."));
             checkNested(child,registry,visited);
         });
+        visited.remove(asset.id());
     }
 
 }

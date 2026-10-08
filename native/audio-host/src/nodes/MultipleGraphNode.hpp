@@ -139,7 +139,7 @@ struct MultipleGraphNode : NodeProcessor {
     // Exporters provide a concrete per-instance kernel; live graphs keep the
     // generic implementation. Allocation remains entirely on the control thread.
     virtual std::unique_ptr<Instance> createInstance(){return std::make_unique<Instance>();}
-    int maximum=16,count=8;bool mean=false,primary=true,explicitCombines=false;std::size_t outputs=1,framesReserved=0;float fadeStep=1;
+    int maximum=16,count=8;bool mean=false,primary=true,explicitCombines=false;std::size_t outputs=1,framesReserved=0,expandedNodes=0;float fadeStep=1;
     bool canShareChannels()const noexcept override{
         // Connected boundaries remain conservative until their source layout is
         // known. An unconnected group can expose its proven internal layout.
@@ -166,6 +166,7 @@ if(id=="vectordistance")return std::make_unique<VectorDistanceNode>();
 if(id=="vectordot")return std::make_unique<VectorDotNode>();
 if(id=="spatialreceiver")return std::make_unique<SpatialReceiverNode>();
 if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
+        if(id=="multiplegraph")return std::make_unique<MultipleGraphNode>();
         if(id=="spectrum")return std::make_unique<SpectrumNode>();
         if(id=="fftstream")return std::make_unique<FFTStreamNode>();
         if(id=="spectralgraph")return std::make_unique<SpectralGraphNode>();
@@ -206,6 +207,9 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         throw std::runtime_error("Unsupported Multiple Group node: "+id);
     }
     void configure(std::istream& in)override{
+        static thread_local unsigned nesting=0;
+        if(nesting>=16)throw std::runtime_error("Instance Group nesting exceeds 16 levels");
+        struct NestingScope {unsigned& depth;NestingScope(unsigned& d):depth(d){++depth;}~NestingScope(){--depth;}} scope(nesting);
         auto p=parameters::MultipleGraphNodeParameters::read(in);sources=p.sources();maximum=p.maximum_value;count=p.count_value;mean=p.mode_value=="mean";
         if(maximum<1||maximum>256)throw std::runtime_error("Invalid instance capacity");
         if(p.program_value.size()>2000000||p.program_value.size()%2)throw std::runtime_error("Invalid Multiple Group program");
@@ -238,7 +242,10 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
             }
             for(int index:instance->runtime->graph.order)if(!instance->runtime->outputPolicies[index].empty())instance->runtime->autoNodes.push_back(index);
             if(!inputNodes.empty())instance->setFallback(0,float(count));
-            if(instance->runtime->graph.nodes.size()*maximum>4096)throw std::runtime_error("Multiple Group exceeds 4096 node instances; reduce Maximum instances");
+            std::size_t cost=instance->runtime->graph.nodes.size();
+            for(const auto& n:instance->runtime->graph.nodes)if(auto* child=dynamic_cast<MultipleGraphNode*>(n.processor.get()))cost+=child->expandedNodes;
+            expandedNodes=cost*std::size_t(maximum);
+            if(expandedNodes>4096)throw std::runtime_error("Multiple Group exceeds 4096 node instances; reduce Maximum instances");
             for(auto& node:instance->runtime->graph.nodes){
                 // Copies of the same logical generator share an optional block
                 // memo, not their evolving RNG state. Divergent histories miss.
