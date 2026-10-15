@@ -67,6 +67,7 @@ public interface Editor {
         public Slider(double value, Double min, Double max, double step, boolean integral) { this(value,min,max,step,integral,false); }
         public Slider(double value, Double min, Double max, double step) { this(value, min, max, step, false); }
         public Slider {
+            if (integral && Double.isFinite(step) && step > 0) step = Math.max(1, step);
             if (!Double.isFinite(value) || min != null && !Double.isFinite(min)
                     || max != null && !Double.isFinite(max) || min != null && max != null && min >= max
                     || min != null && value < min || max != null && value > max

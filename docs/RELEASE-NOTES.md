@@ -102,3 +102,6 @@ The first published release version has not been designated yet.
 - Instance Groups can contain other Instance Groups, including in Bake and source
   export. Counts and context indices are scoped to each level; capacity limits
   account for the entire nested graph. Update the audio host and plugin SDK together.
+
+- Copied integer group sliders retain usable increments and drag sensitivity, including older editor snapshots. Group-authored sliders can select integer values in Group-IO.
+- Newly extracted groups inherit their first output signal kind once. All signal categories have matching node kinds and shared highlight colors; trigger-producing, buffer and spectrum nodes use their corresponding palettes. Existing manual group kinds remain unchanged.

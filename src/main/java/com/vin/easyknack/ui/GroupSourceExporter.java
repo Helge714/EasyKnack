@@ -62,7 +62,7 @@ final class GroupSourceExporter {
                 double value=new NodeState(instance.properties()).number(GroupUnits.key(mapping.publicPort().id()),options.number("default",0));
                 Double min=options.flag("minimumEnabled",true)?base.convert(options.number("minimum",0),selected):null;
                 Double max=options.flag("maximumEnabled",true)?base.convert(options.number("maximum",1),selected):null;
-                slider=new Editor.Slider(base.convert(value,selected),min,max,.01,options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"),new UnitFormats(selected,selected,GroupUnits.allowed(mapping,base)));
+                slider=new Editor.Slider(base.convert(value,selected),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"),new UnitFormats(selected,selected,GroupUnits.allowed(mapping,base)));
             }
             if(input&&GroupInputSettings.checkbox(mapping))slider=new Editor.Toggle(new NodeState(instance.properties()).number(GroupUnits.key(mapping.publicPort().id()),new NodeState(mapping.presentation().editorOptions()).number("default",0))!=0);
             var choiceValues=new LinkedHashMap<String,Double>();

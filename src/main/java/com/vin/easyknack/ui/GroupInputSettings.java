@@ -25,6 +25,7 @@ final class GroupInputSettings extends GLContainer {
     private final GLLabel rateLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Rate")),kindLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Editor")),modelLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Model")),sourceLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Connected editor"));
     private final GLTextEditor minimum=new GLTextEditor(),maximum=new GLTextEditor(),value=new GLTextEditor();
     private final GLLabel minLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Minimum (empty = unbounded)")),maxLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Maximum (empty = unbounded)")),valueLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Value")),unitsLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Allowed units"));
+    final GLCheckBox integer=new GLCheckBox(AppText.text("group.slider.integer"));
     private final GLCheckBox checked=new GLCheckBox(com.vin.easyknack.ui.AppText.literal("Default: on"));
     private final GLLabel status=new GLLabel("");
     private final NodeTooltipLabel formulaName=new NodeTooltipLabel(AppText.text("formula.identifier"));
@@ -33,7 +34,7 @@ final class GroupInputSettings extends GLContainer {
     private boolean updating;
     GroupInputSettings(GLCompositeInterfaceEditor editor,GLCompositeGraphRegistry groups,EditorTemplates templates,com.vingame.glswing.history.GLHistoryManager history,Runnable changed){
         this.editor=editor;this.groups=groups;this.templates=templates;
-        for(var c:List.of(formulaName,formulaIdentifier,rateLabel,rate,kindLabel,kind,modelLabel,model,sourceLabel,source,minLabel,minimum,maxLabel,maximum,valueLabel,value,checked,unitsLabel,formulaUnitBase,status)){rows.add(c);addGL(c);}
+        for(var c:List.of(formulaName,formulaIdentifier,rateLabel,rate,kindLabel,kind,modelLabel,model,sourceLabel,source,integer,minLabel,minimum,maxLabel,maximum,valueLabel,value,checked,unitsLabel,formulaUnitBase,status)){rows.add(c);addGL(c);}
         formulaIdentifier.addActionListener(e->edit(()->{var before=asset();if(!FormulaGroups.isFormula(before)||editor.selectedPort()==null)return;var after=FormulaGroups.rename(before,editor.selectedPort(),formulaIdentifier.getText().strip());history.perform(AppText.text("formula.identifier"),()->{groups.replaceAsset(after);editor.refresh();changed.run();},()->{groups.replaceAsset(before);editor.refresh();changed.run();});}));
         formulaUnitBase.addActionListener(e->edit(()->{if(formulaUnitBase.getSelectedItem()==null||editor.selectedPort()==null)return;var options=new HashMap<>(editor.selectedPort().presentation().editorOptions());String unit=formulaUnitBase.getSelectedItem().id();options.put(GroupUnits.BASE,GLNodeValue.of(unit));options.put(GroupUnits.ALLOWED,GLNodeValue.of(List.of(unit)));save(GLNodeInputEditorRegistry.SLIDER,options,Kind.SLIDER);}));
         rate.setToolTipText(ProcessingRate.editorHint());
@@ -41,6 +42,7 @@ final class GroupInputSettings extends GLContainer {
         model.addActionListener(e->edit(()->{if(model.getSelectedItem()!=null)applyModel(model.getSelectedItem(),Kind.COMBO,null);}));
         checked.addActionListener(e->edit(()->{var values=new HashMap<>(editor.selectedPort().presentation().editorOptions());values.put("default",GLNodeValue.of(checked.isSelected()?1.0:0.0));save(GLNodeInputEditorRegistry.SLIDER,values,Kind.CHECKBOX);}));
         source.addActionListener(e->edit(this::copySource));
+        integer.addActionListener(e->edit(()->{var p=editor.selectedPort();save(p.presentation().inputEditorId(),integerOptions(p.presentation().editorOptions(),integer.isSelected()),selectedKind(p));}));
         for(var field:List.of(minimum,maximum,value))field.addActionListener(e->edit(this::sliderValues));
     }
     private void edit(Runnable action){if(updating)return;updating=true;try{action.run();status.setText("");}catch(RuntimeException ex){status.setText(ex.getMessage());}finally{updating=false;refresh();editor.refresh();}}
@@ -109,6 +111,16 @@ final class GroupInputSettings extends GLContainer {
         }
         return result.stream().filter(s->selectedRate(p)==ProcessingRate.EVENT?(s.value() instanceof Editor.Trigger||s.presentation()!=null&&s.presentation().inputEditorId().equals(BUTTON)):!(s.value() instanceof Editor.Trigger)&&!(s.presentation()!=null&&s.presentation().inputEditorId().equals(BUTTON))).toList();
     }
+    static Map<String,GLNodeValue> integerOptions(Map<String,GLNodeValue> source,boolean enabled){
+        var options=new HashMap<>(source);var state=new NodeState(source);
+        double min=state.flag("minimumEnabled",true)?state.number("minimum",0):Double.NEGATIVE_INFINITY;
+        double max=state.flag("maximumEnabled",true)?state.number("maximum",1):Double.POSITIVE_INFINITY;
+        if(enabled&&Math.ceil(min)>Math.floor(max))throw new IllegalArgumentException(AppText.text("group.slider.noInteger"));
+        options.put("numericType",GLNodeValue.of(enabled?"integer":"float"));
+        options.put("step",GLNodeValue.of(enabled?Math.max(1,state.number("step",.01)):.01));
+        if(enabled)options.put("default",GLNodeValue.of(Math.max(Math.ceil(min),Math.min(Math.floor(max),Math.rint(state.number("default",0))))));
+        return options;
+    }
     private void sliderValues(){
         var p=editor.selectedPort();var options=new HashMap<>(p.presentation().editorOptions());Double min=minimum.getText().isBlank()?null:Double.valueOf(minimum.getText()),max=maximum.getText().isBlank()?null:Double.valueOf(maximum.getText());double v=Double.parseDouble(value.getText());new Editor.Slider(v,min,max,.01);
         options.put("default",GLNodeValue.of(v));options.put("minimumEnabled",GLNodeValue.of(min!=null));options.put("maximumEnabled",GLNodeValue.of(max!=null));options.put("minimum",GLNodeValue.of(min==null?0:min));options.put("maximum",GLNodeValue.of(max==null?1:max));save(GLNodeInputEditorRegistry.SLIDER,options,Kind.SLIDER);
@@ -127,7 +139,7 @@ final class GroupInputSettings extends GLContainer {
             if(mode==Kind.COMBO){modelLabel.setVisible(true);model.setVisible(true);model.removeAllItems();templates.all().forEach(model::addItem);var applied=GroupInputs.template(p);if(applied!=null){var found=model.getItems().stream().filter(t->t.id().equals(applied.id())).findFirst().orElse(null);if(found==null){model.addItem(applied);found=applied;}model.setSelectedItem(found);}else model.setSelectedItem(null);model.setToolTipText(com.vin.easyknack.ui.AppText.literal("Choose a model defined in Editors. Its values follow the internal connections."));}
             if(mode==Kind.COPY){sourceLabel.setVisible(true);source.setVisible(true);source.removeAllItems();sources().forEach(source::addItem);source.getItems().stream().filter(s->s.endpoint().toString().equals(state.text("copySource",""))).findFirst().ifPresent(source::setSelectedItem);source.setEnabled(!source.getItems().isEmpty());}
             if(mode==Kind.CHECKBOX){checked.setVisible(true);checked.setSelected(state.number("default",0)!=0);}
-            if(mode==Kind.SLIDER){for(var r:List.of(minLabel,minimum,maxLabel,maximum,valueLabel,value,unitsLabel))r.setVisible(true);minimum.setText(state.flag("minimumEnabled",true)?Double.toString(state.number("minimum",0)):"");maximum.setText(state.flag("maximumEnabled",true)?Double.toString(state.number("maximum",1)):"");value.setText(Double.toString(state.number("default",0)));
+            if(mode==Kind.SLIDER){integer.setVisible(true);integer.setSelected(state.text("numericType","float").equals("integer"));for(var r:List.of(minLabel,minimum,maxLabel,maximum,valueLabel,value,unitsLabel))r.setVisible(true);minimum.setText(state.flag("minimumEnabled",true)?Double.toString(state.number("minimum",0)):"");maximum.setText(state.flag("maximumEnabled",true)?Double.toString(state.number("maximum",1)):"");value.setText(Double.toString(state.number("default",0)));
                 var base=GroupUnits.base(groups,asset().compositeDescriptor(),p);formulaUnitBase.setVisible(FormulaGroups.isFormula(asset()));formulaUnitBase.setSelectedItem(base);var allowed=GroupUnits.allowed(p,base);unitsLabel.setText(com.vin.easyknack.ui.AppText.literal("Units (stored: ")+base+")");
                 for(var unit:base.compatible()){var box=new GLCheckBox(unit.toString());box.setSelected(allowed.contains(unit)||unit==base);box.setEnabled(unit!=base);box.addActionListener(e->edit(()->{var options=new HashMap<>(editor.selectedPort().presentation().editorOptions());var next=new ArrayList<>(allowed);if(box.isSelected()){if(!next.contains(unit))next.add(unit);}else next.remove(unit);options.put(GroupUnits.BASE,GLNodeValue.of(base.id()));options.put(GroupUnits.ALLOWED,GLNodeValue.of(next.stream().map(UnitFormat::id).toList()));save(GLNodeInputEditorRegistry.SLIDER,options,Kind.SLIDER);}));unitRows.add(box);addGL(box);}
             }

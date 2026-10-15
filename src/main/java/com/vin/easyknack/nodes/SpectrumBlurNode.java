@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.spectral.blur",title="Spectrum Blur",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.spectral.blur",title="Spectrum Blur",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class SpectrumBlurNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("spectrum"),OUT=new PropertyId("out"),WIDTH=new PropertyId("width");
     public static final PropertyId MODE=new PropertyId("mode"),FACTOR=new PropertyId("factor");

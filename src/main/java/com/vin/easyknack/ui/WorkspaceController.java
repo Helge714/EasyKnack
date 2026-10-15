@@ -52,6 +52,7 @@ final class WorkspaceController implements AutoCloseable {
     private final EditorTemplates editorTemplates;
     private final CompositePortColors compositeColors;
     private int compositeNumber;
+    private final java.util.Set<String> extractedGroupIds=new java.util.HashSet<>();
     private AudioHostService audio;
     private GroupBakes bakes;
     private FormulaRuntime formulas;
@@ -105,6 +106,7 @@ final class WorkspaceController implements AutoCloseable {
         workspace.setGLHistoryManager(history);
         workspace.setCompositeExtractionSupplier(() -> {
             String id = UUID.randomUUID().toString();
+            extractedGroupIds.add("easyknack.asset."+id);
             return new GLNodeWorkspace.CompositeExtraction("easyknack.asset." + id,
                     "easyknack.composite." + id, "Audio Group " + ++compositeNumber, "Audio / Groups");
         });
@@ -178,6 +180,7 @@ final class WorkspaceController implements AutoCloseable {
     /** Also handles property edits originating in the Core inspector, including composites. */
     private void observeCurrentGraph() {
         if (closed) return;
+        for(var id:extractedGroupIds)composites.findAsset(id).filter(a->!a.metadata().containsKey("easyknack.kind")).ifPresent(a->composites.replaceAsset(GroupKinds.initialize(a)));
         // Views are created before Core restores their connections. Navigation to an
         // already observed graph still needs a fresh projection once binding finishes.
         if (!presentationRefreshPending) {

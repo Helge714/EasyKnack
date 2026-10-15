@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 import java.util.List;
-@RegisterNode(id="easyknack.spectral.fft",title="FFT Stream",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.spectral.fft",title="FFT Stream",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class FFTStreamNode extends BasicNode {
     @Override public boolean isListedInCatalog(){return false;} // Legacy documents and source plugins.
     public static final PropertyId IN=new PropertyId("in"),OUT=new PropertyId("spectrum"),SIZE=new PropertyId("size"),WINDOW=new PropertyId("window"),OVERLAP=new PropertyId("overlap");

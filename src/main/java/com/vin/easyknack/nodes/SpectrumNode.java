@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.analysis.spectrum",title="FFT",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.analysis.spectrum",title="FFT",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class SpectrumNode extends BasicNode {
     @Override public NodeState normalizeState(NodeState state){
         var value=state.values().get("overlap");

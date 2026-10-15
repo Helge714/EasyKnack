@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 /** Internal fan-out boundary; retains the original immutable spectrum frames. */
-@RegisterNode(id="easyknack.spectrum.relay",title="Spectrum Relay",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.spectrum.relay",title="Spectrum Relay",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class SpectrumRelayNode extends BasicNode {
  public boolean isListedInCatalog(){return false;}
  public void define(NodeBuilder n,NodeState s){

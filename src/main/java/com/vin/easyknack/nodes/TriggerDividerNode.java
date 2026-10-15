@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.modulation.triggerdivider",title="Trigger Divider",category=NodeCategory.MODULATION,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.modulation.triggerdivider",title="Trigger Divider",category=NodeCategory.MODULATION,kind=NodeKind.TRIGGER)
 public final class TriggerDividerNode extends BasicNode {
     public boolean supportsSampleFeedback(){return true;}
     public boolean supportsTriggerFeedback(){return true;}

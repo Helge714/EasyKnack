@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.resource.history",title="Buffer",category=NodeCategory.BUFFER,kind=NodeKind.AUDIO)
+@RegisterNode(id="easyknack.resource.history",title="Buffer",category=NodeCategory.BUFFER,kind=NodeKind.HISTORY)
 public final class HistoryBufferNode extends BasicNode {
     public static final PropertyId OUT=new PropertyId("history"),IN=new PropertyId("audio-in"),SECONDS=new PropertyId("seconds");
     public void define(NodeBuilder n,NodeState s){

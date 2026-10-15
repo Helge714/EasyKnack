@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.input.trigger",title="Trigger Input",category=NodeCategory.IO,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.input.trigger",title="Trigger Input",category=NodeCategory.IO,kind=NodeKind.TRIGGER)
 public final class TriggerInputNode extends BasicNode {
     public static final PropertyId OUT=new PropertyId("trigger-out"),TRIGGER=new PropertyId("trigger");
     public void define(NodeBuilder n,NodeState s){

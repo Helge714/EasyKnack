@@ -34,18 +34,18 @@ curve.hitRadius=7
 @COLOR curve.handle=#F4EFFF
 @COLOR curve.marker=#E5AF55
 
-@COLOR easyknack.node.MIDI.title.light=#57857E
+@COLOR easyknack.node.MIDI.title.light=${easyknack.signal.MIDI}
 @COLOR easyknack.node.MIDI.title.dark=#35564F
 @COLOR easyknack.signal.MIDI=#57D9BA
 
 @COLOR easyknack.midi.keyboard.focus=#4696FF
 
 # Semantic node title palettes (independent of catalog folders).
-@COLOR easyknack.node.AUDIO.title.light=${easyknack.node.GENERATOR.title.light}
+@COLOR easyknack.node.AUDIO.title.light=${easyknack.signal.AUDIO}
 @COLOR easyknack.node.AUDIO.title.dark=${easyknack.node.GENERATOR.title.dark}
-@COLOR easyknack.node.VALUE.title.light=${easyknack.node.MATH.title.light}
+@COLOR easyknack.node.VALUE.title.light=${easyknack.signal.VALUE}
 @COLOR easyknack.node.VALUE.title.dark=${easyknack.node.MATH.title.dark}
-@COLOR easyknack.node.WAVETABLE.title.light=#E5AF55
+@COLOR easyknack.node.WAVETABLE.title.light=${easyknack.signal.WAVETABLE}
 @COLOR easyknack.node.WAVETABLE.title.dark=#8C6332
 
 @COLOR easyknack.diagnostics.mean=#66C9A5
@@ -68,5 +68,12 @@ curve.hitRadius=7
 @COLOR easyknack.buffer.boundary=#50C3F0
 
 @COLOR easyknack.signal.VECTOR=#66B8DB
-@COLOR easyknack.node.VECTOR.title.light=#66B8DB
+@COLOR easyknack.node.VECTOR.title.light=${easyknack.signal.VECTOR}
 @COLOR easyknack.node.VECTOR.title.dark=#365A78
+
+@COLOR easyknack.node.TRIGGER.title.light=${easyknack.signal.TRIGGER}
+@COLOR easyknack.node.TRIGGER.title.dark=#8C6332
+@COLOR easyknack.node.HISTORY.title.light=${easyknack.signal.HISTORY}
+@COLOR easyknack.node.HISTORY.title.dark=#655078
+@COLOR easyknack.node.SPECTRUM.title.light=${easyknack.signal.SPECTRUM}
+@COLOR easyknack.node.SPECTRUM.title.dark=${easyknack.node.ANALYSIS.title.dark}

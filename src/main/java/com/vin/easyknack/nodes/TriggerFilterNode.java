@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.modulation.triggerfilter",title="Trigger Filter",category=NodeCategory.MODULATION,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.modulation.triggerfilter",title="Trigger Filter",category=NodeCategory.MODULATION,kind=NodeKind.TRIGGER)
 public final class TriggerFilterNode extends BasicNode {
     public boolean supportsSampleFeedback(){return true;}
     public boolean supportsTriggerFeedback(){return true;}

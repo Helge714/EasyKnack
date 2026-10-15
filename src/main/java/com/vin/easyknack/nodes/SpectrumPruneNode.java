@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.spectral.prune",title="Spectrum Prune",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.spectral.prune",title="Spectrum Prune",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class SpectrumPruneNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("spectrum"),OUT=new PropertyId("out"),KEEP=new PropertyId("keep");
     public void define(NodeBuilder n,NodeState s){

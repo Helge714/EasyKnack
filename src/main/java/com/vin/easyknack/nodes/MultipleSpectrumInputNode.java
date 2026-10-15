@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 /** Typed instance boundary, separate from existing numeric instance contracts. */
-@RegisterNode(id="easyknack.multiple.spectruminput",title="Instance Spectrum Input",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.multiple.spectruminput",title="Instance Spectrum Input",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class MultipleSpectrumInputNode extends BasicNode {
  public boolean isListedInCatalog(){return false;}
  public void define(NodeBuilder n,NodeState s){

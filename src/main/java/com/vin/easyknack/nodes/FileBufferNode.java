@@ -1,5 +1,5 @@
 package com.vin.easyknack.nodes;
-@RegisterNode(id="easyknack.resource.filebuffer",title="File Buffer",category=NodeCategory.BUFFER,kind=NodeKind.AUDIO)
+@RegisterNode(id="easyknack.resource.filebuffer",title="File Buffer",category=NodeCategory.BUFFER,kind=NodeKind.HISTORY)
 public final class FileBufferNode extends BasicNode {
  @Override public com.vin.easyknack.ui.BasicNodeView createView(com.vin.easyknack.ui.NodeViewContext context,com.vingame.glswing.node.model.GLGraphNode model){return new com.vin.easyknack.ui.FileBufferView(this,context,model);}
  public static final PropertyId FILE=new PropertyId("file"),START=new PropertyId("start"),END=new PropertyId("end");

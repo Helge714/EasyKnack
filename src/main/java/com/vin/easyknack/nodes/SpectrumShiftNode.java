@@ -1,5 +1,5 @@
 package com.vin.easyknack.nodes;
-@RegisterNode(id="easyknack.spectral.shift",title="Spectrum Shift",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.spectral.shift",title="Spectrum Shift",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class SpectrumShiftNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("spectrum"),OUT=new PropertyId("out"),SHIFT=new PropertyId("shift"),COMPENSATE=new PropertyId("compensate");
     public void define(NodeBuilder n,NodeState s){

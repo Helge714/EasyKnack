@@ -1,5 +1,5 @@
 package com.vin.easyknack.nodes;
-@RegisterNode(id="easyknack.spectral.compiled",title="Spectral Group",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.spectral.compiled",title="Spectral Group",category=NodeCategory.SPECTRAL,kind=NodeKind.SPECTRUM)
 public final class SpectralGraphNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("spectrum"),OUT=new PropertyId("out"),PROGRAM=new PropertyId("program");
     public static final int MAX_EXTERNAL=16, PROGRAM_TOKEN=MAX_EXTERNAL+1;
