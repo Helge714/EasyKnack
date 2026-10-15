@@ -135,6 +135,8 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         GLPopupMenu audio = new GLPopupMenu();
         var startAudio=audio.addItem(com.vin.easyknack.ui.AppText.literal("Start"), event -> controller.startAudio());
         var stopAudio=audio.addItem(com.vin.easyknack.ui.AppText.literal("Stop"), event -> controller.stopAudio());
+        startAudio.setAcceleratorText("Ctrl+Enter");
+        stopAudio.setAcceleratorText("Ctrl+Shift+Enter");
         stopAudio.setEnabled(false);
         controller.setAudioStateListener(state->{
             diagnostics.state(state);
@@ -151,13 +153,14 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         view.addItem(com.vin.easyknack.ui.AppText.literal("Vergrößern"), event -> editor.zoomBy(1.2f)).setAcceleratorText("Ctrl++");
         view.addItem(com.vin.easyknack.ui.AppText.literal("Verkleinern"), event -> editor.zoomBy(1 / 1.2f)).setAcceleratorText("Ctrl+-");
         view.addItem(com.vin.easyknack.ui.AppText.literal("Ansicht zurücksetzen"), event -> editor.resetView()).setAcceleratorText("Ctrl+0");
+        view.addItem(AppText.text("view.fitAll"), event -> editor.fitAllNodes()).setAcceleratorText("Ctrl+Shift+C");
         view.addItem(AppText.text("inspector"), event -> workspace.setInspectorVisible(!workspace.isInspectorVisible())).setAcceleratorText(shortcut("N"));
         view.addSeparator();
         view.addItem(com.vin.easyknack.ui.AppText.literal("Zurück"), event -> {if(analysisFocus.isVisible())closeAnalysis();else workspace.navigateBack();}).setAcceleratorText("Alt+Left");
         view.addItem(com.vin.easyknack.ui.AppText.literal("Vorwärts"), event -> workspace.navigateForward()).setAcceleratorText("Alt+Right");
         menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Ansicht"), view);
 
-        var settings=new GLPopupMenu();settings.addItem(AppText.text("settings.preferences"),e->SettingsDialog.show(this));menuBar.addMenu(AppText.text("settings"),settings);
+        var settings=new GLPopupMenu();settings.addItem(AppText.text("settings.preferences"),e->SettingsDialog.show(this));settings.addItem(AppText.text("document.settings"),e->DocumentSettings.show(this,controller));menuBar.addMenu(AppText.text("settings"),settings);
         menuBar.addMenu(AppText.text("help"), HelpMenu.create(this));
         addGL(workspace);
         addGL(analysisFocus);
@@ -211,6 +214,12 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
             int modifiers = event.getModifiersEx();
             int ctrl = java.awt.event.InputEvent.CTRL_DOWN_MASK, shift = java.awt.event.InputEvent.SHIFT_DOWN_MASK;
             int key=event.getKeyCode();
+            if(key==java.awt.event.KeyEvent.VK_C && modifiers==(ctrl|shift) && !analysisFocus.isVisible()) {
+                workspace.editor().fitAllNodes();event.consume();return;
+            }
+            if(key==java.awt.event.KeyEvent.VK_ENTER && (modifiers==ctrl || modifiers==(ctrl|shift))) {
+                if(modifiers==ctrl)controller.startAudio();else controller.stopAudio();event.consume();return;
+            }
             if(modifiers==java.awt.event.InputEvent.ALT_DOWN_MASK&&(key==java.awt.event.KeyEvent.VK_LEFT||key==java.awt.event.KeyEvent.VK_RIGHT)){
                 if(key==java.awt.event.KeyEvent.VK_LEFT){if(analysisFocus.isVisible())closeAnalysis();else workspace.navigateBack();}else workspace.navigateForward();event.consume();return;
             }

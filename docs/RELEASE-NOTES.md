@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add document-local unused-group retention (off by default when saving), fit-all view (Ctrl+Shift+C), and audio start/stop shortcuts (Ctrl+Enter / Ctrl+Shift+Enter). Missing mute bypass sources now mark connections as ignored and expose destination editors. Existing document metadata remains compatible.
+
 - Replaced Vector Mapping with Vector Scale and Vector Rotate, each with an
   Audio/Control Origin input. Existing documents/plugins using Vector Mapping
   must replace it with Scale followed by Rotate (both Origins zero) and rebuild.

@@ -310,6 +310,8 @@ final class WorkspaceController implements AutoCloseable {
         history.reset();
     }
 
+    boolean preserveUnusedGroups;
+
     com.vingame.glswing.node.document.GLNodeGraphDocument snapshotDocument() {
         var source = workspace.snapshotDocument();
         Map<String, GLNodeGraphAsset> assets = new java.util.LinkedHashMap<>();
@@ -344,13 +346,14 @@ final class WorkspaceController implements AutoCloseable {
         }
         assets.replaceAll((key,asset)->GroupInputs.migrate(asset,composites));
         var root = assets.remove(source.root().id());
-        var rootMetadata=new HashMap<>(root.metadata());if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
+        var rootMetadata=new HashMap<>(root.metadata());rootMetadata.put(DocumentSettings.PRESERVE,com.vingame.glswing.node.model.GLNodeValue.of(preserveUnusedGroups));if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
         root=new GLNodeGraphAsset(root.id(),root.version(),root.kind(),root.graph(),root.viewState(),rootMetadata,root.compositeDescriptor());
         return new com.vingame.glswing.node.document.GLNodeGraphDocument(root, assets, source.externalAssets());
     }
 
     void openDocument(String title, com.vingame.glswing.node.document.GLNodeGraphDocument input) {
         var document = NodeDocuments.prepare(input); // Validate with isolated registries before changing the editor.
+        preserveUnusedGroups=DocumentSettings.preserve(document);
         editorTemplates.load(document.root().metadata().get(EditorTemplates.KEY));
         for(var asset:NodeDocuments.assets(document))if(asset.compositeDescriptor()!=null)for(var port:asset.compositeDescriptor().portMappings()){var template=GroupInputs.template(port);if(template!=null&&port.presentation().inputEditorId().startsWith(EditorTemplates.PREFIX)&&editorTemplates.all().stream().noneMatch(t->t.id().equals(template.id())))editorTemplates.register(template);}
         stopAudio();

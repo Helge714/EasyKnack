@@ -27,8 +27,10 @@ final class WorkspaceGraphDiagnostics {
             var combined=new java.util.ArrayList<>(visibleDiagnostics);combined.addAll(SpectralGroups.diagnostics(snapshot));visibleDiagnostics=combined.stream().distinct().toList();
             var areas=SpectralGroups.executionAreas(snapshot);for(var view:workspace.editor().getNodes())if(view instanceof BasicNodeView basic)basic.executionArea(areas.getOrDefault(basic.nodeId(),""));
         }else for(var view:workspace.editor().getNodes())if(view instanceof BasicNodeView basic)basic.executionArea("");
-        var inactive=visibleDiagnostics.stream().filter(d->d.code().equals("feedback.ignored")).flatMap(d->d.connectionIds().stream()).collect(java.util.stream.Collectors.toSet());
-        workspace.setAdditionalGraphDiagnostics(visibleDiagnostics,inactive);
+        var combinedMute=new ArrayList<>(visibleDiagnostics);combinedMute.addAll(MutedConnections.diagnostics(snapshot,types));
+        var displayDiagnostics=combinedMute.stream().distinct().toList();
+        var inactive=displayDiagnostics.stream().filter(d->(d.code().equals("feedback.ignored")||d.code().equals("mute.ignored"))).flatMap(d->d.connectionIds().stream()).collect(java.util.stream.Collectors.toSet());
+        workspace.setAdditionalGraphDiagnostics(displayDiagnostics,inactive);
         for(var view:workspace.editor().getNodes())if(view instanceof BasicNodeView basic){var model=presented.get(basic);if(model!=null)basic.update(model);}
     }
 }

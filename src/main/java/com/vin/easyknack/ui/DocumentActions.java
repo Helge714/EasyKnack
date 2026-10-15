@@ -158,7 +158,7 @@ final class DocumentActions implements AutoCloseable {
         final GLNodeGraphDocument snapshot;
         try { snapshot = controller.snapshotDocument(); }
         catch (RuntimeException failure) { busy = false; error(GLDocumentOperation.SAVE, destination, failure); result.complete(false); return; }
-        onUi(files.write(destination, snapshot), (saved, failure) -> {
+        onUi(files.write(destination, DocumentSettings.forSave(snapshot)), (saved, failure) -> {
             busy = false;
             if (failure != null) { error(GLDocumentOperation.SAVE, destination, failure); result.complete(false); return; }
             path = saved; checkpoint = NodeDocuments.comparable(snapshot); updateTitle(); result.complete(true);
