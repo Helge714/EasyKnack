@@ -11,6 +11,12 @@ final class ConnectionAppearance {
             editor.setConnectionHandleFactor((float)(editor.getGLStyle().connectionHandleFactor()*curvature));
             editor.setMinimumConnectionHandleLength((float)(editor.getGLStyle().minimumConnectionHandleLength()*curvature));
         }
+        editor.invalidateRecording();
         editor.repaintAndRebuildPicking(editor);
+        // A preferences dialog renders on a different surface. Invalidate the owner
+        // scene as well, rather than relying on the dialog's interactive repaint.
+        com.vingame.glswing.component.GLParent root=editor;
+        while(root instanceof com.vingame.glswing.component.GLContainer c && c.getGLParent()!=null)root=c.getGLParent();
+        root.repaintGL();
     }
 }

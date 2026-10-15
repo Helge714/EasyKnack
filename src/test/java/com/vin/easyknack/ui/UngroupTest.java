@@ -46,11 +46,13 @@ class UngroupTest {
         var input=GLNodeId.random();var a=GLNodeId.random();var b=GLNodeId.random();var group=GLNodeId.random();var other=GLNodeId.random();
         var d=new GLCompositeNodeDescriptor("test.group","test.asset",1,List.of(
             new GLCompositePortMapping(GLNodePortDescriptor.input("in","number",false,1),new GLNodeEndpoint(a,"in")).withEndpoints(List.of(new GLNodeEndpoint(a,"in"),new GLNodeEndpoint(b,"in")))));
-        var asset=new GLNodeGraphAsset("test.asset",1,GLNodeGraphAssetKind.COMPOSITE,new GLNodeGraphSnapshot(GLNodeGraphId.random(),0,List.of(new GLGraphNode(a,"test.child"),new GLGraphNode(b,"test.child")),List.of()),new GLNodeEditorViewState(Map.of(a,new GLNodeViewState(20,30),b,new GLNodeViewState(220,130))),Map.of(),d);
+        var asset=new GLNodeGraphAsset("test.asset",1,GLNodeGraphAssetKind.COMPOSITE,new GLNodeGraphSnapshot(GLNodeGraphId.random(),0,List.of(new GLGraphNode(a,"test.child"),new GLGraphNode(b,"test.child")),List.of()),new GLNodeEditorViewState(Map.of(a,new GLNodeViewState(20,30,100,60),b,new GLNodeViewState(220,130,200,80)),Map.of("composite.boundary.input",new GLNodeViewState(-10000,-10000,100,100))),Map.of(),d);
         var instance=new GLGraphNode(group,"test.group");
         var parent=new GLNodeGraphSnapshot(GLNodeGraphId.random(),0,List.of(new GLGraphNode(input,"test.source"),instance,new GLGraphNode(other,"test.group")),List.of(new GLGraphConnection(GLNodeConnectionId.random(),new GLNodeEndpoint(input,"out"),new GLNodeEndpoint(group,"in"))));
-        var result=GLCompositeUngroup.expand(parent,new GLNodeEditorViewState(Map.of(group,new GLNodeViewState(400,300))),instance,asset);
+        var result=GLCompositeUngroup.expand(parent,new GLNodeEditorViewState(Map.of(group,new GLNodeViewState(400,300,200,100))),instance,asset);
         assertEquals(2,result.graph().connections().size());assertTrue(result.graph().findNode(other).isPresent());
-        assertEquals(400,result.viewState().nodes().get(result.nodeIds().get(a)).x());assertEquals(600,result.viewState().nodes().get(result.nodeIds().get(b)).x());
+        var left=result.viewState().nodes().get(result.nodeIds().get(a));var right=result.viewState().nodes().get(result.nodeIds().get(b));
+        assertEquals(300,left.x());assertEquals(500,right.x());assertEquals(200,right.x()-left.x());
+        assertEquals(500,(left.x()+right.x()+right.width())/2);assertEquals(350,(left.y()+right.y()+right.height())/2);
     }
 }

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Center unpacked groups on their combined node bounds. Curvature previews explicitly redraw the owner surface while Preferences remains open; verified with a modal-window rendering regression test.
+
 - Preview theme, language and connection curvature while Preferences is open; cancel restores the previous appearance. Add one-level Ungroup (Alt+G) with undo, preserved boundary values and connections, and retained group definitions. Special execution groups remain intact. No document or host-protocol migration required.
 
 - Make autosave interval and recovery retention configurable in Preferences. Prepare and compare detached document snapshots on a low-priority worker. Add a live connection-curvature slider from straight lines to the current theme geometry; cancelling restores the previous setting.
