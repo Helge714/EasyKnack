@@ -9,7 +9,7 @@ public final class SpectrumWaveformNode extends BasicNode {
         n.addInput(FREQUENCY,"Fundamental",Editor.Slider.button(440,1.0,20000.0).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         n.addInput(CAPTURE,"Capture",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT);
         n.addEditor(NORMALIZE,"Normalize",new Editor.CheckBox(true));
-        n.addEditor(COPY,"Copy captured curve",new CaptureReadout()).editorCopyable(false);
+        n.addEditor(COPY,"Copy captured resource",new CaptureReadout()).editorCopyable(false);
         n.addEditor(SAVED,"Captured samples",new Editor(){
             public GLNodeValue defaultValue(){return GLNodeValue.of("empty");}
             public Control create(String label,java.util.function.Consumer<GLNodeValue> changed){return new Control(new com.vingame.glswing.ui.GLLabel(""),v->{});}

@@ -42,7 +42,7 @@ struct SpectrumWaveformNode:NodeProcessor {
         for(std::size_t i=0;i<(c.blockFrames?c.blockFrames:c.bufferSize);i++)if(trigger.at(i))pending=true;
         auto* resource=c.resource(0);auto* input=resource&&(resource->kind()==ResourceKind::spectrum||resource->kind()==ResourceKind::analysis)?static_cast<const AnalysisResource*>(resource):nullptr;
         if(pending&&input){auto* result=input->analysisResult();if(result&&result->spectrum.valid())pending=!job->submit(result->spectrum,c.numericInput(1,float(frequency))[0],normalize);}
-        if(publish&&mailbox){AnalysisFrame frame;frame.span=1;frame.valueCount=WaveformResource::size;std::copy(wave->tables.back().begin(),wave->tables.back().end(),frame.values.begin());mailbox->publish(frame);publish=false;}
+        if(publish&&mailbox){AnalysisFrame frame;frame.span=1;frame.valueCount=WaveformResource::size;std::copy(wave->samples.begin(),wave->samples.end(),frame.values.begin());mailbox->publish(frame);publish=false;}
     }
 };
 EASYKNACK_NODE(SpectrumWaveformNode,"spectrumwaveform")

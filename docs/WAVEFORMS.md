@@ -32,10 +32,33 @@ oscillator shape choices remain available when their Waveform port is unconnecte
 A single periodic waveform describes a stable tonal sound. Noisy, polyphonic and
 changing sounds can only be approximated. Capturing again replaces the held cycle.
 
-**Copy captured curve** copies a 64-point approximation for editing. Add a
-Waveform node and choose **Paste captured curve (64 points)** in its curve menu.
-The captured resource itself retains its full table; the editable approximation
-can lose fine detail. Copy/paste is local to the current application session.
+**Copy captured resource** copies all 2,048 samples without curve fitting. Add a
+Waveform node and choose **Paste wavetable resource** in its graph context menu.
+Copy/paste is local to the current application session and creates an independent
+snapshot. Samples are stored losslessly in the document.
+
+## Draw or inspect samples
+
+The Waveform graph context menu switches between **Curve mode** and **Resource
+mode**. Resource mode draws straight segments through the actual table samples;
+drag the mouse to draw new sample values. One pen stroke is one document edit.
+Curve-to-resource conversion samples the curve at 2,048 positions. Switching back
+to curve mode approximates the table with 64 points and may lose detail and clip
+values outside −1 to +1. Undo restores the previous representation.
+
+Add **Analysis → Wavetable Viewer** and connect a Waveform resource to inspect its
+actual samples. Hover for sample index and value. Right-click to copy the complete
+resource, then paste into a Waveform node. The viewer has no audio output and does
+not fit a Bézier curve. Oscillator playback still uses band-limited derived tables.
+
+## Reduce background analysis work
+
+Disable **Synchronous** on FFT. In its inspector, set **Minimum frame interval**
+(e.g. 100 ms). Background requests are separated by at least this interval and by
+the overlap-derived hop, whichever is longer. Zero preserves the overlap-derived
+cadence. This does not change window length or frequency resolution. A busy worker
+can still deliver fewer frames; sparse asynchronous frames are intended for
+analysis and capture, not continuous IFFT resynthesis.
 
 Captured samples are stored with the node when its view receives the capture.
 Keep the capture node visible until the Copy button becomes available before

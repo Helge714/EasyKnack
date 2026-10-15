@@ -13,12 +13,14 @@ public final class SpectrumNode extends BasicNode {
     }
     @Override public String encode(NodeState state,java.util.function.ToIntFunction<PropertyId> input){return super.encode(normalizeState(state),input);}
     public static final PropertyId IN=new PropertyId("audio-in"),OUT=new PropertyId("analysis"),
-        SIZE=new PropertyId("size"),WINDOW=new PropertyId("window"),OVERLAP=new PropertyId("overlap"),CHANNEL=new PropertyId("channel"),PADDING=new PropertyId("padding"),REMOVE_DC=new PropertyId("remove-dc"),SYNC=new PropertyId("synchronous");
+        SIZE=new PropertyId("size"),WINDOW=new PropertyId("window"),OVERLAP=new PropertyId("overlap"),CHANNEL=new PropertyId("channel"),PADDING=new PropertyId("padding"),REMOVE_DC=new PropertyId("remove-dc"),SYNC=new PropertyId("synchronous"),INTERVAL=new PropertyId("interval-ms");
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL)
             .tooltip(com.vin.easyknack.ui.AppText.literal("Complex spectrum for analysis, bin processing and IFFT. Every frame retains its original sample position."));
         n.addInput(IN,"Audio In").rates(PortRates.AUDIO_CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("Audio is collected in an internal buffer. All preserves stereo channels and voices; Left, Right and Mix sum voices."));
         n.addEditor(SYNC,"Synchronous",Editor.checkBox(true)).tooltip(com.vin.easyknack.ui.AppText.literal("Enabled: compute every frame in the audio path. Disabled: background analysis may deliver late or missing frames; IFFT remains allowed but can produce gaps or artifacts."));
+        n.addEditor(INTERVAL,"Minimum frame interval",Editor.Slider.button(0,0.0,60000.0).unit(UnitFormat.MS)).inspectorOnly().visible(!s.flag(SYNC,true))
+            .tooltip(NodeText.text("fft.interval.help","Minimum time between background FFT requests. Zero uses the overlap setting. Synchronous FFT is unaffected."));
         n.addEditor(SIZE,"Window size",Editor.comboBox(java.util.List.of("256","512","1024","2048","4096","8192"),"2048",v->v))
             .tooltip(com.vin.easyknack.ui.AppText.literal("Samples per FFT window. A larger window improves frequency separation but covers a longer period of time. Changing this setting resets the analysis."));
         n.addEditor(WINDOW,"Window",Editor.comboBox(java.util.List.of("Hann","Hamming","Blackman","Rectangular"),"Hann",v->v.toLowerCase(java.util.Locale.ROOT)));
@@ -33,5 +35,5 @@ public final class SpectrumNode extends BasicNode {
             .tooltip(com.vin.easyknack.ui.AppText.literal("All preserves stereo and polyphony for IFFT. Mix analyzes (Left + Right) / 2. Mono keeps its level; opposite-phase channels cancel. Polyphonic voices are summed."));
     }
     public NativeProcessor processor(){return new NativeProcessor("spectrum","nodes/SpectrumNode.hpp",ParameterContract.builder()
-        .source(IN).value(SIZE).value(WINDOW).value(OVERLAP).value(CHANNEL).value(PADDING).value(REMOVE_DC).value(SYNC).build());}
+        .source(IN).value(SIZE).value(WINDOW).value(OVERLAP).value(CHANNEL).value(PADDING).value(REMOVE_DC).value(SYNC).value(INTERVAL).build());}
 }

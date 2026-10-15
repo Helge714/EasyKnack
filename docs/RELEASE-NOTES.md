@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add a sample-based Wavetable Viewer, lossless resource copy/paste and freehand sample editing alongside curves. Add an inspector-only minimum interval for asynchronous FFT requests. Existing curves remain readable; sample-mode documents require this version. Rebuild host and plugins together for the updated waveform and FFT parameter contracts. The current development version covers these additions.
+
+
 - Add dark-blue Waveform resources with a periodic curve editor and band-limited oscillator playback. Add background Spectrum-to-Waveform capture, document snapshots and an explicit 64-point editable-curve copy. Waveform ports now require resources rather than numeric blocks; rebuild custom waveform plugins. The current unreleased development version covers this addition.
 
 - Center unpacked groups on their combined node bounds. Fix live curvature preview with the event-driven application Canvas while Preferences remains open; verified using the actual application host. No document or host-protocol changes.

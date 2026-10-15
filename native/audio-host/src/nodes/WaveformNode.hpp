@@ -2,6 +2,7 @@
 #include "ParameterContracts.hpp"
 #include "../NodeProcessor.hpp"
 #include "../WaveformResource.hpp"
+#include <cstring>
 namespace easyknack {
 struct WaveformNode:NodeProcessor {
     std::shared_ptr<const WaveformResource> wave;
@@ -12,7 +13,12 @@ struct WaveformNode:NodeProcessor {
     void configure(std::istream& in)override{
         auto p=parameters::WaveformNodeParameters::read(in);sources.clear();auto next=std::make_shared<WaveformResource>();
         std::array<float,WaveformResource::size> samples{};
-        for(std::size_t i=0;i<samples.size();i++)samples[i]=float(2*p.curve_value.sample(double(i)/samples.size())-1);
+        if(p.curve_value.size()!=samples.size()*8)throw std::runtime_error("Invalid wavetable length");
+        for(std::size_t i=0;i<samples.size();i++){
+            auto token=p.curve_value.substr(i*8,8);std::size_t used=0;auto bits=static_cast<std::uint32_t>(std::stoul(token,&used,16));
+            if(used!=8)throw std::runtime_error("Invalid wavetable sample");std::memcpy(&samples[i],&bits,sizeof(float));
+            if(!std::isfinite(samples[i]))throw std::runtime_error("Non-finite wavetable sample");
+        }
         next->fromSamples(samples);wave=std::move(next);
     }
     bool supportsLiveParameters()const noexcept override{return true;}

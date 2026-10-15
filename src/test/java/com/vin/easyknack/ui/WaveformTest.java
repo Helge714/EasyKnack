@@ -7,6 +7,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import static org.junit.jupiter.api.Assertions.*;
 class WaveformTest {
+    @Test void resourceClipboardAndDocumentPreserveEverySample(){
+        float[] samples=new float[WaveformSamples.SIZE];
+        for(int i=0;i<samples.length;i++)samples[i]=(float)(Math.sin(i*.719)*2.3);
+        samples[13]=-0.0f;
+        WaveformSamples.copy(samples);var copied=WaveformSamples.copied();copied[0]=99;
+        assertArrayEquals(samples,WaveformSamples.copied());
+        String value=WaveformSamples.PREFIX+WaveformSamples.encode(samples);
+        assertArrayEquals(samples,WaveformSamples.fromValue(value));
+        var node=new WaveformNode();var values=new HashMap<>(node.defaults());values.put(WaveformNode.CURVE.value(),GLNodeValue.of(value));
+        var normalized=node.normalizeState(new NodeState(values));assertEquals(value,normalized.text(WaveformNode.CURVE,""));
+        assertEquals(WaveformSamples.encode(samples),node.encode(normalized,p->-1));
+        assertThrows(IllegalArgumentException.class,()->WaveformSamples.decode("00"));
+        samples[1]=Float.NaN;assertThrows(IllegalArgumentException.class,()->WaveformSamples.copy(samples));
+    }
+    @Test void resourceModeSwitchesExplicitlyAndViewerUsesResources()throws Exception{
+        javax.swing.SwingUtilities.invokeAndWait(()->{
+            var changes=new ArrayList<GLNodeValue>();var control=new WaveformEditor().create("",changes::add);
+            var canvas=(WavetableCanvas)control.component();canvas.resourceModeFromCurve();
+            assertTrue(canvas.resourceMode());assertTrue(((String)changes.get(changes.size()-1).toJavaValue()).startsWith(WaveformSamples.PREFIX));
+            String saved=(String)changes.get(changes.size()-1).toJavaValue();canvas.curveMode();assertFalse(canvas.resourceMode());
+            assertEquals(64,canvas.getCurve().points().size());control.update().accept(GLNodeValue.of(saved));assertTrue(canvas.resourceMode());
+        });
+        var viewer=new WavetableViewerNode();assertEquals(PortDataType.WAVEFORM,viewer.layout(new NodeState(viewer.defaults())).rows().get(0).dataType());
+        var fft=new SpectrumNode();var props=new HashMap<>(fft.defaults());
+        assertFalse(fft.layout(new NodeState(props)).rows().stream().filter(r->r.key().equals(SpectrumNode.INTERVAL)).findFirst().orElseThrow().isVisible());
+        props.put(SpectrumNode.SYNC.value(),GLNodeValue.of(false));props.put(SpectrumNode.INTERVAL.value(),GLNodeValue.of(100));
+        var row=fft.layout(new NodeState(props)).rows().stream().filter(r->r.key().equals(SpectrumNode.INTERVAL)).findFirst().orElseThrow();
+        assertTrue(row.isVisible());assertTrue(row.isInspectorOnly());assertTrue(fft.encode(new NodeState(props),p->-1).endsWith("100.0"));
+    }
     @Test void waveformsAreResourcesWithPersistentCurves(){
         var d=new WaveformNode();var state=new NodeState(d.defaults());var layout=d.layout(state);
         var port=layout.rows().get(0);assertEquals(PortDataType.WAVEFORM,port.dataType());assertEquals(ProcessingRate.CONTROL,port.rate());

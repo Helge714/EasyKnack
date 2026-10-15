@@ -11,7 +11,7 @@ import com.vingame.glswing.node.model.*;
 
 class SpectrumAnalysisTest {
     @Test void analysisTitlesHaveASeparateYellowThemePaletteAndFftCanMix(){
-        for(var node:NodeRegistry.builtinDefinitions())if(node.registration().category()==NodeCategory.ANALYSIS)assertEquals(NodeKind.ANALYSIS,node.registration().kind());
+        for(var node:NodeRegistry.builtinDefinitions())if(node.registration().category()==NodeCategory.ANALYSIS)assertEquals(node instanceof WavetableViewerNode?NodeKind.WAVETABLE:NodeKind.ANALYSIS,node.registration().kind());
         var colors=ApplicationTheme.current().title(NodeKind.ANALYSIS);
         assertEquals(ApplicationTheme.current().signal(SignalCategory.ANALYSIS),colors.light());assertNotEquals(colors.light(),colors.dark());
         var fft=new SpectrumNode();var values=new HashMap<>(fft.defaults());values.put("channel",GLNodeValue.of("mix"));

@@ -9,8 +9,8 @@ public final class WaveformNode extends BasicNode {
         n.addEditor(CURVE,"Waveform",new WaveformEditor()).keepVisibleOnHide().growVertically().editorCopyable(false);
     }
     @Override public NodeState normalizeState(NodeState state){
-        if(!state.values().containsKey(CURVE.value()))return state;
+        if(!state.values().containsKey(CURVE.value())||state.text(CURVE,"").startsWith(WaveformSamples.PREFIX))return state;
         var values=new java.util.HashMap<>(state.values());values.put(CURVE.value(),com.vingame.glswing.node.model.GLNodeValue.of(CurveData.encode(WaveformEditor.periodic(CurveData.decode(state.text(CURVE,""))))));return new NodeState(values,state.connectedInputs());
     }
-    public NativeProcessor processor(){return new NativeProcessor("waveform","nodes/WaveformNode.hpp",ParameterContract.builder().curve(CURVE).build());}
+    public NativeProcessor processor(){return new NativeProcessor("waveform","nodes/WaveformNode.hpp",ParameterContract.builder().mapped(CURVE,s->WaveformSamples.encode(WaveformSamples.fromValue(s.text(CURVE,"")))).build());}
 }

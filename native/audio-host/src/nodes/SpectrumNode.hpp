@@ -12,7 +12,9 @@ struct SpectrumNode : NodeProcessor {
     std::size_t size=2048,hop=512,cursor=0;
     SpectrumWindow window=SpectrumWindow::hann;
     bool mix=false,right=false,all=true,removeDc=false,padded=false,synchronous=true;
-    double rate=0;
+    double rate=0,intervalMs=0;
+    std::uint64_t lastSubmission=0;
+    std::size_t effectiveHop()const noexcept{return synchronous?hop:std::max(hop,static_cast<std::size_t>(std::ceil(rate*intervalMs/1000.)));}
     std::uint64_t end=0,received=0,identity=HistoryResource::nextIdentity.fetch_add(1);
     bool canShareChannels()const noexcept override{return true;}
     bool separatesChannels()const noexcept override{return !all;}
@@ -38,8 +40,9 @@ struct SpectrumNode : NodeProcessor {
         }else{
             in.seekg(position);auto p=parameters::SpectrumNodeParameters::read(in);sources=p.sources();size=std::stoul(p.size_value);
             window=spectrumWindow(p.window_value);hop=hopFor(size,p.overlap_value);right=p.channel_value=="right";mix=p.channel_value=="mix";all=p.channel_value=="all";
-            padded=p.padding_value=="double";removeDc=p.remove_dc_value;synchronous=p.synchronous_value;
+            padded=p.padding_value=="double";removeDc=p.remove_dc_value;synchronous=p.synchronous_value;intervalMs=p.interval_ms_value;
         }
+        if(!std::isfinite(intervalMs)||intervalMs<0||intervalMs>60000)throw std::runtime_error("Invalid FFT frame interval");
         if(size<256||size>8192||(size&(size-1)))throw std::runtime_error("Invalid FFT size");
         if(synchronous)hop=std::max(hop,SpectrumStream::minHop);
     }
@@ -47,23 +50,23 @@ struct SpectrumNode : NodeProcessor {
         rate=sampleRate;resource.prepare(block);ring.assign(8192,0);weights.resize(8192);
         for(std::size_t i=0;i<size;i++)weights[i]=spectrumWindowValue(window,i,size);
         job=AnalysisWorker::instance().create();
-        resource.size=size*(padded?2:1);resource.windowSize=size;resource.hop=hop;resource.window=window;resource.dcRemoved=removeDc;resource.sampleRate=rate;
-        resource.identity=identity;cursor=0;end=received=0;
+        resource.size=size*(padded?2:1);resource.windowSize=size;resource.hop=effectiveHop();resource.window=window;resource.dcRemoved=removeDc;resource.sampleRate=rate;
+        resource.identity=identity;cursor=0;end=received=lastSubmission=0;
     }
     bool supportsLiveParameters()const noexcept override{return true;}
     void applyParameters(const NodeProcessor& configuration)noexcept override{
         const auto& p=static_cast<const SpectrumNode&>(configuration);
-        if(size==p.size&&hop==p.hop&&window==p.window&&all==p.all&&right==p.right&&mix==p.mix&&padded==p.padded&&removeDc==p.removeDc&&synchronous==p.synchronous)return;
+        if(size==p.size&&hop==p.hop&&window==p.window&&all==p.all&&right==p.right&&mix==p.mix&&padded==p.padded&&removeDc==p.removeDc&&synchronous==p.synchronous&&intervalMs==p.intervalMs)return;
         if(size!=p.size||window!=p.window||all!=p.all||right!=p.right||mix!=p.mix||synchronous!=p.synchronous){cursor=0;end=0;std::fill(ring.begin(),ring.end(),0);}
-        size=p.size;hop=p.hop;window=p.window;all=p.all;right=p.right;mix=p.mix;padded=p.padded;removeDc=p.removeDc;synchronous=p.synchronous;
+        size=p.size;hop=p.hop;window=p.window;all=p.all;right=p.right;mix=p.mix;padded=p.padded;removeDc=p.removeDc;synchronous=p.synchronous;intervalMs=p.intervalMs;lastSubmission=0;
         for(std::size_t i=0;i<size;i++)weights[i]=spectrumWindowValue(window,i,size);
         identity=HistoryResource::nextIdentity.fetch_add(1);received=0;resource.result=nullptr;resource.count=0;
-        resource.identity=identity;resource.size=size*(padded?2:1);resource.windowSize=size;resource.hop=hop;resource.window=window;resource.dcRemoved=removeDc;
+        resource.identity=identity;resource.size=size*(padded?2:1);resource.windowSize=size;resource.hop=effectiveHop();resource.window=window;resource.dcRemoved=removeDc;
     }
     void adoptState(NodeProcessor& previous)noexcept override{
         auto& p=static_cast<SpectrumNode&>(previous);
-        if(size==p.size&&hop==p.hop&&window==p.window&&all==p.all&&right==p.right&&mix==p.mix&&padded==p.padded&&removeDc==p.removeDc&&synchronous==p.synchronous&&rate==p.rate){
-            ring.swap(p.ring);job.swap(p.job);cursor=p.cursor;end=p.end;received=p.received;identity=p.identity;resource.identity=identity;
+        if(size==p.size&&hop==p.hop&&window==p.window&&all==p.all&&right==p.right&&mix==p.mix&&padded==p.padded&&removeDc==p.removeDc&&synchronous==p.synchronous&&intervalMs==p.intervalMs&&rate==p.rate){
+            ring.swap(p.ring);job.swap(p.job);cursor=p.cursor;end=p.end;received=p.received;lastSubmission=p.lastSubmission;identity=p.identity;resource.identity=identity;
             resource.analysisCache.swap(p.resource.analysisCache);std::swap(resource.result,p.resource.result);
         }
     }
@@ -88,7 +91,10 @@ struct SpectrumNode : NodeProcessor {
                 for(std::size_t j=0;j<size;j++)frame.bins[j]={(ring[(cursor+j)%size]-mean)*weights[j],0};
                 std::fill(frame.bins.begin()+size,frame.bins.begin()+resource.size,std::complex<double>{});
                 spectrumTransform(frame.bins.data(),resource.size);
-            }else if(job&&end>=size&&(end-size)%hop==0)job->submitSpectrum(ring.data(),cursor,size,hop,window,rate,end,identity,padded,removeDc);
+            }else if(job&&end>=size&&(!lastSubmission||end-lastSubmission>=effectiveHop())){
+                job->submitSpectrum(ring.data(),cursor,size,effectiveHop(),window,rate,end,identity,padded,removeDc);
+                lastSubmission=end; // A busy worker skips this frame; never retry at every sample.
+            }
         }
         if(!synchronous&&job){
             auto* ready=job->acquire();

@@ -22,6 +22,7 @@ public final class InspectorEditor extends GLContainer {
         label=editor.component() instanceof GLComboBox<?>?new GLLabel(row.label()):null;
         if(label!=null)addGL(label);addGL(editor.component());setName(row.id());
         if(editor.component() instanceof GLControl control && row.tooltip()!=null && !row.tooltip().isBlank())control.setToolTipText(row.tooltip());
+        if(editor.component() instanceof WavetableViewerEditor.Plot plot)plot.bind(model.id().toString());
         if(editor.component() instanceof AnalysisEditor.Plot plot)plot.bind(model.id().toString());
         if(editor.component() instanceof PitchReadoutEditor.Readout readout)readout.bind(model.id().toString());
         if(editor.component() instanceof Editor.TriggerButton button)button.bind(model.id().toString(),row.id());

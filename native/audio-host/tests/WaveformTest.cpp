@@ -32,6 +32,20 @@ int main(){
     for(int n=0;n<500&&capture.job->state.load()!=2;n++)std::this_thread::sleep_for(std::chrono::milliseconds(2));assert(capture.job->state.load()==2);
     triggers.clear(256);capture.process(c);assert(std::abs(capture.wave->sample(.25,.01)-1)<1e-5);
     c.valueEventInputs=nullptr;c.bufferSize=256;
+    // Full resource samples retain details that the playback mip levels intentionally omit.
+    std::array<float,WaveformResource::size> raw{};raw[7]=.75f;raw[513]=-.42f;
+    wave->fromSamples(raw);assert(wave->samples==raw);
+    auto viewer=std::make_unique<WavetableViewerNode>();viewer->bindIdentity("waveform-viewer-test");resources[0]=wave.get();viewer->process(c);
+    AnalysisFrame viewed;assert(viewer->mailbox->latest(viewed));assert(viewed.valueCount==raw.size());
+    for(std::size_t i=0;i<raw.size();i++)assert(viewed.values[i]==raw[i]);
+    viewer->process(c);assert(!viewer->mailbox->latest(viewed));
+    // Background request cadence is independent of window duration, and synchronous cadence stays unchanged.
+    auto fft=std::make_unique<SpectrumNode>();fft->size=256;fft->hop=128;fft->synchronous=false;fft->intervalMs=100;fft->prepare(48000,256);
+    assert(fft->effectiveHop()==4800);c.resourceInputs=nullptr;
+    for(int block=0;block<20;block++)fft->process(c);
+    assert(fft->job->submitted==2);assert(fft->lastSubmission==5056);
+    auto same=std::make_unique<SpectrumNode>();same->size=256;same->hop=128;same->synchronous=false;same->intervalMs=100;same->prepare(48000,256);same->adoptState(*fft);
+    assert(same->lastSubmission==5056);same->synchronous=true;assert(same->effectiveHop()==128);
     // GRAPH_TEST
     BakedInput boundary;std::istringstream bc("0 7 0");boundary.configure(bc);assert(boundary.outputResourceKind(0)==ResourceKind::waveform);
 }
