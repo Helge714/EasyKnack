@@ -36,7 +36,9 @@ final class RecoveryStore implements AutoCloseable {
     }
     void touch()throws IOException{if(Files.exists(file))Files.setLastModifiedTime(file,java.nio.file.attribute.FileTime.from(Instant.now()));}
     void clear()throws IOException{Files.deleteIfExists(file);}
-    List<Entry> scan(Instant now)throws IOException{
+    List<Entry> scan(Instant now)throws IOException{return scan(now,RETENTION);}
+    List<Entry> scan(Instant now,Duration retention)throws IOException{
+        if(retention.isZero()||retention.isNegative())throw new IllegalArgumentException("Retention must be positive");
         var result=new ArrayList<Entry>();
         try(var entries=Files.list(directory)){
             for(var candidate:entries.filter(p->p.toString().endsWith(".recovery")).toList()){
@@ -47,7 +49,7 @@ final class RecoveryStore implements AutoCloseable {
                     if(claimed==null)continue;
                     try(claimed){
                         Instant saved=Files.getLastModifiedTime(candidate).toInstant();
-                        if(saved.isBefore(now.minus(RETENTION))){Files.deleteIfExists(candidate);continue;}
+                        if(saved.isBefore(now.minus(retention))){Files.deleteIfExists(candidate);continue;}
                         try(var zip=new ZipFile(candidate.toFile())){
                             var metadata=new Properties();try(var in=zip.getInputStream(zip.getEntry("metadata.properties"))){metadata.load(in);}
                             String original=metadata.getProperty("original");

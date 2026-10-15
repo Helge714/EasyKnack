@@ -313,6 +313,10 @@ final class WorkspaceController implements AutoCloseable {
     boolean preserveUnusedGroups;
 
     com.vingame.glswing.node.document.GLNodeGraphDocument snapshotDocument() {
+        return prepareDocumentSnapshot(captureDocument());
+    }
+    /** Captures immutable model values and UI positions on the EDT; no document migration. */
+    com.vingame.glswing.node.document.GLNodeGraphDocument captureDocument() {
         var source = workspace.snapshotDocument();
         Map<String, GLNodeGraphAsset> assets = new java.util.LinkedHashMap<>();
         for (var asset : NodeDocuments.assets(source)) {
@@ -344,11 +348,19 @@ final class WorkspaceController implements AutoCloseable {
             assets.put(asset.id(), new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(), contents,
                     state, metadata, asset.compositeDescriptor()));
         }
-        assets.replaceAll((key,asset)->GroupInputs.migrate(asset,composites));
+
         var root = assets.remove(source.root().id());
         var rootMetadata=new HashMap<>(root.metadata());rootMetadata.put(DocumentSettings.PRESERVE,com.vingame.glswing.node.model.GLNodeValue.of(preserveUnusedGroups));if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
         root=new GLNodeGraphAsset(root.id(),root.version(),root.kind(),root.graph(),root.viewState(),rootMetadata,root.compositeDescriptor());
         return new com.vingame.glswing.node.document.GLNodeGraphDocument(root, assets, source.externalAssets());
+    }
+
+    /** Uses an isolated registry so background persistence never reads the live graph. */
+    static com.vingame.glswing.node.document.GLNodeGraphDocument prepareDocumentSnapshot(com.vingame.glswing.node.document.GLNodeGraphDocument source){
+        var registry=new com.vingame.glswing.node.composite.GLCompositeGraphRegistry();registry.registerDocument(source);
+        var assets=new java.util.LinkedHashMap<String,GLNodeGraphAsset>();
+        for(var asset:NodeDocuments.assets(source))assets.put(asset.id(),GroupInputs.migrate(asset,registry));
+        return new com.vingame.glswing.node.document.GLNodeGraphDocument(assets.remove(source.root().id()),assets,source.externalAssets());
     }
 
     void openDocument(String title, com.vingame.glswing.node.document.GLNodeGraphDocument input) {

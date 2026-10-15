@@ -43,10 +43,13 @@ inside a Spectral Group.
 
 ## Recover after a crash
 
-EasyKnack saves a separate recovery snapshot every 30 seconds while your document
+EasyKnack saves a separate recovery snapshot every 30 seconds by default while your document
 has unsaved changes. Your original file is not modified. After a crash, the next
 startup offers **Recover**, **Discard snapshot**, or **Later** for available copies.
-Recovery snapshots are kept for seven days after their last update.
+Recovery snapshots are kept for seven days after their last update by default.
+Change the interval (5–3600 seconds) and retention (1–365 days) in
+**Settings → Preferences**; changes apply without restarting. Shorter retention
+is used at the next startup recovery scan.
 
 A recovered document is marked unsaved. **Save** writes to its original path;
 if the document had never been saved, it opens **Save As**. Successful saving or
@@ -58,6 +61,12 @@ not copied into recovery snapshots.
 Ignored connections retain their signal colour but appear translucent. Hover one
 for the reason it is ignored. Groups have an overlapping-frames symbol before
 their title.
+
+## Connection appearance
+
+In **Settings → Preferences**, adjust **Connection curvature** from 0 (straight
+lines) to 1 (the current theme's curves). The graph updates while you drag.
+Save to keep the setting; Cancel restores the previous value.
 
 ## Navigate
 

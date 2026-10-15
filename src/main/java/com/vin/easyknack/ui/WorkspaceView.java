@@ -12,6 +12,7 @@ import com.vingame.glswing.ui.GLPopupMenu;
 /** All workspace widgets, including the menus, are rendered on the GLCanvas. */
 public final class WorkspaceView extends GLContainer implements AutoCloseable, com.vingame.glswing.input.GLKeyTarget, com.vin.easyknack.nodes.AnalysisEditor.Host {
     private javax.swing.Timer launchTimer;
+    private double displayedCurvature=ApplicationSettings.connectionCurvature();
     private boolean openingExternal;
     public void acceptLaunches(com.vin.easyknack.DocumentLaunch launches, JFrame window) {
         var pending = new java.util.ArrayDeque<java.nio.file.Path>();
@@ -78,6 +79,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         var editor = workspace.editor();
         editor.setName("Audio Nodeeditor");
         editor.setZoomRange(0.25f, 2.5f);
+        previewCurvature(ApplicationSettings.connectionCurvature());
         GLPopupMenu file = new GLPopupMenu();
         file.addItem(AppText.text("new"),event->{closeAnalysis();documents.newDocument();}).setAcceleratorText("Ctrl+N");
         file.addItem(AppText.text("open"), event -> {closeAnalysis();documents.open();}).setAcceleratorText(shortcut("Ctrl+O"));
@@ -174,6 +176,8 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         addGL(menuBar);
     }
 
+    void previewCurvature(double value){displayedCurvature=value;ConnectionAppearance.apply(workspace.editor(),value);}
+    @Override protected void themeChanged(){super.themeChanged();if(workspace!=null)ConnectionAppearance.apply(workspace.editor(),displayedCurvature);}
     void applySettings(){
         AppText.reload();com.vin.easyknack.nodes.NodeText.reload();
         com.vingame.glswing.component.GLParent root=this;
@@ -181,6 +185,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         root.setGLTheme(ApplicationTheme.current().theme());
         root.setGLLocalizer(com.vingame.glswing.ui.GLLocalizer.forLocale(ApplicationSettings.locale()));
         controller.refreshAppearance();
+        previewCurvature(ApplicationSettings.connectionCurvature());documents.applyRecoverySettings();
         LiveLanguage.refresh(this);
         audioLoad.setGLStyle(audioLoad.getGLStyle().withBackground(ApplicationTheme.current().theme().menuBarStyle().background()).withBorder(0,new java.awt.Color(0,0,0,0)));
         resized(getWidth(),getHeight());

@@ -22,12 +22,12 @@ final class DocumentActions implements AutoCloseable {
     private final RememberingFileDialogs dialogs = new RememberingFileDialogs();
     private final Timer titleTimer;
     private final Timer recoveryTimer;
-    private final ExecutorService recoveryWorker=Executors.newSingleThreadExecutor(r->new Thread(r,"EasyKnack autosave"));
+    private final ExecutorService recoveryWorker=Executors.newSingleThreadExecutor(r->{var thread=new Thread(r,"EasyKnack autosave");thread.setPriority(Thread.MIN_PRIORITY);return thread;});
     private final CompletableFuture<RecoveryStore> recoveryStore;
     private GLNodeGraphDocument lastRecovery;
     private long recoveryGeneration;
     private RecoveryStore.Entry recoveredEntry;
-    private boolean recoveryStarted,recoveryWriting,recoveryFailed;
+    private boolean recoveryStarted,recoveryWriting,recoveryFailed,titleChecking;
 
     private GLNodeGraphDocument checkpoint;
     private Path path;
@@ -43,9 +43,9 @@ final class DocumentActions implements AutoCloseable {
         this.controller = controller; this.owner = owner; this.window = window;
         this.pluginActivity=pluginActivity;
         recoveryStore=CompletableFuture.supplyAsync(()->{try{return new RecoveryStore(recoveryDirectory);}catch(Exception e){throw new CompletionException(e);}},recoveryWorker);
-        recoveryTimer=new Timer(30_000,event->autosave());recoveryTimer.start();
+        recoveryTimer=new Timer(ApplicationSettings.autosaveSeconds()*1000,event->autosave());recoveryTimer.start();
         checkpoint = NodeDocuments.comparable(controller.snapshotDocument());
-        titleTimer = new Timer(700, event -> updateTitle()); titleTimer.start();
+        titleTimer = new Timer(700, event -> refreshTitleInBackground()); titleTimer.start();
     }
     private boolean modified() { return checkpoint==null || !checkpoint.equals(NodeDocuments.comparable(controller.snapshotDocument())); }
     boolean canOpenExternal() { return !busy && !closed && closeDecision == null; }
@@ -78,7 +78,7 @@ final class DocumentActions implements AutoCloseable {
     }
     void checkRecoveryOnStartup(){
         if(recoveryStarted||closed)return;recoveryStarted=true;busy=true;
-        onUi(recoveryStore.thenApplyAsync(store->{try{return store.scan(java.time.Instant.now());}catch(Exception e){throw new CompletionException(e);}},recoveryWorker),(entries,failure)->{
+        onUi(recoveryStore.thenApplyAsync(store->{try{return store.scan(java.time.Instant.now(),java.time.Duration.ofDays(ApplicationSettings.recoveryDays()));}catch(Exception e){throw new CompletionException(e);}},recoveryWorker),(entries,failure)->{
             if(failure!=null){busy=false;recoveryError(failure);return;}
             if(entries.isEmpty()){busy=false;return;}
             showRecovery(entries);
@@ -120,20 +120,34 @@ final class DocumentActions implements AutoCloseable {
         path=entry.original();checkpoint=null;recoveredEntry=entry;lastRecovery=null;recoveryGeneration++;updateTitle();
     }
     Path currentPath(){return path;}
+    void applyRecoverySettings(){
+        int interval=ApplicationSettings.autosaveSeconds()*1000;
+        recoveryTimer.setDelay(interval);recoveryTimer.setInitialDelay(interval);recoveryTimer.restart();
+    }
     private void autosave(){
         if(closed||busy||recoveryWriting||!window.isShowing())return;
         try{
-            var snapshot=controller.snapshotDocument();var comparable=NodeDocuments.comparable(snapshot);
-            if(checkpoint!=null&&checkpoint.equals(comparable)){if(lastRecovery!=null)clearRecovery();return;}
-            if(comparable.equals(lastRecovery)){
-                recoveryStore.thenAcceptAsync(store->{try{store.touch();}catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker)
-                    .exceptionally(failure->{EventQueue.invokeLater(()->recoveryError(failure));return null;});return;
-            }
+            var captured=controller.captureDocument();var saved=checkpoint;var previous=lastRecovery;
             recoveryWriting=true;var generation=recoveryGeneration;var original=path;var inherited=recoveredEntry;
-            onUi(recoveryStore.thenAcceptAsync(store->{try{store.write(snapshot,original);if(inherited!=null)store.delete(inherited);}catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker),(v,f)->{
-                recoveryWriting=false;if(f!=null){recoveryError(f);return;}if(generation==recoveryGeneration)lastRecovery=comparable;if(recoveredEntry==inherited)recoveredEntry=null;
+            onUi(recoveryStore.thenApplyAsync(store->{try{
+                var snapshot=WorkspaceController.prepareDocumentSnapshot(captured);var comparable=NodeDocuments.comparable(snapshot);
+                if(comparable.equals(saved)){store.clear();return (GLNodeGraphDocument)null;}
+                if(comparable.equals(previous)){store.touch();return comparable;}
+                store.write(snapshot,original);if(inherited!=null)store.delete(inherited);return comparable;
+            }catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker),(comparable,f)->{
+                recoveryWriting=false;if(f!=null){recoveryError(f);return;}
+                if(generation==recoveryGeneration){lastRecovery=comparable;if(recoveredEntry==inherited)recoveredEntry=null;}
             });
-        }catch(Exception failure){recoveryError(failure);}
+        }catch(Exception failure){recoveryWriting=false;recoveryError(failure);}
+    }
+    private void refreshTitleInBackground(){
+        if(closed||busy||titleChecking)return;
+        var captured=controller.captureDocument();var saved=checkpoint;long generation=recoveryGeneration;
+        titleChecking=true;
+        onUi(CompletableFuture.supplyAsync(()->saved==null||!saved.equals(NodeDocuments.comparable(WorkspaceController.prepareDocumentSnapshot(captured))),recoveryWorker),(dirty,failure)->{
+            titleChecking=false;if(failure!=null){failure.printStackTrace();return;}
+            if(generation==recoveryGeneration&&checkpoint==saved)renderTitle(dirty);
+        });
     }
     private void clearRecovery(){
         recoveryGeneration++;var inherited=recoveredEntry;recoveredEntry=null;lastRecovery=null;
@@ -144,7 +158,10 @@ final class DocumentActions implements AutoCloseable {
         failure.printStackTrace();if(!closed&&!recoveryFailed){recoveryFailed=true;error(GLDocumentOperation.SAVE,Path.of(System.getProperty("user.home"),".easyknack","recovery"),failure);}
     }
     private void updateTitle() {
-        if (!closed) window.setTitle((modified() ? "* " : "") + (path == null ? AppText.text("untitled") : path.getFileName()) + " — EasyKnack"+(activity.isEmpty()?"":" — "+activity));
+        renderTitle(modified());
+    }
+    private void renderTitle(boolean dirty){
+        if (!closed) window.setTitle((dirty ? "* " : "") + (path == null ? AppText.text("untitled") : path.getFileName()) + " — EasyKnack"+(activity.isEmpty()?"":" — "+activity));
     }
     void openHarmonizerExample() {
         openExample("Harmonizer",HarmonizerExample::create);
