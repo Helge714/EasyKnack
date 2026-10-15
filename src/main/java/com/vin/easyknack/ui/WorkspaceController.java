@@ -158,6 +158,26 @@ final class WorkspaceController implements AutoCloseable {
     }
     GLNodeEditingActions actions() { guardActions(); return workspace.editor().getEditingActions(); }
     GLHistoryManager history() { return history; }
+    void ungroupSelection() {
+        var ids=selectedNodeIds();if(ids.size()!=1)return;
+        var instance=workspace.currentGraph().snapshot().findNode(ids.iterator().next()).orElseThrow();
+        var descriptor=composites.findComposite(instance.typeId()).orElse(null);if(descriptor==null)return;
+        var asset=composites.findAsset(descriptor.assetId()).orElseThrow();
+        if(MultipleGroups.multiple(asset)||SpectralGroups.spectral(asset)||FormulaGroups.isFormula(asset))
+            throw new IllegalArgumentException(AppText.text("ungroup.special"));
+        if(GLNodeState.isMuted(instance))throw new IllegalArgumentException(AppText.text("ungroup.muted"));
+        var root=new GLNodeGraphAsset("ungroup.root",1,GLNodeGraphAssetKind.PROJECT,
+            workspace.currentGraph().snapshot(),com.vingame.glswing.node.binding.GLNodeEditorViewState.empty());
+        var prepared=GroupCompiler.prepareUngroup(root,composites);
+        var configured=prepared.registry().findAsset(asset.id()).orElseThrow();
+        var normalized=nodes.normalize(configured.graph());
+        configured=new GLNodeGraphAsset(configured.id(),configured.version(),configured.kind(),normalized,configured.viewState(),configured.metadata(),configured.compositeDescriptor());
+        var ungroupDescriptor=configured.compositeDescriptor();
+        workspace.ungroup(prepared.root().graph().findNode(instance.id()).orElseThrow(),configured,
+            (parent,result)->UngroupEditors.remap(parent,result,instance.id(),ungroupDescriptor));
+        syncAudio();
+    }
+
 
     void setNodeProperty(GLNodeId id, com.vin.easyknack.nodes.PropertyId property, com.vingame.glswing.node.model.GLNodeValue value) {
         String key = property.value();

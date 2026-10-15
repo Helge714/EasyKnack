@@ -82,6 +82,14 @@ Save to keep the setting; Cancel restores the previous value.
 | Center and fit all nodes | Ctrl+Shift+C |
 | Start / Stop audio | Ctrl+Enter / Ctrl+Shift+Enter |
 | Remove node and reconnect | Ctrl+Delete |
+| Ungroup selected instance | Alt+G |
+
+Select a group and choose **Nodes → Ungroup** (`Alt+G`) to unpack that instance.
+Its nodes, values and connections move into the current graph; nested groups stay
+as groups. Undo restores the instance. The definition remains available in the
+Add menu. Saving still follows the document setting for unused group definitions.
+Unmute a group before unpacking it. Formula, Instance and Spectral groups retain
+their execution context and cannot be unpacked this way.
 
 Group navigation appears while a group is open. Use Back to return to its parent.
 Double-click an analysis plot to enlarge it; Escape returns to the graph.
@@ -102,6 +110,8 @@ For measured data rather than a graph diagram, use [analysis export](analysis.md
 
 ## Appearance
 
-**Settings → Preferences** applies language and theme changes immediately. Your own
+**Settings → Preferences** previews language, theme and connection curvature
+while the dialog is open. Save keeps the changes; Cancel restores the previous
+appearance. Your own
 node names, file names and plugin names are not translated. File dialogs remember
 the last folder used for each purpose across application restarts.

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preview theme, language and connection curvature while Preferences is open; cancel restores the previous appearance. Add one-level Ungroup (Alt+G) with undo, preserved boundary values and connections, and retained group definitions. Special execution groups remain intact. No document or host-protocol migration required.
+
 - Make autosave interval and recovery retention configurable in Preferences. Prepare and compare detached document snapshots on a low-priority worker. Add a live connection-curvature slider from straight lines to the current theme geometry; cancelling restores the previous setting.
 
 - Add atomic crash-recovery snapshots every 30 seconds with a startup recovery dialog, original save targets, and seven-day retention. Ignored connections use muted opacity; unused muted-node inputs are included. Group titles show a geometric group marker.

@@ -10,6 +10,10 @@ final class GroupCompiler {
     record Prepared(GLNodeGraphAsset root,GLCompositeGraphRegistry registry){}
     private record Adapter(GLCompositePortMapping port,UnitFormat base,String valueKey,String unitKey){}
     static Prepared prepare(GLNodeGraphAsset root,GLCompositeGraphRegistry original){
+        return prepare(root,original,true);
+    }
+    static Prepared prepareUngroup(GLNodeGraphAsset root,GLCompositeGraphRegistry original){return prepare(root,original,false);}
+    private static Prepared prepare(GLNodeGraphAsset root,GLCompositeGraphRegistry original,boolean rewriteNested){
         Map<String,List<Adapter>> adapters=new HashMap<>();
         Map<String,GLNodeGraphAsset> expanded=new LinkedHashMap<>();
         for(var asset:original.assets()){
@@ -86,7 +90,7 @@ final class GroupCompiler {
             declared.put(d.nodeTypeId(),d.properties().stream().map(GLCompositePropertyDescriptor::id).collect(java.util.stream.Collectors.toSet()));
         }
         var registry=new GLCompositeGraphRegistry();
-        for(var asset:expanded.values())registry.registerAsset(rewrite(asset,adapters,declared));
+        for(var asset:expanded.values())registry.registerAsset(rewriteNested?rewrite(asset,adapters,declared):asset);
         return new Prepared(rewrite(GroupChoices.normalizeSelections(root,original),adapters,declared),registry);
     }
     private static GLNodeGraphAsset rewrite(GLNodeGraphAsset asset,Map<String,List<Adapter>> adapters,Map<String,Set<String>> declared){

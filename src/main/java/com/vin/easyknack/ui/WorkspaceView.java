@@ -118,6 +118,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         nodes.addItem(AppText.text("move"),event->{if(!editor.getSelectedNodes().isEmpty()){var point=editor.pointerGraphPosition();editor.beginPlacement(controller.actions().beginMoveSelection(point[0],point[1]));}}).setAcceleratorText(shortcut("node.move-selection"));
         nodes.addItem(AppText.text("arrange"), event -> workspace.arrangeAll()).setAcceleratorText(shortcut("node.arrange-all"));
         nodes.addSeparator();
+        nodes.addItem(AppText.text("ungroup"),event->ungroup()).setAcceleratorText("Alt+G");
         nodes.addItem(AppText.text("hide"), event -> controller.actions().toggleHidden()).setAcceleratorText(shortcut("node.toggle-hidden"));
         nodes.addItem(AppText.text("mute"), event -> controller.actions().toggleMuted()).setAcceleratorText(shortcut("node.toggle-muted"));
         nodes.addSeparator();
@@ -218,6 +219,10 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         status.setVisible(!pluginActivity.isVisible());
     }
 
+    private void ungroup(){
+        try{controller.ungroupSelection();}catch(IllegalArgumentException failure){status.setText(failure.getMessage());}
+    }
+
     @Override public void keyPressed(com.vingame.glswing.input.GLKeyEvent event) {
         if (!analysisFocus.isVisible() && !event.isConsumed()
                 && getGLInputMap().matches(com.vingame.glswing.input.GLInputActions.NODE_ARRANGE,event)) {
@@ -233,6 +238,9 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
             }
             if(key==java.awt.event.KeyEvent.VK_ENTER && (modifiers==ctrl || modifiers==(ctrl|shift))) {
                 if(modifiers==ctrl)controller.startAudio();else controller.stopAudio();event.consume();return;
+            }
+            if(key==java.awt.event.KeyEvent.VK_G && modifiers==java.awt.event.InputEvent.ALT_DOWN_MASK && !analysisFocus.isVisible()) {
+                ungroup();event.consume();return;
             }
             if(modifiers==java.awt.event.InputEvent.ALT_DOWN_MASK&&(key==java.awt.event.KeyEvent.VK_LEFT||key==java.awt.event.KeyEvent.VK_RIGHT)){
                 if(key==java.awt.event.KeyEvent.VK_LEFT){if(analysisFocus.isVisible())closeAnalysis();else workspace.navigateBack();}else workspace.navigateForward();event.consume();return;
