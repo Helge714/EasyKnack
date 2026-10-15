@@ -29,7 +29,9 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
             failure.printStackTrace();
         }
         launchTimer = new javax.swing.Timer(300, event -> {
-            if (!window.isShowing() || openingExternal || !documents.canOpenExternal()) return;
+            if (!window.isShowing())return;
+            documents.checkRecoveryOnStartup();
+            if (openingExternal || !documents.canOpenExternal()) return;
             try {
                 if (pending.isEmpty()) {
                     var request = launches.poll();

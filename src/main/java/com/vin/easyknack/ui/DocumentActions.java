@@ -21,6 +21,14 @@ final class DocumentActions implements AutoCloseable {
     private final NodeDocuments files = new NodeDocuments();
     private final RememberingFileDialogs dialogs = new RememberingFileDialogs();
     private final Timer titleTimer;
+    private final Timer recoveryTimer;
+    private final ExecutorService recoveryWorker=Executors.newSingleThreadExecutor(r->new Thread(r,"EasyKnack autosave"));
+    private final CompletableFuture<RecoveryStore> recoveryStore;
+    private GLNodeGraphDocument lastRecovery;
+    private long recoveryGeneration;
+    private RecoveryStore.Entry recoveredEntry;
+    private boolean recoveryStarted,recoveryWriting,recoveryFailed;
+
     private GLNodeGraphDocument checkpoint;
     private Path path;
     private boolean busy, closed;
@@ -29,12 +37,17 @@ final class DocumentActions implements AutoCloseable {
     private CompletableFuture<Boolean> closeDecision;
 
     DocumentActions(WorkspaceController controller, GLParent owner, JFrame window,java.util.function.Consumer<String> pluginActivity) {
+        this(controller,owner,window,pluginActivity,Path.of(System.getProperty("user.home"),".easyknack","recovery"));
+    }
+    DocumentActions(WorkspaceController controller, GLParent owner, JFrame window,java.util.function.Consumer<String> pluginActivity,Path recoveryDirectory) {
         this.controller = controller; this.owner = owner; this.window = window;
         this.pluginActivity=pluginActivity;
+        recoveryStore=CompletableFuture.supplyAsync(()->{try{return new RecoveryStore(recoveryDirectory);}catch(Exception e){throw new CompletionException(e);}},recoveryWorker);
+        recoveryTimer=new Timer(30_000,event->autosave());recoveryTimer.start();
         checkpoint = NodeDocuments.comparable(controller.snapshotDocument());
         titleTimer = new Timer(700, event -> updateTitle()); titleTimer.start();
     }
-    private boolean modified() { return !checkpoint.equals(NodeDocuments.comparable(controller.snapshotDocument())); }
+    private boolean modified() { return checkpoint==null || !checkpoint.equals(NodeDocuments.comparable(controller.snapshotDocument())); }
     boolean canOpenExternal() { return !busy && !closed && closeDecision == null; }
     /** Startup only: no user document exists to discard before the window is shown. */
     void openInitial(Path source) {
@@ -62,6 +75,73 @@ final class DocumentActions implements AutoCloseable {
             });
         });
         return result;
+    }
+    void checkRecoveryOnStartup(){
+        if(recoveryStarted||closed)return;recoveryStarted=true;busy=true;
+        onUi(recoveryStore.thenApplyAsync(store->{try{return store.scan(java.time.Instant.now());}catch(Exception e){throw new CompletionException(e);}},recoveryWorker),(entries,failure)->{
+            if(failure!=null){busy=false;recoveryError(failure);return;}
+            if(entries.isEmpty()){busy=false;return;}
+            showRecovery(entries);
+        });
+    }
+    private void showRecovery(java.util.List<RecoveryStore.Entry> entries){
+        var ref=new GLDialog[1];
+        record Choice(RecoveryStore.Entry entry){public String toString(){return (entry.original()==null?AppText.text("untitled"):entry.original().toString())+" — "+java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(java.time.ZoneId.systemDefault()).format(entry.saved());}}
+        var content=new GLContainer(){
+            final GLLabel hint=new GLLabel(AppText.text("recovery.hint"));
+            final GLComboBox<Choice> choice=new GLComboBox<>(entries.stream().map(Choice::new).toList());
+            final GLButton restore=new GLButton(AppText.text("recovery.open")),discard=new GLButton(AppText.text("recovery.discard")),later=new GLButton(AppText.text("recovery.later"));
+            {addGL(hint);addGL(choice);addGL(restore);addGL(discard);addGL(later);
+                later.addActionListener(e->ref[0].close());
+                discard.addActionListener(e->{var selected=choice.getSelectedItem();if(selected==null)return;
+                    discard.setEnabled(false);restore.setEnabled(false);
+                    onUi(recoveryStore.thenAcceptAsync(store->{try{store.delete(selected.entry());}catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker),(v,f)->{
+                        discard.setEnabled(true);restore.setEnabled(true);if(f!=null){recoveryError(f);return;}
+                        var remaining=choice.getItems().stream().filter(c->c!=selected).toList();choice.removeAllItems();remaining.forEach(choice::addItem);
+                        if(remaining.isEmpty())ref[0].close();else choice.setSelectedItem(remaining.get(0));
+                    });
+                });
+                restore.addActionListener(e->{var selected=choice.getSelectedItem();if(selected==null)return;
+                    busy=false;
+                    onUi(requestClose(),(proceed,ignored)->{busy=true;if(!Boolean.TRUE.equals(proceed))return;
+                        try{restoreSnapshot(selected.entry());ref[0].close();busy=false;autosave();
+                        }catch(Exception failure){error(GLDocumentOperation.OPEN,selected.entry().file(),failure);}
+                    });
+                });
+            }
+            protected void record(GLContext2D c){}
+            protected void resized(float w,float h){hint.setBounds(20,15,w-40,42);choice.setBounds(20,65,w-40,32);later.setBounds(20,h-45,150,28);discard.setBounds(w-350,h-45,160,28);restore.setBounds(w-180,h-45,160,28);}
+        };
+        ref[0]=new GLDialog(AppText.text("recovery.title"),content);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(820,165);
+        ref[0].closedFuture().thenRun(()->busy=false);ref[0].show(owner);
+    }
+    void restoreSnapshot(RecoveryStore.Entry entry){
+        controller.openDocument(entry.original()==null?AppText.text("untitled"):entry.original().getFileName().toString(),entry.document());
+        path=entry.original();checkpoint=null;recoveredEntry=entry;lastRecovery=null;recoveryGeneration++;updateTitle();
+    }
+    Path currentPath(){return path;}
+    private void autosave(){
+        if(closed||busy||recoveryWriting||!window.isShowing())return;
+        try{
+            var snapshot=controller.snapshotDocument();var comparable=NodeDocuments.comparable(snapshot);
+            if(checkpoint!=null&&checkpoint.equals(comparable)){if(lastRecovery!=null)clearRecovery();return;}
+            if(comparable.equals(lastRecovery)){
+                recoveryStore.thenAcceptAsync(store->{try{store.touch();}catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker)
+                    .exceptionally(failure->{EventQueue.invokeLater(()->recoveryError(failure));return null;});return;
+            }
+            recoveryWriting=true;var generation=recoveryGeneration;var original=path;var inherited=recoveredEntry;
+            onUi(recoveryStore.thenAcceptAsync(store->{try{store.write(snapshot,original);if(inherited!=null)store.delete(inherited);}catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker),(v,f)->{
+                recoveryWriting=false;if(f!=null){recoveryError(f);return;}if(generation==recoveryGeneration)lastRecovery=comparable;if(recoveredEntry==inherited)recoveredEntry=null;
+            });
+        }catch(Exception failure){recoveryError(failure);}
+    }
+    private void clearRecovery(){
+        recoveryGeneration++;var inherited=recoveredEntry;recoveredEntry=null;lastRecovery=null;
+        recoveryStore.thenAcceptAsync(store->{try{store.clear();if(inherited!=null)store.delete(inherited);}catch(Exception failure){throw new CompletionException(failure);}},recoveryWorker)
+            .exceptionally(failure->{EventQueue.invokeLater(()->recoveryError(failure));return null;});
+    }
+    private void recoveryError(Throwable failure){
+        failure.printStackTrace();if(!closed&&!recoveryFailed){recoveryFailed=true;error(GLDocumentOperation.SAVE,Path.of(System.getProperty("user.home"),".easyknack","recovery"),failure);}
     }
     private void updateTitle() {
         if (!closed) window.setTitle((modified() ? "* " : "") + (path == null ? AppText.text("untitled") : path.getFileName()) + " — EasyKnack"+(activity.isEmpty()?"":" — "+activity));
@@ -161,7 +241,7 @@ final class DocumentActions implements AutoCloseable {
         onUi(files.write(destination, DocumentSettings.forSave(snapshot)), (saved, failure) -> {
             busy = false;
             if (failure != null) { error(GLDocumentOperation.SAVE, destination, failure); result.complete(false); return; }
-            path = saved; checkpoint = NodeDocuments.comparable(snapshot); updateTitle(); result.complete(true);
+            clearRecovery();path = saved; checkpoint = NodeDocuments.comparable(snapshot); updateTitle(); result.complete(true);
         });
     }
     void exportGroup() {
@@ -254,7 +334,7 @@ final class DocumentActions implements AutoCloseable {
     CompletionStage<Boolean> requestClose() {
         if (closeDecision != null) return closeDecision;
         if (busy) return CompletableFuture.completedFuture(false);
-        if (!modified()) return CompletableFuture.completedFuture(true);
+        if (!modified()) {clearRecovery();return CompletableFuture.completedFuture(true);}
         var result = new CompletableFuture<Boolean>();
         closeDecision = result;
         result.whenComplete((value, failure) -> closeDecision = null);
@@ -267,7 +347,7 @@ final class DocumentActions implements AutoCloseable {
             {
                 addGL(label); addGL(buttons);
                 cancel.addActionListener(event -> { result.complete(false); dialogRef[0].close(); });
-                discard.addActionListener(event -> { result.complete(true); dialogRef[0].close(); });
+                discard.addActionListener(event -> { clearRecovery();result.complete(true); dialogRef[0].close(); });
                 save.addActionListener(event -> {
                     // Hide the confirmation before opening a file picker.
                     saving[0] = true;
@@ -296,5 +376,7 @@ final class DocumentActions implements AutoCloseable {
     private <T> void onUi(CompletionStage<T> stage, BiConsumer<T, Throwable> action) {
         stage.whenComplete((value, failure) -> EventQueue.invokeLater(() -> { if (!closed) action.accept(value, failure); }));
     }
-    @Override public void close() { closed = true; titleTimer.stop(); dialogs.close(); files.close(); }
+    @Override public void close() { closed = true; titleTimer.stop();recoveryTimer.stop(); dialogs.close(); files.close();
+        recoveryWorker.submit(()->{try{recoveryStore.join().close();}catch(Exception e){e.printStackTrace();}});
+        recoveryWorker.shutdown();try{recoveryWorker.awaitTermination(3,TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();} }
 }

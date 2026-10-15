@@ -41,6 +41,24 @@ with it. This is not a live link to the source file. Imported groups can be edit
 independently; recreate their Bakes if needed. This general import is not offered
 inside a Spectral Group.
 
+## Recover after a crash
+
+EasyKnack saves a separate recovery snapshot every 30 seconds while your document
+has unsaved changes. Your original file is not modified. After a crash, the next
+startup offers **Recover**, **Discard snapshot**, or **Later** for available copies.
+Recovery snapshots are kept for seven days after their last update.
+
+A recovered document is marked unsaved. **Save** writes to its original path;
+if the document had never been saved, it opens **Save As**. Successful saving or
+explicitly discarding your changes removes that document's recovery copy.
+**Later** leaves a copy available at a subsequent startup. Changes since the last
+completed snapshot may be lost in a crash. External audio files are referenced,
+not copied into recovery snapshots.
+
+Ignored connections retain their signal colour but appear translucent. Hover one
+for the reason it is ignored. Groups have an overlapping-frames symbol before
+their title.
+
 ## Navigate
 
 | Action | Shortcut |
@@ -52,6 +70,8 @@ inside a Spectral Group.
 | Back / Forward | Alt+Left / Alt+Right |
 | Toggle Inspector | N |
 | Arrange nodes | Ctrl+Shift+L |
+| Center and fit all nodes | Ctrl+Shift+C |
+| Start / Stop audio | Ctrl+Enter / Ctrl+Shift+Enter |
 | Remove node and reconnect | Ctrl+Delete |
 
 Group navigation appears while a group is open. Use Back to return to its parent.

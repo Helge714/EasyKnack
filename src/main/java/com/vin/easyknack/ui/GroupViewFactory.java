@@ -33,6 +33,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
             super(catalog.find(node.typeId()).map(GLNodeCatalogEntry::displayName).orElse("Group"));
             var source=GroupInputs.materialize(groups.findAsset(groups.findComposite(node.typeId()).orElseThrow().assetId()).orElseThrow());
             descriptor=source.compositeDescriptor();structure=structure(node);
+            setGroupIndicatorVisible(true);
             kind=groupKind();setTitleGradientEnabled(true);setPortOrder(GLNodePortOrder.OUTPUTS_FIRST);setResizeMode(GLNodeResizeMode.HORIZONTAL);setGLHistoryManager(history);
             if(MultipleGroups.multiple(source)){
                 var countPort=descriptor.portMappings().stream().filter(MultipleGroups::countPort).findFirst().orElse(null);
