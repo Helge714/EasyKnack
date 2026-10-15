@@ -178,14 +178,21 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
 
     void previewCurvature(double value){displayedCurvature=value;ConnectionAppearance.apply(workspace.editor(),value);}
     @Override protected void themeChanged(){super.themeChanged();if(workspace!=null)ConnectionAppearance.apply(workspace.editor(),displayedCurvature);}
+    void previewAppearance(java.util.Locale locale,ApplicationTheme theme){
+        ApplicationSettings.previewLocale(locale);ApplicationTheme.activate(theme);refreshAppearance();
+    }
     void applySettings(){
+        ApplicationSettings.previewLocale(null);refreshAppearance();
+        previewCurvature(ApplicationSettings.connectionCurvature());documents.applyRecoverySettings();
+    }
+    private void refreshAppearance(){
         AppText.reload();com.vin.easyknack.nodes.NodeText.reload();
         com.vingame.glswing.component.GLParent root=this;
         while(root instanceof com.vingame.glswing.component.GLContainer c && c.getGLParent()!=null)root=c.getGLParent();
         root.setGLTheme(ApplicationTheme.current().theme());
         root.setGLLocalizer(com.vingame.glswing.ui.GLLocalizer.forLocale(ApplicationSettings.locale()));
         controller.refreshAppearance();
-        previewCurvature(ApplicationSettings.connectionCurvature());documents.applyRecoverySettings();
+        previewCurvature(displayedCurvature);
         LiveLanguage.refresh(this);
         audioLoad.setGLStyle(audioLoad.getGLStyle().withBackground(ApplicationTheme.current().theme().menuBarStyle().background()).withBorder(0,new java.awt.Color(0,0,0,0)));
         resized(getWidth(),getHeight());

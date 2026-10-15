@@ -8,7 +8,9 @@ import java.util.prefs.Preferences;
 public final class ApplicationSettings {
     private static final Preferences PREFS=Preferences.userNodeForPackage(ApplicationSettings.class);
     private ApplicationSettings(){}
-    public static Locale locale(){return Locale.forLanguageTag(System.getProperty("easyknack.language",PREFS.get("language",Locale.getDefault().getLanguage().equals("de")?"de":"en")));}
+    private static volatile Locale previewLocale;
+    static void previewLocale(Locale locale){previewLocale=locale;}
+    public static Locale locale(){if(previewLocale!=null)return previewLocale;return Locale.forLanguageTag(System.getProperty("easyknack.language",PREFS.get("language",Locale.getDefault().getLanguage().equals("de")?"de":"en")));}
     public static String theme(){return System.getProperty("easyknack.theme",PREFS.get("theme",""));}
     public static void save(String language,String theme)throws Exception{PREFS.put("language",language);PREFS.put("theme",theme);PREFS.flush();}
     public static int autosaveSeconds(){return Math.max(5,Math.min(3600,PREFS.getInt("autosaveSeconds",30)));}
