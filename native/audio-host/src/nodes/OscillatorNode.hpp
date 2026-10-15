@@ -2,12 +2,15 @@
 #include "ParameterContracts.hpp"
 #include "../NodeProcessor.hpp"
 #include "../Wavetables.hpp"
+#include "../WaveformResource.hpp"
 #include "../TriggerInput.hpp"
 #include "../LegacyOscillatorParameters.hpp"
 #include <string>
 
 namespace easyknack {
 struct OscillatorNode : NodeProcessor, Wavetables {
+    const WaveformResource* customResource=nullptr;
+    ResourceKind inputResourceKind(std::size_t p)const noexcept override{return p==1?ResourceKind::waveform:ResourceKind::none;}
     ManualTriggerReceiver reset;
     void bindIdentity(const std::string& id)override{reset.bind(id+":reset");}
     void shareChannelState(NodeProcessor& p)override{reset=static_cast<OscillatorNode&>(p).reset;}
@@ -57,13 +60,15 @@ struct OscillatorNode : NodeProcessor, Wavetables {
     double sampleSmoothing = 0;
     void prepare(double rate, std::size_t) override { sampleSmoothing = 1 - std::exp(-1.0 / (.005 * rate)); }
     void processSample(ProcessContext& c) noexcept override {
+        customResource=waveformResource(c.resource(1));
         TriggerInput trigger(c,3,reset);
-        renderPrepared(c.output,c.bufferSize,frequency,c.sampleRate,c.input(0),c.input(1),true,sampleSmoothing,c.blockFrames,c.numericInput(0).stride,c.input(2),c.numericInput(2).stride,trigger.active()?&trigger:nullptr);
+        renderPrepared(c.output,c.bufferSize,frequency,c.sampleRate,c.input(0),nullptr,true,sampleSmoothing,c.blockFrames,c.numericInput(0).stride,c.input(2),c.numericInput(2).stride,trigger.active()?&trigger:nullptr);
     }
     void process(ProcessContext& context) noexcept override {
         const double smoothing=sampleSmoothing?sampleSmoothing:1-std::exp(-1.0/(.005*context.sampleRate));
+        customResource=waveformResource(context.resource(1));
         TriggerInput trigger(context,3,reset);
-        renderPrepared(context.output,context.bufferSize,frequency,context.sampleRate,context.input(0),context.input(1),true,smoothing,context.blockFrames,context.numericInput(0).stride,context.input(2),context.numericInput(2).stride,trigger.active()?&trigger:nullptr);
+        renderPrepared(context.output,context.bufferSize,frequency,context.sampleRate,context.input(0),nullptr,true,smoothing,context.blockFrames,context.numericInput(0).stride,context.input(2),context.numericInput(2).stride,trigger.active()?&trigger:nullptr);
     }
     void inheritState(const NodeProcessor& previous) noexcept override {
         phase = static_cast<const OscillatorNode&>(previous).phase;
@@ -95,14 +100,15 @@ struct OscillatorNode : NodeProcessor, Wavetables {
     // only at block boundaries. The table lookup stays shared with sample().
     float sampleCycles(const SampleKernel& kernel,double& cycles,const float* custom=nullptr,std::size_t tableFrames=0)const noexcept {
         const double position=phaseOffset==0?cycles:wrap(cycles+clean(phaseOffset)/360.);
-        const float value=static_cast<float>(custom?lookup(custom,tableFrames,position):lookup(tables->waves[waveform][kernel.level].data(),tableSize,position));
+        const float value=static_cast<float>(customResource?customResource->sample(position,kernel.increment):custom?lookup(custom,tableFrames,position):lookup(tables->waves[waveform][kernel.level].data(),tableSize,position));
         cycles=wrap(cycles+kernel.increment);return value;
     }
     void processFixedSample(ProcessContext& c,const SampleKernel& kernel)noexcept {
+        customResource=waveformResource(c.resource(1));
         TriggerInput trigger(c,3,reset);if(trigger.at(0))resetPhase();
         currentFrequency+=sampleSmoothing*(frequency-currentFrequency);
         auto saved=phaseOffset;phaseOffset=c.numericInput(2,float(phaseOffset))[0];
-        c.output[0]=sample(kernel,c.input(1),c.blockFrames);phaseOffset=saved;
+        c.output[0]=sample(kernel,nullptr,c.blockFrames);phaseOffset=saved;
     }
     void renderPrepared(float* output,std::size_t size,double frequency,double sampleRate,
             const float* frequencyInput,const float* custom,bool smooth,double smoothing,std::size_t tableFrames=0,std::size_t frequencyStride=1,const float* phaseInput=nullptr,std::size_t phaseStride=1,TriggerInput* trigger=nullptr) noexcept {

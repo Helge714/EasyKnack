@@ -95,7 +95,7 @@ public final class NodeBuilder {
         String requested=state.text("rate","auto");
         for(var row:rows){
             if(row.rates!=null){
-                if(row.dataType!=PortDataType.SIGNAL&&row.dataType!=PortDataType.WAVEFORM&&row.dataType!=PortDataType.VECTOR)
+                if(row.dataType!=PortDataType.SIGNAL&&row.dataType!=PortDataType.VECTOR)
                     throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Numeric rates cannot be assigned to ")+row.dataType);
                 row.adaptive=row.rates==PortRates.AUDIO_CONTROL&&requested.equals("auto");
                 var selected=row.adaptive?ProcessingRate.fromId(state.text(row.kind==RowKind.INPUT
@@ -103,7 +103,7 @@ public final class NodeBuilder {
                         :requested.equals("control")?ProcessingRate.CONTROL:ProcessingRate.AUDIO;
                 row.rate=row.rates.resolve(selected);
             }else if(state.text("rate","").equals("auto")&&row.kind==RowKind.INPUT
-                    &&(row.dataType==PortDataType.SIGNAL||row.dataType==PortDataType.WAVEFORM)){
+                    &&(row.dataType==PortDataType.SIGNAL)){
                 // Source-plugin compatibility for definitions predating PortRates.
                 row.adaptive=true;
                 row.rate=ProcessingRate.fromId(state.text(ProcessingRate.EFFECTIVE+".input."+row.id(),"control"));

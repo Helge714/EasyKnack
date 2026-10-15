@@ -90,7 +90,7 @@ final class CompositePortColors implements GLNodeEditorListener {
                         .filter(c -> c.valueTypeId().equals(mapping.publicPort().valueTypeId()))
                         .findFirst().orElse(SignalCategory.AUDIO);
                 port.setColor(ApplicationTheme.current().signal(category));
-                port.setConnectionDashed(category==SignalCategory.HISTORY || category==SignalCategory.ANALYSIS || category==SignalCategory.SPECTRUM);
+                port.setConnectionDashed(category==SignalCategory.HISTORY || category==SignalCategory.ANALYSIS || category==SignalCategory.SPECTRUM || category==SignalCategory.WAVETABLE);
                 if(category==SignalCategory.MIDI){port.setShape(GLNodePort.Shape.DOUBLE_DIAMOND);port.setToolTipText(com.vin.easyknack.ui.AppText.literal("MIDI events with sample positions."));}
             }
         }

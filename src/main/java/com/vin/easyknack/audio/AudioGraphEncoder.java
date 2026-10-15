@@ -34,7 +34,7 @@ public final class AudioGraphEncoder {
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Ungültige Audioverbindung"));
             var fromPort=ports.get(connection.output().nodeId()).stream().filter(p->p.id().equals(connection.output().portId())).findFirst().orElseThrow();
             var toPort=ports.get(connection.input().nodeId()).stream().filter(p->p.id().equals(connection.input().portId())).findFirst().orElseThrow();
-            var numeric=java.util.Set.of(com.vin.easyknack.nodes.PortDataType.SIGNAL.id(),com.vin.easyknack.nodes.PortDataType.WAVEFORM.id(),com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
+            var numeric=java.util.Set.of(com.vin.easyknack.nodes.PortDataType.SIGNAL.id(),com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
             if(!fromPort.valueTypeId().equals(toPort.valueTypeId())&&!(numeric.contains(fromPort.valueTypeId())&&numeric.contains(toPort.valueTypeId()))
                     &&!(fromPort.valueTypeId().equals(com.vin.easyknack.nodes.PortDataType.SPECTRUM.id())&&toPort.valueTypeId().equals(com.vin.easyknack.nodes.PortDataType.ANALYSIS.id())))
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Incompatible port types: use an explicit Trigger/MIDI converter"));

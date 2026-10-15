@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add dark-blue Waveform resources with a periodic curve editor and band-limited oscillator playback. Add background Spectrum-to-Waveform capture, document snapshots and an explicit 64-point editable-curve copy. Waveform ports now require resources rather than numeric blocks; rebuild custom waveform plugins. The current unreleased development version covers this addition.
+
 - Center unpacked groups on their combined node bounds. Fix live curvature preview with the event-driven application Canvas while Preferences remains open; verified using the actual application host. No document or host-protocol changes.
 
 - Preview theme, language and connection curvature while Preferences is open; cancel restores the previous appearance. Add one-level Ungroup (Alt+G) with undo, preserved boundary values and connections, and retained group definitions. Special execution groups remain intact. No document or host-protocol migration required.

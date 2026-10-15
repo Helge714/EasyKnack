@@ -12,7 +12,7 @@ struct BakedInput : NodeProcessor {
     bool processesEventBlocks()const noexcept override{return triggerInput;}
     void processEventBlock(ProcessContext& c)noexcept override{process(c);}
     std::size_t port=0;float fallback=0;bool midi=false;ResourceKind resourceKind=ResourceKind::none;DspResource* resource=nullptr;
-    void configure(std::istream& in) override { int kind;in>>port>>kind>>fallback;midi=kind==1;triggerInput=kind==5;resourceKind=kind==2?ResourceKind::history:kind==3?ResourceKind::analysis:kind==4?ResourceKind::spectrum:kind==6?ResourceKind::vector:ResourceKind::none;sources.clear();if(!in)throw std::runtime_error("Invalid baked input"); }
+    void configure(std::istream& in) override { int kind;in>>port>>kind>>fallback;midi=kind==1;triggerInput=kind==5;resourceKind=kind==2?ResourceKind::history:kind==3?ResourceKind::analysis:kind==4?ResourceKind::spectrum:kind==6?ResourceKind::vector:kind==7?ResourceKind::waveform:ResourceKind::none;sources.clear();if(!in)throw std::runtime_error("Invalid baked input"); }
     bool producesMidi()const noexcept override{return midi;}
     bool writesEventBuffers()const noexcept override{return true;}
     ResourceKind outputResourceKind(std::size_t)const noexcept override{return resourceKind;}
@@ -36,7 +36,7 @@ struct BakedInput : NodeProcessor {
 };
 struct BakedOutput : NodeProcessor {
     bool midi=false;ResourceKind resourceKind=ResourceKind::none;DspResource* resource=nullptr;
-    void configure(std::istream& in)override{int source,kind;in>>source>>kind;sources={source};midi=kind==1;resourceKind=kind==2?ResourceKind::history:kind==3?ResourceKind::analysis:kind==4?ResourceKind::spectrum:kind==6?ResourceKind::vector:ResourceKind::none;if(!in)throw std::runtime_error("Invalid baked output");}
+    void configure(std::istream& in)override{int source,kind;in>>source>>kind;sources={source};midi=kind==1;resourceKind=kind==2?ResourceKind::history:kind==3?ResourceKind::analysis:kind==4?ResourceKind::spectrum:kind==6?ResourceKind::vector:kind==7?ResourceKind::waveform:ResourceKind::none;if(!in)throw std::runtime_error("Invalid baked output");}
     bool isObserver()const noexcept override{return true;}
     bool canShareChannels()const noexcept override{return true;}
     bool producesMidi()const noexcept override{return midi;}

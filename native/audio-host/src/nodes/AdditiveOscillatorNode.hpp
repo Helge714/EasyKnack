@@ -2,6 +2,7 @@
 #include "ParameterContracts.hpp"
 #include "../NodeProcessor.hpp"
 #include "../Wavetables.hpp"
+#include "../WaveformResource.hpp"
 #include "../TriggerInput.hpp"
 #include "../LegacyOscillatorParameters.hpp"
 #include <algorithm>
@@ -10,6 +11,7 @@
 
 namespace easyknack {
 struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
+    ResourceKind inputResourceKind(std::size_t p)const noexcept override{return p==0?ResourceKind::waveform:ResourceKind::none;}
     ManualTriggerReceiver reset;
     void bindIdentity(const std::string& id)override{reset.bind(id+":reset");}
     void shareChannelState(NodeProcessor& p)override{reset=static_cast<AdditiveOscillatorNode&>(p).reset;}
@@ -94,7 +96,8 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
     }
     void process(ProcessContext& context) noexcept override {
         TriggerInput trigger(context,6,reset);
-        const auto* custom = context.input(0);
+        const auto* resource = waveformResource(context.resource(0));
+
         const auto* hzInput = context.input(1);
         const auto* phaseInput = context.input(2);
         const auto* countInput = context.input(3);
@@ -120,7 +123,7 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
                 if (increment < 0.5) {
                     double phase = phases[h] + offset * currentRatios[h];
                     double sample;
-                    if (custom) sample = lookup(custom, context.samplewise ? context.blockFrames : context.bufferSize, phase);
+                    if (resource) sample = resource->sample(phase,increment);
                     else {
                         unsigned level = 0;
                         if (waveform != 0) while (level + 1 < levels && increment * (1u << (level + 1)) < 0.5) ++level;

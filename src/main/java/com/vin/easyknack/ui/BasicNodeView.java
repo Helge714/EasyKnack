@@ -72,7 +72,7 @@ public class BasicNodeView extends GLNode {
                     port.setToolTipText(content instanceof GLControl control && control.getToolTipText()!=null ? control.getToolTipText() : row.label());
                     port.setColor(ApplicationTheme.current().signal(row.signal()));
                     port.setShape(row.rate().shape());
-                    port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM);
+                    port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM || row.dataType()==PortDataType.WAVEFORM);
                     if (row.kind() == NodeBuilder.RowKind.INPUT) {
                         port.setSocketVisible(row.socketVisible());
                         port.setMaximumConnections(1);
@@ -213,7 +213,7 @@ public class BasicNodeView extends GLNode {
                     if (port == null) continue;
                     port.setColor(ApplicationTheme.current().signal(row.signal()));
                     port.setShape(row.rate().shape());
-                    port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM);
+                    port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM || row.dataType()==PortDataType.WAVEFORM);
 
                     String tip=tooltips.get(row.key());
                     tip=(tip==null||tip.isBlank()?row.label():tip)+"\n"+(row.dataType()==PortDataType.MIDI

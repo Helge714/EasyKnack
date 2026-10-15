@@ -93,7 +93,7 @@ class FilterMidiNodesTest {
             for(BasicNode definition:NodeRegistry.definitionsList()){
                 var view=definition.createView(new NodeViewContext((id,key,value)->{},new com.vingame.glswing.history.GLHistoryManager()),
                         new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults()));
-                view.packGL();boolean curve=definition instanceof CurveNode||definition instanceof EnvelopeNode;
+                view.packGL();boolean curve=definition instanceof CurveNode||definition instanceof EnvelopeNode||definition instanceof WaveformNode;
                 assertEquals(curve||definition instanceof OscilloscopeNode||definition instanceof AutocorrelationNode||definition instanceof AnalysisViewerNode||definition instanceof SpectrumViewerNode?GLNodeResizeMode.BOTH:GLNodeResizeMode.HORIZONTAL,view.getResizeMode());
                 if(curve){
                     var editor=view.getContents().stream().filter(GLCurveEditor.class::isInstance).map(GLCurveEditor.class::cast).findFirst().orElseThrow();

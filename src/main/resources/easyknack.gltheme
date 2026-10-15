@@ -12,7 +12,7 @@ theme.name=EasyKnack
 @COLOR easyknack.node.IO.title.dark=#51416A
 @COLOR easyknack.signal.AUDIO=#796298
 @COLOR easyknack.signal.VALUE=#838383
-@COLOR easyknack.signal.WAVETABLE=#E5AF55
+@COLOR easyknack.signal.WAVETABLE=#345DB8
 
 slider.preferredWidth=120
 
@@ -46,7 +46,7 @@ curve.hitRadius=7
 @COLOR easyknack.node.VALUE.title.light=${easyknack.signal.VALUE}
 @COLOR easyknack.node.VALUE.title.dark=${easyknack.node.MATH.title.dark}
 @COLOR easyknack.node.WAVETABLE.title.light=${easyknack.signal.WAVETABLE}
-@COLOR easyknack.node.WAVETABLE.title.dark=#8C6332
+@COLOR easyknack.node.WAVETABLE.title.dark=#172C66
 
 @COLOR easyknack.diagnostics.mean=#66C9A5
 @COLOR easyknack.diagnostics.peak=#E6BC6A
