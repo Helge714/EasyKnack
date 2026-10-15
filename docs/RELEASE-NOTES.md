@@ -105,3 +105,5 @@ The first published release version has not been designated yet.
 
 - Copied integer group sliders retain usable increments and drag sensitivity, including older editor snapshots. Group-authored sliders can select integer values in Group-IO.
 - Newly extracted groups inherit their first output signal kind once. All signal categories have matching node kinds and shared highlight colors; trigger-producing, buffer and spectrum nodes use their corresponding palettes. Existing manual group kinds remain unchanged.
+
+- Group extraction preserves the semantic category of connected outputs instead of their shared numeric transport type. Editing group slider limits or defaults adjusts dependent values automatically.

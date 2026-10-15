@@ -180,7 +180,7 @@ final class WorkspaceController implements AutoCloseable {
     /** Also handles property edits originating in the Core inspector, including composites. */
     private void observeCurrentGraph() {
         if (closed) return;
-        for(var id:extractedGroupIds)composites.findAsset(id).filter(a->!a.metadata().containsKey("easyknack.kind")).ifPresent(a->composites.replaceAsset(GroupKinds.initialize(a)));
+        for(var id:extractedGroupIds)composites.findAsset(id).filter(a->!a.metadata().containsKey("easyknack.kind")).ifPresent(a->{var initialized=GroupKinds.initialize(a,composites);composites.replaceAsset(initialized);types.replace(initialized.compositeDescriptor().nodeType());});
         // Views are created before Core restores their connections. Navigation to an
         // already observed graph still needs a fresh projection once binding finishes.
         if (!presentationRefreshPending) {

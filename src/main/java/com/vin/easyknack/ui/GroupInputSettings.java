@@ -43,7 +43,7 @@ final class GroupInputSettings extends GLContainer {
         checked.addActionListener(e->edit(()->{var values=new HashMap<>(editor.selectedPort().presentation().editorOptions());values.put("default",GLNodeValue.of(checked.isSelected()?1.0:0.0));save(GLNodeInputEditorRegistry.SLIDER,values,Kind.CHECKBOX);}));
         source.addActionListener(e->edit(this::copySource));
         integer.addActionListener(e->edit(()->{var p=editor.selectedPort();save(p.presentation().inputEditorId(),integerOptions(p.presentation().editorOptions(),integer.isSelected()),selectedKind(p));}));
-        for(var field:List.of(minimum,maximum,value))field.addActionListener(e->edit(this::sliderValues));
+        for(var field:List.of(minimum,maximum,value))field.addActionListener(e->edit(()->sliderValues(field)));
     }
     private void edit(Runnable action){if(updating)return;updating=true;try{action.run();status.setText("");}catch(RuntimeException ex){status.setText(ex.getMessage());}finally{updating=false;refresh();editor.refresh();}}
     private GLNodeGraphAsset asset(){return editor.getAssetId()==null?null:groups.findAsset(editor.getAssetId()).orElse(null);}
@@ -121,9 +121,18 @@ final class GroupInputSettings extends GLContainer {
         if(enabled)options.put("default",GLNodeValue.of(Math.max(Math.ceil(min),Math.min(Math.floor(max),Math.rint(state.number("default",0))))));
         return options;
     }
-    private void sliderValues(){
-        var p=editor.selectedPort();var options=new HashMap<>(p.presentation().editorOptions());Double min=minimum.getText().isBlank()?null:Double.valueOf(minimum.getText()),max=maximum.getText().isBlank()?null:Double.valueOf(maximum.getText());double v=Double.parseDouble(value.getText());new Editor.Slider(v,min,max,.01);
-        options.put("default",GLNodeValue.of(v));options.put("minimumEnabled",GLNodeValue.of(min!=null));options.put("maximumEnabled",GLNodeValue.of(max!=null));options.put("minimum",GLNodeValue.of(min==null?0:min));options.put("maximum",GLNodeValue.of(max==null?1:max));save(GLNodeInputEditorRegistry.SLIDER,options,Kind.SLIDER);
+    private void sliderValues(GLTextEditor field){
+        var p=editor.selectedPort();var options=new HashMap<>(p.presentation().editorOptions());
+        String key=field==minimum?"minimum":field==maximum?"maximum":"default";
+        Double entered=field.getText().isBlank()&&!key.equals("default")?null:Double.valueOf(field.getText());
+        if(selectedKind(p)==Kind.COPY){
+            var base=GroupUnits.base(groups,asset().compositeDescriptor(),p);
+            entered=GroupUnits.initial(p,base).convert(entered,base);
+            var state=new NodeState(options);
+            if(state.flag("minimumEnabled",true))entered=Math.max(state.number("minimum",0),entered);
+            if(state.flag("maximumEnabled",true))entered=Math.min(state.number("maximum",1),entered);
+        }
+        save(GLNodeInputEditorRegistry.SLIDER,GroupSliderBounds.adjust(options,key,entered),selectedKind(p));
     }
     void refresh(){
         if(updating)return;updating=true;try{

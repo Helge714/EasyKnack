@@ -52,14 +52,16 @@ class GroupSliderKindsTest {
     }
     @Test void newGroupsInheritFirstOutputAndKeepManualKind()throws Exception{
         SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
-            var def=new ValueNode();var id=GLNodeId.random();c.workspace().currentGraph().edit("Value",e->e.addNode(new GLGraphNode(id,def.registration().id(),def.defaults())));
+            var def=new MathNode();var id=GLNodeId.random();var sink=GLNodeId.random();var output=new OutputNode();c.workspace().currentGraph().edit("Value",e->{e.addNode(new GLGraphNode(id,def.registration().id(),def.defaults()));e.addNode(new GLGraphNode(sink,output.registration().id(),output.defaults()));e.addConnection(SpectralGroupsTest.wire(id,"audio-out",sink,"audio-in"));});
             var view=c.workspace().editor().getNodes().stream().filter(n->n instanceof BasicNodeView b&&b.nodeId().equals(id)).findFirst().orElseThrow();
             c.workspace().editor().setSelectedNode(view);c.actions().extractComposite();
             var asset=c.snapshotDocument().embeddedAssets().values().stream().filter(a->a.graph().findNode(id).isPresent()).findFirst().orElseThrow();
+            assertEquals(1,asset.compositeDescriptor().portMappings().stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).count());
+            assertTrue(asset.compositeDescriptor().portMappings().stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).allMatch(p->p.publicPort().valueTypeId().equals(SignalCategory.VALUE.valueTypeId())));
             assertEquals("VALUE",new NodeState(asset.metadata()).text("easyknack.kind",""));
             var metadata=new HashMap<>(asset.metadata());metadata.put("easyknack.kind",GLNodeValue.of("TRIGGER"));
             var changed=new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),asset.graph(),asset.viewState(),metadata,asset.compositeDescriptor());
-            assertSame(changed,GroupKinds.initialize(changed));
+            assertSame(changed,GroupKinds.initialize(changed,new GLCompositeGraphRegistry()));
         }});
     }
     @Test void everySignalHasAMatchingNodePalette(){
