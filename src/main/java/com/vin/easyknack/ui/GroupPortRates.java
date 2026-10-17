@@ -39,6 +39,11 @@ final class GroupPortRates {
             var result = SignalCategory.MIDI.valueTypeId().equals(mapping.publicPort().valueTypeId())
                     ? ProcessingRate.EVENT : ProcessingRate.CONTROL;
             for (var endpoint : mapping.internalEndpoints()) {
+                if(GLCompositeForwarding.isInput(endpoint)){
+                    for(var input:descriptor.portMappings())if(input.publicPort().id().equals(endpoint.portId()))
+                        result=maximum(result,rate(descriptor,input,visiting));
+                    continue;
+                }
                 var node = graph.findNode(endpoint.nodeId()).orElse(null);
                 if (node == null) continue;
                 var nested = registry.findComposite(node.typeId()).orElse(null);

@@ -17,6 +17,7 @@ final class GroupCompiler {
         Map<String,List<Adapter>> adapters=new HashMap<>();
         Map<String,GLNodeGraphAsset> expanded=new LinkedHashMap<>();
         for(var asset:original.assets()){
+            asset=GLCompositeForwarding.materialize(asset);
             asset=FormulaGroups.materialize(asset);
             asset=GroupInputs.materialize(asset,original);
             asset=GroupChoices.normalizeSelections(asset,original);

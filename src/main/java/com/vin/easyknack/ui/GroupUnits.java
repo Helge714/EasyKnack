@@ -15,6 +15,11 @@ final class GroupUnits {
     private static UnitFormat target(GLCompositeGraphRegistry registry,GLCompositeNodeDescriptor descriptor,GLCompositePortMapping port,Set<String> visited){
         if(!port.isBound()||!visited.add(descriptor.assetId()))return UnitFormat.FACTOR;
         var asset=registry.findAsset(descriptor.assetId()).orElseThrow();
+        var stored=asset.compositeDescriptor().portMappings().stream().filter(p->p.publicPort().id().equals(port.publicPort().id())).findFirst().orElse(port);
+        if(GLCompositeForwarding.isInput(stored.internalEndpoint())){
+            var input=asset.compositeDescriptor().portMappings().stream().filter(p->p.publicPort().id().equals(stored.internalEndpoint().portId())).findFirst().orElse(null);
+            return input==null?UnitFormat.FACTOR:base(registry,asset.compositeDescriptor(),input);
+        }
         var node=asset.graph().findNode(port.internalEndpoint().nodeId()).orElse(null);
         if(node==null)return UnitFormat.FACTOR;
         var nested=registry.findComposite(node.typeId()).orElse(null);

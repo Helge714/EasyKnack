@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep direct group input-to-output connections when leaving a group and reopening documents. Preserve numeric defaults and units during execution. Groups using direct forwarding require the updated GLSwing dependency; no audio-host protocol change. The current development version covers this fix.
+
 - Add a sample-based Wavetable Viewer, lossless resource copy/paste and freehand sample editing alongside curves. Add an inspector-only minimum interval for asynchronous FFT requests. Existing curves remain readable; sample-mode documents require this version. Rebuild host and plugins together for the updated waveform and FFT parameter contracts. The current development version covers these additions.
 
 
