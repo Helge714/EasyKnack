@@ -9,10 +9,10 @@ namespace easyknack {
 struct RenderCadence {
     inline static thread_local unsigned period=1;
     inline static thread_local bool bounded=false;
-    static constexpr unsigned maxCycle=32768;
+    static constexpr unsigned maxCycle=131072;
     static void begin() noexcept {period=1;bounded=false;}
     static void include(std::size_t hop) noexcept {
-        if(!hop||hop>16384)return;
+        if(!hop||hop>65536)return;
         auto next=std::uint64_t(period/std::gcd(period,static_cast<unsigned>(hop)))*hop;
         bounded=bounded||next>maxCycle;
         period=bounded?maxCycle:static_cast<unsigned>(next);

@@ -4,13 +4,13 @@
 namespace easyknack {
 enum class AnalysisView { magnitude, phase, power, correlation };
 struct AnalysisResult {
-    static constexpr std::size_t count=8193; // Nonnegative bins of the largest 16384-point FFT, including Nyquist.
+    static constexpr std::size_t count=SpectrumFrame::capacity/2+1; // Padded 64k spectrum, including Nyquist; also holds all 64k positive lags.
     std::uint64_t sequence=0,endSample=0,historyIdentity=0;
     double sampleRate=0,lagSpacingSeconds=0,binSpacingHz=0;
     std::size_t windowFrames=8192,fftFrames=16384;
     float frequency=0,confidence=0;
     // One shared FFT, with cached derived views. Correlation has all positive lags.
-    std::array<std::array<float,count>,4> views{};
+    OwnedArray<std::array<float,count>,4> views{};
     std::array<std::array<double,4>,4> statistics{}; // peak, mean, RMS, integral
     double correlationTime=0;
     const char* estimator="DC-centered, unbiased linear autocorrelation";

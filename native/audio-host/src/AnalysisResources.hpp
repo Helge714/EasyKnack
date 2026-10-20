@@ -9,7 +9,7 @@ namespace easyknack {
 struct AnalysisJob {
     struct Request {
         std::atomic<int> state{0}; // free, ready, working
-        std::array<float,8192> values{};
+        OwnedArray<float,SpectrumFrame::maxWindowSize> values{};
         double rate=0;std::uint64_t end=0,identity=0,ordinal=0;float minimum=20,maximum=20000;
         bool spectral=false,correlate=false,padded=false,removeDc=false,unbiased=false;std::size_t size=8192,hop=4096;
         SpectrumFrame inputSpectrum;
@@ -20,11 +20,11 @@ struct AnalysisJob {
     std::array<Request,3> requests;
     std::array<Result,3> results;
     AutocorrelationNode analyzer;
-    std::array<std::complex<double>,16384> spectrum{};
+    OwnedArray<std::complex<double>,SpectrumFrame::capacity> spectrum{};
     std::atomic<std::uint64_t> dropped{0};
     std::uint64_t sequence=0,lastOrdinal=0,submitted=0;
     // Worker-owned temporal average; never shared mutably with the audio thread.
-    std::array<double,8192> smoothed{};
+    OwnedArray<double,SpectrumFrame::maxWindowSize> smoothed{};
     bool smoothingReady=false,smoothedUnbiased=false,smoothedDc=false;
     std::uint64_t smoothedIdentity=0,smoothedEnd=0;
     std::size_t smoothedSize=0,smoothedFftSize=0;
@@ -43,7 +43,7 @@ struct AnalysisJob {
     }
     bool submitSpectrum(const float* ring,std::size_t cursor,std::size_t size,std::size_t hop,
             SpectrumWindow window,double rate,std::uint64_t end,std::uint64_t identity,bool padded=false,bool removeDc=false)noexcept{
-        if(!ring||size<2||size>8192||(size&(size-1))||!hop||end<size||!std::isfinite(rate)||rate<=0)return false;
+        if(!ring||size<2||size>SpectrumFrame::maxWindowSize||(size&(size-1))||!hop||end<size||!std::isfinite(rate)||rate<=0)return false;
         for(auto& r:requests)if(r.state.load(std::memory_order_acquire)==0){
             for(std::size_t i=0;i<size;i++)r.values[i]=ring[(cursor+i)%size];
             r.spectral=true;r.correlate=false;r.padded=padded;r.removeDc=removeDc;r.size=size;r.hop=hop;r.window=window;r.rate=rate;r.end=end;r.identity=identity;r.ordinal=++submitted;
@@ -53,7 +53,7 @@ struct AnalysisJob {
     }
     bool submitCorrelation(const SpectrumFrame& frame,bool unbiased=false,std::uint64_t identity=0,double smoothing=1)noexcept{
         if(!frame.valid()||frame.fftFrames>SpectrumFrame::capacity||(frame.fftFrames&(frame.fftFrames-1))
-            ||!frame.windowFrames||frame.windowFrames>8192||frame.windowFrames>frame.fftFrames
+            ||!frame.windowFrames||frame.windowFrames>SpectrumFrame::maxWindowSize||frame.windowFrames>frame.fftFrames
             ||!std::isfinite(frame.sampleRate)||frame.sampleRate<=0||!std::isfinite(smoothing)||smoothing<0||smoothing>1)return false;
         for(auto& r:requests)if(r.state.load(std::memory_order_acquire)==0){
             r.inputSpectrum=frame;r.smoothing=smoothing;r.unbiased=unbiased;r.correlate=true;r.spectral=false;r.rate=frame.sampleRate;
@@ -144,11 +144,11 @@ struct AnalysisJob {
                 result.sequence=++sequence;result.endSample=request.end;result.historyIdentity=request.identity;result.sampleRate=request.rate;
                 destination->state.store(2,std::memory_order_release);request.state.store(0,std::memory_order_release);continue;
             }
-            analyzer.samples=request.values;analyzer.writeCursor=0;analyzer.filledSamples=8192;
+            std::copy_n(request.values.data(),8192,analyzer.samples.data());analyzer.writeCursor=0;analyzer.filledSamples=8192;
             analyzer.minimum=request.minimum;analyzer.maximum=request.maximum;analyzer.spectralSnapshot=spectrum.data();
             spectrum.fill({});analyzer.analyze(request.rate);lastOrdinal=request.ordinal;
             auto& result=destination->value;result.sequence=++sequence;result.endSample=request.end;result.historyIdentity=request.identity;result.sampleRate=request.rate;result.lagSpacingSeconds=1/request.rate;result.binSpacingHz=request.rate/16384;
-            result.availableViews=15;result.spectrum.fftFrames=0;result.binCount=8192;result.windowFrames=8192;result.fftFrames=16384;
+            result.availableViews=15;result.spectrum.fftFrames=0;result.binCount=result.correlationCount=8192;result.windowFrames=8192;result.fftFrames=16384;
             result.frequency=analyzer.frequency;result.confidence=analyzer.confidence;
             for(std::size_t i=0;i<8192;i++){
                 double power=std::norm(spectrum[i]);
@@ -164,7 +164,7 @@ struct AnalysisJob {
                 result.statistics[view]={peak,sum/8192,std::sqrt(squares/8192),sum*spacing};
             }
             result.correlationTime=0;
-            for(float value:result.views[3]){if(value<=0)break;result.correlationTime+=value/request.rate;}
+            for(std::size_t i=0;i<result.correlationCount;i++){float value=result.views[3][i];if(value<=0)break;result.correlationTime+=value/request.rate;}
             destination->state.store(2,std::memory_order_release);request.state.store(0,std::memory_order_release);
         }
     }

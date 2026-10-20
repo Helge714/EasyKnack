@@ -21,7 +21,7 @@ public final class SpectrumNode extends BasicNode {
         n.addEditor(SYNC,"Synchronous",Editor.checkBox(true)).tooltip(com.vin.easyknack.ui.AppText.literal("Enabled: compute every frame in the audio path. Disabled: background analysis may deliver late or missing frames; IFFT remains allowed but can produce gaps or artifacts."));
         n.addEditor(INTERVAL,"Minimum frame interval",Editor.Slider.button(0,0.0,60000.0).unit(UnitFormat.MS)).inspectorOnly().visible(!s.flag(SYNC,true))
             .tooltip(NodeText.text("fft.interval.help","Minimum time between background FFT requests. Zero uses the overlap setting. Synchronous FFT is unaffected."));
-        n.addEditor(SIZE,"Window size",Editor.comboBox(java.util.List.of("256","512","1024","2048","4096","8192"),"2048",v->v))
+        n.addEditor(SIZE,"Window size",Editor.comboBox(java.util.List.of("256","512","1024","2048","4096","8192","16384","32768","65536"),"2048",v->v))
             .tooltip(com.vin.easyknack.ui.AppText.literal("Samples per FFT window. A larger window improves frequency separation but covers a longer period of time. Changing this setting resets the analysis."));
         n.addEditor(WINDOW,"Window",Editor.comboBox(java.util.List.of("Hann","Hamming","Blackman","Rectangular"),"Hann",v->v.toLowerCase(java.util.Locale.ROOT)));
         n.addEditor(PADDING,"Zero padding",Editor.comboBox(java.util.List.of("None","Linear correlation (2x)"),"None",v->v.equals("None")?"none":"double"))

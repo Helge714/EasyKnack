@@ -10,6 +10,33 @@ import com.vin.easyknack.audio.*;
 import com.vingame.glswing.node.model.*;
 
 class SpectrumAnalysisTest {
+    @Test void largeWindowsAreSelectableAndAnalysisAcceptsEveryPaddedBin(){
+        for(BasicNode node:List.of(new SpectrumNode(),new FFTStreamNode())){
+            var row=node.layout(new NodeState(node.defaults())).rows().stream().filter(r->r.id().equals("size")).findFirst().orElseThrow();
+            var sizes=(Editor.ComboBox<?>)row.editor();
+            assertTrue(sizes.items().containsAll(List.of("16384","32768","65536")));
+            for(String size:List.of("16384","32768","65536")){
+                var state=new HashMap<>(node.defaults());state.put("size",GLNodeValue.of(size));
+                assertTrue(node.encode(new NodeState(state),p->-1).contains(" "+size+" "));
+            }
+        }
+        var message=new StringBuilder("OK 2 fft 0 0 24000 0 65537");
+        for(int i=0;i<65537;i++)message.append(i==65536?" 0.75":" 0");
+        var frame=AudioAnalysis.parse(message.toString()).get("fft");
+        assertEquals(65537,frame.values().length);assertEquals(.75f,frame.values()[65536]);
+        assertThrows(IllegalArgumentException.class,()->AudioAnalysis.parse("OK 2 fft 0 0 24000 0 65538"));
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void largestPaddedWindowReachesTheViewerThroughTheHostProtocol()throws Exception{
+        var graph=new GLNodeGraph();var osc=add(graph,new OscillatorNode());
+        var fft=add(graph,new SpectrumNode(),Map.of("size",GLNodeValue.of("65536"),"padding",GLNodeValue.of("double"),"overlap",GLNodeValue.of(0.0)));
+        var viewer=add(graph,new SpectrumViewerNode());connect(graph,osc,"audio-out",fft,"audio-in");connect(graph,fft,"analysis",viewer,"analysis");
+        try(var host=new AudioHostClient()){
+            host.start(AudioHostClient.defaultExecutable(),true);assertEquals("OK",host.command(AudioGraphEncoder.encode(graph.snapshot())));host.command("PLAY");
+            var frame=awaitFrame(host,viewer,65537);assertEquals(24000,frame.span(),1e-6);
+            assertTrue(host.command("PING").startsWith("OK"));host.command("STOP");
+        }
+    }
     @Test void analysisTitlesHaveASeparateYellowThemePaletteAndFftCanMix(){
         for(var node:NodeRegistry.builtinDefinitions())if(node.registration().category()==NodeCategory.ANALYSIS)assertEquals(node instanceof WavetableViewerNode?NodeKind.WAVETABLE:NodeKind.ANALYSIS,node.registration().kind());
         var colors=ApplicationTheme.current().title(NodeKind.ANALYSIS);

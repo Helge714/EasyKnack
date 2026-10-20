@@ -49,7 +49,32 @@ static void lateFramesAreNotReplayed(){
     auto* analysis=fft.resource.analysisResult();assert(analysis&&analysis->spectrum.valid());assert(std::abs(analysis->views[0][0]-.5)<1e-7);
     assert(analysis==fft.resource.analysisResult());
 }
+static void largeBackgroundAnalysis(std::size_t size,bool padded){
+    auto job=std::make_unique<AnalysisJob>();std::vector<float> samples(size);
+    constexpr double tau=6.2831853071795864769;
+    for(std::size_t i=0;i<size;i++)samples[i]=static_cast<float>(.7*std::cos(tau*37*i/size));
+    assert(job->submitSpectrum(samples.data(),0,size,size/4,SpectrumWindow::rectangular,48000,size,17,padded));job->work();
+    auto* result=job->acquire();assert(result&&result->spectrum.fftFrames==size*(padded?2:1));
+    assert(result->binCount==result->spectrum.fftFrames/2+1);
+    assert(std::abs(result->views[0][37*(padded?2:1)]-.7)<1e-6);
+    AnalysisResource resource;resource.result=result;
+    AnalysisViewerNode viewer;viewer.mailbox=std::make_shared<AnalysisMailbox>();
+    const DspResource* resources[]{&resource};float zero=0;ProcessContext context{nullptr,1,&zero,1,48000,&zero,1};context.resourceInputs=resources;
+    viewer.process(context);auto captured=std::make_unique<AnalysisFrame>();
+    assert(viewer.mailbox->latest(*captured));assert(captured->valueCount==result->binCount);
+    assert(std::abs(captured->span-24000)<1e-8);
+    assert(job->submitCorrelation(result->spectrum));job->work();
+    result=job->acquire();assert(result&&result->correlationCount==size);assert(std::abs(result->views[3][0]-1)<1e-6);
+    assert(std::isfinite(result->views[3][size-1]));
+    // Reusing the same worker for legacy analysis must restore the fixed lag count.
+    HistoryResource history;history.prepare(48000,1,256);for(float value:samples)history.append(value);
+    assert(job->submit(history,40,2000));job->work();assert(job->acquire()->correlationCount==8192);
+}
 int main(){
+    for(auto size:{16384u,32768u,65536u})for(bool padded:{false,true}){
+        unifiedIdentity(size,4,256,SpectrumWindow::hann,true,padded);
+        largeBackgroundAnalysis(size,padded);
+    }
     for(bool padded:{false,true})for(auto size:{256u,1024u,8192u})for(auto block:{137u,256u})for(auto window:{SpectrumWindow::hann,SpectrumWindow::rectangular})unifiedIdentity(size,4,block,window,true,padded);
     lateFramesAreNotReplayed();
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include "Spectrum.hpp"
 #include <array>
 #include <atomic>
 #include <cstddef>
@@ -19,7 +20,7 @@ struct AnalysisFrame {
      * Other existing analyzers remain at 256 samples unless they
      * explicitly increase valueCount.
      */
-    static constexpr std::size_t maxValues = 8193;
+    static constexpr std::size_t maxValues = SpectrumFrame::capacity/2+1;
     static constexpr std::size_t defaultValues = 256;
 
     float frequency = 0.f;

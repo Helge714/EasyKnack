@@ -11,7 +11,7 @@ struct StreamSpectrumFrame {
     std::vector<std::complex<double>> bins;
 };
 struct SpectrumStream final : AnalysisResource {
-    static constexpr std::size_t maxSize=16384,minHop=64;
+    static constexpr std::size_t maxSize=SpectrumFrame::capacity,minHop=64;
     std::size_t size=0,windowSize=0,hop=0,count=0,blockFrames=0;
     bool dcRemoved=false;
     mutable std::unique_ptr<AnalysisResult> analysisCache;

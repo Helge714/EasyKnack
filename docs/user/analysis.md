@@ -32,6 +32,11 @@ voices. DC removal intentionally changes the signal. For a transparent reconstru
 start with `audio → FFT → IFFT → Audio Output` and avoid signal-altering options.
 FFT/IFFT adds a window's latency in addition to device latency.
 
+FFT window sizes range from 256 to 65,536 samples (16k, 32k and 64k are available).
+2x zero padding also works at the largest size. Larger windows increase memory use,
+processing work and reconstruction latency; at 48 kHz a 64k window spans about
+1.37 seconds. Overlap controls how often that work is repeated.
+
 ## Process bins
 
 A Spectral Group receives a spectrum and provides per-bin processing. **Bin Context**

@@ -16,7 +16,7 @@ struct FFTStreamNode : NodeProcessor {
     DspResource* resourceOutput(std::size_t)noexcept override{return &stream;}
     void configure(std::istream& in)override{
         auto p=parameters::FFTStreamNodeParameters::read(in);sources=p.sources();size=std::stoul(p.size_value);window=spectrumWindow(p.window_value);hop=size/std::stoul(p.overlap_value);
-        if(size<256||size>SpectrumStream::maxSize||(size&(size-1))||hop<SpectrumStream::minHop)throw std::runtime_error("Invalid streaming FFT size/hop");
+        if(size<256||size>SpectrumFrame::maxWindowSize||(size&(size-1))||hop<SpectrumStream::minHop)throw std::runtime_error("Invalid streaming FFT size/hop");
     }
     void prepare(double rate,std::size_t block)override{
         stream.prepare(block);ring.assign(size,0);weights.resize(size);for(std::size_t i=0;i<size;i++)weights[i]=spectrumWindowValue(window,i,size);

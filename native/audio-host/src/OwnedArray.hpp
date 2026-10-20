@@ -7,6 +7,8 @@ namespace easyknack {
 template<class T,std::size_t N> class OwnedArray {
     std::unique_ptr<std::array<T,N>> storage=std::make_unique<std::array<T,N>>();
 public:
+    OwnedArray()=default;
+    OwnedArray(const OwnedArray& other):OwnedArray(){*this=other;}
     T& operator[](std::size_t i)noexcept{return (*storage)[i];}
     const T& operator[](std::size_t i)const noexcept{return (*storage)[i];}
     auto begin()noexcept{return storage->begin();}auto end()noexcept{return storage->end();}

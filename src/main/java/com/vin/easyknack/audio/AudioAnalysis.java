@@ -5,7 +5,7 @@ import java.util.*;
 
 public final class AudioAnalysis {
 
-	public static final int MAX_VALUES = 8193;
+	public static final int MAX_VALUES = 65537;
 
 	public record Frame(double frequency, double confidence, double span, boolean symmetric, float[] values) {
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "OwnedArray.hpp"
 #include <complex>
 #include <cmath>
 #include <cstdint>
@@ -52,8 +53,8 @@ inline void spectrumTransform(std::complex<double>* data,std::size_t size,bool i
  * Forward scaling is 1; inverse scaling is 1/fftFrames. These are asynchronous
  * analysis snapshots: frameIndex gaps are permitted, not an IFFT audio stream. */
 struct SpectrumFrame {
-    static constexpr std::size_t capacity=16384;
-    std::array<std::complex<double>,capacity> bins{};
+    static constexpr std::size_t maxWindowSize=65536,capacity=2*maxWindowSize;
+    OwnedArray<std::complex<double>,capacity> bins{};
     std::size_t fftFrames=0,windowFrames=0,hopFrames=0;
     std::uint64_t startSample=0,endSample=0,frameIndex=0,sourceIdentity=0;
     double sampleRate=0,windowSum=0,windowSumSquares=0;
