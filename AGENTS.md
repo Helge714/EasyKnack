@@ -34,6 +34,16 @@
   docs/BUILD-IDENTITY.md. Windows installers use the numeric Maven product version.
   Official release CI and publication remain pending; do not claim those are ready.
 
+## Code navigation
+
+- Start with [docs/development/CODE-MAP.md](docs/development/CODE-MAP.md) and read only the relevant section.
+- Use the map to locate owning files and nearby tests, then verify current code;
+  the map is not an API contract. Avoid repeated repository-wide exploration.
+- Update affected map entries when moving files, adding a subsystem or changing
+  ownership. Keep entries concise and task-oriented, without debugging history.
+- Batch related edits and focused checks. Run required broader builds once after
+  the change is assembled; repeat only for new changes, failures or unresolved risks.
+
 ## Documentation
 
 - User documentation is English, task-oriented and independent of Eclipse.
