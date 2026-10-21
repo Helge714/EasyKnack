@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Read the original project license/notices in verified source checkouts when an incremental IDE build removes generated legal resources. Packaged applications continue to require their bundled documents; plugin SDK licensing uses the same lookup. The current development version covers this fix.
+
 - Keep Help > Licenses responsive by browsing complete license documents individually, starting with an overview. Requires the accompanying GLSwing multiline-layout fix for large texts. The current development version covers this compatible fix.
 
 - Offer EasyKnack, Blue, Dark Blue and Light themes using external GLSwing presets with shared application color/layout fragments. Theme selection previews live; Light adapts workspace overlays for contrast. Existing theme selection IDs remain valid. The current development version covers this compatible feature.

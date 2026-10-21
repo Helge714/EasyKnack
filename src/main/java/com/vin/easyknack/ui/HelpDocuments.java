@@ -16,6 +16,8 @@ final class HelpDocuments {
         return read("/META-INF/" + (name.equals("LICENSE") || name.equals("THIRD-PARTY.md") ? "easyknack/legal/" : "") + name);
     }
     private static String read(String name) throws IOException {
+        if(name.startsWith(com.vin.easyknack.LegalDocuments.RESOURCE_PREFIX))
+            return com.vin.easyknack.LegalDocuments.read(name.substring(com.vin.easyknack.LegalDocuments.RESOURCE_PREFIX.length()));
         try (var input = HelpDocuments.class.getResourceAsStream(name)) {
             if (input == null) throw new IOException("Bundled document missing: " + name);
             String text = new String(input.readAllBytes(), StandardCharsets.UTF_8);

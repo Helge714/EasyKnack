@@ -2,7 +2,6 @@ package com.vin.easyknack.plugins;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /** Notices travel with SDK and generated source archives, not only the application. */
@@ -10,9 +9,8 @@ public final class PluginLicensing {
     private PluginLicensing() { }
 
     public static Map<String, String> files() {
-        try (var input = PluginLicensing.class.getResourceAsStream("/META-INF/easyknack/legal/LICENSE")) {
-            if (input == null) throw new IOException("EasyKnack license resource is missing");
-            return Map.of("LICENSE", new String(input.readAllBytes(), StandardCharsets.UTF_8),
+        try {
+            return Map.of("LICENSE", com.vin.easyknack.LegalDocuments.read("LICENSE"),
                     "LICENSING.md", """
                     # Source and SDK licensing
 

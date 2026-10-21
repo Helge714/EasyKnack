@@ -37,6 +37,10 @@ class PluginSdkTest {
         try (var input = PluginLicensing.class.getResourceAsStream("PluginLicensing.class")) {
             Files.copy(input, classFile.resolveSibling("PluginLicensing.class"));
         }
+        var legalClass=classes.resolve("com/vin/easyknack/LegalDocuments.class");
+        try(var input=com.vin.easyknack.LegalDocuments.class.getResourceAsStream("LegalDocuments.class")){
+            Files.copy(input,legalClass);
+        }
         var license = classes.resolve("META-INF/easyknack/legal/LICENSE");
         Files.createDirectories(license.getParent());
         try (var input = PluginLicensing.class.getResourceAsStream("/META-INF/easyknack/legal/LICENSE")) {

@@ -67,6 +67,7 @@ Paths below are relative to `native/audio-host/src/`.
 - `src/main/resources/application*.properties`, `nodes*.properties`: UI and node translations.
 - `src/processor/java/com/vin/easyknack/processor/NodeProcessor.java`: annotation processing; generated registrations are build output.
 - `pom.xml`: dependencies, product version and Maven build steps.
+- `src/main/java/com/vin/easyknack/LegalDocuments.java`: packaged legal resources and source-checkout fallback after incremental resource cleanup.
 - `scripts/build-audio-host.ps1`, `scripts/generate-native-nodes.ps1`: native build and generation.
 - `Build-Installer.bat`, `scripts/build-installer.ps1`, `scripts/package-windows.ps1`: Windows packaging entry points.
 - `src/test/java/com/vin/easyknack/`: Java tests, generally mirroring packages/features.
