@@ -1,0 +1,24 @@
+# EasyKnack application bundle; base UI comes from the external GLSwing library.
+theme.type=bundle
+theme.name=EasyKnack Light
+theme.extends=/com/vingame/glswing/themes/light.gltheme
+theme.colors=/easyknack/themes/colors.gltheme
+theme.metrics=/easyknack/themes/metrics.gltheme
+
+# Keep semantic signal colors; adapt surfaces and overlays for a light workspace.
+nodeEditor.background=${palette.surface}
+nodeEditor.gridMinor=rgba(37,39,43,12)
+nodeEditor.gridMajor=rgba(37,39,43,28)
+node.background=#FFFFFF
+node.border=${palette.border}
+node.activeSelectedBorder=${palette.accent}
+@COLOR curve.line=#684690
+@COLOR curve.handle=#49315F
+@COLOR curve.marker=#916114
+@COLOR easyknack.analysis.triggerLow=#976018
+@COLOR easyknack.analysis.triggerHigh=#176890
+@COLOR easyknack.diagnostics.mean=#24745B
+@COLOR easyknack.diagnostics.peak=#8F6600
+@COLOR easyknack.diagnostics.error=#BA3434
+@COLOR easyknack.buffer.selection=rgba(66,120,199,45)
+@COLOR easyknack.buffer.boundary=#26649C

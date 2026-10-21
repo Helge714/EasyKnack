@@ -40,7 +40,7 @@ Paths below are relative to `src/main/java/com/vin/easyknack/`.
 | Bake / source export | `ui/GroupBakes.java`, `ui/GroupSourceExporter.java`, `ui/MathFusion.java`, `ui/SampleFusion.java`, `ui/InstanceSourceSpecialization.java`, `ui/SpectralSourceSpecialization.java` | Bake/cache state and generated DSP specializations; inspect the relevant specialization only. |
 | Special groups / formulas | `ui/MultipleGroups.java`, `ui/SpectralGroups.java`, `ui/FormulaGroups.java`, `formula/FormulaCompiler.java`, `formula/TypedFormulaCompiler.java`, `formula/FormulaNativeCompiler.java` | Instance/spectral execution policy and formula validation/compilation. |
 | Plugins | `plugins/PluginManager.java`, `plugins/PluginManifest.java`, `plugins/PluginSdk.java` | Plugin install/build/cache, manifests and compiler SDK. |
-| Preferences / theme / language / units | `ui/SettingsDialog.java`, `ui/ApplicationSettings.java`, `ui/ApplicationTheme.java`, `ui/LiveLanguage.java`, `ui/PortUnitMenus.java`, `nodes/UnitFormat.java` | Application settings, semantic colors, translations and physical-unit policy. |
+| Preferences / theme / language / units | `ui/SettingsDialog.java`, `ui/ApplicationSettings.java`, `ui/ApplicationTheme.java`, `ui/BundledThemes.java`, `ui/LiveLanguage.java`, `ui/PortUnitMenus.java`, `nodes/UnitFormat.java` | Application settings, semantic colors, translations and physical-unit policy. |
 | Image / CSV export | `ui/GraphImageExport.java`, `ui/AnalysisImageExport.java`, `ui/AnalysisCsvExport.java` | Application selection, dialogs and analysis data; generic raster capture/encoding belongs to Core. |
 
 For a particular node, start with `nodes/<Name>Node.java`; search its registration
@@ -62,7 +62,8 @@ Paths below are relative to `native/audio-host/src/`.
 
 ## Resources, builds and tests
 
-- `src/main/resources/easyknack.gltheme`: application theme and signal/category colors.
+- `src/main/resources/easyknack*.gltheme`: selectable bundles over external Core presets.
+- `src/main/resources/easyknack/themes/`: shared color and geometry fragments; fragments are not selectable themes.
 - `src/main/resources/application*.properties`, `nodes*.properties`: UI and node translations.
 - `src/processor/java/com/vin/easyknack/processor/NodeProcessor.java`: annotation processing; generated registrations are build output.
 - `pom.xml`: dependencies, product version and Maven build steps.

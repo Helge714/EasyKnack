@@ -1,0 +1,16 @@
+# Shared EasyKnack geometry, layered over the selected GLSwing preset.
+theme.type=metrics
+
+slider.preferredWidth=120
+node.cornerRadius=6
+node.rowGap=6
+node.minimumWidth=140
+nodeEditor.horizontalNodeSpacing=60
+nodeEditor.verticalNodeSpacing=40
+node.contentPadding=12
+curve.height=110
+curve.previewHeight=32
+curve.inspectorHeight=200
+curve.padding=9
+curve.pointRadius=3
+curve.hitRadius=7

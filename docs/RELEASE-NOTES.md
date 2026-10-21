@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Offer EasyKnack, Blue, Dark Blue and Light themes using external GLSwing presets with shared application color/layout fragments. Theme selection previews live; Light adapts workspace overlays for contrast. Existing theme selection IDs remain valid. The current development version covers this compatible feature.
+
 - Add 16k, 32k and 64k FFT windows for synchronous and background processing, including 2x padding, IFFT and analysis readouts. Rebuild the audio host and source plugins with the updated SDK; new window sizes require this version. The current development version covers this compatible feature.
 
 - Keep direct group input-to-output connections when leaving a group and reopening documents. Preserve numeric defaults and units during execution. Groups using direct forwarding require the updated GLSwing dependency; no audio-host protocol change. The current development version covers this fix.

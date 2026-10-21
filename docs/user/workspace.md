@@ -115,3 +115,10 @@ while the dialog is open. Save keeps the changes; Cancel restores the previous
 appearance. Your own
 node names, file names and plugin names are not translated. File dialogs remember
 the last folder used for each purpose across application restarts.
+
+## Themes
+
+In **Settings → Preferences**, choose EasyKnack, EasyKnack Blue, EasyKnack Dark Blue
+or EasyKnack Light. The choice previews immediately, including existing nodes.
+Save keeps the selection for the next launch; Cancel restores the previous theme.
+Signal colours continue to identify the same types across all four variants.
