@@ -30,6 +30,19 @@ final class HelpDocuments {
         return text.toString();
     }
 
+    record LicenseDocument(String title,String resource){
+        @Override public String toString(){return title;}
+        String text()throws IOException{return read(resource);}
+    }
+    static List<LicenseDocument> licenseDocuments()throws IOException{
+        var documents=new java.util.ArrayList<LicenseDocument>();
+        documents.add(new LicenseDocument(AppText.text("help.licenses.overview"),"/META-INF/easyknack/legal/THIRD-PARTY.md"));
+        documents.add(new LicenseDocument("EasyKnack — GPL-3.0-only","/META-INF/easyknack/legal/LICENSE"));
+        for(String name:read("/easyknack/notices/index.txt").lines().map(String::strip).filter(s->!s.isBlank()).toList())
+            documents.add(new LicenseDocument(name,"/easyknack/notices/"+name));
+        return List.copyOf(documents);
+    }
+
     static Path manual() throws IOException {
         // Every page is regenerated, so a development run cannot show a stale manual.
         Path folder = Path.of(System.getProperty("user.home"), ".easyknack", "help");

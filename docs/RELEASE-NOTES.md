@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep Help > Licenses responsive by browsing complete license documents individually, starting with an overview. Requires the accompanying GLSwing multiline-layout fix for large texts. The current development version covers this compatible fix.
+
 - Offer EasyKnack, Blue, Dark Blue and Light themes using external GLSwing presets with shared application color/layout fragments. Theme selection previews live; Light adapts workspace overlays for contrast. Existing theme selection IDs remain valid. The current development version covers this compatible feature.
 
 - Add 16k, 32k and 64k FFT windows for synchronous and background processing, including 2x padding, IFFT and analysis readouts. Rebuild the audio host and source plugins with the updated SDK; new window sizes require this version. The current development version covers this compatible feature.

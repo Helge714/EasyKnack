@@ -4,6 +4,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class HelpDocumentsTest {
+    @Test void licenseBrowserLoadsIndividualCompleteDocuments()throws Exception{
+        var documents=HelpDocuments.licenseDocuments();
+        assertTrue(documents.size()>2);
+        assertEquals(AppText.text("help.licenses.overview"),documents.get(0).title());
+        for(var document:documents)assertFalse(document.text().isBlank(),document.title());
+        javax.swing.SwingUtilities.invokeAndWait(()->{
+            var panel=new HelpMenu.DocumentPanel("",documents,()->{});
+            try{
+                assertEquals(normalized(HelpDocuments.resource("THIRD-PARTY.md")),panel.content.getText());
+                panel.documents.setSelectedItem(documents.get(1));
+                assertEquals(normalized(HelpDocuments.resource("LICENSE")),panel.content.getText());
+                panel.documents.setSelectedItem(documents.get(2));
+                assertEquals(normalized(documents.get(2).text()),panel.content.getText());
+                assertEquals(0,panel.content.getCaretPosition());
+            }catch(java.io.IOException failure){throw new AssertionError(failure);}
+        });
+    }
+    private static String normalized(String text){return text.replace("\r\n","\n").replace('\r','\n');}
     @Test void handbookAndLicenseAreAvailableWithoutAnInstallation() throws Exception {
         for (String page : HelpDocuments.PAGES)
             assertTrue(HelpDocuments.resource("easyknack/manual/" + page + ".md").startsWith("#"));

@@ -24,7 +24,7 @@ Paths below are relative to `src/main/java/com/vin/easyknack/`.
 | Task | Start here | Responsibility |
 | --- | --- | --- |
 | Startup / launch files | `EasyKnack.java`, `DocumentLaunch.java`, `LaunchArguments.java` | Application launch, startup work and opening documents passed to the process. |
-| Workspace / menus | `ui/WorkspaceController.java`, `ui/WorkspaceView.java`, `ui/DocumentActions.java`, `ui/NodeEditingActions.java` | Application orchestration and commands; generic editing lives in Core. |
+| Workspace / menus | `ui/WorkspaceController.java`, `ui/WorkspaceView.java`, `ui/DocumentActions.java`, `ui/NodeEditingActions.java`, `ui/HelpMenu.java`, `ui/HelpDocuments.java` | Application orchestration and commands; generic editing lives in Core. |
 | Node definitions | `nodes/BasicNode.java`, `nodes/NodeBuilder.java`, `nodes/Editor.java`, `nodes/PropertyId.java` | Node layout, properties, editors, native binding and capability hooks. |
 | Registration / add menu | `nodes/RegisterNode.java`, `nodes/NodeRegistry.java`, `nodes/NodeCategory.java`, `nodes/NodeKind.java`, `nodes/SignalCategory.java` | Registration, menu grouping, title categories and signal types are distinct concerns. |
 | Node views / inspector | `ui/AudioNodeFactory.java`, `ui/BasicNodeView.java`, `nodes/InspectorEditor.java`, `nodes/EditorPresentation.java` | Application view binding and editor presentation. Special views live beside BasicNodeView. |
