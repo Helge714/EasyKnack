@@ -164,6 +164,7 @@ public class BasicNodeView extends GLNode {
                 spec.bindUnitMenu(slider,unit->write(new PropertyId(row.id()+".unit"),GLNodeValue.of(unit.id())));
             if(custom.component() instanceof GLSlider slider) {UnitSlider.bindHistory(slider,()->history);slider.setName(row.label()+ (slider.getUnit().isBlank()?"":" ["+slider.getUnit()+"]"));}
             if(custom.component() instanceof AnalysisEditor.Plot plot)plot.bind(id.toString());
+            if(custom.component() instanceof ValueViewerPanel viewer)viewer.bind(id.toString());
             if(custom.component() instanceof PitchReadoutEditor.Readout readout)readout.bind(id.toString());
             if(custom.component() instanceof Editor.TriggerButton button)button.bind(id.toString(),row.id());
             if(custom.component() instanceof GLCurveEditor curve)CurveEditor.bindHistory(curve,()->history);

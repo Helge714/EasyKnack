@@ -2,6 +2,9 @@
 
 [User guide](README.md)
 
+See [Spectral features and numeric inspection](spectral-features.md) for spectral
+descriptors and the multi-input Value Viewer with history, Freeze and export.
+
 ## Inspect audio
 
 Connect audio directly to **Oscilloscope** for a time plot, or **Level Detector**

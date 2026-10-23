@@ -24,6 +24,7 @@ public final class InspectorEditor extends GLContainer {
         if(editor.component() instanceof GLControl control && row.tooltip()!=null && !row.tooltip().isBlank())control.setToolTipText(row.tooltip());
         if(editor.component() instanceof WavetableViewerEditor.Plot plot)plot.bind(model.id().toString());
         if(editor.component() instanceof AnalysisEditor.Plot plot)plot.bind(model.id().toString());
+        if(editor.component() instanceof com.vin.easyknack.ui.ValueViewerPanel viewer)viewer.bind(model.id().toString());
         if(editor.component() instanceof PitchReadoutEditor.Readout readout)readout.bind(model.id().toString());
         if(editor.component() instanceof Editor.TriggerButton button)button.bind(model.id().toString(),row.id());
         update(model);

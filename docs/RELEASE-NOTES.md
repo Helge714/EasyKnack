@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Spectral Features (eight descriptors) and a multi-input Value Viewer with bounded history, peak-preserving plots, Freeze, numeric display, zoom/measurement cursors and PNG/JPG/CSV snapshot export. Rebuild Java, host and plugin SDK together for the new node types; existing contracts and documents are unchanged. The current development version covers these compatible additions.
+
 - Read the original project license/notices in verified source checkouts when an incremental IDE build removes generated legal resources. Packaged applications continue to require their bundled documents; plugin SDK licensing uses the same lookup. The current development version covers this fix.
 
 - Keep Help > Licenses responsive by browsing complete license documents individually, starting with an overview. Requires the accompanying GLSwing multiline-layout fix for large texts. The current development version covers this compatible fix.

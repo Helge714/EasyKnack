@@ -48,3 +48,13 @@ theme.type=colors
 @COLOR easyknack.node.HISTORY.title.dark=#655078
 @COLOR easyknack.node.SPECTRUM.title.light=${easyknack.signal.SPECTRUM}
 @COLOR easyknack.node.SPECTRUM.title.dark=${easyknack.node.ANALYSIS.title.dark}
+
+# Value Viewer trace palette
+@COLOR easyknack.viewer.trace1=#50A8EC
+@COLOR easyknack.viewer.trace2=#E5984A
+@COLOR easyknack.viewer.trace3=#73B85D
+@COLOR easyknack.viewer.trace4=#C97ADB
+@COLOR easyknack.viewer.trace5=#E16E78
+@COLOR easyknack.viewer.trace6=#42B9B1
+@COLOR easyknack.viewer.trace7=#B2A957
+@COLOR easyknack.viewer.trace8=#9C8AED
