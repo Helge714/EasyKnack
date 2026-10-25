@@ -14,7 +14,7 @@ import com.vingame.glswing.component.GLContainer;
 
 /** Default node projection. Subclasses can replace controls and rendering, with typed model writes. */
 public class BasicNodeView extends GLNode {
-        void executionArea(String area){setTitle(definition.title()+(area.isEmpty()?"":" ["+area+"]"));}
+        void executionArea(String area){setDefaultTitle(definition.title());setTitleSuffix(area.isEmpty()?"":" ["+area+"]");}
         private final BasicNode definition;
         private final NodeViewContext.PropertyWriter writer;
         private final GLHistoryManager history;
