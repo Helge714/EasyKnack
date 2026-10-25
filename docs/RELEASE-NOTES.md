@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Buffer spectral render bursts on a dedicated WASAPI producer, with reserve based on FFT hop cadence. Ordinary audio graphs keep direct rendering; ASIO stays synchronous. This trades extra spectral-path latency for callback deadline isolation. Playback queue underruns are reported independently of cycle-averaged DSP load. The current development version covers the fix.
+
 - Add MIDI editor drivers with learning, per-slider mapping/pickup, note/CC control of choices, toggles and trigger buttons, and MIDI-colored frames. Assignments persist in documents; graph connections take precedence without removing them. MIDI changes do not add Undo entries and retain current values through graph Undo. Requires the updated external GLSwing artifact and rebuilt audio/plugin host; audio protocol remains 11 with additive driver commands. The current development version covers these compatible additions.
 
 - Add Spectral Features (eight descriptors) and a multi-input Value Viewer with bounded history, peak-preserving plots, Freeze, numeric display, zoom/measurement cursors and PNG/JPG/CSV snapshot export. Rebuild Java, host and plugin SDK together for the new node types; existing contracts and documents are unchanged. The current development version covers these compatible additions.

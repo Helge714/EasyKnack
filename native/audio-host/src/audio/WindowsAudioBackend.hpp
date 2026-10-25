@@ -1,6 +1,7 @@
 #pragma once
 // Only this backend knows WASAPI, Windows process IDs and miniaudio devices.
 #include "AudioBackend.hpp"
+#include "AudioRenderAhead.hpp"
 #include "ProtocolText.hpp"
 #include "WindowsProcessCapture.hpp"
 #include "../AudioGraph.hpp"
@@ -38,6 +39,7 @@ class WindowsAudioBackend final : public AudioBackend {
         ma_result openResult = MA_SUCCESS;
         ma_device device{};
         StereoRing<> ring;
+        std::unique_ptr<StereoRing<131072>> playback;
         std::array<float, blockSize*2> block{};
         std::atomic<bool> failed{false};
         std::atomic<std::uint64_t> directFrames{0};
@@ -60,6 +62,7 @@ class WindowsAudioBackend final : public AudioBackend {
     bool contextReady = false, clockContextReady = false, clockReady = false, comReady = false;
     bool nullBackend = false, running = false, processCapture = false;
     bool clockEnabled = true;
+    AudioRenderAhead renderAhead;
     Stream* master = nullptr; // Changed only while every callback is stopped.
     float* directOutput = nullptr; // DSP thread only, valid for one master callback.
     std::size_t directOffset = 0;
@@ -83,13 +86,22 @@ class WindowsAudioBackend final : public AudioBackend {
         }
         else if (stream.drivesDsp) {
             auto& self = *stream.owner;
+            if(self.renderAhead.active()){self.renderAhead.read(static_cast<float*>(output),frames);stream.directFrames.fetch_add(frames,std::memory_order_relaxed);return;}
             self.directOutput = static_cast<float*>(output);
             self.directOffset = 0;
             self.engine.render(self.directOutput, frames, &self, true);
             self.directOutput = nullptr;
+            if(RenderCadence::period>1)self.renderAhead.enable(RenderCadence::period);
             stream.directFrames.fetch_add(frames, std::memory_order_relaxed);
         }
+        else if(stream.playback)stream.playback->readAdaptive(static_cast<float*>(output), frames);
         else stream.ring.readAdaptive(static_cast<float*>(output), frames);
+    }
+    static unsigned renderQueued(void* context,float* output,unsigned frames)noexcept {
+        auto& self=*static_cast<WindowsAudioBackend*>(context);
+        self.directOutput=output;self.directOffset=0;
+        self.engine.render(output,frames,&self,true);self.directOutput=nullptr;
+        return RenderCadence::period;
     }
     static void notification(const ma_device_notification* event) {
         if (event->type == ma_device_notification_type_stopped)
@@ -195,13 +207,15 @@ class WindowsAudioBackend final : public AudioBackend {
     }
     static void prime(Stream& stream) {
         stream.ring.reset();
+        if(stream.playback)stream.playback->reset();
         stream.directFrames.store(0);
-        if (!stream.input) stream.ring.write(nullptr, StereoRing<>::adaptiveTargetFrames);
+        if (!stream.input&&stream.playback)stream.playback->write(nullptr,StereoRing<>::adaptiveTargetFrames);
     }
     void pauseStreams() {
         ma_device_stop(&clock);
         // The DSP producer must finish before any consumer/buffer is reset or destroyed.
         if (master) master->stop();
+        renderAhead.stop();
         for (auto& stream : streams) if (stream->initialized && stream.get()!=master) stream->stop();
         master = nullptr;
     }
@@ -217,7 +231,8 @@ class WindowsAudioBackend final : public AudioBackend {
             // Capture and secondary sinks are ready before the master starts the DSP.
             for (auto& stream : streams) if (stream->initialized && stream.get()!=master)
                 stream->failed.store(!stream->start());
-            if (master && !master->start()) { master->failed.store(true); master=nullptr; }
+            if(master)renderAhead.start(renderQueued,this);
+            if (master && !master->start()) { renderAhead.stop();master->failed.store(true); master=nullptr; }
         }
         if (clockEnabled && !master && ma_device_start(&clock)!=MA_SUCCESS)
             throw std::runtime_error("audio fallback clock start failed");
@@ -257,7 +272,7 @@ public:
         return "output " + hexText(master->id) + " "
             + std::to_string(master->device.playback.internalPeriodSizeInFrames) + " "
             + std::to_string(master->device.playback.internalSampleRate) + " "
-            + std::to_string(inputReserve);
+            + std::to_string(inputReserve)+" render-reserve "+std::to_string(renderAhead.latencyFrames());
     }
     bool needsRefresh() const {
         return routeKey(selectedRoutes)!=preparedKey || std::any_of(streams.begin(),streams.end(),[this](const auto& s) {
@@ -325,6 +340,7 @@ public:
             std::vector<DWORD> processes = info && !info->processes.empty() ? info->processes : std::vector<DWORD>{info ? info->process : 0};
             for (DWORD pid : processes) {
             auto stream = std::make_unique<Stream>(); stream->owner=this; stream->id = route.endpoint; stream->input = route.input;
+            if(!route.input)stream->playback=std::make_unique<StereoRing<131072>>();
             stream->name = info ? info->endpoint.name : route.endpoint;
             if (info) {
                 bool loopback = info->endpoint.type == AudioEndpointType::SystemMix || info->endpoint.type == AudioEndpointType::Application;
@@ -383,12 +399,15 @@ public:
         AudioIOStatistics result;
         for (const auto& stream : streams) {
             if (stream->input) result.capturedFrames += stream->ring.writtenFrames();
-            else result.playedFrames += stream.get()==master ? stream->directFrames.load() : stream->ring.readFrames();
+            else result.playedFrames += stream.get()==master ? stream->directFrames.load() : stream->playback?stream->playback->readFrames():stream->ring.readFrames();
             result.underruns += stream->ring.underruns.load(); result.overruns += stream->ring.overruns.load();
             if(stream->input){result.captureUnder+=stream->ring.underruns.load();result.captureOver+=stream->ring.overruns.load();}
             else{result.playbackUnder+=stream->ring.underruns.load();result.playbackOver+=stream->ring.overruns.load();}
             result.priming+=stream->ring.priming.load();
+            if(stream->playback){auto under=stream->playback->underruns.load(),over=stream->playback->overruns.load();result.underruns+=under;result.overruns+=over;result.playbackUnder+=under;result.playbackOver+=over;result.priming+=stream->playback->priming.load();}
         }
+        result.playbackUnder+=renderAhead.underruns();result.playbackOver+=renderAhead.overruns();
+        result.underruns+=renderAhead.underruns();result.overruns+=renderAhead.overruns();
         return result;
     }
     void beginBlock(std::size_t frames) noexcept override {
@@ -418,6 +437,7 @@ public:
             stream->peak.store(std::max(peak,stream->peak.load(std::memory_order_relaxed)),std::memory_order_relaxed);
             if (stream.get()==master && directOutput)
                 std::copy_n(stream->block.data(), frames*2, directOutput+directOffset*2);
+            else if(stream->playback)stream->playback->write(stream->block.data(),frames);
             else stream->ring.write(stream->block.data(), frames);
         }
         directOffset += frames;

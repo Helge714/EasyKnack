@@ -77,6 +77,27 @@ struct WindowsAudioBackendTest {
         }
         valid &= backend.master->directFrames.load()==total;
         valid &= backend.master->ring.writtenFrames()==0;
+        // Buffered callbacks retain routing, stereo and partial callback offsets.
+        // Wait on the test side only; the device callback itself never waits.
+        backend.renderAhead.start(WindowsAudioBackend::renderQueued,&backend);
+        backend.renderAhead.enable(1024);
+        auto reserve=backend.renderAhead.latencyFrames();
+        std::array<float,512> buffered{};
+        for(unsigned consumed=0;consumed<reserve;consumed+=256){
+            WindowsAudioBackend::deviceCallback(&backend.master->device,buffered.data(),nullptr,256);
+            for(float value:buffered)valid &= value==0;
+            auto until=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+            while(backend.renderAhead.renderedFrames()<consumed+256&&std::chrono::steady_clock::now()<until)std::this_thread::yield();
+            valid &= backend.renderAhead.renderedFrames()>=consumed+256;
+        }
+        WindowsAudioBackend::deviceCallback(&backend.master->device,buffered.data(),nullptr,256);
+        for(unsigned f=0;f<256;f++){
+            envelope+=(.2f-envelope)*.004f;
+            valid &= std::abs(buffered[2*f]-1.5f*envelope)<1e-6f;
+            valid &= std::abs(buffered[2*f+1]+.5f*envelope)<1e-6f;
+        }
+        valid &= backend.renderAhead.underruns()==0&&backend.renderAhead.overruns()==0;
+        backend.renderAhead.stop();
         // Restore simulated handles before the ordinary backend destructor runs.
         for (auto& stream:backend.streams) stream->initialized=false;
         backend.master=nullptr;
