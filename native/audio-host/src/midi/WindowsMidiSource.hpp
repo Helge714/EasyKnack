@@ -17,7 +17,8 @@ private:
     struct Slot {
         std::atomic<std::uint64_t> key{0},generation{0};
         std::atomic<bool> enabled{false};
-        MidiQueue queue;
+        MidiQueue queue,driverQueue;
+        std::atomic<bool> driverEnabled{false};
         MidiBlock block;
         HMIDIIN handle=nullptr; // control thread only
         WindowsMidiSource* owner=nullptr;
@@ -26,7 +27,8 @@ private:
     Slot keyboard;
     std::atomic<bool> running{false};
     bool hardware;
-    std::vector<std::uint64_t> wanted;
+    std::vector<std::uint64_t> wanted,driverWanted;
+    bool learningDrivers=false;
     std::string problem;
     static std::int64_t now() noexcept {return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();}
     static std::string utf8(const wchar_t* text){
@@ -38,8 +40,11 @@ private:
     static void CALLBACK callback(HMIDIIN,UINT message,DWORD_PTR instance,DWORD_PTR data,DWORD_PTR) noexcept {
         auto& slot=*reinterpret_cast<Slot*>(instance);
         if(message==MIM_ERROR||message==MIM_MOREDATA||message==MIM_CLOSE){if(message==MIM_CLOSE)slot.enabled.store(false,std::memory_order_release);slot.queue.panic();return;}
-        if(message==MIM_DATA&&slot.enabled.load(std::memory_order_acquire)&&slot.owner->running.load(std::memory_order_acquire))
-            slot.queue.push(now(),static_cast<std::uint32_t>(data));
+        if(message==MIM_DATA&&slot.enabled.load(std::memory_order_acquire)){
+            auto value=static_cast<std::uint32_t>(data);auto type=value&0xf0;
+            if(slot.driverEnabled.load(std::memory_order_acquire)&&(type==0x80||type==0x90||type==0xb0))slot.driverQueue.push(now(),value);
+            if(slot.owner->running.load(std::memory_order_acquire))slot.queue.push(now(),value);
+        }
     }
     void close(Slot& slot){
         slot.enabled.store(false,std::memory_order_release);slot.queue.panic();
@@ -65,6 +70,8 @@ public:
     }
     void refresh(){
         auto devices=enumerate();std::set<std::uint64_t> requested(wanted.begin(),wanted.end());problem.clear();
+        requested.insert(driverWanted.begin(),driverWanted.end());if(learningDrivers)for(auto& device:devices)requested.insert(device.key);
+        for(auto& slot:slots)slot.driverEnabled.store(learningDrivers||std::find(driverWanted.begin(),driverWanted.end(),slot.key.load())!=driverWanted.end(),std::memory_order_release);
         for(auto& s:slots){auto key=s.key.load();if(s.handle&&(!s.enabled.load()||!requested.count(key)||std::none_of(devices.begin(),devices.end(),[&](const Device& d){return d.key==key;})))close(s);}
         for(auto key:requested){
             if(key<=1)continue;
@@ -78,13 +85,30 @@ public:
             slot->generation.fetch_add(1);slot->queue.panic();
             auto result=midiInOpen(&slot->handle,found->index,reinterpret_cast<DWORD_PTR>(&callback),reinterpret_cast<DWORD_PTR>(slot),CALLBACK_FUNCTION|MIDI_IO_STATUS);
             if(result!=MMSYSERR_NOERROR){slot->handle=nullptr;problem="MIDI input busy or unavailable: "+found->name;continue;}
+            slot->driverEnabled.store(learningDrivers||std::find(driverWanted.begin(),driverWanted.end(),key)!=driverWanted.end(),std::memory_order_release);
             slot->enabled.store(true,std::memory_order_release);
             if(midiInStart(slot->handle)!=MMSYSERR_NOERROR){close(*slot);problem="MIDI input could not start: "+found->name;}
         }
     }
+    void prepareDrivers(std::vector<std::uint64_t> devices,bool learning){
+        std::sort(devices.begin(),devices.end());devices.erase(std::unique(devices.begin(),devices.end()),devices.end());
+        if(driverWanted==devices&&learningDrivers==learning)return;driverWanted=std::move(devices);learningDrivers=learning;
+        keyboard.driverEnabled.store(learning||std::find(driverWanted.begin(),driverWanted.end(),1)!=driverWanted.end());refresh();
+    }
+    std::vector<std::pair<std::uint64_t,std::uint32_t>> driverEvents(){
+        std::vector<std::pair<std::uint64_t,std::uint32_t>> result;auto end=now()+1;
+        auto drain=[&](Slot& slot){MidiBlock block;slot.driverQueue.drain(block,0,end,1);
+            if(block.panic)result.emplace_back(slot.key.load(),255);
+            for(std::size_t i=0;i<block.count;i++)result.emplace_back(slot.key.load(),block.events[i].message);};
+        drain(keyboard);for(auto& slot:slots)if(slot.key.load())drain(slot);return result;
+    }
     void setRunning(bool value) noexcept {running.store(value,std::memory_order_release);if(!value)panic();}
     void panic() noexcept {keyboard.queue.panic();for(auto& s:slots)s.queue.panic();}
-    void keyboardEvent(std::uint32_t message) noexcept {if(message==255)keyboard.queue.panic();else if(running.load(std::memory_order_acquire))keyboard.queue.push(now(),message);}
+    void keyboardEvent(std::uint32_t message) noexcept {
+        if(message==255){keyboard.queue.panic();keyboard.driverQueue.panic();return;}
+        if(keyboard.driverEnabled.load())keyboard.driverQueue.push(now(),message);
+        if(running.load(std::memory_order_acquire))keyboard.queue.push(now(),message);
+    }
     const std::string& status() const {return problem;}
     void beginBlock(std::size_t frames,double rate) noexcept override {
         auto end=now(),start=end-static_cast<std::int64_t>(frames*1e9/rate);

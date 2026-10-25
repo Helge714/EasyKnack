@@ -53,6 +53,7 @@ public final class AudioHostService implements AutoCloseable {
         });
     }
     private String sent;
+    private String sentDrivers;
     private volatile boolean discoveryRequested = true;
     private long nextDiscovery, nextMeters, nextVolumes, nextAnalysis;
     private String routingStatus = "";
@@ -72,7 +73,7 @@ public final class AudioHostService implements AutoCloseable {
     }
     private void sendKeyboard() throws java.io.IOException {
         var events=MidiDevices.drainKeyboard();
-        if(client!=null&&playing&&!events.isEmpty())client.command("MIDI_KEYBOARD "+events.size()+events.stream().map(e->" "+e).collect(java.util.stream.Collectors.joining()));
+        if(client!=null&&!events.isEmpty())client.command("MIDI_KEYBOARD "+events.size()+events.stream().map(e->" "+e).collect(java.util.stream.Collectors.joining()));
     }
     public void setStatusListener(Consumer<String> listener) { this.listener = listener; }
     public void setLoadListener(Consumer<String> listener) { loadListener = listener; }
@@ -111,12 +112,16 @@ public final class AudioHostService implements AutoCloseable {
             if (client == null && (wanted || discoveryRequested)) {
                 discoveryRequested = false;
                 client = new AudioHostClient();
-                client.start(executable, nullDevice);openedExecutable=executable;
+                client.start(executable, nullDevice);openedExecutable=executable;sentDrivers=null;
                 diagnosticsUnavailable=false;
                 SwingUtilities.invokeLater(()->diagnosticsListener.accept(null));
                 nextDiscovery = 0;
             }
             if (client == null) return;
+            String drivers=MidiDriverInput.command();
+            if(!drivers.equals(sentDrivers)){client.command(drivers);sentDrivers=drivers;}
+            var driverEvents=MidiDriverInput.parse(client.command("MIDI_DRIVER_EVENTS"));
+            if(!driverEvents.isEmpty())SwingUtilities.invokeLater(()->{if(!closed)MidiDriverInput.publish(driverEvents);});
             if(MidiDevices.takePanic())client.command("MIDI_PANIC");
             sendKeyboard();
             if (latest.error() == null && latest != rejectedGraph && !latest.command().equals(sent)) {

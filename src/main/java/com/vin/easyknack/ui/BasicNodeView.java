@@ -48,6 +48,7 @@ public class BasicNodeView extends GLNode {
                 if (row.isInspectorOnly()) continue;
                 GLContainer content = row.editor() == null ? new NodeTooltipLabel(row.label(), row.kind()==NodeBuilder.RowKind.OUTPUT) : control(row);
                 controls.put(row.key(),content);
+                if(row.isDriverAssignable())MidiDrivers.attach(history,id,row.id(),content);
                 if(content instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->write(new PropertyId(GLGraphNode.AUTOMATIC_PREFIX+row.id()),GLNodeValue.of(true)));
                 if(content instanceof GLControl control) {
                     String tip=row.editor() instanceof UnitSlider?(row.tooltip()==null||row.tooltip().isBlank()?"":row.tooltip()+"\n")+control.getToolTipText():row.tooltip();

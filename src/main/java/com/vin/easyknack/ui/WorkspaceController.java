@@ -49,6 +49,7 @@ final class WorkspaceController implements AutoCloseable {
     private boolean changingProperties;
     private boolean closed;
     private final GLNodeWorkspace workspace;
+    private MidiDrivers midiDrivers;
     private final EditorTemplates editorTemplates;
     private final CompositePortColors compositeColors;
     private int compositeNumber;
@@ -89,6 +90,7 @@ final class WorkspaceController implements AutoCloseable {
         workspace = new GLNodeWorkspace(types, composites, catalog, new AudioNodeFactory(this::setNodeProperty, history, this::observeCurrentGraph),
                 GLGraphCyclePolicy.DELAYED_FEEDBACK, history, valueTypes, inputEditors,
                 nodes.schemas());
+        midiDrivers=new MidiDrivers(this);
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
         editorTemplates=new EditorTemplates(inputEditors);
         inputEditors.register(new com.vingame.glswing.node.composite.GLNodeInputEditorDescriptor(GroupInputSettings.BUTTON,"Button",java.util.Set.of(com.vin.easyknack.nodes.SignalCategory.TRIGGER.valueTypeId()),Map.of()));
@@ -181,6 +183,7 @@ final class WorkspaceController implements AutoCloseable {
 
     void setNodeProperty(GLNodeId id, com.vin.easyknack.nodes.PropertyId property, com.vingame.glswing.node.model.GLNodeValue value) {
         String key = property.value();
+        if(midiDrivers!=null)midiDrivers.manualEdit(driverCurrentAsset(),id,key);
         var target = workspace.currentGraph();
         if (target == null) return;
         var node = target.snapshot().findNode(id).orElse(null);
@@ -220,6 +223,7 @@ final class WorkspaceController implements AutoCloseable {
         if (target == null || observed.containsKey(target)) return;
         GLNodeGraph.Listener listener = (source, change) -> {
             if (changingProperties || history.isApplying()) return;
+            if(midiDrivers!=null)midiDrivers.manualGraphChange(change.before(),change.after());
             boolean parametersChanged = change.after().nodes().stream().anyMatch(n -> {
                 var old = change.before().findNode(n.id()).orElse(null);
                 if (old == null || NodeRegistry.find(n.typeId()).isEmpty()) return false;
@@ -387,6 +391,7 @@ final class WorkspaceController implements AutoCloseable {
         var document = NodeDocuments.prepare(input); // Validate with isolated registries before changing the editor.
         preserveUnusedGroups=DocumentSettings.preserve(document);
         editorTemplates.load(document.root().metadata().get(EditorTemplates.KEY));
+        if(midiDrivers!=null)midiDrivers.documentChanged();
         for(var asset:NodeDocuments.assets(document))if(asset.compositeDescriptor()!=null)for(var port:asset.compositeDescriptor().portMappings()){var template=GroupInputs.template(port);if(template!=null&&port.presentation().inputEditorId().startsWith(EditorTemplates.PREFIX)&&editorTemplates.all().stream().noneMatch(t->t.id().equals(template.id())))editorTemplates.register(template);}
         stopAudio();
         bakes.reset();
@@ -506,6 +511,7 @@ final class WorkspaceController implements AutoCloseable {
                             ? n.withProperty(com.vin.easyknack.nodes.ProcessingRate.EFFECTIVE,rates.get(n.id())) : n).map(this::withPortRates).ifPresent(n->{if(connectionsChanged||!n.equals(presented.get(basic))){basic.update(n);presented.put(basic,n);}});
         }
         refreshGraphDiagnostics();
+        if(midiDrivers!=null)midiDrivers.refresh();
     }
 
     private void prepareBakeInspector(){
@@ -516,6 +522,7 @@ final class WorkspaceController implements AutoCloseable {
             GroupCheckboxes.register(nodes.schemas(),composites);
             InstanceCountInspector.register(nodes.schemas(),composites);
             bakes.register(nodes.schemas(),composites);
+            registerDriverInspector();
             var current=workspace.currentGraph();if(current==null)return;
             var missing=current.snapshot().nodes().stream().filter(n->composites.findComposite(n.typeId()).isPresent()&&!n.properties().containsKey(GroupBakes.PROPERTY)).toList();
             if(!missing.isEmpty()){
@@ -717,8 +724,65 @@ final class WorkspaceController implements AutoCloseable {
         for(var view:workspace.editor().getNodes())if(compositeColors.modelId(view).filter(node.id()::equals).isPresent()){view.setLocation(x,y);workspace.editor().setSelectedNode(view);break;}syncAudio();
     }
 
+    String driverCurrentAsset(){return workspace.currentAssetId()==null?MidiDrivers.ROOT:workspace.currentAssetId();}
+    Map<String,GLNodeGraphSnapshot> driverGraphs(){
+        var result=new java.util.LinkedHashMap<String,GLNodeGraphSnapshot>();result.put(MidiDrivers.ROOT,graph.snapshot());
+        composites.assets().forEach(a->result.put(a.id(),a.graph()));
+        if(workspace.currentGraph()!=null)result.put(driverCurrentAsset(),workspace.currentGraph().snapshot());return result;
+    }
+    MidiDrivers.Spec driverGroupSpec(GLGraphNode node,String property){
+        var descriptor=composites.findComposite(node.typeId()).orElse(null);if(descriptor==null)return null;
+        var asset=GroupInputs.materialize(composites.findAsset(descriptor.assetId()).orElseThrow());
+        var choice=GroupChoices.choices(asset,composites).stream().filter(c->c.id().equals(property)).findFirst().orElse(null);
+        if(choice!=null){var port=descriptor.portMappings().stream().filter(p->GroupInputs.choice(p)&&GroupInputs.property(p).equals(property)).map(p->p.publicPort().id()).findFirst().orElse(null);return new MidiDrivers.Spec(choice.editor(),port,()->{});}
+        var port=descriptor.portMappings().stream().filter(p->GroupUnits.key(p.publicPort().id()).equals(property)).findFirst().orElse(null);
+        if(port==null)return null;String id=port.publicPort().id();
+        if(port.presentation().inputEditorId().equals(GroupInputSettings.BUTTON))return new MidiDrivers.Spec(new com.vin.easyknack.nodes.Editor.Trigger(),id,()->GroupInputTriggers.fire(composites,node.id().toString(),descriptor,port));
+        var options=new com.vin.easyknack.nodes.NodeState(port.presentation().editorOptions());
+        if(GroupInputSettings.checkbox(port))return new MidiDrivers.Spec(new com.vin.easyknack.nodes.Editor.Toggle(options.number("default",0)!=0),id,()->{});
+        if(!port.presentation().inputEditorId().equals(com.vingame.glswing.node.composite.GLNodeInputEditorRegistry.SLIDER)||GroupVectorEditors.isVector(port))return null;
+        Double min=options.flag("minimumEnabled",true)?options.number("minimum",0):null,max=options.flag("maximumEnabled",true)?options.number("maximum",1):null;
+        return new MidiDrivers.Spec(new com.vin.easyknack.nodes.Editor.Slider(options.number("default",0),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),false),id,()->{});
+    }
+    boolean driverControlled(String asset,GLNodeId node,String property){
+        var source=composites.findAsset(asset).orElse(null);if(source==null||source.compositeDescriptor()==null)return false;
+        return source.compositeDescriptor().portMappings().stream().flatMap(p->GroupEditorCopies.targets(p).stream()).anyMatch(e->e.nodeId().equals(node)&&e.portId().equals(property));
+    }
+    void driverConfigure(String asset,GLNodeId node,String property,com.vingame.glswing.node.model.GLNodeValue value){
+        if(!asset.equals(driverCurrentAsset()))throw new IllegalStateException("Open the owning group to edit its driver");
+        if(value!=null)setNodeProperty(node,new com.vin.easyknack.nodes.PropertyId(property),value);
+        else {var target=workspace.currentGraph();var before=target.snapshot();var draft=new GLNodeGraph(before);draft.edit("Remove driver",e->e.removeProperty(node,property));var after=nodes.normalize(draft.snapshot(),java.util.Set.of(node));changingProperties=true;
+            try{history.perform(AppText.text("driver.remove"),()->replaceProperties(target,"Remove driver",after),()->replaceProperties(target,"Restore driver",before));}
+            finally{changingProperties=false;}}
+        prepareBakeInspector();if(workspace.propertyInspector()!=null)workspace.propertyInspector().refresh();syncAudio();
+    }
+    void driverWrite(String asset,GLNodeId node,String property,com.vingame.glswing.node.model.GLNodeValue value){
+        var before=driverGraphs().get(asset);if(before==null)return;var model=before.findNode(node).orElse(null);
+        if(model==null||value.equals(model.properties().get(property))&&!model.isPropertyAutomatic(property))return;
+        var edited=new GLNodeGraph(before);edited.edit("MIDI driver",e->e.setExplicitProperty(node,property,value));
+        var after=nodes.normalize(edited.snapshot(),java.util.Set.of(node));
+        boolean previous=changingProperties;changingProperties=true;
+        try{
+            var target=asset.equals(driverCurrentAsset())?workspace.currentGraph():asset.equals(MidiDrivers.ROOT)?graph:null;
+            if(target!=null)replaceProperties(target,"MIDI driver",after);
+            else {var original=composites.findAsset(asset).orElseThrow();composites.replaceAsset(new GLNodeGraphAsset(original.id(),original.version(),original.kind(),after,original.viewState(),original.metadata(),original.compositeDescriptor()));}
+        }finally{changingProperties=previous;}
+        history.markExternalChange();syncAudio();
+    }
+    private void registerDriverInspector(){
+        if(midiDrivers==null||workspace.currentGraph()==null)return;
+        for(var node:workspace.currentGraph().snapshot().nodes())if(selectedNodeIds().contains(node.id())&&composites.findComposite(node.typeId()).isPresent()){
+            var properties=new java.util.ArrayList<>(nodes.schemas().properties(node.typeId()));properties.removeIf(p->p.id().startsWith(com.vingame.glswing.ui.GLDriverTarget.PROPERTY_PREFIX));
+            node.properties().forEach((key,value)->{if(key.startsWith(com.vingame.glswing.ui.GLDriverTarget.PROPERTY_PREFIX)){
+                String property=MidiDriverBinding.property(key);var address=new MidiDrivers.Address(driverCurrentAsset(),node.id(),property);var target=midiDrivers.target(address);if(target==null)return;
+                properties.add(new com.vingame.glswing.node.model.GLCustomNodeProperty(key,AppText.text("driver.title"),(model,ignored)->new MidiDriverSettingsPanel(MidiDriverBinding.read(model.properties().getOrDefault(key,value)),target,updated->driverConfigure(driverCurrentAsset(),model.id(),key,updated)),
+                    (control,model)->((MidiDriverSettingsPanel)control).update(MidiDriverBinding.read(model.properties().getOrDefault(key,value)))));
+            }});nodes.schemas().register(node.typeId(),properties);
+        }
+    }
     @Override public void close() {
         closed = true; audioUpdateTimer.stop();presented.clear();
+        if(midiDrivers!=null)midiDrivers.close();
         bakes.close();if(formulas!=null)formulas.close();formulaEditors.values().forEach(FormulaEditorPanel::close);formulaEditors.clear();
         history.removeListener(rateHistoryListener);
         compositeColors.close();

@@ -27,6 +27,7 @@ public final class InspectorEditor extends GLContainer {
         if(editor.component() instanceof com.vin.easyknack.ui.ValueViewerPanel viewer)viewer.bind(model.id().toString());
         if(editor.component() instanceof PitchReadoutEditor.Readout readout)readout.bind(model.id().toString());
         if(editor.component() instanceof Editor.TriggerButton button)button.bind(model.id().toString(),row.id());
+        if(row.isDriverAssignable())com.vin.easyknack.ui.MidiDrivers.attachInspector(model.id(),row.id(),editor.component());
         update(model);
         setPreferredGLSize(180,(label==null?0:24)+Math.max(30,editor.component().getPreferredGLSize().height()));
     }

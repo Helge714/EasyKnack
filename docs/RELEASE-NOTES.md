@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add MIDI editor drivers with learning, per-slider mapping/pickup, note/CC control of choices, toggles and trigger buttons, and MIDI-colored frames. Assignments persist in documents; graph connections take precedence without removing them. MIDI changes do not add Undo entries and retain current values through graph Undo. Requires the updated external GLSwing artifact and rebuilt audio/plugin host; audio protocol remains 11 with additive driver commands. The current development version covers these compatible additions.
+
 - Add Spectral Features (eight descriptors) and a multi-input Value Viewer with bounded history, peak-preserving plots, Freeze, numeric display, zoom/measurement cursors and PNG/JPG/CSV snapshot export. Rebuild Java, host and plugin SDK together for the new node types; existing contracts and documents are unchanged. The current development version covers these compatible additions.
 
 - Read the original project license/notices in verified source checkouts when an incremental IDE build removes generated legal resources. Packaged applications continue to require their bundled documents; plugin SDK licensing uses the same lookup. The current development version covers this fix.

@@ -53,7 +53,7 @@ public abstract class BasicNode {
     }
     public String textPrefix(){return registration().id();}
     public final NodeBuilder layout(NodeState state) {
-        state=normalizeState(state);NodeBuilder builder = new NodeBuilder(); define(builder, state); builder.applyFormats(state); builder.applyRates(state); builder.translate(textPrefix()); builder.validate(state); return builder;
+        state=normalizeState(state);NodeBuilder builder = new NodeBuilder(); define(builder, state); builder.applyFormats(state); MidiDriverSettingsEditor.addSettings(builder,state); builder.applyRates(state); builder.translate(textPrefix()); builder.validate(state); return builder;
     }
     public final String title() { return NodeText.text(registration().id() + ".title", registration().title()); }
     public Map<String, GLNodeValue> defaults() { return layout(new NodeState(Map.of())).defaults(); }

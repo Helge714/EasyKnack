@@ -66,6 +66,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
                     UnitSlider.bindHistory((GLSlider)control,()->history);
                     format.bindUnitMenu((GLSlider)control,u->writer.set(node.id(),new PropertyId(GroupUnits.unitKey(port.id())),GLNodeValue.of(u.id())));
                 }else control=new NodeTooltipLabel(port.id(),output);
+                if(!output)MidiDrivers.attach(history,node.id(),GroupInputs.choice(p)?GroupInputs.property(p):GroupUnits.key(port.id()),control);
                 if(output)addOutput(port.id(),control);
                 else {var input=addInput(port.id(),control);input.setSocketVisible(p.presentation().socketVisible());input.setContentHiddenWhenConnected(controls.containsKey(port.id()) || GroupInputs.choice(p) || p.presentation().inputEditorId().equals(GroupInputSettings.BUTTON));}
                 
@@ -74,7 +75,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
                 if(choiceControls.containsKey(choice.id()))continue;
                 addContent(new GLLabel(choice.label()));
                 var binding=choice.editor().create(choice.id(),v->{if(!updating)writer.set(node.id(),new PropertyId(choice.id()),v);});
-                choiceControls.put(choice.id(),binding);addContent(binding.component());
+                choiceControls.put(choice.id(),binding);MidiDrivers.attach(history,node.id(),choice.id(),binding.component());addContent(binding.component());
             }
             CompositePortColors.apply(this,descriptor);update(node);
             String monitor=new NodeState(groups.findAsset(descriptor.assetId()).orElseThrow().metadata()).text(PitchReadoutEditor.GROUP_MONITOR,"");

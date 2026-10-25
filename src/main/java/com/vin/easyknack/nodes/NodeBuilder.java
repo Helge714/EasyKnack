@@ -17,7 +17,9 @@ public final class NodeBuilder {
         private UnitFormats formats;
         public Row formats(UnitFormats value) { formats=value;return this; }
         private boolean alwaysVisible;
-        private boolean editorCopyable=true;
+        private boolean editorCopyable=true,driverAssignable=true;
+        public Row driverAssignable(boolean value){driverAssignable=value;return this;}
+        public boolean isDriverAssignable(){return driverAssignable&&(editor instanceof Editor.Slider||editor instanceof UnitSlider||editor instanceof Editor.CheckBox||editor instanceof Editor.Toggle||editor instanceof Editor.ComboBox<?>||editor instanceof Editor.Trigger);}
         /** Disable for editors whose behavior depends on a custom node view. */
         public Row editorCopyable(boolean value){editorCopyable=value;return this;}
         public boolean isEditorCopyable(){return editorCopyable;}

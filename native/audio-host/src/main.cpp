@@ -133,6 +133,17 @@ int main(int argc, char** argv) {
                     std::string extra;if(input>>extra)throw std::runtime_error("unexpected keyboard data");
                     for(int i=0;i<count;i++)midi->keyboardEvent(messages[i]);
                 }
+                else if(line.rfind("MIDI_DRIVERS ",0)==0){
+                    std::istringstream input(line.substr(13));int learning,count;
+                    if(!(input>>learning>>count)||(learning!=0&&learning!=1)||count<0||count>64)throw std::runtime_error("invalid MIDI driver subscription");
+                    std::vector<std::uint64_t> devices(count);for(auto& id:devices)if(!(input>>id))throw std::runtime_error("invalid driver device");
+                    std::string extra;if(input>>extra)throw std::runtime_error("unexpected driver data");midi->prepareDrivers(std::move(devices),learning!=0);
+                }
+                else if(line=="MIDI_DRIVER_EVENTS"){
+                    auto events=midi->driverEvents();std::string response="OK "+std::to_string(events.size());
+                    for(auto event:events)response+=" "+std::to_string(event.first)+" "+std::to_string(event.second);
+                    sendLine(client.value,response);continue;
+                }
                 else if(line=="MIDI_INPUTS"){
                     auto devices=midi->enumerate();midi->refresh();
                     std::string response="OK "+std::to_string(devices.size());
