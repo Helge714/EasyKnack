@@ -32,7 +32,9 @@ struct SpectrumCorrelationNode : NodeProcessor {
         auto& p=static_cast<SpectrumCorrelationNode&>(previous);if(unbiased!=p.unbiased||smoothing!=p.smoothing)return;generation=p.generation;job.swap(p.job);std::swap(resource.result,p.resource.result);sequence=p.sequence;identity=p.identity;
     }
     void process(ProcessContext& c)noexcept override{
-        if(c.channelIndex||!job)return;
+        // Each stereo lane owns its worker and analysis resource. Both must run
+        // when FFT preserves channels; selected-channel FFTs already collapse to mono.
+        if(!job)return;
         auto* input=static_cast<const AnalysisResource*>(c.resource(0));auto* result=input?input->analysisResult():nullptr;
         if(!result||!result->spectrum.valid()){resource.result=nullptr;sequence=identity=0;return;}
         if(identity!=result->historyIdentity){resource.result=nullptr;sequence=0;identity=result->historyIdentity;generation=HistoryResource::nextIdentity.fetch_add(1);}

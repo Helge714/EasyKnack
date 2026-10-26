@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix right-channel autocorrelation processing when FFT preserves stereo. Correlation descriptors now remain valid on both channels instead of being halved by a downstream channel mix. Rebuild the audio host and plugin SDK; document and protocol versions are unchanged. Covered by the current development version.
+
 - Add Correlation Features with held control outputs for periodicity, period, repetition frequency, estimated HNR and validity; no Updated trigger. Inspector search/threshold settings and source-level metadata support silence gating, including averaged correlations. Rebuild Java, host and plugin SDK together. Document and host protocol versions are unchanged; the current development version covers this addition.
 
 - Fix Measurement Recorder capture and Undo retention with multiple inputs by recognizing dynamically registered node variants. The current development version covers the fix; document and host contracts are unchanged.

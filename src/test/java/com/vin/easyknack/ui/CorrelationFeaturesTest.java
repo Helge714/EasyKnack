@@ -9,17 +9,32 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CorrelationFeaturesTest {
-    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
-    void fftCorrelationDescriptorsReachRecorderThroughTheHost()throws Exception{
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans={false,true})
+    @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void fftCorrelationDescriptorsReachRecorderThroughTheHost(boolean stereo)throws Exception{
         var graph=new GLNodeGraph();
         var oscillator=AdvancedSourceExportTest.add(graph,new OscillatorNode(),Map.of("frequency",GLNodeValue.of(440.)));
         var fft=AdvancedSourceExportTest.add(graph,new SpectrumNode(),Map.of("size",GLNodeValue.of("8192"),"window",GLNodeValue.of("rectangular"),"padding",GLNodeValue.of("double"),"remove-dc",GLNodeValue.of(true)));
         var correlation=AdvancedSourceExportTest.add(graph,new SpectrumCorrelationNode(),Map.of("normalization",GLNodeValue.of("unbiased")));
         var features=AdvancedSourceExportTest.add(graph,new CorrelationFeaturesNode());
         var recorder=AdvancedSourceExportTest.add(graph,new MeasurementRecorderNode(),Map.of("inputs",GLNodeValue.of(5.)));
-        AdvancedSourceExportTest.connect(graph,oscillator,"audio-out",fft,"audio-in");AdvancedSourceExportTest.connect(graph,fft,"analysis",correlation,"spectrum");AdvancedSourceExportTest.connect(graph,correlation,"analysis",features,"analysis");
+        var source=oscillator;
+        if(stereo){
+            var right=AdvancedSourceExportTest.add(graph,new OscillatorNode(),Map.of("frequency",GLNodeValue.of(660.)));
+            source=AdvancedSourceExportTest.add(graph,new ChannelCombineNode());
+            AdvancedSourceExportTest.connect(graph,oscillator,"audio-out",source,"left");
+            AdvancedSourceExportTest.connect(graph,right,"audio-out",source,"right");
+        }
+        AdvancedSourceExportTest.connect(graph,source,"audio-out",fft,"audio-in");AdvancedSourceExportTest.connect(graph,fft,"analysis",correlation,"spectrum");AdvancedSourceExportTest.connect(graph,correlation,"analysis",features,"analysis");
         var ports=List.of("periodicity","period","frequency","hnr","valid");
-        for(int i=0;i<ports.size();i++)AdvancedSourceExportTest.connect(graph,features,ports.get(i),recorder,"value-"+i);
+        for(int i=0;i<ports.size();i++){
+            if(stereo){
+                var channels=AdvancedSourceExportTest.add(graph,new ChannelSeparateNode());
+                AdvancedSourceExportTest.connect(graph,features,ports.get(i),channels,"audio-in");
+                AdvancedSourceExportTest.connect(graph,channels,"right",recorder,"value-"+i);
+            }else AdvancedSourceExportTest.connect(graph,features,ports.get(i),recorder,"value-"+i);
+        }
         try(var host=new com.vin.easyknack.audio.AudioHostClient()){
             host.start(Path.of(System.getProperty("easyknack.test.host",com.vin.easyknack.audio.AudioHostClient.defaultExecutable().toString())),true);
             host.command(com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()));host.command("PLAY");
@@ -31,7 +46,13 @@ class CorrelationFeaturesTest {
                 row=((GLNodeValue.ListValue)rows.get(rows.size()-1)).values();if(((Number)row.get(6).toJavaValue()).doubleValue()>.5)break;
             }
             assertEquals(7,row.size());assertEquals(1.,((Number)row.get(6).toJavaValue()).doubleValue());
-            assertEquals(440.,((Number)row.get(4).toJavaValue()).doubleValue(),2.);
+            double expectedFrequency=stereo?660:440;
+            assertEquals(expectedFrequency,((Number)row.get(4).toJavaValue()).doubleValue(),2.);
+            assertEquals(1./expectedFrequency,((Number)row.get(3).toJavaValue()).doubleValue(),.00002);
+            // The telemetry rounds Periodicity near 1; reconstructing its logarithm
+            // would amplify transport rounding. Exact HNR is covered natively.
+            double hnr=((Number)row.get(5).toJavaValue()).doubleValue();
+            assertTrue(hnr>15&&hnr<=120);
             assertTrue(((Number)row.get(2).toJavaValue()).doubleValue()>.98);host.command("STOP");
         }
     }
