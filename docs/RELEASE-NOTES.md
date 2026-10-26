@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add population standard deviation, minimum and maximum to Value Average, using the same finite acquisition and held results as Mean. Rebuild Java, audio host and plugin SDK together. Existing port IDs and output indices are retained; document and protocol versions are unchanged. Covered by the current development version.
+
 - Preserve direct group input-to-output routes when outer parameters change. Keep custom Value Viewer dimensions when returning from a group, including hidden nodes. Requires the updated external Core artifact; document and audio contracts are unchanged. Covered by the current development version.
 
 - Fix group connection Undo after view replacement and preserve boundary wiring through presentation/property changes. Copied choice editors now allocate independent persistent parameter IDs; duplicate legacy IDs are repaired deterministically, retaining the first parameter value and using each additional editor's own default. Requires the updated external Core artifact; existing valid IDs, document format and audio protocol are unchanged. The current development version covers these fixes.

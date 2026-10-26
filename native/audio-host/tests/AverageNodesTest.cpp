@@ -2,7 +2,40 @@
 #include <cassert>
 #include <cmath>
 using namespace easyknack;
+static void valueStatistics(){
+    float signal[8]={1,3,5,7,9,11,13,15},trigger[8]={1};
+    float out[8]{},count[8]{},finished[8]{},deviation[8]{},minimum[8]{},maximum[8]{};
+    const float* inputs[]={signal,trigger};float* outputs[]={out,count,finished,deviation,minimum,maximum};
+    char rates[]={'a','e'};
+    ProcessContext c{inputs,2,out,8,8,out,8};c.outputs=outputs;c.outputCount=6;c.sourceRates=rates;
+    ValueAverageNode value;value.measurement.measurements=true;value.measurement.requestedCount=4;
+    assert(value.outputCount()==6);value.process(c);
+    assert(deviation[0]==0&&minimum[0]==1&&maximum[0]==1);
+    assert(std::abs(deviation[3]-std::sqrt(5.))<1e-6&&minimum[3]==1&&maximum[3]==7);
+    trigger[0]=0;value.process(c);
+    assert(out[7]==4&&std::abs(deviation[7]-std::sqrt(5.))<1e-6&&minimum[7]==1&&maximum[7]==7);
+    // Control observations have equal weight, regardless of the number of held samples.
+    rates[0]='c';trigger[0]=1;signal[0]=10;value.measurement.requestedCount=2;value.process(c);
+    assert(count[7]==1&&minimum[7]==10&&maximum[7]==10&&deviation[7]==0);
+    trigger[0]=0;signal[0]=14;value.process(c);
+    assert(out[7]==12&&deviation[7]==2&&minimum[7]==10&&maximum[7]==14&&finished[0]==1);
+    // A rebuild during acquisition preserves all accumulated moments and extrema.
+    rates[0]='a';trigger[0]=1;value.measurement.requestedCount=4;c.bufferSize=2;
+    signal[0]=-5;signal[1]=-3;value.process(c);
+    ValueAverageNode replacement;replacement.inheritState(value);trigger[0]=0;
+    signal[0]=-1;signal[1]=1;replacement.process(c);
+    assert(count[1]==4&&out[1]==-2&&std::abs(deviation[1]-std::sqrt(5.))<1e-6);
+    assert(minimum[1]==-5&&maximum[1]==1&&finished[1]==1);
+    // Stable variance for small changes around a large baseline.
+    trigger[0]=1;value.measurement.requestedCount=2;signal[0]=1000000;signal[1]=1000002;value.process(c);
+    assert(out[1]==1000001&&deviation[1]==1);
+    // Empty acquisitions and non-finite observations never leak the previous statistics.
+    value.measurement.measurements=false;value.measurement.duration=.25;
+    signal[0]=std::numeric_limits<float>::quiet_NaN();signal[1]=std::numeric_limits<float>::infinity();
+    value.process(c);assert(count[1]==0&&finished[1]==1&&out[1]==0&&deviation[1]==0&&minimum[1]==0&&maximum[1]==0);
+}
 int main(){
+    valueStatistics();
     float signal[8]={1,3,5,7,9,11,13,15},trigger[8]={1},out[8]{},count[8]{},finished[8]{};
     const float* inputs[]={signal,trigger};float* outputs[]={out,count,finished};char rates[]={'a','e'};
     ProcessContext c{inputs,2,out,8,8,out,8};c.outputs=outputs;c.outputCount=3;c.sourceRates=rates;

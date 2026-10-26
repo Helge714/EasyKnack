@@ -18,6 +18,17 @@ An Audio source contributes one value per sample; Control contributes one value 
 block. An unconnected Value editor also contributes once per block. Invalid numeric
 values are skipped. A timed acquisition with no valid observations finishes with zero.
 
+**Standard Deviation**, **Minimum** and **Maximum** use the same observations as
+**Mean** and hold their results when the measurement finishes. Standard deviation
+uses the population formula `sqrt(sum((x - mean)^2) / count)`, with zero for fewer
+than two observations. All four statistics have the same unit as the incoming values.
+Start resets all statistics together.
+
+To measure movement of a frequency centre, connect **Spectral Features → Centroid**
+to Value Average. Its standard deviation measures variation of the centroid over
+time in Hz. This differs from Spectral Spread, which measures frequency dispersion
+within each spectrum, and does not indicate how fast the centroid moves.
+
 ## Spectra and autocorrelation
 
 For averaged spectral features, connect **FFT → Analysis Average → Spectral Features**.
