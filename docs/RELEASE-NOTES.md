@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix Analysis Average dropping delayed frames from asynchronous FFT spectrum streams; each new delivered frame now counts once. Both averaging nodes support insertion into compatible connections and mute bypass; auxiliary Count/Finished outputs are silenced while muted. Existing contracts and versions are unchanged; the current development version covers these fixes.
+
 - Add Value Average and Analysis Average for trigger-started finite arithmetic measurements, count/time limits, held results and a Finished trigger. Spectra average power per bin; correlations average per lag. Spectral Features accepts statistical analysis resources; IFFT still requires a phase-bearing spectrum. Rebuild Java, host and plugin SDK together. The current development version covers these compatible additions; existing protocol and document versions are unchanged.
 
 - Preserve renamed nodes through diagnostic refresh, language changes, copying and group navigation. Custom names are saved in Core graph schema 9; older documents still load, while new saves require the updated Core. The current development version covers this fix.

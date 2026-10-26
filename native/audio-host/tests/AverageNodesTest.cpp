@@ -29,10 +29,18 @@ int main(){
     c.bufferSize=4;analysis->process(c);assert(count[3]==2&&finished[3]==1);
     assert(std::abs(std::norm(analysis->result->spectrum.bins[1])-4)<1e-9);
     // Every completed synchronous frame contributes, even within one audio block.
-    stream->windowSize=4;stream->blockStart=0;stream->count=2;
+    stream->identity++;stream->windowSize=4;stream->blockStart=0;stream->count=2;
     stream->frames[0].start=0;stream->frames[1].start=4;stream->frames[1].bins[1]={0,-2};
     c.bufferSize=8;trigger[0]=1;analysis->process(c);
     assert(count[7]==2&&finished[7]==1&&std::norm(analysis->result->spectrum.bins[1])==4);
+    // Async SpectrumNode delivers through SpectrumStream too, with capture times
+    // before this block. Count new arrivals once, not only synchronous timestamps.
+    stream->identity++;stream->count=1;stream->blockStart=100;stream->frames[0].start=84;
+    trigger[0]=1;analysis->process(c);assert(count[7]==0);
+    trigger[0]=0;stream->blockStart=108;stream->frames[0].start=88;analysis->process(c);
+    assert(count[7]==1);analysis->process(c);assert(count[7]==1);
+    stream->blockStart=116;stream->frames[0].start=92;analysis->process(c);
+    assert(count[7]==2&&finished[0]==1&&analysis->resource.result);
     // Features consume mean power, rather than a mean of descriptor values.
     analysis->begin(8);std::complex<double> a[8]{},b[8]{};
     a[0]=2;a[2]=std::sqrt(2.);a[4]=2;b[1]=b[3]=std::sqrt(2.);

@@ -11,6 +11,7 @@ struct AnalysisAverageNode : NodeProcessor {
     std::unique_ptr<AnalysisResult> result=std::make_unique<AnalysisResult>();
     std::vector<double> mean;
     std::uint64_t seenIdentity=0,seenSequence=0,seenEnd=0,sourceIdentity=0;
+    std::uint64_t seenStreamIdentity=0,seenStreamEnd=0;
     bool correlation=false,hasResult=false;
     char executionRate()const noexcept override{return 'a';}
     bool canShareChannels()const noexcept override{return true;}
@@ -30,6 +31,7 @@ struct AnalysisAverageNode : NodeProcessor {
         auto& p=static_cast<AnalysisAverageNode&>(old);auto settings=measurement;
         measurement=p.measurement;measurement.parameters(settings);mean.swap(p.mean);result.swap(p.result);
         seenIdentity=p.seenIdentity;seenSequence=p.seenSequence;seenEnd=p.seenEnd;sourceIdentity=p.sourceIdentity;
+        seenStreamIdentity=p.seenStreamIdentity;seenStreamEnd=p.seenStreamEnd;
         correlation=p.correlation;hasResult=p.hasResult;resource.view=p.resource.view;resource.result=hasResult?result.get():nullptr;
     }
     void begin(double rate)noexcept{
@@ -103,11 +105,19 @@ struct AnalysisAverageNode : NodeProcessor {
         if(snapshot){seenIdentity=snapshot->historyIdentity;seenSequence=snapshot->sequence;seenEnd=snapshot->endSample;}
         std::size_t cursor=0;
         for(std::size_t i=0;i<c.bufferSize;i++){
-            if(start.at(i)){begin(c.sampleRate);fresh=false;}
+            bool beginning=start.at(i);
+            if(beginning){begin(c.sampleRate);fresh=false;}
             if(stream){
                 while(cursor<stream->count){auto& f=stream->frames[cursor];auto end=f.start+static_cast<std::int64_t>(stream->windowFrames());
                     if(end>static_cast<std::int64_t>(stream->blockStart+i+1))break;++cursor;
-                    if(measurement.active&&f.start>=0&&end>static_cast<std::int64_t>(stream->blockStart+i))
+                    if(f.start<0)continue;
+                    bool newFrame=stream->identity!=seenStreamIdentity||static_cast<std::uint64_t>(end)>seenStreamEnd;
+                    if(!newFrame)continue;
+                    seenStreamIdentity=stream->identity;seenStreamEnd=static_cast<std::uint64_t>(end);
+                    // Async FFT uses the same stream type, but delivers old capture timestamps.
+                    // Accept these at delivery; a stale frame present at Start is only a baseline.
+                    bool delayed=end<=static_cast<std::int64_t>(stream->blockStart);
+                    if(measurement.active&&!(beginning&&delayed))
                         spectrum(f.bins.data(),stream->size,stream->windowFrames(),stream->hop,stream->sampleRate,stream->identity,static_cast<std::uint64_t>(end),stream->window,stream->dcRemoved);
                 }
             }else if(i==0&&fresh&&measurement.active){

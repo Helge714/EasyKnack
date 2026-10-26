@@ -10,4 +10,6 @@ public final class AnalysisAverageNode extends BasicNode {
         AverageMeasurement.settings(n,s);
     }
     public NativeProcessor processor(){return new NativeProcessor("analysisaverage","nodes/AnalysisAverageNode.hpp",AverageMeasurement.contract(IN));}
+    @Override public void mute(MuteRouting r,NodeState s){r.connect(IN,OUT);}
+    @Override public void insert(InsertionRouting r,NodeState s){r.connect(IN,OUT);}
 }
