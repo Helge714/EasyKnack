@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Value Average and Analysis Average for trigger-started finite arithmetic measurements, count/time limits, held results and a Finished trigger. Spectra average power per bin; correlations average per lag. Spectral Features accepts statistical analysis resources; IFFT still requires a phase-bearing spectrum. Rebuild Java, host and plugin SDK together. The current development version covers these compatible additions; existing protocol and document versions are unchanged.
+
 - Preserve renamed nodes through diagnostic refresh, language changes, copying and group navigation. Custom names are saved in Core graph schema 9; older documents still load, while new saves require the updated Core. The current development version covers this fix.
 
 - Buffer spectral render bursts on a dedicated WASAPI producer, with reserve based on FFT hop cadence. Ordinary audio graphs keep direct rendering; ASIO stays synchronous. This trades extra spectral-path latency for callback deadline isolation. Playback queue underruns are reported independently of cycle-averaged DSP load. The current development version covers the fix.

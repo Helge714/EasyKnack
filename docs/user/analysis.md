@@ -100,3 +100,8 @@ size and JPG quality. It includes axes and measurement cursors. Larger images ca
 increase measurement resolution. Export timestamps describe UI reception in UTC,
 not sample-accurate acquisition time. Keep FFT window, sample rate and display mode
 with your results when comparing measurements.
+
+## Average a finite measurement
+
+Use [finite averaging](averaging.md) for trigger-started numeric, power-spectrum or
+autocorrelation measurements with a held result and a Finished trigger.

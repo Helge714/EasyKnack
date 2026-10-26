@@ -14,7 +14,7 @@ public final class SpectralFeaturesNode extends BasicNode {
                 .signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
             if(name.equals("centroid")||name.equals("spread")||name.equals("rolloff"))row.formats(UnitFormats.FREQUENCY);
         }
-        n.addInput(IN,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
+        n.addInput(IN,"Spectrum").dataType(PortDataType.ANALYSIS).signal(SignalCategory.ANALYSIS).rate(ProcessingRate.CONTROL);
         n.addEditor(WEIGHT,"Weighting",Editor.comboBox(List.of("Power","Magnitude"),"Power",v->v.toLowerCase(java.util.Locale.ROOT)))
             .tooltip("Power uses one-sided bin energy; Magnitude uses one-sided amplitude. Moments describe the distribution over frequency, not bin-height statistics. Kurtosis is ordinary kurtosis (Gaussian = 3). Slope is normalized linear regression per Hz.");
         n.addEditor(ROLL,"Roll-off fraction",Editor.Slider.bar(.85,0,1).formats(UnitFormats.PROPORTION))
