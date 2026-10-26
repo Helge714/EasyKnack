@@ -12,6 +12,7 @@ import com.vin.easyknack.nodes.OutputNode;
 import com.vin.easyknack.audio.AudioGraphEncoder;
 import com.vin.easyknack.audio.AudioHostService;
 import com.vingame.glswing.node.composite.GLCompositeGraphFlattener;
+import com.vingame.glswing.node.composite.GLCompositeForwarding;
 import com.vingame.glswing.node.composite.GLCompositeExpansionLimits;
 import com.vingame.glswing.node.document.GLNodeGraphAsset;
 import com.vingame.glswing.node.document.GLNodeGraphAssetKind;
@@ -283,8 +284,11 @@ final class WorkspaceController implements AutoCloseable {
                 var descriptor = asset.compositeDescriptor();
                 if (descriptor == null) continue;
                 var ports = descriptor.portMappings().stream().flatMap(mapping -> {
-                    var remaining=mapping.internalEndpoints().stream().filter(endpoint -> asset.graph().findNode(endpoint.nodeId())
-                            .flatMap(node -> types.find(node.typeId())).flatMap(type -> type.findPort(endpoint.portId())).isPresent()).toList();
+                    var remaining=mapping.internalEndpoints().stream().filter(endpoint ->
+                            GLCompositeForwarding.isInput(endpoint)
+                                ? GLCompositeForwarding.valid(mapping,descriptor.portMappings())
+                                : asset.graph().findNode(endpoint.nodeId()).flatMap(node -> types.find(node.typeId()))
+                                    .flatMap(type -> type.findPort(endpoint.portId())).isPresent()).toList();
                     return mapping.isBound()&&remaining.isEmpty()?java.util.stream.Stream.<com.vingame.glswing.node.composite.GLCompositePortMapping>empty()
                             :java.util.stream.Stream.of(mapping.withEndpoints(remaining));
                 }).toList();

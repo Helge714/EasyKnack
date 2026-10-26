@@ -129,7 +129,7 @@ public class BasicNodeView extends GLNode {
                 applyThemeWidth();
                 var preferred = getPreferredGLSize();
                 setSize(autoWidth && Math.abs(getWidth() - widthBefore) < .5f ? preferred.width() : Math.max(getWidth(), preferred.width()),
-                        autoHeight && Math.abs(getHeight() - heightBefore) < .5f || isContentHidden()
+                        autoHeight && Math.abs(getHeight() - heightBefore) < .5f
                                 ? preferred.height() : Math.max(getHeight(), preferred.height()));
             });
         }
