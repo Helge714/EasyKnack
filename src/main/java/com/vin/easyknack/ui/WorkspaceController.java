@@ -51,6 +51,7 @@ final class WorkspaceController implements AutoCloseable {
     private boolean closed;
     private final GLNodeWorkspace workspace;
     private MidiDrivers midiDrivers;
+    private MeasurementRecorders measurementRecorders;
     private final EditorTemplates editorTemplates;
     private final CompositePortColors compositeColors;
     private int compositeNumber;
@@ -92,6 +93,7 @@ final class WorkspaceController implements AutoCloseable {
                 GLGraphCyclePolicy.DELAYED_FEEDBACK, history, valueTypes, inputEditors,
                 nodes.schemas());
         midiDrivers=new MidiDrivers(this);
+        measurementRecorders=new MeasurementRecorders(this);
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
         editorTemplates=new EditorTemplates(inputEditors);
         inputEditors.register(new com.vingame.glswing.node.composite.GLNodeInputEditorDescriptor(GroupInputSettings.BUTTON,"Button",java.util.Set.of(com.vin.easyknack.nodes.SignalCategory.TRIGGER.valueTypeId()),Map.of()));
@@ -416,7 +418,9 @@ final class WorkspaceController implements AutoCloseable {
         }
         for (var asset : NodeDocuments.assets(document)) asset.graph().nodes().forEach(nodes::normalize);
         workspace.openDocument(title, document);
-        graph = workspace.currentGraph(); history.reset(); guardActions(); syncAudio();
+        graph = workspace.currentGraph();
+        if(measurementRecorders!=null)measurementRecorders.documentChanged();
+        history.reset(); guardActions(); syncAudio();
         bakes.restore(document);
     }
 
@@ -761,14 +765,17 @@ final class WorkspaceController implements AutoCloseable {
         prepareBakeInspector();if(workspace.propertyInspector()!=null)workspace.propertyInspector().refresh();syncAudio();
     }
     void driverWrite(String asset,GLNodeId node,String property,com.vingame.glswing.node.model.GLNodeValue value){
+        writeExternalProperty(asset,node,property,value,"MIDI driver");
+    }
+    void writeExternalProperty(String asset,GLNodeId node,String property,com.vingame.glswing.node.model.GLNodeValue value,String action){
         var before=driverGraphs().get(asset);if(before==null)return;var model=before.findNode(node).orElse(null);
         if(model==null||value.equals(model.properties().get(property))&&!model.isPropertyAutomatic(property))return;
-        var edited=new GLNodeGraph(before);edited.edit("MIDI driver",e->e.setExplicitProperty(node,property,value));
+        var edited=new GLNodeGraph(before);edited.edit(action,e->e.setExplicitProperty(node,property,value));
         var after=nodes.normalize(edited.snapshot(),java.util.Set.of(node));
         boolean previous=changingProperties;changingProperties=true;
         try{
             var target=asset.equals(driverCurrentAsset())?workspace.currentGraph():asset.equals(MidiDrivers.ROOT)?graph:null;
-            if(target!=null)replaceProperties(target,"MIDI driver",after);
+            if(target!=null)replaceProperties(target,action,after);
             else {var original=composites.findAsset(asset).orElseThrow();composites.replaceAsset(new GLNodeGraphAsset(original.id(),original.version(),original.kind(),after,original.viewState(),original.metadata(),original.compositeDescriptor()));}
         }finally{changingProperties=previous;}
         history.markExternalChange();syncAudio();
@@ -787,6 +794,7 @@ final class WorkspaceController implements AutoCloseable {
     @Override public void close() {
         closed = true; audioUpdateTimer.stop();presented.clear();
         if(midiDrivers!=null)midiDrivers.close();
+        if(measurementRecorders!=null)measurementRecorders.close();
         bakes.close();if(formulas!=null)formulas.close();formulaEditors.values().forEach(FormulaEditorPanel::close);formulaEditors.clear();
         history.removeListener(rateHistoryListener);
         compositeColors.close();

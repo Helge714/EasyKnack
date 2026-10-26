@@ -302,7 +302,7 @@ struct AudioGraph {
         // Only output consumers make a branch live. Mute/bypass has already been
         // resolved by the workspace, so unused mute inputs disappear naturally.
         // Keep node indices and state, but compile the callback schedule only once.
-        for (auto& node : graph.nodes) node.active = node.processor->isSink() || (node.processor->isObserver() && std::any_of(node.processor->sources.begin(),node.processor->sources.end(),[](int source){return source>=0;}));
+        for (auto& node : graph.nodes) node.active = node.processor->isSink() || (node.processor->isObserver() && (node.processor->observesWithoutInputs() || std::any_of(node.processor->sources.begin(),node.processor->sources.end(),[](int source){return source>=0;})));
         for(std::size_t pass=0;pass<graph.nodes.size();++pass)for (auto it = graph.order.rbegin(); it != graph.order.rend(); ++it)
             if (graph.nodes[*it].active)
                 for (int source : graph.nodes[*it].processor->sources)

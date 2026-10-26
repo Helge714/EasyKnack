@@ -107,6 +107,7 @@ struct NodeProcessor {
     virtual void inheritState(const NodeProcessor&) noexcept { }
     virtual void bindIdentity(const std::string&) { }
     virtual bool isObserver() const noexcept { return false; }
+    virtual bool observesWithoutInputs() const noexcept { return false; }
     virtual bool isSink() const noexcept { return false; }
     virtual bool supportsControlRate() const noexcept { return false; }
     virtual bool supportsEventRate() const noexcept { return producesMidi(); }

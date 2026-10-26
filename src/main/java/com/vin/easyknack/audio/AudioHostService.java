@@ -135,11 +135,16 @@ public final class AudioHostService implements AutoCloseable {
             }
             boolean valid = latest.error() == null && (latest != rejectedGraph || retainedGraph);
             boolean next = wanted && valid;
+            boolean stopped=playing&&!next;
             if (playing != next) {
                 client.command(next ? "PLAY" : "STOP"); playing = next;
                 status(next ? com.vin.easyknack.ui.AppText.literal("Audio aktiv · 48 kHz · Stereo") : valid ? com.vin.easyknack.ui.AppText.literal("Audio gestoppt") : "Audio pausiert: " + latest.error());
             }
             state(wanted && !valid ? State.PAUSED : playing ? State.RUNNING : State.STOPPED);
+            if(stopped){
+                var finalAnalysis=AudioAnalysis.parse(client.command("ANALYSIS"));
+                if(!finalAnalysis.isEmpty())SwingUtilities.invokeLater(()->{if(!closed)AudioAnalysis.publish(finalAnalysis);});
+            }
 
             if(!volumeLinks.equals(sentVolumeLinks)) { client.command(volumeLinks); sentVolumeLinks=volumeLinks; }
             for(var request:AudioDeviceVolumes.drain().entrySet()) {

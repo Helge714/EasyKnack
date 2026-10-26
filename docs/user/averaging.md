@@ -53,3 +53,28 @@ Changing analysis format or source cancels an active measurement and clears its
 result without a Finished trigger. A completed result stays held until Start.
 If no fresh frame arrives during a timed measurement, Count stays zero and no analysis
 result is published; count mode waits until enough fresh frames arrive.
+
+## Recording a measurement series
+
+Add **Analysis → Measurement Recorder**. Set **Inputs**, then name each column in
+its inspector (include units in names, for example `Centroid [Hz]`). Connect Mean,
+Standard Deviation, Minimum and Maximum to separate inputs. Connect the averaging
+node's **Finished** output to **Record**. Each trigger captures all inputs at that
+sample position; the unconnected Record button captures a row manually.
+
+Open **Table…** to inspect rows. Each row includes its session identifier and audio
+time in seconds since that recorder session began. Host restarts or a changed input
+count begin a new session. Invalid numeric inputs are shown as empty cells, not zero.
+Changing the input count retains earlier rows; missing columns remain empty.
+
+Measurements are stored in the `.knack` document and included in autosave recovery.
+Save the document to keep them. Capture continues while inspecting another group;
+automatic rows do not add Undo entries. Ordinary graph Undo retains captured rows.
+Tables hold up to 4096 rows; when full, earlier rows are retained and the status
+asks you to clear the table. **Clear** empties the document table and starts a new
+acquisition. It does not affect previously exported files.
+
+Use **CSV export…** for an independent snapshot. CSV uses commas and decimal points;
+CSV (Excel DE) uses semicolons, decimal commas and a UTF-8 byte-order mark. The file
+location is selected at export; recording never writes automatically to a separate
+file. Multiple triggers at the same sample position are treated as one record.
