@@ -79,7 +79,7 @@ final class GroupInputSettings extends GLContainer {
         }
     }
     private void applyModel(EditorTemplates.Template t,Kind k,Source copied){
-        var p=editor.selectedPort();var options=new HashMap<String,GLNodeValue>();options.put("template",t.value());options.put("autoBind",GLNodeValue.of(true));options.put(GroupInputs.CHOICE,GLNodeValue.of(GroupInputs.property(p)));
+        var p=editor.selectedPort();var options=new HashMap<String,GLNodeValue>();options.put("template",t.value());options.put("autoBind",GLNodeValue.of(true));options.put(GroupInputs.CHOICE,GLNodeValue.of(GroupInputs.allocateProperty(p)));
         if(copied!=null)options.put("copySource",GLNodeValue.of(copied.endpoint().toString()));
         save("easyknack.choice",options,k);
     }

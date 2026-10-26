@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix group connection Undo after view replacement and preserve boundary wiring through presentation/property changes. Copied choice editors now allocate independent persistent parameter IDs; duplicate legacy IDs are repaired deterministically, retaining the first parameter value and using each additional editor's own default. Requires the updated external Core artifact; existing valid IDs, document format and audio protocol are unchanged. The current development version covers these fixes.
+
 - Fix Analysis Average dropping delayed frames from asynchronous FFT spectrum streams; each new delivered frame now counts once. Both averaging nodes support insertion into compatible connections and mute bypass; auxiliary Count/Finished outputs are silenced while muted. Existing contracts and versions are unchanged; the current development version covers these fixes.
 
 - Add Value Average and Analysis Average for trigger-started finite arithmetic measurements, count/time limits, held results and a Finished trigger. Spectra average power per bin; correlations average per lag. Spectral Features accepts statistical analysis resources; IFFT still requires a phase-bearing spectrum. Rebuild Java, host and plugin SDK together. The current development version covers these compatible additions; existing protocol and document versions are unchanged.

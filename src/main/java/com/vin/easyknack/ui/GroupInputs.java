@@ -9,6 +9,26 @@ import com.vingame.glswing.node.model.*;
 final class GroupInputs {
     static final String CHOICE="choiceProperty";
     static String property(GLCompositePortMapping port){return new NodeState(port.presentation().editorOptions()).text(CHOICE,"input-choice-"+UUID.nameUUIDFromBytes(port.publicPort().id().getBytes(java.nio.charset.StandardCharsets.UTF_8)));}
+    /** Allocate once when creating a choice editor; renaming/reusing a port name must not alias parameters. */
+    static String allocateProperty(GLCompositePortMapping port){
+        var existing=port.presentation().editorOptions().get(CHOICE);
+        return existing==null?"input-choice-"+UUID.randomUUID():existing.toJavaValue().toString();
+    }
+    private static GLNodeGraphAsset uniqueChoiceProperties(GLNodeGraphAsset asset){
+        var d=asset.compositeDescriptor();var used=new HashSet<String>();var ports=new ArrayList<GLCompositePortMapping>();
+        for(var p:d.portMappings()){
+            if(choice(p)){
+                String id=property(p);
+                if(!used.add(id)&&template(p)!=null){
+                    int suffix=0;String replacement;
+                    do{replacement="input-choice-"+UUID.nameUUIDFromBytes((asset.id()+"/choice/"+p.publicPort().id()+"/"+suffix++).getBytes(java.nio.charset.StandardCharsets.UTF_8));}while(!used.add(replacement));
+                    var options=new HashMap<>(p.presentation().editorOptions());options.put(CHOICE,GLNodeValue.of(replacement));
+                    p=new GLCompositePortMapping(p.publicPort(),p.internalEndpoint(),new GLCompositePortPresentation(p.presentation().inputEditorId(),p.presentation().socketVisible(),options),p.additionalEndpoints());
+                }
+            }ports.add(p);
+        }
+        return ports.equals(d.portMappings())?asset:descriptor(asset,new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),ports,d.properties(),d.propertyMappings()));
+    }
     static EditorTemplates.Template template(GLCompositePortMapping port){var value=port.presentation().editorOptions().get("template");return value==null?null:EditorTemplates.Template.read(value);}
     static boolean choice(GLCompositePortMapping port){return template(port)!=null||port.presentation().editorOptions().containsKey(CHOICE);}
     static boolean editorOnly(GLCompositePortMapping port){return choice(port)&&!port.presentation().socketVisible();}
@@ -35,7 +55,8 @@ final class GroupInputs {
         return materialize(descriptor(asset,new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),d.portMappings().stream().map(p->normalize(p,asset,groups)).toList(),d.properties(),d.propertyMappings())));
     }
     static GLNodeGraphAsset materialize(GLNodeGraphAsset asset){
-        var d=asset.compositeDescriptor();if(d==null)return asset;
+        if(asset.compositeDescriptor()==null)return asset;
+        asset=uniqueChoiceProperties(asset);var d=asset.compositeDescriptor();
         if(new NodeState(asset.metadata()).flag("easyknack.inputsUnified",false)){
             var retained=d.portMappings().stream().filter(GroupInputs::choice).map(GroupInputs::property).collect(java.util.stream.Collectors.toSet());
             var removed=asset.metadata().keySet().stream().filter(k->k.startsWith(GroupChoices.META)).map(k->k.substring(GroupChoices.META.length())).filter(k->!retained.contains(k)).collect(java.util.stream.Collectors.toSet());
@@ -109,7 +130,7 @@ final class GroupInputs {
     }
     static GLNodeGraphAsset applyTemplate(GLNodeGraphAsset asset,GLCompositePortMapping port,EditorTemplates.Template template){return applyTemplate(asset,port,template,null);}
     static GLNodeGraphAsset applyTemplate(GLNodeGraphAsset asset,GLCompositePortMapping port,EditorTemplates.Template template,GLCompositeGraphRegistry registry){
-        var options=new HashMap<String,GLNodeValue>();options.put("template",template.value());options.put("autoBind",GLNodeValue.of(true));options.put(CHOICE,GLNodeValue.of(property(port)));
+        var options=new HashMap<String,GLNodeValue>();options.put("template",template.value());options.put("autoBind",GLNodeValue.of(true));options.put(CHOICE,GLNodeValue.of(allocateProperty(port)));
         for(String key:List.of(FormulaGroups.ID,FormulaGroups.NAME))if(port.presentation().editorOptions().containsKey(key))options.put(key,port.presentation().editorOptions().get(key));
         var presentation=new GLCompositePortPresentation(EditorTemplates.PREFIX+template.id(),port.presentation().socketVisible(),options);
         var replacement=new GLCompositePortMapping(port.publicPort(),port.internalEndpoint(),presentation,port.additionalEndpoints());

@@ -584,3 +584,9 @@ Dabei bleibt der A4-Nachweis unveränderter Spitzenlatenz unter realer Last offe
 ## Instance processor capabilities
 
 - [ ] Replace the separate Java supported-ID list and native instance factory list with explicit per-instance capability declarations and generated registration. Review ordinary DSP processors systematically; retain deliberate exclusions for device I/O, nested execution domains and resource outputs without a defined reduction. Cover live processing, stereo/rates and Bake/export together.
+
+## Group stability (26 October 2026)
+
+- Implemented and covered by regressions: model-based connection Undo across view replacement; preserved group boundary bindings during presentation changes; independent persistent IDs for copied choice editors, including deterministic repair of duplicate legacy IDs.
+- Manual verification pending: Undo/Redo inside groups, changing defaults/units on nested and directly forwarded group inputs, and two independently copied FFT window editors.
+- Other urgent-list items are deferred until this group-stability pass is confirmed.
