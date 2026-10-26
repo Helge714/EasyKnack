@@ -30,6 +30,7 @@ struct AnalysisJob {
     std::size_t smoothedSize=0,smoothedFftSize=0;
     SpectrumWindow smoothedWindow=SpectrumWindow::hann;
     double smoothedRate=0;
+    double smoothedPower=0;
     int borrowed=-1; // audio thread only
     bool submit(const HistoryResource& history,float minimum,float maximum)noexcept {
         if(history.end<8192||history.samples.size()<8192)return false;
@@ -79,6 +80,9 @@ struct AnalysisJob {
         bool reset=!smoothingReady||smoothedIdentity!=frame.sourceIdentity||smoothedSize!=frame.windowFrames
             ||smoothedFftSize!=frame.fftFrames||smoothedWindow!=frame.window||smoothedDc!=frame.dcRemoved
             ||smoothedRate!=frame.sampleRate||smoothedUnbiased!=request.unbiased||frame.endSample<smoothedEnd;
+        double sourcePower=std::max(0.,energy)/std::max(1.,frame.windowSumSquares);
+        if(!reset&&request.smoothing<1)sourcePower=frame.endSample==smoothedEnd?smoothedPower:smoothedPower*(1-request.smoothing)+sourcePower*request.smoothing;
+        smoothedPower=sourcePower;result.correlationRms=std::sqrt(sourcePower);
         for(std::size_t i=0;i<result.correlationCount;i++){
             double correction=request.unbiased&&frame.fftFrames>=2*frame.windowFrames-1?static_cast<double>(frame.windowFrames)/(frame.windowFrames-i):1;
             double value=energy>1e-30?std::clamp(spectrum[i].real()/energy*correction,-1.,1.):0;
@@ -150,6 +154,7 @@ struct AnalysisJob {
             auto& result=destination->value;result.sequence=++sequence;result.endSample=request.end;result.historyIdentity=request.identity;result.sampleRate=request.rate;result.lagSpacingSeconds=1/request.rate;result.binSpacingHz=request.rate/16384;
             result.availableViews=15;result.spectrum.fftFrames=0;result.binCount=result.correlationCount=8192;result.windowFrames=8192;result.fftFrames=16384;
             result.frequency=analyzer.frequency;result.confidence=analyzer.confidence;
+            result.correlationRms=analyzer.sourceRms;
             for(std::size_t i=0;i<8192;i++){
                 double power=std::norm(spectrum[i]);
                 result.views[0][i]=static_cast<float>(std::sqrt(power)/8192);

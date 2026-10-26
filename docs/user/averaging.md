@@ -78,3 +78,43 @@ Use **CSV export…** for an independent snapshot. CSV uses commas and decimal p
 CSV (Excel DE) uses semicolons, decimal commas and a UTF-8 byte-order mark. The file
 location is selected at export; recording never writes automatically to a separate
 file. Multiple triggers at the same sample position are treated as one record.
+
+## Measuring periodicity
+
+Connect **FFT → Autocorrelation → Correlation Features**. The new node reads the
+existing correlation; it does not perform another FFT. Its Control outputs hold
+between analysis frames; there is no Updated trigger.
+
+- **Periodicity** is the strongest interpolated positive local correlation peak,
+  normalized by lag zero and limited to 0–1. It is not a probability.
+- **Period** is the selected repetition time (seconds, ms or samples).
+- **Frequency** is `1 / Period`, a repetition frequency, not necessarily perceived
+  pitch. Nearly equal peak heights prefer the shortest period; octave ambiguities
+  remain possible for harmonic mixtures, modulation and polyphonic signals.
+- **HNR** estimates `10 log10(p / (1 - p))` from Periodicity, capped at ±120 dB.
+  It assumes periodic structure plus uncorrelated noise; it is not an independent
+  descriptor or a calibrated noise measurement. Window/overlap normalization affects
+  the estimate. Perfectly periodic input reaches a finite ceiling.
+- **Valid** is 1 only when a peak passes the search and amplitude thresholds.
+  Otherwise Period and Frequency are zero. A weak peak can still yield Periodicity
+  and HNR while Valid is zero. Silence, missing correlation or an unsuitable resource
+  return zero descriptors and an HNR floor of −120 dB.
+
+In the inspector, choose minimum/maximum repetition frequencies, a Periodicity
+threshold (default 0.3) and a linear source-RMS silence threshold (default 0.000001).
+The search excludes lag zero and monotonic neighbours, respects Nyquist and requires
+at least three repetitions within the available correlation window. Increase the
+FFT window to measure slower repetition. Reversed bounds yield an invalid result.
+
+The node describes the incoming curve, not a separately corrected estimator.
+For a periodicity/HNR comparison with little taper bias, use FFT **Rectangular**,
+**2x padding**, **Remove DC**, and Autocorrelation **Unbiased**. Hann and other tapering
+windows reduce nonzero-lag peaks; unbiased overlap correction does not undo that
+window shape. Use identical settings across experiments. This is not the complete
+Praat/Boersma pitch and harmonicity algorithm.
+
+Connect Periodicity or Frequency to **Value Average** to measure its temporal mean,
+standard deviation and extrema. Its observations follow the block/sample rules above,
+not one observation per analysis frame. Record the completed statistics through
+**Finished → Measurement Recorder: Record**. Gate invalid frequency estimates if you
+want to exclude their zeros rather than include them in the measurement.

@@ -13,6 +13,7 @@ struct AnalysisResult {
     OwnedArray<std::array<float,count>,4> views{};
     std::array<std::array<double,4>,4> statistics{}; // peak, mean, RMS, integral
     double correlationTime=0;
+    double correlationRms=0; // Source amplitude before lag-zero normalization, for silence gating.
     const char* estimator="DC-centered, unbiased linear autocorrelation";
     SpectrumFrame spectrum; // New FFT snapshots preserve raw complex coefficients.
     std::size_t binCount=8192,correlationCount=8192;

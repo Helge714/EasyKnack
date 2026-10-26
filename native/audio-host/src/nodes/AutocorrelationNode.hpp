@@ -109,6 +109,7 @@ struct AutocorrelationNode : NodeProcessor {
 
     float confidence =
         0.f;
+    double sourceRms=0;
 
     float minimum =
         40.f;
@@ -568,6 +569,7 @@ struct AutocorrelationNode : NodeProcessor {
             / static_cast<double>(
                 size
             );
+        sourceRms=std::sqrt(std::max(0.,zeroLag));
 
         if (
             !std::isfinite(zeroLag)
@@ -857,6 +859,7 @@ struct AutocorrelationNode : NodeProcessor {
             result.sampleRate=sampleRate;result.windowFrames=size;result.fftFrames=fftSize;
             result.binCount=size;result.lagSpacingSeconds=1/sampleRate;result.binSpacingHz=0;
             result.frequency=frequency;result.confidence=confidence;
+            result.correlationRms=sourceRms;
             double peak=0,sum=0,squares=0;
             for(unsigned i=0;i<size;i++){double value=correlation[i];result.views[3][i]=correlation[i];peak=std::max(peak,std::abs(value));sum+=value;squares+=value*value;}
             result.statistics[3]={peak,sum/size,std::sqrt(squares/size),sum/sampleRate};

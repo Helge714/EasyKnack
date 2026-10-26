@@ -86,6 +86,8 @@ struct AnalysisAverageNode : NodeProcessor {
         if(!compatible(true,r.historyIdentity,r.fftFrames,r.windowFrames,count,r.sampleRate,r.spectrum.window,r.spectrum.dcRemoved,r.spectrum.hopFrames))return;
         bool first=measurement.count==0;measurement.record();
         result->fftFrames=r.fftFrames;result->windowFrames=r.windowFrames;result->sampleRate=r.sampleRate;result->correlationCount=count;result->binCount=0;
+        double power=r.correlationRms*r.correlationRms,previous=result->correlationRms*result->correlationRms;
+        result->correlationRms=std::sqrt(first?power:std::max(0.,previous+(power-previous)/measurement.count));
         result->spectrum.fftFrames=0;result->spectrum.window=r.spectrum.window;result->spectrum.dcRemoved=r.spectrum.dcRemoved;result->spectrum.hopFrames=r.spectrum.hopFrames;
         result->lagSpacingSeconds=r.lagSpacingSeconds;result->binSpacingHz=0;result->availableViews=8;result->frequency=result->confidence=0;
         result->estimator="Arithmetic mean autocorrelation";result->correlationTime=0;

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Correlation Features with held control outputs for periodicity, period, repetition frequency, estimated HNR and validity; no Updated trigger. Inspector search/threshold settings and source-level metadata support silence gating, including averaged correlations. Rebuild Java, host and plugin SDK together. Document and host protocol versions are unchanged; the current development version covers this addition.
+
 - Fix Measurement Recorder capture and Undo retention with multiple inputs by recognizing dynamically registered node variants. The current development version covers the fix; document and host contracts are unchanged.
 
 - Add Measurement Recorder: trigger-aligned numeric rows, named inputs, persistent document tables, enlarged inspection and CSV/Excel export. Automatic capture marks the document modified without adding Undo entries. Tables retain up to 4096 rows without overwriting; Clear starts a new acquisition. Rebuild Java, host and plugin SDK together. No existing protocol or document-schema changes; the current development version covers this addition.
