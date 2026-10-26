@@ -2,6 +2,7 @@ package com.vin.easyknack.ui;
 
 import com.vin.easyknack.audio.AudioAnalysis;
 import com.vin.easyknack.nodes.MeasurementRecorderNode;
+import com.vin.easyknack.nodes.NodeRegistry;
 
 /** Document-scoped capture, independent of whether a node or its group is visible. */
 final class MeasurementRecorders {
@@ -16,7 +17,7 @@ final class MeasurementRecorders {
         if(closed||receiving)return;receiving=true;
         try{
             var seen=new java.util.HashSet<com.vingame.glswing.node.model.GLNodeId>();
-            for(var asset:controller.driverGraphs().entrySet())for(var node:asset.getValue().nodes())if(node.typeId().equals("easyknack.analysis.recorder")&&seen.add(node.id())){
+            for(var asset:controller.driverGraphs().entrySet())for(var node:asset.getValue().nodes())if(NodeRegistry.find(node.typeId()).orElse(null) instanceof MeasurementRecorderNode&&seen.add(node.id())){
                 var old=node.properties().getOrDefault(MeasurementRecorderNode.TABLE.value(),MeasurementTable.empty());
                 var next=MeasurementTable.merge(old,AudioAnalysis.frame(node.id().toString()));
                 latest.put(new Address(asset.getKey(),node.id()),next);
@@ -28,7 +29,7 @@ final class MeasurementRecorders {
         if(closed||receiving)return;receiving=true;
         try{
             var seen=new java.util.HashSet<com.vingame.glswing.node.model.GLNodeId>();
-            for(var asset:controller.driverGraphs().entrySet())for(var node:asset.getValue().nodes())if(node.typeId().equals("easyknack.analysis.recorder")&&seen.add(node.id())){
+            for(var asset:controller.driverGraphs().entrySet())for(var node:asset.getValue().nodes())if(NodeRegistry.find(node.typeId()).orElse(null) instanceof MeasurementRecorderNode&&seen.add(node.id())){
                 var address=new Address(asset.getKey(),node.id());var current=node.properties().getOrDefault(MeasurementRecorderNode.TABLE.value(),MeasurementTable.empty());var captured=latest.get(address);
                 if(captured!=null&&MeasurementTable.generation(captured).equals(MeasurementTable.generation(current))&&MeasurementTable.rows(captured).size()>MeasurementTable.rows(current).size())
                     controller.writeExternalProperty(asset.getKey(),node.id(),MeasurementRecorderNode.TABLE.value(),captured,"Retain measurements");

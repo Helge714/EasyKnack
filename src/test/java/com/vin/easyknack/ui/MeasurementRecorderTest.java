@@ -12,6 +12,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MeasurementRecorderTest {
+    @Test void everyInputCountCapturesAndRetainsRowsAcrossUndo()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            for(int count=1;count<=8;count++){
+                var graph=new GLNodeGraph();var id=GLNodeId.random();var definition=new MeasurementRecorderNode();
+                var properties=new HashMap<>(definition.defaults());properties.put("inputs",GLNodeValue.of(count));
+                graph.edit("Recorder",e->e.addNode(new GLGraphNode(id,definition.registration().id(),properties)));
+                c.openDocument("Recorder "+count,new GLNodeGraphDocument(new GLNodeGraphAsset("root",1,GLNodeGraphAssetKind.PROJECT,graph.snapshot(),GLNodeEditorViewState.empty())));
+                assertTrue(NodeRegistry.find(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().typeId()).orElseThrow() instanceof MeasurementRecorderNode);
+                c.setNodeProperty(id,MeasurementRecorderNode.input(0),GLNodeValue.of(20.));
+                AudioAnalysis.publish(Map.of(id.toString(),frame(count,1,7,"0")));
+                var table=c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties().get("table");
+                assertEquals(1,MeasurementTable.rows(table).size(),"Capture with "+count+" inputs");
+                assertEquals(count+2,((GLNodeValue.ListValue)MeasurementTable.rows(table).get(0)).values().size());
+                c.history().undo();
+                assertEquals(table,c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties().get("table"),"Retain with "+count+" inputs");
+            }
+        }finally{AudioAnalysis.clear();}});
+    }
     @Test @org.junit.jupiter.api.condition.EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void nativeCaptureAndUnconnectedManualRecorder()throws Exception{
         var directory=java.nio.file.Files.createTempDirectory(java.nio.file.Path.of("target"),"recorder-native-").toAbsolutePath();

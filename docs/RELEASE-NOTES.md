@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix Measurement Recorder capture and Undo retention with multiple inputs by recognizing dynamically registered node variants. The current development version covers the fix; document and host contracts are unchanged.
+
 - Add Measurement Recorder: trigger-aligned numeric rows, named inputs, persistent document tables, enlarged inspection and CSV/Excel export. Automatic capture marks the document modified without adding Undo entries. Tables retain up to 4096 rows without overwriting; Clear starts a new acquisition. Rebuild Java, host and plugin SDK together. No existing protocol or document-schema changes; the current development version covers this addition.
 
 - Add population standard deviation, minimum and maximum to Value Average, using the same finite acquisition and held results as Mean. Rebuild Java, audio host and plugin SDK together. Existing port IDs and output indices are retained; document and protocol versions are unchanged. Covered by the current development version.
