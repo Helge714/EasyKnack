@@ -84,7 +84,7 @@ class NoiseSeedsTest {
                 auto stereo=AudioGraph::compile(%s,factory);
                 assert(stereo.nodes[1].stereo);stereo.process(a.data(),256,0,nullptr);stereo.process(b.data(),256,1,nullptr);assert(a!=b);
             }
-            """.formatted(quote(payload),quote("GRAPH 3 c context @ ccc - n noise !"+NativeContractGenerator.fingerprint(noise)+" "+noise.encode(new NodeState(noise.defaults()),p->0)+" @ a c o out 1 0 @ a a"));
+            """.formatted(quote(payload),quote("GRAPH 3 c context @ ccca - n noise !"+NativeContractGenerator.fingerprint(noise)+" "+noise.encode(new NodeState(noise.defaults()),p->0)+" @ a c o out 1 0 @ a a"));
         var source=dir.resolve("test.cpp");Files.writeString(source,code);RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
     }
 }

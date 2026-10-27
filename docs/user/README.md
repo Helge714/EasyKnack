@@ -12,6 +12,7 @@ same menu.
 | Edit, save and share a graph | [Workspace and documents](workspace.md) |
 | Select devices or process another application's audio | [Audio and routing](audio.md) |
 | Find a node or understand rates and units | [Node reference](nodes.md) |
+| Apply random frequency modulation | [Digital Noise](digital-noise.md) |
 | Control editors with MIDI hardware | [MIDI editor drivers](midi-drivers.md) |
 | Build a reusable interface, Formula or plugin | [Groups and custom processing](groups.md) |
 | Process spectra or inspect measurements | [Spectrum and analysis](analysis.md) |

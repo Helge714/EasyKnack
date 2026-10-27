@@ -19,8 +19,12 @@ struct DigitalNoiseNode : NodeProcessor {
     float frequencyValue = 440.f;
     float strengthValue = 0.f;
     int seedValue=-1,activeSeed=-1;
+    bool gaussian=false;
+    float distributionAmount=-1;
+    bool distributionGaussian=false;
+    double lowerFactor=1,factorSpan=0,normalLow=0,normalSpan=1,normalSigma=0,normalShift=0;
 
-    double phase = 0.0;
+    double phase = 0.0; // Elapsed base-frequency cycles, not modulated phase.
 
     float currentFactor = 1.f;
 
@@ -47,13 +51,22 @@ struct DigitalNoiseNode : NodeProcessor {
     bool supportsLiveParameters() const noexcept override { return true; }
     void applyParameters(const NodeProcessor& configuration) noexcept override {
         const auto& p=static_cast<const DigitalNoiseNode&>(configuration);
-        frequencyValue=p.frequencyValue;strengthValue=p.strengthValue;seedValue=p.seedValue;
+        frequencyValue=p.frequencyValue;strengthValue=p.strengthValue;seedValue=p.seedValue;gaussian=p.gaussian;
     }
     void configure(
         std::istream& in
     ) override {
 
         auto position=in.tellg();std::string marker;in>>marker;
+        // Pre-distribution source plugins retain this payload when rebuilt with a
+        // newer SDK. Keep their parameter layout readable and default to Uniform.
+        if(marker=="!5bc07ddcba438cf0"){
+            int f,s,seed;
+            if(!(in>>f>>frequencyValue>>s>>strengthValue>>seed>>seedValue)||f< -1||f>=2048||s< -1||s>=2048||seed< -1||seed>=2048||
+                !std::isfinite(frequencyValue)||!std::isfinite(strengthValue)||frequencyValue<.00001f||frequencyValue>20000||strengthValue<0||strengthValue>1||seedValue< -1||seedValue>16777215)
+                throw std::runtime_error("Invalid legacy Digital Noise");
+            sources={f,s,seed};gaussian=false;return;
+        }
         if(marker=="!abfa1179a859e263"){
             int f,s;if(!(in>>f>>frequencyValue>>s>>strengthValue)||f< -1||f>=2048||s< -1||s>=2048||!std::isfinite(frequencyValue)||!std::isfinite(strengthValue)||frequencyValue<.00001f||frequencyValue>20000||strengthValue<0||strengthValue>1)throw std::runtime_error("Invalid legacy Digital Noise");sources={f,s};return;
         }
@@ -68,6 +81,7 @@ struct DigitalNoiseNode : NodeProcessor {
             sources =
                 p.sources();
             seedValue=p.seed_value;
+            gaussian=p.distribution_value=="gaussian";
 
             frequencyValue =
                 static_cast<float>(
@@ -143,7 +157,7 @@ struct DigitalNoiseNode : NodeProcessor {
             activeSeed=selected;phase=0;initialized=false;
         }
         if(instanceCache&&!context.samplewise&&context.bufferSize<=256){
-            NoiseBlockCache::Key key{double(rngState),phase,currentFactor,double(initialized),context.numericInput(0,frequencyValue)[0],context.numericInput(1,strengthValue)[0],double(context.input(0)!=nullptr),double(context.input(1)!=nullptr)};
+            NoiseBlockCache::Key key{double(rngState),phase,currentFactor,double(initialized),context.numericInput(0,frequencyValue)[0],context.numericInput(1,strengthValue)[0],double(context.input(0)!=nullptr),double(context.input(1)!=nullptr),double(gaussian)};
             instanceCache->process(context,key,[&](ProcessContext& c){render(c);},[&](const auto& s){rngState=std::uint32_t(s[0]);phase=s[1];currentFactor=s[2];initialized=s[3]!=0;},
                 [&]{return std::array<double,8>{double(rngState),phase,currentFactor,double(initialized)};},2);return;
         }
@@ -201,6 +215,15 @@ struct DigitalNoiseNode : NodeProcessor {
                     true;
             }
 
+            if(amount==0.f)currentFactor=1.f;
+            // Preserve fractional elapsed time across boundaries. Keeping the old
+            // modulated phase remainder would bias short periods on the sample grid.
+            while(phase>=1.0/currentFactor){
+                phase-=1.0/currentFactor;
+                currentFactor=drawFactor(amount);
+                trigger=true;
+            }
+
 
             /*
              * Current factor is held throughout this sample.
@@ -210,7 +233,7 @@ struct DigitalNoiseNode : NodeProcessor {
 
 
             /*
-             * Advance using the factor of the current cycle.
+             * Advance base-cycle time; each random cycle lasts 1 / factor.
              */
             const double actualFrequency =
                 static_cast<double>(
@@ -223,27 +246,8 @@ struct DigitalNoiseNode : NodeProcessor {
             if(auto* out=context.outputAt(2))out[i]=static_cast<float>(actualFrequency);
 
             phase +=
-                actualFrequency
+                static_cast<double>(baseFrequency)
                 / context.sampleRate;
-
-
-            /*
-             * At the end of the current period,
-             * draw the factor for the next period.
-             */
-            while (phase >= 1.0) {
-
-                phase -=
-                    1.0;
-
-                currentFactor =
-                    drawFactor(
-                        amount
-                    );
-
-                trigger =
-                    true;
-            }
 
 
             if(trigger&&context.eventOutput(1))context.eventOutput(1)->push(static_cast<std::uint32_t>(context.sampleOffset+i),1,ValueEventKind::trigger);
@@ -314,19 +318,32 @@ private:
             return 1.f;
         }
 
-        const float bipolar =
-            uniform01()
-            * 2.f
-            - 1.f;
-
-        const float exponent =
-            bipolar
-            * strength;
-
-        return std::exp2(
-            exponent
-        );
+        if(distributionAmount!=strength||distributionGaussian!=gaussian){
+            distributionAmount=strength;distributionGaussian=gaussian;
+            double upper=std::exp2(double(strength));lowerFactor=1/upper;factorSpan=upper-lowerFactor;
+            if(gaussian){
+                normalSigma=double(strength)/3;
+                normalShift=std::log(2.)*normalSigma;
+                normalLow=normalCdf(-3-normalShift);
+                normalSpan=normalCdf(3-normalShift)-normalLow;
+            }
+        }
+        double u=uniform01();
+        // q(x) ∝ 2^x p(x) cancels duration 2^-x. For uniform p(x),
+        // drawing the factor uniformly in linear space is exactly this proposal.
+        if(!gaussian)return static_cast<float>(lowerFactor+u*factorSpan);
+        // Exponential tilting of N(0,sigma²) shifts its mean by ln(2)*sigma².
+        // Invert the truncated CDF without rejection or unbounded random retries.
+        double p=normalLow+u*normalSpan;
+        // p is bounded by the ±3-sigma truncation (including the small tilt).
+        // A tail-based starting estimate keeps Newton steps inside that domain.
+        double z=std::copysign(std::sqrt(-2*std::log(std::min(p,1-p)))-.5,p-.5);
+        for(unsigned i=0;i<6;i++)z-=(normalCdf(z)-p)*2.5066282746310005*std::exp(.5*z*z);
+        double x=normalSigma*(z+normalShift);
+        return static_cast<float>(std::clamp(std::exp2(x),lowerFactor,lowerFactor+factorSpan));
     }
+
+    static double normalCdf(double x)noexcept{return .5*std::erfc(-x*.7071067811865475);}
 
 
     static float sanitizeFrequency(

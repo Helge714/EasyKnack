@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Correct Digital Noise cycle-duration bias and fractional cycle timing so stationary octave deviations are symmetric over elapsed time. Add a bounded Gaussian distribution alongside Uniform; Strength remains the maximum octave deviation, with Gaussian sigma = Strength / 3. Strength zero immediately passes the base frequency. This intentionally changes existing sounds and seeded sequences. Rebuild Java, host, plugin SDK and affected baked/exported nodes together. Port IDs and document/protocol versions are unchanged. With no release baseline, retain the current development version and include this behaviour change in the first release notes.
+
 - Add an inspector frequency-scale choice to Spectral Features. Logarithmic moments exclude DC, return a geometric Centroid in Hz and Spread in octaves (with semitone/cent choices), and preserve the definitions of Flux, Roll-off, Slope and Flatness. Linear remains the default; changing scale changes Spread connection semantics. Rebuild Java, host and plugin SDK together; document and protocol versions are unchanged. Covered by the current development version.
 
 - Fix right-channel autocorrelation processing when FFT preserves stereo. Correlation descriptors now remain valid on both channels instead of being halved by a downstream channel mix. Rebuild the audio host and plugin SDK; document and protocol versions are unchanged. Covered by the current development version.
