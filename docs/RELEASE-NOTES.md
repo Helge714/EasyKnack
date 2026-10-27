@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add shared, compact name/unit inspector rows with up/down ordering to Value Viewer and Measurement Recorder. Display order applies to frozen histories, table columns and exports while input sockets, trace colours and recorded slot associations remain stable. Recorder units are display labels only. Settings persist with the document and support Undo; legacy names/units are retained. Native contracts and document schema are unchanged. Covered by the current development version.
+
 - Correct Digital Noise cycle-duration bias and fractional cycle timing so stationary octave deviations are symmetric over elapsed time. Add a bounded Gaussian distribution alongside Uniform; Strength remains the maximum octave deviation, with Gaussian sigma = Strength / 3. Strength zero immediately passes the base frequency. This intentionally changes existing sounds and seeded sequences. Rebuild Java, host, plugin SDK and affected baked/exported nodes together. Port IDs and document/protocol versions are unchanged. With no release baseline, retain the current development version and include this behaviour change in the first release notes.
 
 - Add an inspector frequency-scale choice to Spectral Features. Logarithmic moments exclude DC, return a geometric Centroid in Hz and Spread in octaves (with semitone/cent choices), and preserve the definitions of Flux, Roll-off, Slope and Flatness. Linear remains the default; changing scale changes Spread connection semantics. Rebuild Java, host and plugin SDK together; document and protocol versions are unchanged. Covered by the current development version.

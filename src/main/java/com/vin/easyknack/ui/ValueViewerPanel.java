@@ -16,8 +16,12 @@ public final class ValueViewerPanel extends GLContainer {
     private static final class Session {
         final ValueHistory history=new ValueHistory();
         String id="";String[] names={"Value 1"},units={""};
+        java.util.List<ValueSeries.Entry> series=ValueSeries.visible(new NodeState(java.util.Map.of()),1);
         double window=10;boolean paused,numbers,overlay;
         ValueHistory.Snapshot frozen;
+        ValueHistory.Snapshot frozenView;
+        java.util.List<ValueSeries.Entry> frozenSeries;
+        final java.util.List<java.lang.ref.WeakReference<ValueViewerPanel>> views=new java.util.ArrayList<>();
     }
     private final Session session;
     private final Consumer<GLNodeValue> changed;
@@ -32,6 +36,7 @@ public final class ValueViewerPanel extends GLContainer {
     public ValueViewerPanel(Consumer<GLNodeValue> changed){this(new Session(),changed,false);}
     private ValueViewerPanel(Session session,Consumer<GLNodeValue> changed,boolean expanded){
         this.session=session;this.changed=changed;this.expanded=expanded;
+        session.views.add(new java.lang.ref.WeakReference<>(this));
         for(var c:java.util.List.of(mode,pause,expand,export,chart,status))addGL(c);
         mode.addActionListener(e->{session.numbers=!session.numbers;saveOptions();});
         pause.addActionListener(e->setPaused(!session.paused));
@@ -43,11 +48,13 @@ public final class ValueViewerPanel extends GLContainer {
     public void configure(NodeState state){
         int count=ValueViewerNode.count(state);session.window=state.number(ValueViewerNode.WINDOW,10);
         session.names=new String[count];session.units=new String[count];
-        for(int i=0;i<count;i++){
-            session.names[i]=state.text("name-"+i,AppText.literal("Value")+" "+(i+1));
-            String unit=state.text("unit-"+i,"none");session.units[i]=unit.equals("none")?"":UnitFormat.fromId(unit).suffix();
+        session.series=ValueSeries.visible(state,count);
+        for(var e:session.series){
+            session.names[e.input()]=e.name();session.units[e.input()]=e.suffix();
         }
         session.history.configure(count,session.window);receive();refresh();
+        session.views.removeIf(ref->ref.get()==null);
+        for(var ref:session.views){var view=ref.get();if(view!=null&&view!=this)view.refresh();}
     }
     public void options(String options){session.numbers=options.contains("values");session.overlay=options.contains("overlay");refresh();}
     private void saveOptions(){changed.accept(GLNodeValue.of((session.numbers?"values":"history")+(session.overlay?";overlay":"")));refresh();}
@@ -55,6 +62,7 @@ public final class ValueViewerPanel extends GLContainer {
     public void setPaused(boolean value){
         if(value==session.paused)return;
         if(value)session.frozen=session.history.snapshot(session.names,session.units,true);
+        session.frozenView=null;
         session.paused=value;if(!value){session.frozen=null;zoom=1;pan=0;}refresh();
     }
     private void receive(){
@@ -85,8 +93,13 @@ public final class ValueViewerPanel extends GLContainer {
         for(int p=0;p<s.channels();p++)result+=" / "+s.names()[p]+" "+AnalysisChart.number(s.value()[p][nearest])+" "+s.units()[p];return result;
     }
     public ValueHistory.Snapshot snapshot(boolean screen){
-        if(session.paused&&session.frozen!=null)return session.frozen;
-        return session.history.snapshot(session.names,session.units,false,screen?Math.max(100,(int)chart.getWidth()*2):Integer.MAX_VALUE);
+        if(session.paused&&session.frozen!=null){
+            if(session.frozenView==null||!session.series.equals(session.frozenSeries)){
+                session.frozenView=ValueSeries.reorder(session.frozen,session.series);session.frozenSeries=session.series;
+            }
+            return session.frozenView;
+        }
+        return ValueSeries.reorder(session.history.snapshot(session.names,session.units,false,screen?Math.max(100,(int)chart.getWidth()*2):Integer.MAX_VALUE),session.series);
     }
     public ValueHistory.Snapshot visibleSnapshot(boolean screen){
         var s=snapshot(screen);if(s.size()==0||zoom==1)return s;
@@ -94,7 +107,9 @@ public final class ValueViewerPanel extends GLContainer {
         return s.range(start,end);
     }
     private Color[] colors(){
-        var result=new Color[8];for(int i=0;i<8;i++)result[i]=ApplicationTheme.current().color("viewer.trace"+(i+1));return result;
+        int channels=session.paused&&session.frozen!=null?session.frozen.channels():session.names.length;
+        var shown=session.series.stream().filter(e->e.input()<channels).toList();
+        var result=new Color[8];for(int i=0;i<8;i++)result[i]=ApplicationTheme.current().color("viewer.trace"+(i<shown.size()?shown.get(i).input()+1:i+1));return result;
     }
     private void openExpanded(){
         var panel=new ValueViewerPanel(session,changed,true);panel.zoom=zoom;panel.pan=pan;panel.cursorA=cursorA;panel.cursorB=cursorB;

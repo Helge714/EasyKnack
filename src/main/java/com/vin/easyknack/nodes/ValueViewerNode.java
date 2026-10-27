@@ -17,18 +17,17 @@ public final class ValueViewerNode extends BasicNode {
         n.addEditor(RAW,"Record every sample",Editor.checkBox(false)).inspectorOnly()
             .tooltip("Off: retain minimum, maximum and last value per 10 ms, including short peaks. On: retain each sample. History is bounded to one million input records; the visible duration can therefore be shorter than requested. Transport gaps are shown as gaps, never interpolated.");
         n.addEditor(CHANNEL,"Channel",Editor.comboBox(List.of("Left","Right","Mix"),"Left",v->v.toLowerCase(java.util.Locale.ROOT))).inspectorOnly();
-        for(int i=0;i<count(s);i++){
-            String initial=NodeText.text("easyknack.analysis.valueviewer.input","Value")+" "+(i+1);
-            n.addInput(input(i),s.text("name-"+i,initial))
+        n.addEditor(ValueSeries.SETTINGS,"Values",new ValueSeriesEditor(s,count(s))).inspectorOnly().editorCopyable(false);
+        for(var entry:ValueSeries.visible(s,count(s)).stream().sorted(java.util.Comparator.comparingInt(ValueSeries.Entry::input)).toList()){
+            int i=entry.input();
+            n.addInput(input(i),entry.name())
             .rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE)
             .tooltip("Audio is recorded sample by sample before display reduction. Control values are held over their block. Right-click the graph for Freeze, views, enlarged inspection and export.");
-            n.addEditor(new PropertyId("name-"+i),initial+" — "+NodeText.text("viewer.name","Name"),new ViewerNameEditor(initial)).inspectorOnly();
-            n.addEditor(new PropertyId("unit-"+i),initial+" — "+NodeText.text("viewer.unit","Unit"),Editor.comboBox(UNITS,UNITS.get(0),UnitChoice::id)).inspectorOnly()
-                .tooltip("Display unit only; the incoming numeric value is unchanged. Use Unit Converter to convert values.");
         }
     }
     @Override public void updateEditor(PropertyId id,com.vingame.glswing.component.GLContainer control,NodeState state){
         if(control instanceof com.vin.easyknack.ui.ValueViewerPanel panel)panel.configure(state);
+        if(control instanceof com.vin.easyknack.ui.ValueSeriesSettingsPanel panel)panel.configure(state);
     }
     private static final ParameterContract CONTRACT=contract();
     private static ParameterContract contract(){
@@ -36,7 +35,4 @@ public final class ValueViewerNode extends BasicNode {
         for(int i=0;i<MAX_INPUTS;i++){final int index=i;b.source(input(i),s->index<count(s));}return b.build();
     }
     @Override public NativeProcessor processor(){return new NativeProcessor("valueviewer","nodes/ValueViewerNode.hpp",CONTRACT);}
-    private record UnitChoice(String id,UnitFormat unit){public String toString(){return unit==null?NodeText.text("viewer.unit.none","None"):unit.toString();}}
-    private static final List<UnitChoice> UNITS=units();
-    private static List<UnitChoice> units(){var units=new java.util.ArrayList<UnitChoice>();units.add(new UnitChoice("none",null));for(var u:UnitFormat.values())units.add(new UnitChoice(u.id(),u));return List.copyOf(units);}
 }

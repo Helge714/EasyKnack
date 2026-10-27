@@ -42,12 +42,17 @@ public final class MeasurementTable {
     }
     public static int columns(GLNodeValue table,int configured){return Math.max(configured,rows(table).stream().mapToInt(r->((GLNodeValue.ListValue)r).values().size()-2).max().orElse(0));}
     public static void csv(GLNodeValue table,String[] names,Writer out,boolean excel)throws IOException{
+        csv(table,names,java.util.stream.IntStream.range(0,names.length).toArray(),out,excel);
+    }
+    public static void csv(GLNodeValue table,String[] names,int[] order,Writer out,boolean excel)throws IOException{
+        if(names.length!=order.length)throw new IllegalArgumentException("Column order length mismatch");
         String separator=excel?";":",";if(excel)out.write('\uFEFF');
         out.write("measurement"+separator+"session"+separator+"time_s");
         for(String name:names)out.write(separator+quote(name));out.write("\r\n");int number=0;
         for(var value:rows(table)){
             var row=((GLNodeValue.ListValue)value).values();out.write(++number+separator+quote((String)row.get(0).toJavaValue()));
-            for(int i=1;i<names.length+2;i++)out.write(separator+(i<row.size()?number(row.get(i),excel):""));out.write("\r\n");
+            out.write(separator+number(row.get(1),excel));
+            for(int slot:order){int i=slot+2;out.write(separator+(i<row.size()?number(row.get(i),excel):""));}out.write("\r\n");
         }
     }
     private static String number(GLNodeValue value,boolean excel){if(value==GLNodeValue.NullValue.INSTANCE)return "";String s=value.toJavaValue().toString();return excel?s.replace('.',','):s;}

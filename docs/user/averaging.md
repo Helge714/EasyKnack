@@ -67,6 +67,14 @@ time in seconds since that recorder session began. Host restarts or a changed in
 count begin a new session. Invalid numeric inputs are shown as empty cells, not zero.
 Changing the input count retains earlier rows; missing columns remain empty.
 
+Use the inspector's input rows to edit names and display units side by side.
+The up/down buttons reorder the table and CSV columns, including measurements
+already captured. Their numbers identify fixed input sockets: connections and
+stored input-to-value associations do not move. Units annotate headings only;
+use Unit Converter to change actual numeric values. Names, units and order are
+saved with the node and support Undo. Hidden columns from a reduced input count
+remain available for existing table rows.
+
 Measurements are stored in the `.knack` document and included in autosave recovery.
 Save the document to keep them. Capture continues while inspecting another group;
 automatic rows do not add Undo entries. Ordinary graph Undo retains captured rows.

@@ -14,14 +14,14 @@ public final class MeasurementRecorderNode extends BasicNode {
         n.addInput(RECORD,"Record",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT)
             .tooltip("Append one row with all current input values at the trigger's sample position. Measurements are saved in this document.");
         n.addEditor(COUNT,"Inputs",Editor.Slider.button(1,1.,8.).integers()).editorCopyable(false);
-        for(int i=0;i<count(s);i++){
-            String name=s.text("name-"+i,NodeText.text("easyknack.analysis.recorder.value","Value")+" "+(i+1));
-            n.addInput(input(i),name,Editor.Slider.button(0)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
-            n.addEditor(new PropertyId("name-"+i),name,new ViewerNameEditor(name)).inspectorOnly();
+        n.addEditor(ValueSeries.SETTINGS,"Values",new ValueSeriesEditor(s,count(s))).inspectorOnly().editorCopyable(false);
+        for(var entry:ValueSeries.visible(s,count(s)).stream().sorted(java.util.Comparator.comparingInt(ValueSeries.Entry::input)).toList()){
+            n.addInput(input(entry.input()),entry.name(),Editor.Slider.button(0)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         }
     }
     @Override public void updateEditor(PropertyId id,com.vingame.glswing.component.GLContainer control,NodeState state){
         if(control instanceof MeasurementRecorderPanel panel)panel.configure(state);
+        if(control instanceof com.vin.easyknack.ui.ValueSeriesSettingsPanel panel)panel.configure(state);
     }
     private static final ParameterContract CONTRACT=contract();
     private static ParameterContract contract(){

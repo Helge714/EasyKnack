@@ -34,7 +34,8 @@ public final class MeasurementRecorderPanel extends GLContainer {
     }
     public void update(GLNodeValue value){table=value;refresh();for(var child:children)child.update(value);}
     public void configure(NodeState value){state=value;refresh();for(var child:children)child.configure(value);}
-    private String[] names(){int count=MeasurementTable.columns(table,MeasurementRecorderNode.count(state));String[] result=new String[count];for(int i=0;i<count;i++)result[i]=state.text("name-"+i,NodeText.text("easyknack.analysis.recorder.value","Value")+" "+(i+1));return result;}
+    private java.util.List<ValueSeries.Entry> series(){return ValueSeries.visible(state,MeasurementTable.columns(table,MeasurementRecorderNode.count(state)));}
+    private String[] names(){return series().stream().map(ValueSeries.Entry::heading).toArray(String[]::new);}
     private void refresh(){
         int count=MeasurementTable.rows(table).size();status.setText(count+" / "+MeasurementTable.MAX_ROWS+" "+AppText.text(count==MeasurementTable.MAX_ROWS?"recorder.full":"recorder.rows"));
         open.setText(AppText.text("recorder.open"));open.setVisible(!expanded);
@@ -53,19 +54,22 @@ public final class MeasurementRecorderPanel extends GLContainer {
         var bounds=export.getLastRenderedScreenBounds();if(bounds!=null)menu.show(this,bounds[0],bounds[1]+bounds[3]);
     }
     private void export(boolean excel){
-        var files=new RememberingFileDialogs();var snapshot=table;var headings=names();
+        var files=new RememberingFileDialogs();var snapshot=table;var headings=names();var order=series().stream().mapToInt(ValueSeries.Entry::input).toArray();
         files.show("recorder.csv",GLFileDialogRequest.save().title(AppText.text("recorder.export")).filter("CSV","csv").suggestedFileName("Measurements.csv").build(),this)
             .whenComplete((choice,failure)->EventQueue.invokeLater(()->{
                 files.close();if(failure!=null){status.setText(failure.getMessage());return;}if(!choice.approved())return;
                 CompletableFuture.runAsync(()->{
-                    try{writeCsv(snapshot,headings,choice.selectedPath(),excel);}catch(java.io.IOException ex){throw new CompletionException(ex);}
+                    try{writeCsv(snapshot,headings,order,choice.selectedPath(),excel);}catch(java.io.IOException ex){throw new CompletionException(ex);}
                 }).whenComplete((v,error)->EventQueue.invokeLater(()->{if(error!=null)status.setText(error.getCause().getMessage());}));
             }));
     }
     static void writeCsv(GLNodeValue table,String[] names,Path target,boolean excel)throws java.io.IOException{
+        writeCsv(table,names,java.util.stream.IntStream.range(0,names.length).toArray(),target,excel);
+    }
+    static void writeCsv(GLNodeValue table,String[] names,int[] order,Path target,boolean excel)throws java.io.IOException{
         target=target.toAbsolutePath();var temporary=Files.createTempFile(target.getParent(),".easyknack-measurements-",".tmp");
         try{
-            try(var writer=Files.newBufferedWriter(temporary,StandardCharsets.UTF_8)){MeasurementTable.csv(table,names,writer,excel);}
+            try(var writer=Files.newBufferedWriter(temporary,StandardCharsets.UTF_8)){MeasurementTable.csv(table,names,order,writer,excel);}
             try{Files.move(temporary,target,StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
             catch(AtomicMoveNotSupportedException ex){Files.move(temporary,target,StandardCopyOption.REPLACE_EXISTING);}
         }finally{Files.deleteIfExists(temporary);}
@@ -78,7 +82,7 @@ public final class MeasurementRecorderPanel extends GLContainer {
     @Override protected void record(GLContext2D c){}
     private final class Grid extends GLContainer {
         @Override protected void record(GLContext2D c){
-            var names=names();var rows=MeasurementTable.rows(table);var font=getGLFont(getGLTheme().labelStyle().font());var color=getGLTheme().labelStyle().textColor();
+            var names=names();var series=series();var rows=MeasurementTable.rows(table);var font=getGLFont(getGLTheme().labelStyle().font());var color=getGLTheme().labelStyle().textColor();
             var border=getGLTheme().sliderStyle().borderColor();
             int first=Math.max(0,(int)(-getY()/28)-1),last=Math.min(rows.size(),first+(int)(scroll.getHeight()/28)+3);
             for(int i=first;i<=last;i++){
@@ -86,7 +90,10 @@ public final class MeasurementRecorderPanel extends GLContainer {
                 for(int p=0;p<names.length+3;p++){
                     String text;
                     if(i==0)text=p==0?"#":p==1?AppText.text("recorder.session"):p==2?AppText.text("recorder.time"):names[p-3];
-                    else text=p==0?Integer.toString(i):p==1?(String)row.get(0).toJavaValue():p-1<row.size()&&row.get(p-1)!=GLNodeValue.NullValue.INSTANCE?row.get(p-1).toJavaValue().toString():"—";
+                    else {
+                        int slot=p<3?p-1:series.get(p-3).input()+2;
+                        text=p==0?Integer.toString(i):p==1?(String)row.get(0).toJavaValue():slot<row.size()&&row.get(slot)!=GLNodeValue.NullValue.INSTANCE?row.get(slot).toJavaValue().toString():"—";
+                    }
                     c.beginClip(p*140+5,i*28,130,28);c.drawUIText(font,text,p*140+6,i*28+19,color);c.endClip();
                 }
                 c.drawLine(0,(i+1)*28,getWidth(),(i+1)*28,border);
