@@ -8,6 +8,21 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpectralFeaturesTest {
+    @Test void frequencyScaleControlsMomentUnitsAndNativeContract(){
+        var features=new SpectralFeaturesNode();var values=new HashMap<>(features.defaults());
+        assertEquals("linear",values.get("frequency-scale").toJavaValue());
+        values.put("frequency-scale",com.vingame.glswing.node.model.GLNodeValue.of("logarithmic"));
+        var state=new NodeState(values);var rows=features.layout(state).rows();
+        var scale=rows.stream().filter(r->r.id().equals("frequency-scale")).findFirst().orElseThrow();
+        assertTrue(scale.isInspectorOnly());
+        assertEquals(UnitFormat.OCTAVE,rows.stream().filter(r->r.id().equals("spread")).findFirst().orElseThrow().formats().stored());
+        assertEquals(UnitFormat.HZ,rows.stream().filter(r->r.id().equals("centroid")).findFirst().orElseThrow().formats().stored());
+        assertTrue(features.encode(state,p->3).endsWith("logarithmic"));
+        values.put("spread.unit",com.vingame.glswing.node.model.GLNodeValue.of("cent"));
+        assertEquals(UnitFormat.CENT,features.layout(new NodeState(values)).rows().stream().filter(r->r.id().equals("spread")).findFirst().orElseThrow().unit());
+        values.put("frequency-scale",com.vingame.glswing.node.model.GLNodeValue.of("linear"));
+        assertEquals(UnitFormat.HZ,features.layout(new NodeState(values)).rows().stream().filter(r->r.id().equals("spread")).findFirst().orElseThrow().unit());
+    }
     @Test void nodeContractsExposeAllDescriptorsAndDynamicViewerInputs(){
         var features=new SpectralFeaturesNode();var layout=features.layout(new NodeState(features.defaults()));
         assertEquals(8,layout.rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).count());

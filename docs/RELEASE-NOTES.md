@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add an inspector frequency-scale choice to Spectral Features. Logarithmic moments exclude DC, return a geometric Centroid in Hz and Spread in octaves (with semitone/cent choices), and preserve the definitions of Flux, Roll-off, Slope and Flatness. Linear remains the default; changing scale changes Spread connection semantics. Rebuild Java, host and plugin SDK together; document and protocol versions are unchanged. Covered by the current development version.
+
 - Fix right-channel autocorrelation processing when FFT preserves stereo. Correlation descriptors now remain valid on both channels instead of being halved by a downstream channel mix. Rebuild the audio host and plugin SDK; document and protocol versions are unchanged. Covered by the current development version.
 
 - Add Correlation Features with held control outputs for periodicity, period, repetition frequency, estimated HNR and validity; no Updated trigger. Inspector search/threshold settings and source-level metadata support silence gating, including averaged correlations. Rebuild Java, host and plugin SDK together. Document and host protocol versions are unchanged; the current development version covers this addition.

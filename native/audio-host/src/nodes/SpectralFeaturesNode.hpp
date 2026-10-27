@@ -5,9 +5,9 @@
 #include <array>
 namespace easyknack {
 struct SpectralFeaturesNode : NodeProcessor {
-    bool power=true,normalized=true,ready=false;
+    bool power=true,normalized=true,ready=false,logarithmic=false;
     double fraction=.85;
-    std::vector<double> weights,previous;
+    std::vector<double> weights,previous,coordinates;
     std::array<double,8> values{};
     std::uint64_t identity=0,end=0;
     std::size_t size=0,windowSize=0,hop=0;
@@ -17,22 +17,24 @@ struct SpectralFeaturesNode : NodeProcessor {
     bool supportsControlRate()const noexcept override{return true;}
     bool canShareChannels()const noexcept override{return true;}
     ResourceKind inputResourceKind(std::size_t)const noexcept override{return ResourceKind::analysis;}
-    void prepare(double,std::size_t)override{weights.resize(SpectrumFrame::capacity/2+1);previous.resize(weights.size());}
+    void prepare(double,std::size_t)override{weights.resize(SpectrumFrame::capacity/2+1);previous.resize(weights.size());coordinates.resize(weights.size());}
     void configure(std::istream& in)override{
         auto p=parameters::SpectralFeaturesNodeParameters::read(in);sources=p.sources();
         if(p.weighting_value!="power"&&p.weighting_value!="magnitude")throw std::runtime_error("Invalid spectral weighting");
+        if(p.frequency_scale_value!="linear"&&p.frequency_scale_value!="logarithmic")throw std::runtime_error("Invalid spectral frequency scale");
+        logarithmic=p.frequency_scale_value=="logarithmic";
         power=p.weighting_value=="power";fraction=std::clamp(p.rolloff_fraction_value,0.,1.);normalized=p.normalize_flux_value!=0;
     }
     bool supportsLiveParameters()const noexcept override{return true;}
     void applyParameters(const NodeProcessor& node)noexcept override{
         auto& p=static_cast<const SpectralFeaturesNode&>(node);
-        if(power!=p.power||normalized!=p.normalized||fraction!=p.fraction)ready=false;
-        power=p.power;normalized=p.normalized;fraction=p.fraction;
+        if(power!=p.power||normalized!=p.normalized||fraction!=p.fraction||logarithmic!=p.logarithmic)ready=false;
+        power=p.power;normalized=p.normalized;fraction=p.fraction;logarithmic=p.logarithmic;
     }
     void adoptState(NodeProcessor& old)noexcept override{
         auto& p=static_cast<SpectralFeaturesNode&>(old);
-        if(power!=p.power||normalized!=p.normalized||fraction!=p.fraction)return;
-        previous.swap(p.previous);values=p.values;ready=p.ready;identity=p.identity;end=p.end;size=p.size;
+        if(power!=p.power||normalized!=p.normalized||fraction!=p.fraction||logarithmic!=p.logarithmic)return;
+        previous.swap(p.previous);coordinates.swap(p.coordinates);values=p.values;ready=p.ready;identity=p.identity;end=p.end;size=p.size;
         windowSize=p.windowSize;hop=p.hop;rate=p.rate;window=p.window;dc=p.dc;amplitudeScale=p.amplitudeScale;
     }
     void evaluate(const std::complex<double>* bins,std::size_t fft,std::size_t win,std::size_t step,
@@ -41,6 +43,9 @@ struct SpectralFeaturesNode : NodeProcessor {
         bool compatible=ready&&identity==source&&size==fft&&windowSize==win&&hop==step&&rate==sr&&window==shape&&dc==removed&&position>end;
         if(ready&&identity==source&&size==fft&&windowSize==win&&hop==step&&rate==sr&&window==shape&&dc==removed&&position==end)return;
         std::size_t count=fft/2+1;double total=0,first=0,logSum=0,spacing=sr/fft;
+        // Coordinates change only with the selected scale or FFT geometry.
+        if(!ready||size!=fft||rate!=sr)for(std::size_t k=0;k<count;k++)coordinates[k]=logarithmic?(k?std::log2(k*spacing):0):k*spacing;
+        double momentTotal=0,momentFirst=0;
         if(!ready||windowSize!=win||window!=shape){double sum=0;for(std::size_t i=0;i<win;i++)sum+=spectrumWindowValue(shape,i,win);amplitudeScale=sum>0?1/sum:1;}
         double scale=amplitudeScale;
         for(std::size_t k=0;k<count;k++){
@@ -48,27 +53,31 @@ struct SpectralFeaturesNode : NodeProcessor {
             double w=(power?a*a:a)*multiplier;
             if(!std::isfinite(w)||w<0)w=0;
             weights[k]=w;total+=w;first+=w*k*spacing;
+            if(!logarithmic||k){momentTotal+=w;momentFirst+=w*coordinates[k];}
         }
         values.fill(0);
         if(total>1e-30){
-            double center=first/total,m2=0,m3=0,m4=0,flux=0,cumulative=0;
+            double center=momentTotal>1e-30?momentFirst/momentTotal:0,m2=0,m3=0,m4=0,flux=0,cumulative=0;
             double floor=std::max(1e-300,total/count*1e-12),arithmetic=0;
             bool rolled=false;
             for(std::size_t k=0;k<count;k++){
-                double p=weights[k]/total,d=k*spacing-center,d2=d*d;
-                m2+=p*d2;m3+=p*d2*d;m4+=p*d2*d2;
+                double p=weights[k]/total;
+                if((!logarithmic||k)&&momentTotal>1e-30){
+                    double q=weights[k]/momentTotal,d=coordinates[k]-center,d2=d*d;
+                    m2+=q*d2;m3+=q*d2*d;m4+=q*d2*d2;
+                }
                 double current=normalized?p:weights[k],difference=current-(compatible?previous[k]:current);
                 flux+=difference*difference;previous[k]=current;
                 cumulative+=weights[k];
                 if(!rolled&&cumulative>=fraction*total){values[5]=k*spacing;rolled=true;}
                 double clamped=std::max(weights[k],floor);logSum+=std::log(clamped);arithmetic+=clamped;
             }
-            values[0]=center;values[1]=std::sqrt(std::max(0.,m2));
+            values[0]=momentTotal>1e-30?(logarithmic?std::exp2(center):center):0;values[1]=std::sqrt(std::max(0.,m2));
             if(m2>1e-20){values[2]=m3/(m2*std::sqrt(m2));values[3]=m4/(m2*m2);}
             values[4]=std::sqrt(flux);
             double middle=spacing*(count-1)*.5;
             double denominator=spacing*spacing*count*(static_cast<double>(count)*count-1)/12;
-            values[6]=denominator>0?(center-middle)/denominator:0;
+            values[6]=denominator>0?(first/total-middle)/denominator:0;
             values[7]=std::clamp(std::exp(logSum/count)/(arithmetic/count),0.,1.);
         }else{
             double flux=0;for(std::size_t k=0;k<count;k++){if(compatible)flux+=previous[k]*previous[k];previous[k]=0;}values[4]=std::sqrt(flux);

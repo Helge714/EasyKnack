@@ -17,6 +17,27 @@ int main(){
     bins[0]=std::sqrt(2.);bins[4]=std::sqrt(2.);for(int k=1;k<4;k++)bins[k]=1;
     evaluate(20);assert(approximately(node.values[0],200));assert(approximately(node.values[7],1));assert(approximately(node.values[6],0));
     node.evaluate(bins,8,8,4,800,8,24,SpectrumWindow::rectangular,false);assert(node.values[4]==0);
+    // Equal energy at 220 and 880 Hz: linear centre 550 Hz, log centre 440 Hz.
+    SpectralFeaturesNode linear,log;linear.prepare(1760,256);log.prepare(1760,256);log.logarithmic=true;
+    std::complex<double> octaveBins[8]{};octaveBins[1]=1;octaveBins[4]=std::sqrt(2.);
+    auto measure=[&](SpectralFeaturesNode& n,double sr=1760){n.evaluate(octaveBins,8,8,4,sr,31,8,SpectrumWindow::rectangular,false);};
+    measure(linear);measure(log);
+    assert(approximately(linear.values[0],550));assert(approximately(linear.values[1],330));
+    assert(approximately(log.values[0],440));assert(approximately(log.values[1],1));
+    assert(approximately(log.values[2],0));assert(approximately(log.values[3],1));
+    for(int p:{4,5,6,7})assert(approximately(linear.values[p],log.values[p]));
+    // Equal weights remain equal: there is no rebinning or implicit 1/f weighting.
+    octaveBins[0]=100;log.ready=false;measure(log);assert(approximately(log.values[0],440));assert(approximately(log.values[1],1));
+    octaveBins[0]=0;log.ready=false;measure(log,3520);assert(approximately(log.values[0],880));assert(approximately(log.values[1],1));
+    octaveBins[4]=std::sqrt(6.);log.ready=false;measure(log);
+    assert(approximately(log.values[0],220*std::exp2(1.5)));assert(approximately(log.values[1],std::sqrt(.75)));
+    assert(approximately(log.values[2],-2/std::sqrt(3.)));assert(approximately(log.values[3],7./3));
+    // A live scale change re-evaluates the held frame and resets flux history.
+    auto settings=linear;settings.logarithmic=true;linear.applyParameters(settings);
+    octaveBins[4]=std::sqrt(2.);measure(linear);assert(approximately(linear.values[0],440));assert(linear.values[4]==0);
+    octaveBins[1]=octaveBins[4]=0;octaveBins[0]=1;log.ready=false;measure(log);
+    for(int p:{0,1,2,3})assert(log.values[p]==0); // DC has no log frequency.
+    octaveBins[0]=0;log.ready=false;measure(log);for(double value:log.values)assert(value==0);
     // Process every synchronous frame, not only the last frame of the block.
     SpectrumStream stream;stream.prepare(256);stream.size=8;stream.windowSize=8;stream.hop=4;stream.sampleRate=800;stream.identity=9;stream.count=2;
     stream.frames[0].start=0;stream.frames[0].bins[1]=1;stream.frames[1].start=4;stream.frames[1].bins[2]=1;

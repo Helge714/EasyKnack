@@ -35,6 +35,28 @@ Define `p[k] = w[k] / sum(w)`, `mu = sum(p[k] * f[k])`, and
 | Slope | Linear regression slope of `p[k]` against `f[k]` | 1/Hz |
 | Flatness | Geometric mean of weights divided by their arithmetic mean | 0–1 |
 
+In the inspector, **Frequency scale** selects the coordinates for Centroid,
+Spread, Skewness and Kurtosis. **Linear** is the default and uses the definitions
+above. **Logarithmic** uses `x[k] = log2(f[k] / 1 Hz)` for positive-frequency bins;
+DC is excluded and the remaining weights are normalized again for these four
+moments. Centroid is `2^mean(x)` Hz, Spread is the standard deviation of `x` in
+octaves (also selectable as semitones or cents). Skewness and Kurtosis use the
+central moments of `x` and remain dimensionless. A DC-only spectrum has zero for
+all four moments.
+
+For equal weights at 220 and 880 Hz, Linear gives Centroid 550 Hz and Spread
+330 Hz; Logarithmic gives Centroid 440 Hz and Spread 1 octave. Transposing the
+whole distribution shifts the logarithmic Centroid but preserves its Spread,
+Skewness and Kurtosis. No resampling into equal-octave bands or extra frequency
+weighting is performed. This is a coordinate change for moments, not a change
+to the spectrum.
+
+Flux, Roll-off, Slope and Flatness retain their original definitions, including
+DC. Slope always uses linear Hz. Changing scale resets the Flux comparison and
+re-evaluates the current frame. Switching Spread from Hz to octaves changes the
+meaning of values on existing downstream connections; review those connections
+when changing scale. Existing documents remain Linear unless explicitly changed.
+
 **Normalize flux** compares unit-sum weights, measuring changes of spectral
 shape independently of overall level. Disable it to compare the unnormalized
 weights, including changes of level. Flux is a difference per observed frame,
