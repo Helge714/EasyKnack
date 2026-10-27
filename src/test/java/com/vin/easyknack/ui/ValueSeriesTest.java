@@ -24,7 +24,8 @@ class ValueSeriesTest {
         for(BasicNode node:List.of(new ValueViewerNode(),new MeasurementRecorderNode())){
             var a=new HashMap<>(node.defaults());a.putAll(before.values());var b=new HashMap<>(a);b.putAll(after.values());
             assertEquals(node.encode(new NodeState(a),p->p.value().equals("record")?-1:Integer.parseInt(p.value().substring(6))),node.encode(new NodeState(b),p->p.value().equals("record")?-1:Integer.parseInt(p.value().substring(6))));
-            assertEquals(List.of("value-0","value-1","value-2"),node.layout(new NodeState(b)).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.INPUT&&r.id().startsWith("value-")).map(NodeBuilder.Row::id).toList());
+            assertEquals(List.of("value-0","value-2","value-1"),node.layout(new NodeState(b)).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.INPUT&&r.id().startsWith("value-")).map(NodeBuilder.Row::id).toList());
+            assertTrue(node.layout(new NodeState(b)).rows().stream().filter(r->r.id().startsWith("value-")).allMatch(r->r.editor()==null));
             assertFalse(node.layout(new NodeState(b)).rows().stream().anyMatch(r->r.id().startsWith("name-")||r.id().startsWith("unit-")));
         }
     }
@@ -48,10 +49,15 @@ class ValueSeriesTest {
     @Test void inspectorPairsAndReorderButtonsEditOneSharedProperty()throws Exception{
         SwingUtilities.invokeAndWait(()->{
             var changed=new AtomicReference<GLNodeValue>();var panel=new ValueSeriesSettingsPanel(settings(),3,changed::set);panel.setSize(280,122);
-            var fields=panel.getGLChildren().stream().filter(GLTextEditor.class::isInstance).map(GLTextEditor.class::cast).toList();
-            var units=panel.getGLChildren().stream().filter(GLComboBox.class::isInstance).toList();
+            var groups=panel.getGLChildren().stream().filter(GLLayoutGroup.class::isInstance).map(GLLayoutGroup.class::cast).toList();assertEquals(3,groups.size());
+            var children=groups.stream().flatMap(g->g.getGLChildren().stream()).toList();
+            var fields=children.stream().filter(GLTextEditor.class::isInstance).map(GLTextEditor.class::cast).toList();
+            var units=children.stream().filter(GLComboBox.class::isInstance).map(GLComboBox.class::cast).toList();
             assertEquals(3,fields.size());assertEquals(fields.get(0).getY(),units.get(0).getY());assertTrue(units.get(0).getX()>fields.get(0).getX());
-            panel.getGLChildren().stream().filter(c->c instanceof GLButton b&&b.getText().equals("↓")).map(GLButton.class::cast).findFirst().orElseThrow().doClick();
+            assertFalse(groups.get(0).getOutlineShape().isEmpty());
+            assertTrue(units.get(0).getPopupMenu().getItems().stream().filter(i->i.getSubMenu()!=null).count()>3);
+            var down=children.stream().filter(c->c instanceof GLButton&&"series-down-0".equals(c.getName())).map(GLButton.class::cast).findFirst().orElseThrow();
+            assertNotNull(down.getIcon());assertEquals("",down.getText());down.doClick();
             var s=new NodeState(Map.of(ValueSeries.SETTINGS.value(),changed.get()));assertEquals(List.of(1,0,2),ValueSeries.visible(s,3).stream().map(ValueSeries.Entry::input).toList());
         });
     }
@@ -67,9 +73,12 @@ class ValueSeriesTest {
             AudioAnalysis.publish(Map.of(id.toString(),new AudioAnalysis.Frame(3,1000,0,false,packet)));panel.setPaused(true);
             assertEquals(20,panel.snapshot(false).value()[1][0]);var connections=c.workspace().currentGraph().snapshot().connections();
             c.setNodeProperty(id,ValueSeries.SETTINGS,reordered(settings()).values().get(ValueSeries.SETTINGS.value()));
-            assertSame(view,c.workspace().editor().getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow());
-            assertEquals(30,panel.snapshot(false).value()[1][0]);assertTrue(panel.isPaused());assertEquals(connections,c.workspace().currentGraph().snapshot().connections());
-            c.history().undo();assertEquals(20,panel.snapshot(false).value()[1][0]);
+            java.util.function.Supplier<com.vingame.glswing.node.GLNode> current=()->c.workspace().editor().getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();
+            java.util.function.Supplier<ValueViewerPanel> currentPanel=()->current.get().getContents().stream().filter(ValueViewerPanel.class::isInstance).map(ValueViewerPanel.class::cast).findFirst().orElseThrow();
+            assertEquals(List.of("value-0","value-2","value-1"),current.get().getPorts().stream().map(p->p.getId()).toList());
+            assertEquals(30,currentPanel.get().snapshot(false).value()[1][0]);assertTrue(currentPanel.get().isPaused());assertEquals(connections,c.workspace().currentGraph().snapshot().connections());
+            c.history().undo();assertEquals(20,currentPanel.get().snapshot(false).value()[1][0]);
+            assertEquals(List.of("value-0","value-1","value-2"),current.get().getPorts().stream().map(p->p.getId()).toList());
         }finally{AudioAnalysis.publish(Map.of());}});
     }
 }

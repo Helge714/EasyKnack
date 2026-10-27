@@ -23,7 +23,8 @@ public final class MeasurementRecorderPanel extends GLContainer {
     private final GLButton open=new GLButton(""),export=new GLButton(""),clear=new GLButton("");
     private final Grid grid=new Grid();
     private final GLScrollPane scroll=new GLScrollPane(grid);
-    private final java.util.List<MeasurementRecorderPanel> children=new ArrayList<>();
+    private java.util.List<MeasurementRecorderPanel> children=new ArrayList<>();
+    void adoptViewState(MeasurementRecorderPanel previous,NodeState state){children=previous.children;configure(state);}
     public MeasurementRecorderPanel(Consumer<GLNodeValue> changed){this(changed,false);}
     private MeasurementRecorderPanel(Consumer<GLNodeValue> changed,boolean expanded){
         this.changed=changed;this.expanded=expanded;

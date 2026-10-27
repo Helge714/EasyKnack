@@ -68,9 +68,10 @@ count begin a new session. Invalid numeric inputs are shown as empty cells, not 
 Changing the input count retains earlier rows; missing columns remain empty.
 
 Use the inspector's input rows to edit names and display units side by side.
-The up/down buttons reorder the table and CSV columns, including measurements
-already captured. Their numbers identify fixed input sockets: connections and
-stored input-to-value associations do not move. Units annotate headings only;
+Each framed row has icon buttons for moving its port up/down. The table and CSV
+columns follow that port order, including measurements already captured. Existing
+connections move with their ports and retain their value associations. The numeric
+ports have no fallback sliders. Units are grouped by category and annotate headings only;
 use Unit Converter to change actual numeric values. Names, units and order are
 saved with the node and support Undo. Hidden columns from a reduced input count
 remain available for existing table rows.

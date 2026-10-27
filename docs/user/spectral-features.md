@@ -107,9 +107,10 @@ with sample recording and many inputs. Gaps are not interpolated. Use an audio
 recording node for guaranteed complete audio capture.
 
 In the inspector, each input has one row with its name, display unit and up/down
-buttons. The small number identifies its fixed input socket. Reordering changes
-the numeric rows, graph/legend order and exports; the sockets and their connections
-stay in place. Each trace keeps its input colour. Names, units and order are saved
+buttons. Each row is framed with the standard control-group outline. Units are
+sorted into category submenus. Reordering moves the input socket and its existing
+connection together; numeric rows, graphs, legends and exports follow the same
+order. Each trace keeps its input colour. Names, units and order are saved
 in the document and can be undone. Units are labels only, not conversions.
 
 Reordering also works while frozen: it rearranges the same captured samples

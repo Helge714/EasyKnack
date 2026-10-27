@@ -23,7 +23,7 @@ public final class ValueViewerPanel extends GLContainer {
         java.util.List<ValueSeries.Entry> frozenSeries;
         final java.util.List<java.lang.ref.WeakReference<ValueViewerPanel>> views=new java.util.ArrayList<>();
     }
-    private final Session session;
+    private Session session;
     private final Consumer<GLNodeValue> changed;
     private final GLButton mode=new GLButton(""),pause=new GLButton(""),expand=new GLButton(""),export=new GLButton("");
     private final GLLabel status=new GLLabel("");
@@ -45,6 +45,12 @@ public final class ValueViewerPanel extends GLContainer {
         setPreferredGLSize(210,220);AudioAnalysis.listen(listener);refresh();
     }
     public void bind(String id){session.id=id;receive();refresh();}
+    void adoptViewState(ValueViewerPanel previous,NodeState state){
+        session.views.removeIf(ref->ref.get()==this||ref.get()==null);
+        session=previous.session;session.views.add(new java.lang.ref.WeakReference<>(this));
+        zoom=previous.zoom;pan=previous.pan;cursorA=previous.cursorA;cursorB=previous.cursorB;
+        configure(state);
+    }
     public void configure(NodeState state){
         int count=ValueViewerNode.count(state);session.window=state.number(ValueViewerNode.WINDOW,10);
         session.names=new String[count];session.units=new String[count];

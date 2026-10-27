@@ -18,7 +18,7 @@ public final class ValueViewerNode extends BasicNode {
             .tooltip("Off: retain minimum, maximum and last value per 10 ms, including short peaks. On: retain each sample. History is bounded to one million input records; the visible duration can therefore be shorter than requested. Transport gaps are shown as gaps, never interpolated.");
         n.addEditor(CHANNEL,"Channel",Editor.comboBox(List.of("Left","Right","Mix"),"Left",v->v.toLowerCase(java.util.Locale.ROOT))).inspectorOnly();
         n.addEditor(ValueSeries.SETTINGS,"Values",new ValueSeriesEditor(s,count(s))).inspectorOnly().editorCopyable(false);
-        for(var entry:ValueSeries.visible(s,count(s)).stream().sorted(java.util.Comparator.comparingInt(ValueSeries.Entry::input)).toList()){
+        for(var entry:ValueSeries.visible(s,count(s))){
             int i=entry.input();
             n.addInput(input(i),entry.name())
             .rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE)

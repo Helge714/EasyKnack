@@ -15,8 +15,8 @@ public final class MeasurementRecorderNode extends BasicNode {
             .tooltip("Append one row with all current input values at the trigger's sample position. Measurements are saved in this document.");
         n.addEditor(COUNT,"Inputs",Editor.Slider.button(1,1.,8.).integers()).editorCopyable(false);
         n.addEditor(ValueSeries.SETTINGS,"Values",new ValueSeriesEditor(s,count(s))).inspectorOnly().editorCopyable(false);
-        for(var entry:ValueSeries.visible(s,count(s)).stream().sorted(java.util.Comparator.comparingInt(ValueSeries.Entry::input)).toList()){
-            n.addInput(input(entry.input()),entry.name(),Editor.Slider.button(0)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
+        for(var entry:ValueSeries.visible(s,count(s))){
+            n.addInput(input(entry.input()),entry.name()).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         }
     }
     @Override public void updateEditor(PropertyId id,com.vingame.glswing.component.GLContainer control,NodeState state){
