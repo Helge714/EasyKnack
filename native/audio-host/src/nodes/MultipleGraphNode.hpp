@@ -31,6 +31,8 @@
 #include "PitchHoldNode.hpp"
 #include "InstanceContextNode.hpp"
 #include "MultipleInputNode.hpp"
+#include "MultipleWaveformInputNode.hpp"
+#include "WaveformNode.hpp"
 #include "VectorNode.hpp"
 #include "VectorCombineNode.hpp"
 #include "VectorSeparateNode.hpp"
@@ -166,6 +168,8 @@ if(id=="vectordistance")return std::make_unique<VectorDistanceNode>();
 if(id=="vectordot")return std::make_unique<VectorDotNode>();
 if(id=="spatialreceiver")return std::make_unique<SpatialReceiverNode>();
 if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
+        if(id=="waveform")return std::make_unique<WaveformNode>();
+        if(id=="multiplewaveforminput")return std::make_unique<MultipleWaveformInputNode>();
         if(id=="multiplegraph")return std::make_unique<MultipleGraphNode>();
         if(id=="spectrum")return std::make_unique<SpectrumNode>();
         if(id=="fftstream")return std::make_unique<FFTStreamNode>();

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Support Wavetable nodes and typed external Wavetable inputs in Instance Groups, including shared processing, Bake and source export. Rebuild the audio host and plugin SDK together; existing document and protocol versions are unchanged. Covered by the current development version.
+
 - Unify Value Viewer/Recorder port and display order. Reordering moves ports with their connections while retaining recorded values and frozen Viewer state. Use Core-framed inspector rows, drawn arrow icons and categorized unit submenus; remove Recorder fallback sliders to match Viewer port spacing and simplify the inspector. Requires the updated external Core view-state-transfer callback. Native contracts and document schema are unchanged; covered by the current development version.
 
 - Add shared, compact name/unit inspector rows with up/down ordering to Value Viewer and Measurement Recorder. Display order applies to frozen histories, table columns and exports while input sockets, trace colours and recorded slot associations remain stable. Recorder units are display labels only. Settings persist with the document and support Undo; legacy names/units are retained. Native contracts and document schema are unchanged. Covered by the current development version.
