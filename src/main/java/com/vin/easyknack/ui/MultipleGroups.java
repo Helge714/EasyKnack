@@ -9,7 +9,19 @@ import com.vingame.glswing.node.model.*;
 /** Compiles an editable group into independent scheduled instances, not cloned editor nodes. */
 final class MultipleGroups {
     static final String MARKER="easyknack.multiple",MAXIMUM="easyknack.multiple.maximum",MERGE="easyknack.multiple.merge",CREATE_TYPE="easyknack.action.multiple",COUNT_PROPERTY="easyknack.instance.count",EXECUTION="easyknack.instance.execution";
-    private static final Set<String> SUPPORTED=Set.of("waveform","multiplewaveforminput","math","maprange","mix","curve","clamp","unitconvert","value","comparator","gain","filter","delay","osc","additive","digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher","samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext","multiplegraph","multipleinput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate","vectorscale","vectorlength","vectordistance","vectordot","spatialreceiver","multiplevectorinput","multipleoutput","instancecombine","spectrum","fftstream","spectralgraph","ifft");
+    private static final Set<String> SUPPORTED=Set.of(
+        "formula",
+        "spectrumblur","spectrumshift","spectrumprune","spectrumcorrelation","spectrumstatistics","spectralfeatures","correlationfeatures","analysisaverage",
+        "valueaverage","levelanalysis","pitchdetection","envelope","triggerinput","triggercounter","triggerdelay","triggerdivider",
+        "triggerfilter","triggermerge","triggertimer","history","historyreader","positionreader","spectrumrelay","vectorrelay",
+        "waveformrelay","waveform","multiplewaveforminput","math","maprange","mix","curve","clamp",
+        "unitconvert","value","comparator","gain","filter","delay","osc","additive",
+        "digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher",
+        "samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext",
+        "multiplegraph","multipleinput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate",
+        "vectorscale","vectorlength","vectordistance","vectordot","spatialreceiver","multiplevectorinput","multipleoutput","instancecombine",
+        "spectrum","fftstream","spectralgraph","ifft"
+    );
     static final String COUNT_ROLE="easyknack.instance.role";
     static boolean countPort(GLCompositePortMapping port){return GLNodeValue.of("count").equals(port.presentation().editorOptions().get(COUNT_ROLE));}
     static GLCompositePortMapping countPort(String id){

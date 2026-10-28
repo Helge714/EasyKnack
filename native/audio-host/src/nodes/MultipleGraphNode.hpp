@@ -51,6 +51,32 @@
 #include "FFTStreamNode.hpp"
 #include "SpectralGraphNode.hpp"
 #include "IFFTNode.hpp"
+#include "FormulaNode.hpp"
+#include "SpectrumBlurNode.hpp"
+#include "SpectrumShiftNode.hpp"
+#include "SpectrumPruneNode.hpp"
+#include "SpectrumCorrelationNode.hpp"
+#include "SpectrumStatisticsNode.hpp"
+#include "SpectralFeaturesNode.hpp"
+#include "CorrelationFeaturesNode.hpp"
+#include "AnalysisAverageNode.hpp"
+#include "ValueAverageNode.hpp"
+#include "LevelAnalysisNode.hpp"
+#include "PitchDetectionNode.hpp"
+#include "EnvelopeNode.hpp"
+#include "TriggerInputNode.hpp"
+#include "TriggerCounterNode.hpp"
+#include "TriggerDelayNode.hpp"
+#include "TriggerDividerNode.hpp"
+#include "TriggerFilterNode.hpp"
+#include "TriggerMergeNode.hpp"
+#include "TriggerTimerNode.hpp"
+#include "HistoryBufferNode.hpp"
+#include "HistoryReaderNode.hpp"
+#include "PositionReaderNode.hpp"
+#include "SpectrumRelayNode.hpp"
+#include "VectorRelayNode.hpp"
+#include "WaveformRelayNode.hpp"
 namespace easyknack {
 struct MultipleGraphNode : NodeProcessor {
     struct Instance : BakedGraphProcessor {
@@ -157,6 +183,32 @@ struct MultipleGraphNode : NodeProcessor {
     std::size_t outputCount()const noexcept override{return outputs;}
     void shareChannelState(NodeProcessor& other)override{state=static_cast<MultipleGraphNode&>(other).state;primary=false;}
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
+        if(id=="formula")return std::make_unique<FormulaNode>();
+        if(id=="spectrumblur")return std::make_unique<SpectrumBlurNode>();
+        if(id=="spectrumshift")return std::make_unique<SpectrumShiftNode>();
+        if(id=="spectrumprune")return std::make_unique<SpectrumPruneNode>();
+        if(id=="spectrumcorrelation")return std::make_unique<SpectrumCorrelationNode>();
+        if(id=="spectrumstatistics")return std::make_unique<SpectrumStatisticsNode>();
+        if(id=="spectralfeatures")return std::make_unique<SpectralFeaturesNode>();
+        if(id=="correlationfeatures")return std::make_unique<CorrelationFeaturesNode>();
+        if(id=="analysisaverage")return std::make_unique<AnalysisAverageNode>();
+        if(id=="valueaverage")return std::make_unique<ValueAverageNode>();
+        if(id=="levelanalysis")return std::make_unique<LevelAnalysisNode>();
+        if(id=="pitchdetection")return std::make_unique<PitchDetectionNode>();
+        if(id=="envelope")return std::make_unique<EnvelopeNode>();
+        if(id=="triggerinput")return std::make_unique<TriggerInputNode>();
+        if(id=="triggercounter")return std::make_unique<TriggerCounterNode>();
+        if(id=="triggerdelay")return std::make_unique<TriggerDelayNode>();
+        if(id=="triggerdivider")return std::make_unique<TriggerDividerNode>();
+        if(id=="triggerfilter")return std::make_unique<TriggerFilterNode>();
+        if(id=="triggermerge")return std::make_unique<TriggerMergeNode>();
+        if(id=="triggertimer")return std::make_unique<TriggerTimerNode>();
+        if(id=="history")return std::make_unique<HistoryBufferNode>();
+        if(id=="historyreader")return std::make_unique<HistoryReaderNode>();
+        if(id=="positionreader")return std::make_unique<PositionReaderNode>();
+        if(id=="spectrumrelay")return std::make_unique<SpectrumRelayNode>();
+        if(id=="vectorrelay")return std::make_unique<VectorRelayNode>();
+        if(id=="waveformrelay")return std::make_unique<WaveformRelayNode>();
         if(id=="vector")return std::make_unique<VectorNode>();
 if(id=="vectorcombine")return std::make_unique<VectorCombineNode>();
 if(id=="vectorseparate")return std::make_unique<VectorSeparateNode>();
