@@ -15,6 +15,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class ControlInterpolationTest {
     static Editor.Slider slider(BasicNode node,String property){var editor=node.layout(new NodeState(node.defaults())).rows().stream().filter(r->r.id().equals(property)).findFirst().orElseThrow().editor();return editor instanceof UnitSlider u?u.spec():(Editor.Slider)editor;}
     static GLNodeGraphSnapshot graph(BasicNode node,Map<String,GLNodeValue> values){var graph=new GLNodeGraph();var merged=new HashMap<>(node.defaults());merged.putAll(values);graph.edit("Fixture",e->e.addNode(new GLGraphNode(GLNodeId.random(),node.registration().id(),merged)));return graph.snapshot();}
+    @Test void bufferingAndBoundarySmoothingPersistIndependently(){
+        var defaults=ControlInterpolationSettings.DEFAULT;assertTrue(defaults.buffered());assertTrue(defaults.smoothing());assertEquals(50,defaults.bufferMs());assertEquals(5,defaults.smoothingMs());
+        for(boolean buffered:List.of(false,true))for(boolean smoothing:List.of(false,true)){
+            var settings=new ControlInterpolationSettings(true,5,50,buffered,35,smoothing,3);
+            assertEquals(settings,ControlInterpolationSettings.read(settings.value()));
+            var driver=new MidiDriverBinding("1","Device",0,7,true,new GLDriverMapping(0,1,false,false,false),false,64,settings);
+            assertEquals(driver,MidiDriverBinding.read(driver.value()));
+        }
+        var legacy=ControlInterpolationSettings.read(GLNodeValue.of(Map.of("enabled",true,"minimumMs",5,"maximumMs",50)));
+        assertTrue(legacy.buffered());assertTrue(legacy.smoothing());
+        assertThrows(IllegalArgumentException.class,()->new ControlInterpolationSettings(true,5,50,true,1001,true,5));
+        var definition=new ValueNode();try(var scope=ControlMetadata.use(defaults)){
+            assertTrue(AudioGraphEncoder.encode(graph(definition,Map.of())).contains(" B 1 50.0 1 5.0 -"));
+        }
+    }
     @Test void continuousDefaultIsIndependentOfIntegerPresentationAndConfigurationIsDiscrete(){
         assertTrue(Editor.Slider.button(0).continuousChanges());
         assertTrue(Editor.Slider.button(0).integers().continuousChanges());

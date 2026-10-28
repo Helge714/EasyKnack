@@ -11,6 +11,11 @@ namespace easyknack {
 /** State belongs to one processor lane. Only unsourced numeric defaults are
  * interpolated. */
 struct ControlInterpolation {
+  struct Point {
+    std::int64_t time = 0;
+    double value = 0;
+    bool start = false;
+  };
   struct Entry {
     std::size_t port = 0;
     bool enabled = true, initialized = false;
@@ -25,6 +30,18 @@ struct ControlInterpolation {
     std::array<float, 256> samples{};
     std::array<float, 128> mappedValues{};
     bool lookup = false;
+    bool buffered = false, smoothing = false;
+    double bufferMs = 50, smoothingMs = 5;
+    // Bounded history: hardware CC normally produces far fewer than 512 points
+    // per second.
+    std::array<Point, 512> points{};
+    std::size_t head = 0, count = 0;
+    Point segmentA{}, segmentB{};
+    bool segmentValid = false, segmentStart = false, segmentEnd = false,
+         fromRest = true;
+    double rampStart = 0;
+    std::uint64_t rampLength = 0, rampPosition = 0;
+    bool rampBegin = false, rampEnd = false;
   };
   std::vector<Entry> entries;
   std::uint64_t clock = 0, blockStart = 0, epoch = 0;
@@ -47,7 +64,23 @@ struct ControlInterpolation {
           e.minimumMs < 0 || e.maximumMs < e.minimumMs || e.maximumMs > 60000)
         throw std::runtime_error("Invalid interpolation bounds");
       std::string mapping;
-      if (!(in >> mapping) || (mapping != "-" && mapping != "LUT"))
+      if (!(in >> mapping) ||
+          (mapping != "-" && mapping != "LUT" && mapping != "B"))
+        throw std::runtime_error("Invalid interpolation lookup");
+      if (mapping == "B") {
+        int buffered, smoothing;
+        if (!(in >> buffered >> e.bufferMs >> smoothing >> e.smoothingMs >>
+              mapping) ||
+            (buffered != 0 && buffered != 1) ||
+            (smoothing != 0 && smoothing != 1) || !std::isfinite(e.bufferMs) ||
+            e.bufferMs < 0 || e.bufferMs > 1000 ||
+            !std::isfinite(e.smoothingMs) || e.smoothingMs < 0 ||
+            e.smoothingMs > 100)
+          throw std::runtime_error("Invalid buffered interpolation timing");
+        e.buffered = buffered != 0;
+        e.smoothing = smoothing != 0;
+      }
+      if (mapping != "-" && mapping != "LUT")
         throw std::runtime_error("Invalid interpolation lookup");
       e.lookup = mapping == "LUT";
       if (e.lookup)
@@ -95,6 +128,17 @@ struct ControlInterpolation {
       e.enabled = n.enabled;
       e.minimumMs = n.minimumMs;
       e.maximumMs = n.maximumMs;
+      const bool modeChanged =
+          e.buffered != n.buffered || e.bufferMs != n.bufferMs ||
+          e.smoothing != n.smoothing || e.smoothingMs != n.smoothingMs;
+      e.buffered = n.buffered;
+      e.bufferMs = n.bufferMs;
+      e.smoothing = n.smoothing;
+      e.smoothingMs = n.smoothingMs;
+      if (modeChanged) {
+        clearHistory(e);
+        e.initialized = false;
+      }
       if (mappingChanged || e.device != n.device || e.channel != n.channel ||
           e.number != n.number || e.low != n.low || e.high != n.high ||
           e.reverse != n.reverse || e.log != n.log || e.pickup != n.pickup)
@@ -126,6 +170,17 @@ struct ControlInterpolation {
       entries[i].enabled = config.enabled;
       entries[i].minimumMs = config.minimumMs;
       entries[i].maximumMs = config.maximumMs;
+      entries[i].buffered = config.buffered;
+      entries[i].bufferMs = config.bufferMs;
+      entries[i].smoothing = config.smoothing;
+      entries[i].smoothingMs = config.smoothingMs;
+      if (config.buffered != old.entries[i].buffered ||
+          config.bufferMs != old.entries[i].bufferMs ||
+          config.smoothing != old.entries[i].smoothing ||
+          config.smoothingMs != old.entries[i].smoothingMs) {
+        clearHistory(entries[i]);
+        entries[i].initialized = false;
+      }
       entries[i].manualPending |= config.value != old.entries[i].value &&
                                   (!config.external || !config.device);
       entries[i].device = config.device;
@@ -146,7 +201,7 @@ struct ControlInterpolation {
   void resetTargets() noexcept {
     for (auto &e : entries) {
       e.current = e.target = e.value;
-      e.remaining = 0;
+      clearHistory(e);
       e.manualPending = e.changedBefore = e.constantBuffer = false;
       e.initialized = true;
     }
@@ -156,7 +211,7 @@ struct ControlInterpolation {
       if (e.port == port) {
         e.initialized = e.changedBefore = e.acquired = e.previousValid =
             e.constantBuffer = false;
-        e.remaining = 0;
+        clearHistory(e);
         e.manualPending = false;
       }
   }
@@ -168,13 +223,14 @@ struct ControlInterpolation {
   }
   bool requiresGeneralScheduling() const noexcept {
     for (const auto &e : entries)
-      if (e.enabled && (e.remaining || e.manualPending || e.device))
+      if (e.enabled &&
+          (e.remaining || e.manualPending || e.device || pending(e)))
         return true;
     return false;
   }
   bool changing() const noexcept {
     for (const auto &e : entries)
-      if (e.enabled && (e.remaining || e.manualPending ||
+      if (e.enabled && (e.remaining || pending(e) || e.manualPending ||
                         e.device && midi && midi->events(e.device) &&
                             midi->events(e.device)->count))
         return true;
@@ -195,6 +251,81 @@ struct ControlInterpolation {
                             t * (std::log(e.high) - std::log(e.low)))
                  : e.low + t * (e.high - e.low);
   }
+  static void clearHistory(Entry &e) noexcept {
+    e.count = e.head = 0;
+    e.segmentValid = false;
+    e.fromRest = true;
+    e.remaining = 0;
+    e.rampLength = e.rampPosition = 0;
+  }
+  static bool pending(const Entry &e) noexcept { return e.count > 1; }
+  static Point &point(Entry &e, std::size_t i) noexcept {
+    return e.points[(e.head + i) % e.points.size()];
+  }
+  static void append(Entry &e, Point value) noexcept {
+    if (e.count && point(e, e.count - 1).time == value.time &&
+        !point(e, e.count - 1).start && !value.start) {
+      point(e, e.count - 1) = value;
+      return;
+    }
+    if (e.count == e.points.size()) {
+      // Keep the playback head and its next endpoint stable; coarsen only the
+      // future tail.
+      point(e, e.count - 1) = value;
+      return;
+    }
+    e.points[(e.head + e.count) % e.points.size()] = value;
+    ++e.count;
+  }
+  static double curve(double a, double b, double position, double length,
+                      double rounding, bool begin, bool end) noexcept {
+    if (length <= 0)
+      return b;
+    double t = std::clamp(position, 0., length),
+           width = std::min(rounding, length / (begin && end ? 2. : 1.));
+    double offset = t;
+    if (width > 0 && begin && t < width) {
+      double u = t / width;
+      offset = width * (-u * u * u + 2 * u * u);
+    } else if (width > 0 && end && t > length - width) {
+      double u = (t - (length - width)) / width;
+      offset = length - width + width * (-u * u * u + u * u + u);
+    }
+    return a + (b - a) * (offset / length);
+  }
+  double bufferedValue(Entry &e, std::uint64_t now) noexcept {
+    if (!e.count)
+      return e.current;
+    const double q = double(now) - std::llround(e.bufferMs * rate / 1000.);
+    while (e.count > 1 && q >= double(point(e, 1).time)) {
+      e.fromRest = e.segmentValid ? e.segmentEnd : true;
+      e.head = (e.head + 1) % e.points.size();
+      --e.count;
+      e.segmentValid = false;
+    }
+    const auto &a = point(e, 0);
+    if (e.count == 1 || q <= double(a.time)) {
+      if (e.count == 1 && q >= double(a.time))
+        e.fromRest = true;
+      return a.value;
+    }
+    const auto &b = point(e, 1);
+    double rounding = e.smoothing ? e.smoothingMs * rate / 1000. : 0;
+    if (!e.segmentValid || e.segmentA.time != a.time ||
+        e.segmentB.time != b.time) {
+      e.segmentA = a;
+      e.segmentB = b;
+      e.segmentStart = a.start || e.fromRest;
+      e.segmentEnd = e.count < 3 || point(e, 2).start;
+      e.segmentValid = true;
+    }
+    // A successor arriving before the rounding tail starts keeps the motion
+    // linear.
+    if (e.count > 2 && !point(e, 2).start && q <= double(b.time) - rounding)
+      e.segmentEnd = false;
+    return curve(a.value, b.value, q - double(a.time), double(b.time - a.time),
+                 rounding, e.segmentStart, e.segmentEnd);
+  }
   void retarget(Entry &e, double value, std::uint64_t now) noexcept {
     if (value == e.target)
       return;
@@ -203,8 +334,32 @@ struct ControlInterpolation {
     // Min is the first/restart duration, not a lower bound on frequent changes.
     const double ms =
         !e.changedBefore || interval > e.maximumMs ? e.minimumMs : interval;
+    const bool gestureStart = !e.changedBefore || interval > e.maximumMs;
+    if (e.buffered && e.bufferMs > 0) {
+      const auto delay = std::uint64_t(std::llround(e.bufferMs * rate / 1000.));
+      const bool late = !e.count || double(now) - double(delay) >
+                                        double(point(e, e.count - 1).time);
+      if (gestureStart || late) {
+        auto lead = std::uint64_t(std::llround(e.minimumMs * rate / 1000.));
+        lead = std::min(lead, delay);
+        auto anchor = std::int64_t(now) - std::int64_t(lead);
+        if (e.count)
+          anchor = std::max(anchor, point(e, e.count - 1).time);
+        append(e, {anchor, e.target, true});
+      }
+      append(e, {std::int64_t(now), value, false});
+      e.lastChange = now;
+      e.changedBefore = true;
+      e.target = value;
+      e.constantBuffer = false;
+      return;
+    }
     e.lastChange = now;
     e.changedBefore = true;
+    e.rampStart = e.current;
+    e.rampPosition = 0;
+    e.rampBegin = gestureStart;
+    e.rampEnd = gestureStart;
     e.target = value;
     if (ms <= 0) {
       e.current = value;
@@ -214,6 +369,7 @@ struct ControlInterpolation {
       return;
     }
     e.remaining = std::max<std::uint64_t>(1, std::llround(ms * rate / 1000));
+    e.rampLength = e.remaining;
     e.step = (value - e.current) / e.remaining;
   }
   void begin(std::size_t count, double sampleRate,
@@ -234,6 +390,7 @@ struct ControlInterpolation {
           e.epoch = epoch;
           if (!e.initialized) {
             e.current = e.target = e.value;
+            clearHistory(e);
             e.constantBuffer = false;
             e.initialized = true;
             e.manualPending = false;
@@ -242,7 +399,7 @@ struct ControlInterpolation {
             if (e.current != e.value)
               e.constantBuffer = false;
             e.current = e.target = e.value;
-            e.remaining = 0;
+            clearHistory(e);
             e.manualPending = false;
           } else if (e.manualPending) {
             retarget(e, e.value, blockStart);
@@ -253,11 +410,12 @@ struct ControlInterpolation {
           std::size_t event = 0;
           if (events && events->panic)
             e.acquired = e.previousValid = e.changedBefore = false;
-          if (e.constantBuffer && !e.remaining && (!events || !events->count)) {
+          if (e.constantBuffer && !e.remaining && !pending(e) &&
+              (!events || !events->count)) {
             return e.samples.data() + std::min(offset, frames - 1);
           }
           e.constantBuffer = false;
-          bool steady = !e.remaining;
+          bool steady = !e.remaining && !pending(e);
 
           for (std::size_t i = 0; i < frames; i++) {
             while (events && event < events->count &&
@@ -281,15 +439,24 @@ struct ControlInterpolation {
               }
               retarget(e, value, blockStart + i);
             }
+            if (e.buffered && e.bufferMs > 0)
+              e.current = bufferedValue(e, blockStart + i);
             e.samples[i] = float(e.current);
             if (e.remaining) {
-              e.current += e.step;
+              ++e.rampPosition;
+              if (e.smoothing)
+                e.current =
+                    curve(e.rampStart, e.target, double(e.rampPosition),
+                          double(e.rampLength), e.smoothingMs * rate / 1000.,
+                          e.rampBegin, e.rampEnd);
+              else
+                e.current += e.step;
               if (--e.remaining == 0)
                 e.current = e.target;
             }
           }
-          e.constantBuffer =
-              steady && !e.remaining && (!events || !events->count);
+          e.constantBuffer = steady && !e.remaining && !pending(e) &&
+                             (!events || !events->count);
           if (e.constantBuffer)
             e.samples.fill(float(e.current));
         }

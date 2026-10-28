@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add independently switchable buffered control interpolation (50 ms default) and finite movement-edge rounding (5 ms default), saved per document with driver overrides. Buffering replaces adaptive ramp latency; rounding preserves endpoints and linear interiors. Existing documents adopt these defaults when the new fields are absent. Host protocol advances to 13: rebuild Java, host and plugin SDK together. Product version remains covered by the current development baseline.
+
 - Correct adaptive control timing: first changes and gaps above Max use Min; all other intervals are used exactly, including intervals below Min. Interrupted ramps continue from the current value. Clarify the timing labels; host protocol and document schema remain unchanged. Covered by the current development version.
 
 - Add document-scoped adaptive linear interpolation for continuous mouse and MIDI controls, with per-driver overrides, bounded timing and explicit discrete-slider policies. Connected signals bypass interpolation; copied group editors and baked/Instance boundaries retain the policy. Audio rate renders per-sample transitions; Control remains once per block. Host protocol advances to 12: rebuild Java, host and plugin SDK together. Existing documents use 5-50 ms defaults; the current development version covers this feature.

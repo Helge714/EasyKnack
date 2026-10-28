@@ -1,5 +1,6 @@
 #include "AudioGraph.hpp"
 #include "nodes/ValueNode.hpp"
+#include "nodes/VectorCombineNode.hpp"
 #include "nodes/VectorNode.hpp"
 #include <cassert>
 #include <cstdlib>
@@ -34,7 +35,121 @@ struct Source : MidiSource {
     block.append(offset, 0xb0 | 7 << 8 | value << 16);
   }
 };
+std::string bufferedEntry(bool buffer, bool smooth, double delay = 50) {
+  auto text = entry(0, 0, true, 1);
+  return text.substr(0, text.size() - 1) + "B " + (buffer ? "1" : "0") + " " +
+         std::to_string(delay) + " " + (smooth ? "1" : "0") + " 5 -";
+}
+void bufferedTests() {
+  Source midi;
+  for (auto t : {10u, 25u, 40u, 70u})
+    midi.cc(t, t);
+  ControlInterpolation linear(bufferedEntry(true, false));
+  linear.begin(150, 1000, &midi);
+  rendering = true;
+  auto *samples = linear.input(0, 0, 0);
+  close(samples[54], 0);
+  close(samples[60], 10. / 127);
+  close(samples[80], 30. / 127);
+  for (int t = 65; t < 110; t++)
+    close(samples[t + 1] - samples[t], 1. / 127);
+  close(samples[120], 70. / 127);
+  close(samples[149], 70. / 127);
+  rendering = false;
+  // Mouse/model snapshots follow the same buffered timeline, without a MIDI
+  // device.
+  auto manualText = entry(0, 0);
+  manualText = manualText.substr(0, manualText.size() - 1) + "B 1 50 0 5 -";
+  ControlInterpolation manual(manualText);
+  manual.begin(10, 1000);
+  manual.input(0, 0, 0);
+  ControlInterpolation snapshot(manualText);
+  snapshot.entries[0].value = 1;
+  manual.apply(snapshot);
+  manual.begin(80, 1000);
+  auto *mouse = manual.input(0, 0, 0);
+  close(mouse[44], 0);
+  close(mouse[50], 1);
+  // User path: an audio-rate Vector Combine carries one buffered coordinate per
+  // sample.
+  VectorCombineNode combine;
+  combine.prepare(1000, 150);
+  float vectorOutput[150]{};
+  ControlInterpolation coordinates(bufferedEntry(true, false));
+  coordinates.begin(150, 1000, &midi);
+  ProcessContext vectorContext{nullptr, 0,    vectorOutput,
+                               150,     1000, vectorOutput};
+  vectorContext.controls = &coordinates;
+  rendering = true;
+  combine.process(vectorContext);
+  rendering = false;
+  assert(combine.result.count == 150);
+  close(combine.result.samples[80][0], 30. / 127);
+  close(combine.result.samples[80][1], 0);
+  // A point arriving exactly at the buffer horizon still continues the segment.
+  Source horizon;
+  for (auto t : {10u, 60u, 110u})
+    horizon.cc(t, t);
+  ControlInterpolation exact(bufferedEntry(true, false));
+  exact.begin(200, 1000, &horizon);
+  auto *boundary = exact.input(0, 0, 0);
+  close(boundary[70], 20. / 127);
+  close(boundary[120], 70. / 127);
+  // Same delay with rounding: only gesture boundaries change, not the interior.
+  ControlInterpolation rounded(bufferedEntry(true, true));
+  rounded.begin(150, 1000, &midi);
+  rendering = true;
+  auto *smooth = rounded.input(0, 0, 0);
+  close(smooth[54], 0);
+  close(smooth[55], 0);
+  close(smooth[80], 30. / 127);
+  assert(smooth[56] > 0 && smooth[56] < samples[56]);
+  assert(smooth[120] - smooth[119] > 0 && smooth[120] - smooth[119] < 1. / 127);
+  for (int i = 0; i < 150; i++)
+    assert(smooth[i] >= 0 && smooth[i] <= 70. / 127 + 1e-6);
+  close(smooth[120], 70. / 127);
+  close(smooth[149], 70. / 127);
+  rendering = false;
+  // No additional restart-ramp latency: the endpoint arrives after exactly D.
+  Source first;
+  first.cc(0, 127);
+  ControlInterpolation immediate(bufferedEntry(true, false));
+  immediate.begin(80, 1000, &first);
+  samples = immediate.input(0, 0, 0);
+  close(samples[44], 0);
+  close(samples[50], 1);
+  close(samples[79], 1);
+  ControlInterpolation noBuffer(bufferedEntry(false, false));
+  noBuffer.begin(80, 1000, &first);
+  samples = noBuffer.input(0, 0, 0);
+  close(samples[0], 0);
+  close(samples[5], 1);
+  ControlInterpolation zeroBuffer(bufferedEntry(true, false, 0));
+  zeroBuffer.begin(80, 1000, &first);
+  samples = zeroBuffer.input(0, 0, 0);
+  close(samples[5], 1);
+  ControlInterpolation roundedOnly(bufferedEntry(false, true));
+  roundedOnly.begin(80, 1000, &first);
+  samples = roundedOnly.input(0, 0, 0);
+  assert(samples[1] > 0 && samples[1] < .2);
+  close(samples[5], 1);
+  // Overflow coarsens future points, without allocations or changing the
+  // playback head.
+  ControlInterpolation saturated(bufferedEntry(true, true));
+  saturated.begin(1, 1000);
+  saturated.input(0, 0, 0);
+  rendering = true;
+  for (unsigned t = 1; t < 1500; t++)
+    saturated.retarget(saturated.entries[0], t / 1500., t);
+  assert(saturated.entries[0].count <= 512);
+  saturated.begin(256, 1000);
+  samples = saturated.input(0, 0, 0);
+  for (int i = 0; i < 256; i++)
+    assert(std::isfinite(samples[i]));
+  rendering = false;
+}
 int main() {
+  bufferedTests();
   // Exact threshold and zero-interval behavior, independent of block rounding.
   ControlInterpolation timing(entry(0, 0));
   timing.begin(1, 1000);

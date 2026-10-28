@@ -78,9 +78,9 @@ is not a source dependency or included in the distribution.
 ## Execution and protocol
 
 The application starts the host only on Audio → Start. The host opens an ephemeral
-IPv4 loopback port, reports `READY 12 <port>` on stdout and accepts one client.
+IPv4 loopback port, reports `READY 13 <port>` on stdout and accepts one client.
 The session token is generated for each child process, passed as its first
-argument, and required in `HELLO 12 <token>`; the reply is `OK 12`.
+argument, and required in `HELLO 13 <token>`; the reply is `OK 13`.
 Version 3 adds explicit processing-rate metadata to every node record.
 Rebuild the host together with Java; the handshake rejects old executables.
 
@@ -286,12 +286,12 @@ It preserves voice domains until an explicit merge or sink, with channel-local g
 Legacy `voicemerge ... mix ...` packets remain supported only for existing documents.
 
 
-## Parameter contracts and analysis (protocol 12)
+## Parameter contracts and analysis (protocol 13)
 
 The application prefixes native payloads with `!<schema fingerprint>`. Java's `ParameterContract`
 is the single declaration for encoding, input ordering and generated C++ parameter structs.
 Run Maven through `process-classes` before a standalone native build, or use `-Pnative-audio`.
-The handshake is `HELLO 12`; incompatible parameter schemas are rejected without terminating
+The handshake is `HELLO 13`; incompatible parameter schemas are rejected without terminating
 host control. The existing unversioned parser is retained for diagnostic/legacy graph fixtures.
 
 `ANALYSIS` returns `OK 2` followed by zero or more records:
@@ -324,12 +324,12 @@ Sample-by-sample feedback uses **Effects > Sample Delay** instead. Its one-sampl
 delay and supported feedback islands are described in
 [Sample Feedback](../../docs/SAMPLE-FEEDBACK.md).
 
-## Manual parameter interpolation (protocol 12)
+## Manual parameter interpolation (protocol 13)
 
 Optional metadata after a node's rate fields has this form:
 
 ```text
-~ count [port enabled minMs maxMs target device channel cc low high reversed logarithmic pickup externalEcho mapping]... ~
+~ count [port enabled minMs maxMs target device channel cc low high reversed logarithmic pickup externalEcho B buffered bufferMs smoothing smoothingMs mapping]... ~
 ```
 
 Only unconnected numeric defaults are interpolated. Physical sources retain their
@@ -345,3 +345,11 @@ No additional graph nodes, render-thread allocations or GUI animation are needed
 `mapping` is `-` for the ordinary MIDI range mapping, or `LUT` followed by 128
 values when parameter/unit conversion must follow MIDI mapping. Tables are
 prepared in Java and copied into preallocated lane storage on live updates.
+
+Protocol 13 adds the `B` timing extension before `mapping`; unextended diagnostic
+entries retain adaptive behavior. Continuous controls default to a 50 ms buffered
+timeline and 5 ms boundary rounding in Java. Points use a preallocated 512-slot
+queue per lane. Overflow coarsens the future tail without replacing the playback
+head. Segments latch their endpoint treatment once rounding begins, so a late
+successor never changes an already rendered boundary retrospectively. In adaptive
+mode, rounding applies to initial/restart ramps only; ongoing ramps stay linear.

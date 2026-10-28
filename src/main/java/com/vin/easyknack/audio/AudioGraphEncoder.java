@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.vingame.glswing.node.model.*;
 
-/** Protocol 12 (manual-control interpolation, per-output rates and typed resources): source references encode node index + 256 * output index (up to eight outputs). */
+/** Protocol 13 (buffered manual-control interpolation, per-output rates and typed resources): source references encode node index + 256 * output index (up to eight outputs). */
 public final class AudioGraphEncoder {
     private AudioGraphEncoder() { }
 

@@ -132,7 +132,9 @@ public final class ControlMetadata {
                     .add(driver != null && driver.mapping().reversed() ? "1" : "0")
                     .add(driver != null && driver.mapping().logarithmic() ? "1" : "0")
                     .add(driver != null && driver.mapping().pickup() ? "1" : "0")
-                    .add(echo ? "1" : "0").add(lookup);
+                    .add(echo ? "1" : "0").add("B").add(policy.buffered()?"1":"0")
+                    .add(Double.toString(policy.bufferMs())).add(policy.smoothing()?"1":"0")
+                    .add(Double.toString(policy.smoothingMs())).add(lookup);
             return out.toString();
         }
     }
