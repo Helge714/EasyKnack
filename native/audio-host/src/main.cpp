@@ -16,6 +16,7 @@
 #include "midi/WindowsMidiSource.hpp"
 #include <iostream>
 #include <chrono>
+#include "CommandReader.hpp"
 
 namespace {
 struct Socket {
@@ -31,15 +32,10 @@ void sendLine(SOCKET socket, const std::string& line) {
         offset += sent;
     }
 }
-std::string readLine(SOCKET socket) {
-    std::string line;
-    char ch;
-    while (line.size() < 65536) {
-        if (recv(socket, &ch, 1, 0) != 1) throw std::runtime_error("connection closed or timed out");
-        if (ch == '\n') return line;
-        if (ch != '\r') line += ch;
-    }
-    throw std::runtime_error("command too large");
+std::string readLine(SOCKET socket,easyknack::CommandReader& reader) {
+    return reader.read([socket](char* buffer,std::size_t size){
+        return recv(socket,buffer,static_cast<int>(size),0);
+    });
 }
 }
 
@@ -89,13 +85,15 @@ int main(int argc, char** argv) {
         DWORD deadline = 5000;
         setsockopt(client.value, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&deadline), sizeof(deadline));
         setsockopt(client.value, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<char*>(&deadline), sizeof(deadline));
-        if (readLine(client.value) != "HELLO 11 " + std::string(argv[1])) throw std::runtime_error("invalid handshake");
+        easyknack::CommandReader commands;
+        if (readLine(client.value,commands) != "HELLO 11 " + std::string(argv[1])) throw std::runtime_error("invalid handshake");
         sendLine(client.value, "OK 11");
         std::uint64_t diagnosticGeneration=0;
         easyknack::AudioIOStatistics diagnosticBase;
         for (;;) {
-            std::string line = readLine(client.value);
+            std::string line;
             try {
+                line=readLine(client.value,commands);
                 volume.poll();
                 if(line.rfind("VOLUME ",0)==0) {
                     std::istringstream args(line.substr(7)); std::string token,extra; float scalar;
