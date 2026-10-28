@@ -83,6 +83,12 @@ Tables hold up to 4096 rows; when full, earlier rows are retained and the status
 asks you to clear the table. **Clear** empties the document table and starts a new
 acquisition. It does not affect previously exported files.
 
+The **Test** column immediately after **#** is editable. Click a cell to describe
+that measurement, then press Enter or leave the cell to save. Esc cancels the edit.
+Labels stay with their rows while capture continues or value columns are reordered.
+They are saved in the document and included in CSV as `test`, immediately after
+`measurement`. Undoing a label edit retains automatically captured rows.
+
 Use **CSV export…** for an independent snapshot. CSV uses commas and decimal points;
 CSV (Excel DE) uses semicolons, decimal commas and a UTF-8 byte-order mark. The file
 location is selected at export; recording never writes automatically to a separate

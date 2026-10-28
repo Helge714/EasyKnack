@@ -32,7 +32,10 @@ final class MeasurementRecorders {
             for(var asset:controller.driverGraphs().entrySet())for(var node:asset.getValue().nodes())if(NodeRegistry.find(node.typeId()).orElse(null) instanceof MeasurementRecorderNode&&seen.add(node.id())){
                 var address=new Address(asset.getKey(),node.id());var current=node.properties().getOrDefault(MeasurementRecorderNode.TABLE.value(),MeasurementTable.empty());var captured=latest.get(address);
                 if(captured!=null&&MeasurementTable.generation(captured).equals(MeasurementTable.generation(current))&&MeasurementTable.rows(captured).size()>MeasurementTable.rows(current).size())
-                    controller.writeExternalProperty(asset.getKey(),node.id(),MeasurementRecorderNode.TABLE.value(),captured,"Retain measurements");
+                {
+                    var retained=MeasurementTable.retainCaptured(captured,current);latest.put(address,retained);
+                    controller.writeExternalProperty(asset.getKey(),node.id(),MeasurementRecorderNode.TABLE.value(),retained,"Retain measurements");
+                }
                 else latest.put(address,current);
             }
         }finally{receiving=false;}

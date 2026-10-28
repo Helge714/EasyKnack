@@ -18,6 +18,25 @@ public final class MeasurementTable {
     private static GLNodeValue field(GLNodeValue value,String key){return value instanceof GLNodeValue.MapValue m?m.values().get(key):null;}
     private static String text(GLNodeValue value,String key,String fallback){return field(value,key) instanceof GLNodeValue.TextValue t?t.value():fallback;}
     public static List<GLNodeValue> rows(GLNodeValue value){return field(value,"rows") instanceof GLNodeValue.ListValue list?list.values():List.of();}
+    private static Map<String,GLNodeValue> labels(GLNodeValue table){return field(table,"labels") instanceof GLNodeValue.MapValue map?map.values():Map.of();}
+    public static String label(GLNodeValue table,int row){var value=labels(table).get(Integer.toString(row));return value instanceof GLNodeValue.TextValue text?text.value():"";}
+    /** Rows are append-only; labels use their stable zero-based row index without shifting numeric slots. */
+    public static GLNodeValue withLabel(GLNodeValue table,int row,String label){
+        Objects.requireNonNull(label);Objects.checkIndex(row,rows(table).size());
+        if(label.equals(label(table,row)))return table;
+        var values=new HashMap<>(((GLNodeValue.MapValue)table).values());var names=new HashMap<>(labels(table));
+        if(label.isEmpty())names.remove(Integer.toString(row));else names.put(Integer.toString(row),GLNodeValue.of(label));
+        if(names.isEmpty())values.remove("labels");else values.put("labels",GLNodeValue.of(names));
+        return GLNodeValue.of(values);
+    }
+    /** Undo may restore an older row count. Keep automatic captures while restoring manual labels. */
+    public static GLNodeValue retainCaptured(GLNodeValue captured,GLNodeValue current){
+        if(!generation(captured).equals(generation(current))||rows(captured).size()<=rows(current).size())return current;
+        var values=new HashMap<>(((GLNodeValue.MapValue)captured).values());var names=new HashMap<>(labels(captured));
+        for(int i=0;i<rows(current).size();i++){String label=label(current,i);if(label.isEmpty())names.remove(Integer.toString(i));else names.put(Integer.toString(i),GLNodeValue.of(label));}
+        if(names.isEmpty())values.remove("labels");else values.put("labels",GLNodeValue.of(names));
+        return GLNodeValue.of(values);
+    }
     static String words(float[] values,int offset){
         long bits=0;for(int i=0;i<4;i++){float v=values[offset+i];if(v<0||v>65535||v!=Math.rint(v))throw new IllegalArgumentException("Invalid recorder clock word");bits|=(long)v<<(16*i);}return Long.toUnsignedString(bits,16);
     }
@@ -38,7 +57,9 @@ public final class MeasurementTable {
             int valid=(int)v[p+4];for(int j=0;j<count;j++)row.add((valid&(1<<j))!=0&&Float.isFinite(v[p+5+j])?GLNodeValue.of(v[p+5+j]):GLNodeValue.NullValue.INSTANCE);
             result.add(new GLNodeValue.ListValue(row));
         }
-        return data(generation(previous),session,stored,result);
+        var values=new HashMap<>(((GLNodeValue.MapValue)data(generation(previous),session,stored,result)).values());
+        if(!labels(previous).isEmpty())values.put("labels",field(previous,"labels"));
+        return GLNodeValue.of(values);
     }
     public static int columns(GLNodeValue table,int configured){return Math.max(configured,rows(table).stream().mapToInt(r->((GLNodeValue.ListValue)r).values().size()-2).max().orElse(0));}
     public static void csv(GLNodeValue table,String[] names,Writer out,boolean excel)throws IOException{
@@ -47,10 +68,10 @@ public final class MeasurementTable {
     public static void csv(GLNodeValue table,String[] names,int[] order,Writer out,boolean excel)throws IOException{
         if(names.length!=order.length)throw new IllegalArgumentException("Column order length mismatch");
         String separator=excel?";":",";if(excel)out.write('\uFEFF');
-        out.write("measurement"+separator+"session"+separator+"time_s");
+        out.write("measurement"+separator+"test"+separator+"session"+separator+"time_s");
         for(String name:names)out.write(separator+quote(name));out.write("\r\n");int number=0;
         for(var value:rows(table)){
-            var row=((GLNodeValue.ListValue)value).values();out.write(++number+separator+quote((String)row.get(0).toJavaValue()));
+            var row=((GLNodeValue.ListValue)value).values();out.write(++number+separator+quote(label(table,number-1))+separator+quote((String)row.get(0).toJavaValue()));
             out.write(separator+number(row.get(1),excel));
             for(int slot:order){int i=slot+2;out.write(separator+(i<row.size()?number(row.get(i),excel):""));}out.write("\r\n");
         }
