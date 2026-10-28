@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Correct adaptive control timing: first changes and gaps above Max use Min; all other intervals are used exactly, including intervals below Min. Interrupted ramps continue from the current value. Clarify the timing labels; host protocol and document schema remain unchanged. Covered by the current development version.
+
 - Add document-scoped adaptive linear interpolation for continuous mouse and MIDI controls, with per-driver overrides, bounded timing and explicit discrete-slider policies. Connected signals bypass interpolation; copied group editors and baked/Instance boundaries retain the policy. Audio rate renders per-sample transitions; Control remains once per block. Host protocol advances to 12: rebuild Java, host and plugin SDK together. Existing documents use 5-50 ms defaults; the current development version covers this feature.
 
 - Expand Instance Groups with Spectrum Blur/Shift/Prune, Formula Groups, numeric spectral/correlation analysis and averaging, envelopes, trigger processors, live Buffers and Buffer Readers. Include resource relays for nested execution. Public boundary formats remain unchanged. Rebuild the host and plugin SDK together; existing document and protocol versions are unchanged. Covered by the current development version.

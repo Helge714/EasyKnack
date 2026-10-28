@@ -198,9 +198,11 @@ struct ControlInterpolation {
   void retarget(Entry &e, double value, std::uint64_t now) noexcept {
     if (value == e.target)
       return;
-    double ms =
-        e.changedBefore ? double(now - e.lastChange) * 1000 / rate : 20.;
-    ms = std::clamp(ms, e.minimumMs, e.maximumMs);
+    const double interval =
+        e.changedBefore ? double(now - e.lastChange) * 1000 / rate : 0.;
+    // Min is the first/restart duration, not a lower bound on frequent changes.
+    const double ms =
+        !e.changedBefore || interval > e.maximumMs ? e.minimumMs : interval;
     e.lastChange = now;
     e.changedBefore = true;
     e.target = value;

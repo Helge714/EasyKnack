@@ -2,13 +2,15 @@
 
 Continuous sliders use adaptive linear transitions for mouse and MIDI changes.
 Choose **Settings → Document settings** to enable or disable interpolation and set
-its minimum and maximum transition time. The defaults are **5 ms** and **50 ms**.
+the initial/restart transition (**Min**, default **5 ms**) and inactivity threshold
+(**Max**, default **50 ms**).
 These settings are saved in the document.
 
 Each new target starts from the value currently being rendered. The transition
-time follows the interval between changes, bounded by the configured limits.
-The first transition uses 20 ms within those limits. A long pause therefore never
-causes an excessively slow response. This reduces stepping; it cannot predict
+time equals the interval since the previous target change. The first change, or
+an interval greater than Max, uses Min instead. Intervals below Min are used
+unchanged; Min is not a lower bound. An interval exactly equal to Max is also used
+unchanged. A long pause therefore never causes an excessively slow response. This reduces stepping; it cannot predict
 future controller movement or guarantee a perfectly constant motion.
 
 **Configure MIDI driver** offers **Document default**, **Adaptive linear** with

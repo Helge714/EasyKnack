@@ -35,24 +35,42 @@ struct Source : MidiSource {
   }
 };
 int main() {
+  // Exact threshold and zero-interval behavior, independent of block rounding.
+  ControlInterpolation timing(entry(0, 0));
+  timing.begin(1, 1000);
+  auto &e = timing.entries[0];
+  timing.retarget(e, 1, 100);
+  assert(e.remaining == 5); // first => Min
+  e.current = .4;
+  timing.retarget(e, 0, 102);
+  assert(e.remaining == 2);
+  close(e.current, .4);
+  timing.retarget(e, 1, 152);
+  assert(e.remaining == 50); // equal to Max => interval
+  timing.retarget(e, 0, 203);
+  assert(e.remaining == 5); // greater than Max => Min
+  timing.retarget(e, 1, 203);
+  assert(e.remaining == 0);
+  close(e.current, 1); // same sample => instant
+
   ControlInterpolation control(entry(0, 0));
   control.begin(10, 1000);
   close(control.input(0, 0, 0)[9], 0);
   ControlInterpolation one(entry(0, 1));
   control.apply(one);
-  control.begin(10, 1000);
+  control.begin(2, 1000);
   rendering = true;
   auto *data = control.input(0, 0, 0);
   close(data[0], 0);
-  close(data[9], .45);
+  close(data[1], .2);
   rendering = false;
-  // A new target interrupts from .5, never from the previous target 1.
+  // Interrupt at .4 after 2ms: use exactly 2ms, even below the 5ms fallback.
   ControlInterpolation zero(entry(0, 0));
   control.apply(zero);
-  control.begin(10, 1000);
+  control.begin(2, 1000);
   data = control.input(0, 0, 0);
-  close(data[0], .5);
-  close(data[9], .05);
+  close(data[0], .4);
+  close(data[1], .2);
   for (int i = 0; i < 20; i++) {
     control.begin(10, 1000);
     control.input(0, 0, 0);
@@ -60,7 +78,9 @@ int main() {
   control.apply(one);
   control.begin(10, 1000);
   data = control.input(0, 0, 0);
-  close(data[9], .18); // paused: max 50ms
+  close(data[4], .8);
+  close(data[5], 1);
+  close(data[9], 1); // paused: restart in Min = 5ms
   // A physical source bypasses the entire path, at its own sampling rate.
   float wire[10] = {.7f};
   const float *inputs[] = {wire};
@@ -83,21 +103,21 @@ int main() {
   Source midi;
   ControlInterpolation remote(entry(0, 0, true, 1));
   midi.cc(3, 127);
-  remote.begin(10, 1000, &midi);
+  remote.begin(5, 1000, &midi);
   data = remote.input(0, 0, 0);
   close(data[3], 0);
-  close(data[4], .05);
-  close(data[9], .3);
+  close(data[4], .2);
   ControlInterpolation echo(entry(0, 1, true, 1, true));
   remote.apply(echo);
   midi.block.clear();
+  remote.begin(5, 1000, &midi);
+  data = remote.input(0, 0, 0);
+  close(data[0], .4);
+  close(data[2], .8);
+  close(data[3], 1);
   remote.begin(10, 1000, &midi);
   data = remote.input(0, 0, 0);
-  close(data[0], .35);
-  close(data[9], .8);
-  remote.begin(10, 1000, &midi);
-  data = remote.input(0, 0, 0);
-  close(data[0], .85);
+  close(data[0], 1);
   close(data[9], 1);
   // Control-rate evaluations advance the ramp clock by the complete block.
   ControlInterpolation held(entry(0, 0));
@@ -107,7 +127,7 @@ int main() {
   held.begin(10, 1000);
   close(held.input(0, 0, 0)[0], 0);
   held.begin(10, 1000);
-  close(held.input(0, 0, 0)[0], .5);
+  close(held.input(0, 0, 0)[0], 1);
   // No heap work while generating ramps or applying snapshots.
   rendering = true;
   held.apply(zero);
@@ -156,7 +176,9 @@ int main() {
   live.applyLiveParameters(changed, retired);
   live.process(audio.data(), 256);
   rendering = false;
-  assert(audio[0] == 0 && audio[255] > .1 && audio[255] < .5);
+  assert(audio[0] == 0 && audio[239] < 1);
+  close(audio[240], 1);
+  close(audio[255], 1);
   auto block = graph(0, "c");
   block.process(audio.data(), 256);
   auto next = graph(1, "c");
