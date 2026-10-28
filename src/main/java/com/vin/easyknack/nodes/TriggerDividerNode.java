@@ -9,7 +9,7 @@ public final class TriggerDividerNode extends BasicNode {
         n.addOutput(OUT,"Trigger").rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
         n.addInput(IN,"Trigger",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
             .tooltip(com.vin.easyknack.ui.AppText.text("triggerdivider.trigger.tooltip"));
-        n.addInput(DIVISOR,"Division",Editor.Slider.button(2,1.0,1024.0).integers()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
+        n.addInput(DIVISOR,"Division",Editor.Slider.button(2,1.0,1024.0).integers().discrete()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
         n.addInput(RESET,"Reset",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
             .tooltip(com.vin.easyknack.ui.AppText.text("triggerdivider.reset.tooltip"));
     }

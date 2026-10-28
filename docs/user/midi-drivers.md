@@ -45,7 +45,8 @@ ranges only), and **Pickup**. Mapping endpoints use the parameter's stored unit,
 as indicated by the labels; a display-unit change does not silently change them.
 Integer editors round their driven values.
 
-Direct mappings apply the next incoming CC immediately. Pickup waits until the
+Direct mappings update the target with the next incoming CC. Continuous sliders
+can interpolate the rendered value; see [Manual control interpolation](manual-controls.md). Pickup waits until the
 hardware controller reaches or crosses the current software value. Connecting an
 input suspends pickup; after disconnecting it must acquire the value again.
 

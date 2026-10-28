@@ -12,7 +12,7 @@ public final class ValueViewerNode extends BasicNode {
     @Override public com.vingame.glswing.node.GLNodeResizeMode resizeMode(){return com.vingame.glswing.node.GLNodeResizeMode.BOTH;}
     @Override public void define(NodeBuilder n,NodeState s){
         n.addEditor(GRAPH,"Values",new ValueViewerEditor()).growVertically().keepVisibleOnHide().editorCopyable(false);
-        n.addEditor(COUNT,"Inputs",Editor.Slider.button(1,1.,8.).integers()).editorCopyable(false);
+        n.addEditor(COUNT,"Inputs",Editor.Slider.button(1,1.,8.).integers().discrete()).editorCopyable(false);
         n.addEditor(WINDOW,"Time window",Editor.Slider.button(10,.1,600.).formats(UnitFormats.TIME_SECONDS));
         n.addEditor(RAW,"Record every sample",Editor.checkBox(false)).inspectorOnly()
             .tooltip("Off: retain minimum, maximum and last value per 10 ms, including short peaks. On: retain each sample. History is bounded to one million input records; the visible duration can therefore be shorter than requested. Transport gaps are shown as gaps, never interpolated.");

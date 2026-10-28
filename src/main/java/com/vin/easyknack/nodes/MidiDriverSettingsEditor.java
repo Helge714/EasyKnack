@@ -14,7 +14,7 @@ public record MidiDriverSettingsEditor(Editor targetEditor,GLNodeValue initial) 
         else if(target instanceof Editor.ComboBox<?> combo)driver=GLDriverTarget.choice(()->0,v->{},()->combo.items().size());
         else if(target instanceof Editor.Trigger)driver=GLDriverTarget.action(()->{});
         else driver=GLDriverTarget.toggle(()->0,v->{});
-        var panel=new MidiDriverSettingsPanel(MidiDriverBinding.read(initial),driver,changed);
+        var panel=new MidiDriverSettingsPanel(MidiDriverBinding.read(initial),driver,changed,target instanceof Editor.Slider s&&s.continuousChanges());
         return new Control(panel,v->panel.update(MidiDriverBinding.read(v)));
     }
     public static void addSettings(NodeBuilder builder,NodeState state){

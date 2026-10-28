@@ -56,6 +56,7 @@ struct UnitConverterNode:NodeProcessor {
     bool supportsLiveParameters() const noexcept override { return true; }
     void applyParameters(const NodeProcessor& configuration) noexcept override {
         const auto& p=static_cast<const UnitConverterNode&>(configuration);
+        if(from!=p.from&&controls)controls->resetTargets();
         value=p.value;from=p.from;to=p.to;
     }
     void configure(std::istream& in)override{

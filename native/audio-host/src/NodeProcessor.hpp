@@ -12,6 +12,7 @@
 #include "ValueEvents.hpp"
 #include "ManualTriggers.hpp"
 #include "DspResources.hpp"
+#include "ControlInterpolation.hpp"
 
 namespace easyknack {
 /** Borrowed buffers for one block. No allocation, ownership or node-specific parameters. */
@@ -22,7 +23,10 @@ struct ProcessContext {
         float operator[](std::size_t i)const noexcept{return data?data[i*stride]:fallback;}
     };
     NumericInput numericInput(std::size_t port,float fallback=0)const noexcept {
-        return {input(port),sourceRates&&port<inputCount&&sourceRates[port]=='c'?std::size_t{0}:std::size_t{1},fallback};
+        auto* connected=rawInput(port);
+        if(connected&&controls)controls->connected(port);
+        if(!connected&&controls)if(auto* values=controls->input(port,fallback,sampleOffset))return {values,controls->stride(port),fallback};
+        return {connected,sourceRates&&port<inputCount&&sourceRates[port]=='c'?std::size_t{0}:std::size_t{1},fallback};
     }
     const float* const* inputs;
     std::size_t inputCount;
@@ -46,6 +50,7 @@ struct ProcessContext {
     std::size_t sampleOffset=0; // Absolute offset within this block, including sample-feedback evaluation.
     bool samplewise=false; // Audio feedback chunk (possibly one sample), not a control evaluation.
     const DspResource* resource(std::size_t port)const noexcept{return resourceInputs&&port<inputCount?resourceInputs[port]:nullptr;}
+    ControlInterpolation* controls=nullptr;
     bool eventRefresh=false;
     bool legacyEventEvaluation=false;
     std::uint64_t* eventEvaluationCount=nullptr;
@@ -56,12 +61,16 @@ struct ProcessContext {
     ValueEventBuffer* eventOutput(std::size_t port=0)const noexcept{return valueEventOutputs&&port<outputCount?valueEventOutputs[port]:nullptr;}
     float valueAt(std::size_t port,std::uint32_t offset,float fallback=0)const noexcept {
         if(auto* stream=events(port))return stream->valueAt(offset);
-        auto* data=input(port);return data?data[sourceRates&&sourceRates[port]=='c'?0:offset]:fallback;
+        return numericInput(port,fallback)[offset];
     }
     MidiBlock* midiOutputAt(std::size_t index) const noexcept { return midiOutputs&&index<outputCount?midiOutputs[index]:index==0?midiOutput:nullptr; }
     float* outputAt(std::size_t index) const noexcept { return index==0?output:index<outputCount&&outputs?outputs[index]:nullptr; }
     const MidiBlock* midi(std::size_t index) const noexcept {return midiInputs&&index<inputCount?midiInputs[index]:nullptr;}
-    const float* input(std::size_t index) const noexcept { return index < inputCount ? inputs[index] : nullptr; }
+    const float* rawInput(std::size_t index)const noexcept{return inputs&&index<inputCount?inputs[index]:nullptr;}
+    const float* input(std::size_t index)const noexcept{
+        auto* data=rawInput(index);if(data){if(controls)controls->connected(index);return data;}
+        return controls?controls->input(index,0,sampleOffset):nullptr;
+    }
     const float* inputOrSilence(std::size_t index) const noexcept { auto buffer = input(index); return buffer ? buffer : silence; }
 };
 
@@ -88,6 +97,8 @@ struct NodeProcessor {
     // Source compatibility for older plugins. Connected signals are never smoothed.
     virtual bool smoothControlInput(std::size_t)const noexcept{return false;}
     std::vector<int> sources;
+    std::unique_ptr<ControlInterpolation> controls;
+    std::string controlsText;
     const std::string defaultOutputEndpoint = "default";
     virtual ~NodeProcessor() = default;
     virtual void configure(std::istream& in) = 0;
@@ -101,6 +112,7 @@ struct NodeProcessor {
     virtual std::string parameterStructure()const{return {};}
     virtual std::size_t parameterResourceSlots()const noexcept{return 1;}
     virtual void applyLiveParameters(const NodeProcessor& configuration,ParameterRetirement& retired)noexcept{
+        if(controls&&configuration.controls)controls->apply(*configuration.controls);
         retired.keep(takeParameterResource());applyParameters(configuration);
     }
     // Validated configuration only; must retain state and perform no allocation.
@@ -192,6 +204,7 @@ struct NodeProcessor {
     }
     virtual void collectMidiDevices(std::vector<std::uint64_t>& devices) const {
         if(auto device=midiDevice())devices.push_back(device);
+        if(controls)controls->devices(devices);
     }
     virtual bool mergesVoices() const noexcept { return false; }
     /** Opt in only when equal inputs and state produce equal channels (no channel-local IO/randomness).

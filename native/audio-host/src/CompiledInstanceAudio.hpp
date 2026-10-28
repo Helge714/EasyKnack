@@ -42,6 +42,7 @@ struct CompiledInstanceAudio {
         // Validate every instance before advancing any processor state.
         for(int i=0;i<active;i++){
             auto& instance=static_cast<Instance&>(*state.instances[i]);
+            if(instance.interpolatingControls()){invalidate();return false;}
             if(!prepared){instance.resolveChannels(c);instance.resolveAutoRate(rates.data(),std::min(c.inputCount,rates.size()));
                 if(!instance.reductionReady()){invalidate();return false;}}
             auto& osc=static_cast<OscillatorNode&>(*instance.runtime->graph.nodes[instance.reductionOsc].processor);

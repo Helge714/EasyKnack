@@ -35,7 +35,7 @@ public final class DigitalNoiseNode extends BasicNode {
 				.rates(PortRates.AUDIO_CONTROL)
 				.tooltip(NodeText.text("digitalnoise.strength.help","Maximum deviation in octaves: 0 = factor 1; 1 = 0.5x to 2x. Gaussian uses a standard deviation of Strength / 3, truncated at ±Strength. Distribution is compensated for each cycle's duration."));
 		node.addEditor(DISTRIBUTION,"Distribution",Editor.comboBox(java.util.List.of(Distribution.values()),Distribution.UNIFORM,Distribution::id));
-		node.addInput(SEED,"Seed",Editor.Slider.button(-1,-1.0,16777215.0).integers()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL)
+		node.addInput(SEED,"Seed",Editor.Slider.button(-1,-1.0,16777215.0).integers().discrete()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL)
 		    .tooltip(com.vin.easyknack.ui.AppText.literal("-1 = automatic seed per logical node, shared by channel and instance copies. Connect Context Channel or Instance Index/Seed for independent randomness. Changing the seed restarts the random cycle."));
 	}
 

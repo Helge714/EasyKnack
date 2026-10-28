@@ -78,9 +78,9 @@ is not a source dependency or included in the distribution.
 ## Execution and protocol
 
 The application starts the host only on Audio → Start. The host opens an ephemeral
-IPv4 loopback port, reports `READY 11 <port>` on stdout and accepts one client.
+IPv4 loopback port, reports `READY 12 <port>` on stdout and accepts one client.
 The session token is generated for each child process, passed as its first
-argument, and required in `HELLO 11 <token>`; the reply is `OK 11`.
+argument, and required in `HELLO 12 <token>`; the reply is `OK 12`.
 Version 3 adds explicit processing-rate metadata to every node record.
 Rebuild the host together with Java; the handshake rejects old executables.
 
@@ -286,12 +286,12 @@ It preserves voice domains until an explicit merge or sink, with channel-local g
 Legacy `voicemerge ... mix ...` packets remain supported only for existing documents.
 
 
-## Parameter contracts and analysis (protocol 11)
+## Parameter contracts and analysis (protocol 12)
 
 The application prefixes native payloads with `!<schema fingerprint>`. Java's `ParameterContract`
 is the single declaration for encoding, input ordering and generated C++ parameter structs.
 Run Maven through `process-classes` before a standalone native build, or use `-Pnative-audio`.
-The handshake is `HELLO 11`; incompatible parameter schemas are rejected without terminating
+The handshake is `HELLO 12`; incompatible parameter schemas are rejected without terminating
 host control. The existing unversioned parser is retained for diagnostic/legacy graph fixtures.
 
 `ANALYSIS` returns `OK 2` followed by zero or more records:
@@ -323,3 +323,25 @@ rejected explicitly until generated plans support the commit phase as well.
 Sample-by-sample feedback uses **Effects > Sample Delay** instead. Its one-sample
 delay and supported feedback islands are described in
 [Sample Feedback](../../docs/SAMPLE-FEEDBACK.md).
+
+## Manual parameter interpolation (protocol 12)
+
+Optional metadata after a node's rate fields has this form:
+
+```text
+~ count [port enabled minMs maxMs target device channel cc low high reversed logarithmic pickup externalEcho mapping]... ~
+```
+
+Only unconnected numeric defaults are interpolated. Physical sources retain their
+actual rates and values. Ports 32 + 3 * input + axis are reserved for vector-editor
+components; Vector Input uses input zero. Configuration-only and explicitly
+discrete sliders disable interpolation. Device zero means no direct MIDI input.
+The host retains per-lane timing and current values through parameter updates.
+External GUI echoes of a directly handled MIDI CC do not restart the native ramp.
+Control-rate processors sample the transition once per block. Settled defaults
+retain zero-stride scalar access; active ramps use preallocated sample buffers.
+No additional graph nodes, render-thread allocations or GUI animation are needed.
+
+`mapping` is `-` for the ordinary MIDI range mapping, or `LUT` followed by 128
+values when parameter/unit conversion must follow MIDI mapping. Tables are
+prepared in Java and copied into preallocated lane storage on live updates.

@@ -13,7 +13,7 @@ public final class TriggerCounterNode extends BasicNode {
         n.addInput(RESET,"Reset",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
             .tooltip(com.vin.easyknack.ui.AppText.text("triggercounter.reset.tooltip"));
         n.addEditor(WRAP,"Wrap",Editor.checkBox(false));
-        n.addInput(COUNT,"Count",Editor.Slider.button(16,1.0,16777216.0).integers()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE)
+        n.addInput(COUNT,"Count",Editor.Slider.button(16,1.0,16777216.0).integers().discrete()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE)
             .tooltip(com.vin.easyknack.ui.AppText.text("triggercounter.count.tooltip"));
     }
     public NativeProcessor processor(){return new NativeProcessor("triggercounter","nodes/TriggerCounterNode.hpp",

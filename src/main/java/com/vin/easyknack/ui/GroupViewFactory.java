@@ -59,7 +59,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
                 }else if(!output&&p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER)){
                     var options=new NodeState(p.presentation().editorOptions());var base=GroupUnits.base(groups,descriptor,p);var selected=GroupUnits.selected(node,p,base);
                     Double min=options.flag("minimumEnabled",true)?options.number("minimum",0):null,max=options.flag("maximumEnabled",true)?options.number("maximum",1):null;
-                    var spec=new com.vin.easyknack.nodes.Editor.Slider(options.number("default",0),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"));
+                    var spec=new com.vin.easyknack.nodes.Editor.Slider(options.number("default",0),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"));if(!options.flag("continuous",true))spec=spec.discrete();
                     var format=new UnitSlider(spec,new UnitFormats(base,base,GroupUnits.allowed(p,base)),selected);
                     var binding=format.create(port.id(),v->{if(!updating)writer.set(node.id(),new PropertyId(GroupUnits.key(port.id())),v);});
                     control=binding.component();controls.put(port.id(),binding);

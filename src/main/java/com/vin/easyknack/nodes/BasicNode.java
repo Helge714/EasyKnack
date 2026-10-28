@@ -20,6 +20,8 @@ public abstract class BasicNode {
     /** Presentation updates shared by the node and the inspector, without recreating controls. */
     public void updateEditor(PropertyId id, com.vingame.glswing.component.GLContainer control, NodeState state) { }
     public abstract NativeProcessor processor();
+    /** Numeric signal defaults that the host may interpolate. Extra virtual ports are opt-in. */
+    public Map<PropertyId,Integer> manualControlPorts(){var result=new java.util.LinkedHashMap<PropertyId,Integer>();var inputs=processor().inputs();for(int i=0;i<inputs.size();i++)result.put(inputs.get(i),i);return Map.copyOf(result);}
     public String nativeParameterType(){return getClass().getSimpleName()+"Parameters";}
     /** Protocol payload is owned by the node alongside its native binding. */
     public String encode(NodeState state, ToIntFunction<PropertyId> input) { return processor().contract().encode(this,state,input); }
@@ -53,7 +55,7 @@ public abstract class BasicNode {
     }
     public String textPrefix(){return registration().id();}
     public final NodeBuilder layout(NodeState state) {
-        state=normalizeState(state);NodeBuilder builder = new NodeBuilder(); define(builder, state); builder.applyFormats(state); MidiDriverSettingsEditor.addSettings(builder,state); builder.applyRates(state); builder.translate(textPrefix()); builder.validate(state); return builder;
+        state=normalizeState(state);NodeBuilder builder = new NodeBuilder(); define(builder, state); builder.applyInteractionPolicy(manualControlPorts()); builder.applyFormats(state); MidiDriverSettingsEditor.addSettings(builder,state); builder.applyRates(state); builder.translate(textPrefix()); builder.validate(state); return builder;
     }
     public final String title() { return NodeText.text(registration().id() + ".title", registration().title()); }
     public Map<String, GLNodeValue> defaults() { return layout(new NodeState(Map.of())).defaults(); }

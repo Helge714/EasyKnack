@@ -103,8 +103,12 @@ struct MultipleGraphNode : NodeProcessor {
             for(int index:g.order)if(g.nodes[index].active&&index!=osc&&index!=runtime->outputs[0])scalarPlan.push_back(index);
             reductionOsc=osc;
         }
+        bool interpolatingControls()const noexcept{
+            for(const auto& node:runtime->graph.nodes)if(node.active&&node.processor->controls&&node.processor->controls->requiresGeneralScheduling())return true;
+            return false;
+        }
         bool reductionReady()const noexcept{
-            if(reductionOsc<0||!sampleKernelsPrepared)return false;
+            if(reductionOsc<0||!sampleKernelsPrepared||interpolatingControls())return false;
             const auto& g=runtime->graph;
             for(int index:scalarPlan){const auto& n=g.nodes[index];if(n.eventRate||n.stereo)return false;
                 for(int ref:n.processor->sources)if(ref>=0&&g.nodes[ref%maxNodes].outputRate(ref/maxNodes)=='e')return false;}
@@ -137,6 +141,7 @@ struct MultipleGraphNode : NodeProcessor {
             for(std::size_t port=0;port<lane.outputPointers.size();port++)lane.outputPointers[port]=lane.channelCache[0].outputs[port].data();
             ProcessContext c{lane.inputs.data(),lane.inputs.size(),lane.outputPointers[0],n.controlRate?1u:std::size_t(frames),g.preparedSampleRate,g.silence.data(),std::size_t(frames)};
             c.outputs=lane.outputPointers.data();c.outputCount=lane.outputPointers.size();c.sourceRates=lane.sourceRates.data();
+            c.controls=p.controls.get();if(c.controls)c.controls->begin(frames,g.preparedSampleRate);
             render(p,c);
         }
         void renderScalars(int frames)noexcept{
@@ -175,6 +180,9 @@ struct MultipleGraphNode : NodeProcessor {
         return state->instances[0]->canShareChannels();
     }
     bool separatesChannels()const noexcept override{return true;}
+    void collectMidiDevices(std::vector<std::uint64_t>& devices)const override{
+        NodeProcessor::collectMidiDevices(devices);if(state&&!state->instances.empty())state->instances[0]->collectMidiDevices(devices);
+    }
     ResourceKind inputResourceKind(std::size_t port)const noexcept override{
         return state&&!state->instances.empty()?state->instances[0]->inputResourceKind(port):ResourceKind::none;
     }

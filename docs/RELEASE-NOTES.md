@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add document-scoped adaptive linear interpolation for continuous mouse and MIDI controls, with per-driver overrides, bounded timing and explicit discrete-slider policies. Connected signals bypass interpolation; copied group editors and baked/Instance boundaries retain the policy. Audio rate renders per-sample transitions; Control remains once per block. Host protocol advances to 12: rebuild Java, host and plugin SDK together. Existing documents use 5-50 ms defaults; the current development version covers this feature.
+
 - Expand Instance Groups with Spectrum Blur/Shift/Prune, Formula Groups, numeric spectral/correlation analysis and averaging, envelopes, trigger processors, live Buffers and Buffer Readers. Include resource relays for nested execution. Public boundary formats remain unchanged. Rebuild the host and plugin SDK together; existing document and protocol versions are unchanged. Covered by the current development version.
 
 - Apply live parameter changes recursively inside Instance Groups and exported/baked graphs without rebuilding their runtime, resetting oscillator phases or regenerating unchanged Wavetables. Parse one instance template per update, share immutable Wavetables and reuse Java execution contracts. Structural edits still require preparation. Rebuild the host, SDK and source plugins together; document and wire-protocol versions are unchanged. Covered by the current development version.

@@ -8,8 +8,8 @@ public final class MidiCCNode extends BasicNode {
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Value").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO).tooltip(com.vin.easyknack.ui.AppText.literal("MIDI Control Change value, normalized from 0-127 to 0-1. Holds the most recently received value."));
         n.addInput(IN,"MIDI").dataType(PortDataType.MIDI).signal(SignalCategory.MIDI).rate(ProcessingRate.EVENT);
-        n.addEditor(CHANNEL,"Channel (0 = all)",Editor.Slider.button(0,0.0,16.0).integers());
-        n.addEditor(CC,"Controller",Editor.Slider.button(1,0.0,127.0).integers()).tooltip(com.vin.easyknack.ui.AppText.literal("MIDI CC number: 1 = modulation wheel, 7 = volume, 64 = sustain pedal. Map the 0-1 output to your desired parameter range."));
+        n.addEditor(CHANNEL,"Channel (0 = all)",Editor.Slider.button(0,0.0,16.0).integers().discrete());
+        n.addEditor(CC,"Controller",Editor.Slider.button(1,0.0,127.0).integers().discrete()).tooltip(com.vin.easyknack.ui.AppText.literal("MIDI CC number: 1 = modulation wheel, 7 = volume, 64 = sustain pedal. Map the 0-1 output to your desired parameter range."));
     }
     @Override public NativeProcessor processor() { return new NativeProcessor("midicc", "nodes/MidiCCNode.hpp",
             ParameterContract.builder().source(IN).integer(CHANNEL).integer(CC).build()); }

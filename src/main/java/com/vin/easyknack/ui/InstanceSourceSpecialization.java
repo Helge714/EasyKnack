@@ -51,9 +51,9 @@ final class InstanceSourceSpecialization {
         for(int i=0;i<slots.size();i++)if(slots.get(i)>=0){int p=slots.get(i);
             s.append("        left[").append(i).append("]=c.input(").append(p).append(");if(!left[").append(i).append("])left[").append(i).append("]=&defaults[").append(p).append("];\n")
                 .append("        right[").append(i).append("]=c.rightInputs&&").append(p).append("<c.inputCount?c.rightInputs[").append(p).append("]:c.input(").append(p).append(");if(!right[").append(i).append("])right[").append(i).append("]=&defaults[").append(p).append("];\n")
-                .append("        rates[").append(i).append("]=c.input(").append(p).append(")?(c.sourceRates?c.sourceRates[").append(p).append("]:'a'):'c';\n");
+                .append("        rates[").append(i).append("]=c.rawInput(").append(p).append(")?(c.sourceRates?c.sourceRates[").append(p).append("]:'a'):c.input(").append(p).append(")?(c.numericInput(").append(p).append(").stride?'a':'c'):'c';\n");
         }
-        s.append("        auto inner=c;inner.inputs=left.data();inner.rightInputs=right.data();inner.sourceRates=rates.data();inner.inputCount=9;\n")
+        s.append("        auto inner=c;inner.inputs=left.data();inner.rightInputs=right.data();inner.sourceRates=rates.data();inner.inputCount=9;inner.controls=nullptr;\n")
             .append(kernel==null?"":"        if(audioKernel.process<CompiledInstance>(*this,inner))return;\n")
             .append(kernel==null?"":"        if(inner.channelIndex==0){audioKernel.invalidate();for(auto& instance:state->instances)static_cast<CompiledInstance&>(*instance).scalarCacheValid=false;}\n")
             .append("        processInstances<").append(kernel==null?"Instance":"CompiledInstance").append(">(inner);\n    }\n};\n")
@@ -91,6 +91,7 @@ final class InstanceSourceSpecialization {
                 if(f.kind()==ParameterContract.Kind.SOURCE)sources.add(Integer.parseInt(value));
             }
             if(!tokens.remove().equals("@"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing rates"));tokens.remove();tokens.remove();
+            if("~".equals(tokens.peek())){tokens.remove();while(!"~".equals(tokens.remove())){} }
             result.add(new Operation(type,fields,sources));
         }
         if(!tokens.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Trailing program data"));

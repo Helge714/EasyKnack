@@ -13,7 +13,7 @@ public final class StepSwitchNode extends BasicNode {
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Value").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         n.addOutput(INDEX,"Index").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE).tooltip("Active step index, starting at 0. Follows the output rate.");
-        n.addEditor(STEPS,"Steps",Editor.Slider.button(4,1.,(double)MAX_STEPS).integers()).keepVisibleOnHide()
+        n.addEditor(STEPS,"Steps",Editor.Slider.button(4,1.,(double)MAX_STEPS).integers().discrete()).keepVisibleOnHide()
             .tooltip("Number of inputs, 1–32. Removing the active step returns to the first input. Undo restores removed connections.");
         n.addInput(NEXT,"Next",new Editor.Trigger()).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT).signal(SignalCategory.TRIGGER)
             .tooltip("Each trigger advances one step and wraps at the end. Unconnected: click to advance at the next block.");

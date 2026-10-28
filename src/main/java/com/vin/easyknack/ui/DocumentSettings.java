@@ -31,13 +31,22 @@ final class DocumentSettings {
         var content=new GLContainer(){
             final GLCheckBox preserve=new GLCheckBox(AppText.text("document.preserveGroups"));
             final GLLabel hint=new GLLabel(AppText.text("document.pruningHint"));
+            final GLCheckBox interpolate=new GLCheckBox(AppText.text("control.interpolation"));
+            final GLLabel minLabel=new GLLabel(AppText.text("control.minimum")),maxLabel=new GLLabel(AppText.text("control.maximum"));
+            final GLNumberSpinner min=new GLNumberSpinner(0,60000,controller.controlInterpolation.minimumMs()),max=new GLNumberSpinner(0,60000,controller.controlInterpolation.maximumMs());
+            boolean adjusting;
+            void bounds(boolean fromMin){if(adjusting)return;adjusting=true;try{if(min.getValue()>max.getValue()){if(fromMin)max.setValue(min.getValue());else min.setValue(max.getValue());}}finally{adjusting=false;}}
             final GLButton save=new GLButton(AppText.text("save")),cancel=new GLButton(AppText.text("cancel"));
-            {preserve.setSelected(controller.preserveUnusedGroups);addGL(preserve);addGL(hint);addGL(save);addGL(cancel);
-                save.addActionListener(e->{controller.preserveUnusedGroups=preserve.isSelected();ref[0].close();});
+            {interpolate.setSelected(controller.controlInterpolation.enabled());min.setUnit("ms");max.setUnit("ms");
+                min.addChangeListener(e->bounds(true));max.addChangeListener(e->bounds(false));
+                for(var c:List.of(interpolate,minLabel,min,maxLabel,max))addGL(c);
+                interpolate.setToolTipText(AppText.text("control.interpolation.hint"));
+                preserve.setSelected(controller.preserveUnusedGroups);addGL(preserve);addGL(hint);addGL(save);addGL(cancel);
+                save.addActionListener(e->{controller.preserveUnusedGroups=preserve.isSelected();controller.controlInterpolation=new ControlInterpolationSettings(interpolate.isSelected(),min.getValue(),max.getValue());controller.controlSettingsChanged();ref[0].close();});
                 cancel.addActionListener(e->ref[0].close());}
             protected void record(com.vingame.glswing.rendering.GLContext2D c){}
-            protected void resized(float w,float h){preserve.setBounds(20,20,w-40,30);hint.setBounds(20,60,w-40,40);cancel.setBounds(w-230,h-45,100,28);save.setBounds(w-120,h-45,100,28);}
+            protected void resized(float w,float h){preserve.setBounds(20,20,w-40,30);hint.setBounds(20,60,w-40,40);interpolate.setBounds(20,108,w-40,30);minLabel.setBounds(20,146,200,28);min.setBounds(230,146,w-250,28);maxLabel.setBounds(20,180,200,28);max.setBounds(230,180,w-250,28);cancel.setBounds(w-230,h-45,100,28);save.setBounds(w-120,h-45,100,28);}
         };
-        ref[0]=new GLDialog(AppText.text("document.settings"),content);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(650,170);ref[0].show(owner);
+        ref[0]=new GLDialog(AppText.text("document.settings"),content);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(650,320);ref[0].show(owner);
     }
 }

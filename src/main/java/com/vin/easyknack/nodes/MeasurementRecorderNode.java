@@ -13,7 +13,7 @@ public final class MeasurementRecorderNode extends BasicNode {
         n.addEditor(TABLE,"Measurements",new TableEditor()).keepVisibleOnHide().editorCopyable(false);
         n.addInput(RECORD,"Record",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT)
             .tooltip("Append one row with all current input values at the trigger's sample position. Measurements are saved in this document.");
-        n.addEditor(COUNT,"Inputs",Editor.Slider.button(1,1.,8.).integers()).editorCopyable(false);
+        n.addEditor(COUNT,"Inputs",Editor.Slider.button(1,1.,8.).integers().discrete()).editorCopyable(false);
         n.addEditor(ValueSeries.SETTINGS,"Values",new ValueSeriesEditor(s,count(s))).inspectorOnly().editorCopyable(false);
         for(var entry:ValueSeries.visible(s,count(s))){
             n.addInput(input(entry.input()),entry.name()).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);

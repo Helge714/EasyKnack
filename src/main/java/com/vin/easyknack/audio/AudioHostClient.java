@@ -26,7 +26,7 @@ public final class AudioHostClient implements AutoCloseable {
                 try { return output.readLine(); }
                 catch (IOException error) { throw new CompletionException(error); }
             }).get(12, TimeUnit.SECONDS);
-            if (line == null || !line.matches("READY 11 [0-9]+")) throw new IOException(com.vin.easyknack.ui.AppText.literal("Audiohost nicht bereit oder veraltet: bitte C++-Host neu bauen"));
+            if (line == null || !line.matches("READY 12 [0-9]+")) throw new IOException(com.vin.easyknack.ui.AppText.literal("Audiohost nicht bereit oder veraltet: bitte C++-Host neu bauen"));
             int port = Integer.parseInt(line.substring(9));
             socket = new Socket();
             socket.connect(new InetSocketAddress("127.0.0.1", port), 2000);
@@ -34,7 +34,7 @@ public final class AudioHostClient implements AutoCloseable {
             socket.setTcpNoDelay(true);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-            if (!command("HELLO 11 " + token).equals("OK 11")) throw new IOException(com.vin.easyknack.ui.AppText.literal("Protokollversion unpassend"));
+            if (!command("HELLO 12 " + token).equals("OK 12")) throw new IOException(com.vin.easyknack.ui.AppText.literal("Protokollversion unpassend"));
         } catch (Exception failure) { close(); throw failure; }
     }
 

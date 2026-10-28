@@ -8,7 +8,7 @@ public final class MultipleGraphNode extends BasicNode {
     public boolean isListedInCatalog(){return false;}
     public void define(NodeBuilder n,NodeState s){
         for(int i=0;i<(int)s.number("outputs",1);i++)n.addOutput(output(i),"Out "+(i+1));
-        n.addInput(COUNT,"Count",Editor.Slider.button(8,0.0,256.0).integers()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
+        n.addInput(COUNT,"Count",Editor.Slider.button(8,0.0,256.0).integers().discrete()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
         var spectrum=java.util.Set.of(s.text("spectrumInputs","").split(","));
         var waveforms=java.util.Set.of(s.text("waveformInputs","").split(","));
         var vectors=java.util.Set.of(s.text("vectorInputs","").split(","));
@@ -19,7 +19,7 @@ public final class MultipleGraphNode extends BasicNode {
             else if(vectors.contains(Integer.toString(i)))row.dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL);
             else row.rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         }
-        n.addEditor(MAXIMUM,"Maximum instances",Editor.Slider.button(16,1.0,256.0).integers());
+        n.addEditor(MAXIMUM,"Maximum instances",Editor.Slider.button(16,1.0,256.0).integers().discrete());
         n.addEditor(MODE,"Merge",Editor.comboBox(java.util.List.of("sum","mean"),"sum",v->v));
     }
     public NativeProcessor processor(){var b=ParameterContract.builder().source(COUNT).integer(COUNT).integer(MAXIMUM).value(MODE);for(int i=0;i<MAX_INPUTS;i++)b.source(input(i));

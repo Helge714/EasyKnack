@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.vingame.glswing.node.model.*;
 
-/** Protocol 11 (per-output rates and typed resources): source references encode node index + 256 * output index (up to eight outputs). */
+/** Protocol 12 (manual-control interpolation, per-output rates and typed resources): source references encode node index + 256 * output index (up to eight outputs). */
 public final class AudioGraphEncoder {
     private AudioGraphEncoder() { }
 
@@ -27,7 +27,9 @@ public final class AudioGraphEncoder {
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximal acht Ausgänge pro Audio-Node"));
         }
         Map<GLNodeEndpoint, Integer> inputs = new HashMap<>();
+        Map<GLNodeId,java.util.Set<String>> connectedPorts=new HashMap<>();
         for (var connection : graph.connections()) {
+            connectedPorts.computeIfAbsent(connection.input().nodeId(),id->new java.util.HashSet<>()).add(connection.input().portId());
             Integer source = indices.get(connection.output().nodeId());
             if (source == null || !validPort(ports, connection.output(), GLPortDirection.OUTPUT)
                     || !validPort(ports, connection.input(), GLPortDirection.INPUT))
@@ -82,7 +84,7 @@ public final class AudioGraphEncoder {
                                 if (!validPort(ports, endpoint, GLPortDirection.INPUT))
                                     throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Undeclared input: ") + node.typeId() + "/" + port.value());
                                 return inputs.getOrDefault(endpoint, -1);
-                            })).append(" @ ").append(outputRateMetadata(layout)).append(' ').append(inputRates.isEmpty() ? "-" : inputRates);
+                            })).append(" @ ").append(outputRateMetadata(layout)).append(' ').append(inputRates.isEmpty() ? "-" : inputRates).append(com.vin.easyknack.ui.ControlMetadata.encode(node,definition,layout,connectedPorts.getOrDefault(node.id(),java.util.Set.of())));
         }
         conversions.forEach(result::append);
         return result.toString();

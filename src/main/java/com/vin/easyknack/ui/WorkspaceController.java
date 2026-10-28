@@ -341,6 +341,8 @@ final class WorkspaceController implements AutoCloseable {
     }
 
     boolean preserveUnusedGroups;
+    ControlInterpolationSettings controlInterpolation=ControlInterpolationSettings.DEFAULT;
+    void controlSettingsChanged(){history.markExternalChange();syncAudio();}
 
     com.vingame.glswing.node.document.GLNodeGraphDocument snapshotDocument() {
         return prepareDocumentSnapshot(captureDocument());
@@ -380,7 +382,7 @@ final class WorkspaceController implements AutoCloseable {
         }
 
         var root = assets.remove(source.root().id());
-        var rootMetadata=new HashMap<>(root.metadata());rootMetadata.put(DocumentSettings.PRESERVE,com.vingame.glswing.node.model.GLNodeValue.of(preserveUnusedGroups));if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
+        var rootMetadata=new HashMap<>(root.metadata());rootMetadata.put(ControlInterpolationSettings.KEY,controlInterpolation.value());rootMetadata.put(DocumentSettings.PRESERVE,com.vingame.glswing.node.model.GLNodeValue.of(preserveUnusedGroups));if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
         root=new GLNodeGraphAsset(root.id(),root.version(),root.kind(),root.graph(),root.viewState(),rootMetadata,root.compositeDescriptor());
         return new com.vingame.glswing.node.document.GLNodeGraphDocument(root, assets, source.externalAssets());
     }
@@ -396,6 +398,7 @@ final class WorkspaceController implements AutoCloseable {
     void openDocument(String title, com.vingame.glswing.node.document.GLNodeGraphDocument input) {
         var document = NodeDocuments.prepare(input); // Validate with isolated registries before changing the editor.
         preserveUnusedGroups=DocumentSettings.preserve(document);
+        controlInterpolation=ControlInterpolationSettings.read(document.root().metadata().get(ControlInterpolationSettings.KEY));
         editorTemplates.load(document.root().metadata().get(EditorTemplates.KEY));
         if(midiDrivers!=null)midiDrivers.documentChanged();
         for(var asset:NodeDocuments.assets(document))if(asset.compositeDescriptor()!=null)for(var port:asset.compositeDescriptor().portMappings()){var template=GroupInputs.template(port);if(template!=null&&port.presentation().inputEditorId().startsWith(EditorTemplates.PREFIX)&&editorTemplates.all().stream().noneMatch(t->t.id().equals(template.id())))editorTemplates.register(template);}
@@ -559,6 +562,9 @@ final class WorkspaceController implements AutoCloseable {
 
     /** Always compile the root project, even while the UI navigates inside a composite. */
     String audioGraph() {
+        try(var policy=ControlMetadata.use(controlInterpolation)){return encodeAudioGraph();}
+    }
+    private String encodeAudioGraph() {
         GroupRouting.synchronize(composites,types);
         if(audio!=null) audio.setVolumeLinks(audioVolumeLinks());
         bakes.validate();
@@ -583,7 +589,8 @@ final class WorkspaceController implements AutoCloseable {
     private com.vingame.glswing.node.composite.GLCompositeFlattenResult flattenedAudioGraph(boolean useBakes) {
         var registry = new GLCompositeGraphRegistry();
         for (var source : composites.assets()) {
-            var asset=useBakes?bakes.apply(source):source;
+            var preparedSource=ControlMetadata.prepare(source,(id,key)->midiDrivers!=null&&midiDrivers.isExternal(source.id(),id,key));
+            var asset=useBakes?bakes.apply(preparedSource):preparedSource;
             registry.registerAsset(new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(), executableCompositeMutes(asset.graph()),
                 asset.viewState(), asset.metadata(), asset.compositeDescriptor()));
         }
@@ -591,6 +598,7 @@ final class WorkspaceController implements AutoCloseable {
             if (registry.findComposite(composite.nodeTypeId()).isEmpty()) registry.registerComposite(composite);
         var root = new GLNodeGraphAsset("easyknack.root", 1, GLNodeGraphAssetKind.PROJECT,
                 executableCompositeMutes(graph.snapshot()), GLNodeEditorViewState.empty());
+        root=ControlMetadata.prepare(root,(id,key)->midiDrivers!=null&&midiDrivers.isExternal(MidiDrivers.ROOT,id,key));
         if(useBakes)root=bakes.apply(root);
         var prepared=GroupCompiler.prepare(root,registry);
         var flat=SpectralGroups.flatten(prepared,new GLCompositeExpansionLimits(16, 256, 512, 10000));
@@ -786,7 +794,7 @@ final class WorkspaceController implements AutoCloseable {
             var properties=new java.util.ArrayList<>(nodes.schemas().properties(node.typeId()));properties.removeIf(p->p.id().startsWith(com.vingame.glswing.ui.GLDriverTarget.PROPERTY_PREFIX));
             node.properties().forEach((key,value)->{if(key.startsWith(com.vingame.glswing.ui.GLDriverTarget.PROPERTY_PREFIX)){
                 String property=MidiDriverBinding.property(key);var address=new MidiDrivers.Address(driverCurrentAsset(),node.id(),property);var target=midiDrivers.target(address);if(target==null)return;
-                properties.add(new com.vingame.glswing.node.model.GLCustomNodeProperty(key,AppText.text("driver.title"),(model,ignored)->new MidiDriverSettingsPanel(MidiDriverBinding.read(model.properties().getOrDefault(key,value)),target,updated->driverConfigure(driverCurrentAsset(),model.id(),key,updated)),
+                properties.add(new com.vingame.glswing.node.model.GLCustomNodeProperty(key,AppText.text("driver.title"),(model,ignored)->new MidiDriverSettingsPanel(MidiDriverBinding.read(model.properties().getOrDefault(key,value)),target,updated->driverConfigure(driverCurrentAsset(),model.id(),key,updated),MidiDrivers.continuous(midiDrivers.spec(address))),
                     (control,model)->((MidiDriverSettingsPanel)control).update(MidiDriverBinding.read(model.properties().getOrDefault(key,value)))));
             }});nodes.schemas().register(node.typeId(),properties);
         }

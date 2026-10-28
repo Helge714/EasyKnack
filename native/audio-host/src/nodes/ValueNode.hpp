@@ -24,6 +24,7 @@ struct ValueNode : NodeProcessor {
     }
     bool supportsControlRate() const noexcept override { return true; }
     void process(ProcessContext& context) noexcept override {
+        if(context.controls){auto values=context.numericInput(0,value);for(std::size_t i=0;i<context.bufferSize;i++)context.output[i]=values[i];current=context.output[context.bufferSize-1];sliding=false;return;}
         if(sliding){
             auto frames=context.blockFrames?context.blockFrames:context.bufferSize;
             current+=static_cast<float>(1-std::exp(-double(frames)/(.005*context.sampleRate)))*(value-current);

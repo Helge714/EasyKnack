@@ -69,6 +69,7 @@ public final class MidiDrivers implements AutoCloseable {
             return row==null||!row.isDriverAssignable()?null:new Spec(row.editor(),row.kind()==NodeBuilder.RowKind.INPUT?row.id():null,()->ManualTriggers.fire(a.node().toString(),a.property()));}
         return owner.driverGroupSpec(node,a.property());
     }
+    static boolean continuous(Spec spec){var editor=spec==null?null:spec.editor();if(editor instanceof UnitSlider u)editor=u.spec();return editor instanceof Editor.Slider s&&s.continuousChanges();}
     GLDriverTarget target(Address a){
         var spec=spec(a);if(spec==null)return null;final Editor original=spec.editor();Editor editor=original;
         java.util.function.Supplier<GLNodeValue> read=()->{var node=node(a);return node==null?original.defaultValue():node.properties().getOrDefault(a.property(),original.defaultValue());};
@@ -108,8 +109,8 @@ public final class MidiDrivers implements AutoCloseable {
     }
     private void showSettings(Address a,GLParent parent){
         owner.workspace().setInspectorVisible(true);
-        var panel=new MidiDriverSettingsPanel(binding(a),target(a),value->assign(a,MidiDriverBinding.read(value)));
-        var dialog=new GLDialog(AppText.text("driver.configure"),panel);dialog.setDecoration(GLDialog.Decoration.THEMED);dialog.setSize(580,440);dialog.show(parent);
+        var panel=new MidiDriverSettingsPanel(binding(a),target(a),value->assign(a,MidiDriverBinding.read(value)),continuous(spec(a)));
+        var dialog=new GLDialog(AppText.text("driver.configure"),panel);dialog.setDecoration(GLDialog.Decoration.THEMED);dialog.setSize(580,620);dialog.show(parent);
     }
     void flush(){
         if(closed){pending.clear();return;}
@@ -170,6 +171,7 @@ public final class MidiDrivers implements AutoCloseable {
         MidiDriverInput.request(this,bindings.values().stream().map(MidiDriverBinding::device).collect(java.util.stream.Collectors.toSet()),learning!=null);refreshIndicators();
     }
     private void refreshIndicators(){controls.removeIf(ref->{var c=ref.get();if(c==null)return true;var a=addresses.get(c);c.setDriverIndicator(a!=null&&binding(a)!=null,"easyknack.signal.MIDI");return false;});}
+    boolean isExternal(String asset,GLNodeId id,String property){var value=external.get(new Address(asset,id,property));var node=owner.driverGraphs().getOrDefault(asset,empty()).findNode(id).orElse(null);return value!=null&&node!=null&&value.equals(node.properties().get(property));}
     void manualEdit(String asset,GLNodeId node,String property){external.remove(new Address(asset,node,property));}
     void manualGraphChange(GLNodeGraphSnapshot before,GLNodeGraphSnapshot after){
         var graphs=owner.driverGraphs();external.keySet().removeIf(a->{

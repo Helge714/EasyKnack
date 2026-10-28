@@ -62,7 +62,7 @@ final class GroupSourceExporter {
                 double value=new NodeState(instance.properties()).number(GroupUnits.key(mapping.publicPort().id()),options.number("default",0));
                 Double min=options.flag("minimumEnabled",true)?base.convert(options.number("minimum",0),selected):null;
                 Double max=options.flag("maximumEnabled",true)?base.convert(options.number("maximum",1),selected):null;
-                slider=new Editor.Slider(base.convert(value,selected),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"),new UnitFormats(selected,selected,GroupUnits.allowed(mapping,base)));
+                slider=new Editor.Slider(base.convert(value,selected),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"),new UnitFormats(selected,selected,GroupUnits.allowed(mapping,base)),!MultipleGroups.countPort(mapping)&&options.flag("continuous",true));
             }
             if(input&&GroupInputSettings.checkbox(mapping))slider=new Editor.Toggle(new NodeState(instance.properties()).number(GroupUnits.key(mapping.publicPort().id()),new NodeState(mapping.presentation().editorOptions()).number("default",0))!=0);
             var choiceValues=new LinkedHashMap<String,Double>();
@@ -285,7 +285,7 @@ final class GroupSourceExporter {
         if(value instanceof Editor.ComboBox<?> c)return choiceEditor(new ChoiceParameter("","",new PropertyId("unused"),GroupChoices.copy(c,c.defaultValue())));
         if(value instanceof Editor.Toggle t)return "new Editor.Toggle("+t.value()+")";
         var s=(Editor.Slider)value;
-        var f=s.formats();return "new Editor.Slider("+s.value()+", "+s.min()+", "+s.max()+", "+s.step()+", "+s.integral()+", "+s.bar()+", new UnitFormats(UnitFormat."+f.stored().name()+", UnitFormat."+f.initial().name()+", java.util.List.of("+String.join(",",f.choices().stream().map(u->"UnitFormat."+u.name()).toList())+")))";
+        var f=s.formats();return "new Editor.Slider("+s.value()+", "+s.min()+", "+s.max()+", "+s.step()+", "+s.integral()+", "+s.bar()+", new UnitFormats(UnitFormat."+f.stored().name()+", UnitFormat."+f.initial().name()+", java.util.List.of("+String.join(",",f.choices().stream().map(u->"UnitFormat."+u.name()).toList())+")), "+s.continuousChanges()+")";
     }
     private static String javaSource(String name,String processor,GLNodeGraphAsset asset,List<Port> inputs,List<Port> outputs,BakedRatePlan ratePlan,List<ChoiceParameter> choices,String monitorPath){
         String kind=new NodeState(asset.metadata()).text("easyknack.kind","AUDIO");

@@ -71,11 +71,15 @@ final class GroupCompiler {
                 var id=new GLNodeId(UUID.nameUUIDFromBytes((asset.id()+"/unit/"+p.publicPort().id()+"/"+endpoint).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
                 var def=new UnitConverterNode();var values=new HashMap<>(def.defaults());
                 values.put("from",GLNodeValue.of(base.id()));values.put("to",GLNodeValue.of(target.id()));values.put("value",GLNodeValue.of(fallback));values.put("rate",GLNodeValue.of(new NodeState(p.presentation().editorOptions()).text(GroupInputSettings.RATE,"auto")));
+                values.put(ControlMetadata.DISCRETE,GLNodeValue.of(!new NodeState(p.presentation().editorOptions()).flag("continuous",true)));
                 nodes.add(new GLGraphNode(id,def.registration().id(),values));
                 wires.add(new GLGraphConnection(new GLNodeConnectionId(UUID.nameUUIDFromBytes((id+"/wire").getBytes(java.nio.charset.StandardCharsets.UTF_8))),new GLNodeEndpoint(id,"out"),endpoint));
                 adapterEndpoints.add(new GLNodeEndpoint(id,"value"));
                 mappings.add(new GLCompositePropertyMapping(key,id,"value"));mappings.add(new GLCompositePropertyMapping(ukey,id,"from"));
                 }
+                String driverKey=MidiDriverBinding.key(key);
+                properties.add(new GLCompositePropertyDescriptor(driverKey,"driver",GLCompositeValueKind.MAP,GLNodeValue.of(Map.of())));
+                for(var endpoint:adapterEndpoints)mappings.add(new GLCompositePropertyMapping(driverKey,endpoint.nodeId(),MidiDriverBinding.key("value")));
                 ports.add(p.withEndpoints(adapterEndpoints));
                 properties.add(new GLCompositePropertyDescriptor(key,"number",GLCompositeValueKind.DECIMAL,GLNodeValue.of(fallback)));
                 properties.add(new GLCompositePropertyDescriptor(ukey,"text",GLCompositeValueKind.TEXT,GLNodeValue.of(base.id())));
@@ -105,6 +109,12 @@ final class GroupCompiler {
                 double value=new NodeState(node.properties()).number(binding.valueKey,MultipleGroups.countPort(binding.port)?new NodeState(node.properties()).number(MultipleGroups.COUNT_PROPERTY,fallback):fallback);
                 if(GroupInputSettings.checkbox(binding.port))value=value==0?0:1;
                 values.put(binding.valueKey,GLNodeValue.of(binding.base.convert(value,selected)));values.put(binding.unitKey,GLNodeValue.of(selected.id()));
+                var driverKey=MidiDriverBinding.key(binding.valueKey);var assignment=values.get(driverKey);
+                if(binding.base!=selected&&assignment instanceof GLNodeValue.MapValue map&&map.values().containsKey("device")){
+                    var driver=MidiDriverBinding.read(assignment);var converted=new HashMap<>(map.values());
+                    converted.put("nativeValues",GLNodeValue.of(java.util.stream.IntStream.range(0,128).mapToObj(i->binding.base.convert(driver.mapping().map(i/127.),selected)).toList()));
+                    values.put(driverKey,GLNodeValue.of(converted));
+                }
             }
             // Interface edits can leave former input defaults on existing instances.
             // Only discard our reserved input keys, never arbitrary composite properties.

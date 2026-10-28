@@ -62,7 +62,8 @@ public interface Editor {
         public Control { java.util.Objects.requireNonNull(component); java.util.Objects.requireNonNull(update); }
     }
 
-    record Slider(double value, Double min, Double max, double step, boolean integral, boolean bar, UnitFormats formats) implements Editor {
+    record Slider(double value, Double min, Double max, double step, boolean integral, boolean bar, UnitFormats formats,boolean continuousChanges) implements Editor {
+        public Slider(double value,Double min,Double max,double step,boolean integral,boolean bar,UnitFormats formats){this(value,min,max,step,integral,bar,formats,true);}
         public Slider(double value, Double min, Double max, double step, boolean integral, boolean bar) { this(value,min,max,step,integral,bar,null); }
         public Slider(double value, Double min, Double max, double step, boolean integral) { this(value,min,max,step,integral,false); }
         public Slider(double value, Double min, Double max, double step) { this(value, min, max, step, false); }
@@ -77,14 +78,16 @@ public interface Editor {
         public static Slider button(double value, Double min, Double max) { return new Slider(value, min, max, .01); }
         public static Slider button(double value, double step) { return new Slider(value, null, null, step); }
         public static Slider button(double value) { return new Slider(value, null, null, .01); }
-        public Slider step(double step) { return new Slider(value, min, max, step, integral,bar,formats); }
-        public Slider integers() { return new Slider(value, min, max, Math.max(1, step), true,bar,formats); }
+        public Slider step(double step) { return new Slider(value, min, max, step, integral,bar,formats,continuousChanges); }
+        public Slider integers() { return new Slider(value, min, max, Math.max(1, step), true,bar,formats,continuousChanges); }
         public Slider unit(UnitFormat unit) { return formats(UnitFormats.fixed(java.util.Objects.requireNonNull(unit))); }
-        public Slider formats(UnitFormats formats) { return new Slider(value,min,max,step,integral,bar,java.util.Objects.requireNonNull(formats)); }
+        public Slider formats(UnitFormats formats) { return new Slider(value,min,max,step,integral,bar,java.util.Objects.requireNonNull(formats),continuousChanges); }
+        public Slider continuous(){return new Slider(value,min,max,step,integral,bar,formats,true);}
+        public Slider discrete(){return new Slider(value,min,max,step,integral,bar,formats,false);}
         public String unitSuffix() { return formats==null?"":formats.initial().suffix(); }
         public static Slider bar(double value, double min, double max) { return new Slider(value,min,max,.01,false,true); }
         @Override public GLNodeValue defaultValue() { return GLNodeValue.of(value); }
-        @Override public String viewKey() { return "slider:"+bar+":"+integral+":"+(min!=null&&max!=null?"fixed":"free"); }
+        @Override public String viewKey() { return "slider:"+continuousChanges+":"+bar+":"+integral+":"+(min!=null&&max!=null?"fixed":"free"); }
         @Override public void validate(GLNodeValue value) {
             Object raw = value.toJavaValue();
             if (!(raw instanceof Number n) || !Double.isFinite(n.doubleValue())

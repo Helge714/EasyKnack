@@ -270,6 +270,14 @@ struct AudioGraph {
             node.inputs.resize(node.processor->sources.size());
             if(!node.processor->supportsScalarInputs())node.heldInputs.resize(node.processor->sources.size());
             }
+            in>>std::ws;
+            std::string controlText;
+            if(in.peek()=='~'){
+                std::string token;in>>token;if(token!="~"||!std::getline(in,controlText,'~')||in.eof())throw std::runtime_error("Invalid interpolation metadata");
+                node.processor->controlsText=controlText;node.processor->controls=std::make_unique<ControlInterpolation>(controlText);
+                if(node.rightProcessor){node.rightProcessor->controlsText=controlText;node.rightProcessor->controls=std::make_unique<ControlInterpolation>(controlText);}
+                node.liveParameters=std::make_shared<const std::string>(node.parameters+" ~"+controlText);
+            }
             graph.nodes.push_back(std::move(node));
         }
         std::string extra;
@@ -347,6 +355,7 @@ struct AudioGraph {
                 lane.processor=createNodeProcessor(node.processorId);lane.rightProcessor=createNodeProcessor(node.processorId);
                 std::istringstream left(node.parameters),right(node.parameters);
                 lane.processor->configure(left);lane.rightProcessor->configure(right);
+                if(node.processor->controls){auto text=node.processor->controlsText;lane.processor->controlsText=text;lane.rightProcessor->controlsText=text;lane.processor->controls=std::make_unique<ControlInterpolation>(text);lane.rightProcessor->controls=std::make_unique<ControlInterpolation>(text);}
                 lane.processor->shareVoiceState(*node.processor);
                 lane.rightProcessor->shareChannelState(*lane.processor);
                 lane.processor->selectVoice(v);lane.rightProcessor->selectVoice(v);
@@ -385,7 +394,8 @@ struct AudioGraph {
                <<':'<<p.inputEndpoint()<<':'<<p.outputEndpoint()<<':'<<p.midiDevice();
             for(int source:p.sources)out<<','<<source;
             for(std::size_t i=0;i<p.outputCount();i++)out<<p.outputIsMidi(i);
-            out<<':'<<p.parameterStructure();
+            out<<':'<<p.parameterStructure()<<':'<<(p.controls?p.controls->shape():std::string{});
+            if(p.controls){std::vector<std::uint64_t> devices;p.controls->devices(devices);for(auto device:devices)out<<','<<device;}
             if(!p.supportsLiveParameters())out<<':'<<n.parameters;
             out<<';';
         }
@@ -401,11 +411,16 @@ struct AudioGraph {
     void applyLiveParameters(const AudioGraph& configuration,ParameterRetirement& retired)noexcept{
         for(std::size_t i=0;i<nodes.size();i++){
             auto& node=nodes[i];const auto& incoming=configuration.nodes[i];
-            if(node.parameterValues()==incoming.parameterValues()||!incoming.processor->supportsLiveParameters())continue;
+            if(node.parameterValues()==incoming.parameterValues())continue;
             for(std::size_t v=0;v<node.voiceCount();v++){
                 auto& lane=node.voice(v);
-                lane.processor->applyLiveParameters(*incoming.processor,retired);
-                lane.rightProcessor->applyLiveParameters(*incoming.processor,retired);
+                if(incoming.processor->supportsLiveParameters()){
+                    lane.processor->applyLiveParameters(*incoming.processor,retired);
+                    lane.rightProcessor->applyLiveParameters(*incoming.processor,retired);
+                }else{
+                    if(lane.processor->controls&&incoming.processor->controls)lane.processor->controls->apply(*incoming.processor->controls);
+                    if(lane.rightProcessor->controls&&incoming.processor->controls)lane.rightProcessor->controls->apply(*incoming.processor->controls);
+                }
                 lane.eventReady={};
             }
             retired.keep(node.liveParameters);node.liveParameters=incoming.liveParameters;
@@ -421,7 +436,8 @@ struct AudioGraph {
                 for(std::size_t v=0;v<node.voiceCount()&&v<previous.voiceCount();++v) {
                     auto& lane=node.voice(v); auto& prior=previous.voice(v);
                     lane.processor->adoptState(*prior.processor);
-                    if(previous.stereo) lane.rightProcessor->adoptState(*prior.rightProcessor);
+                    if(lane.processor->controls&&prior.processor->controls)lane.processor->controls->inherit(*prior.processor->controls);
+                    if(previous.stereo){lane.rightProcessor->adoptState(*prior.rightProcessor);if(lane.rightProcessor->controls&&prior.rightProcessor->controls)lane.rightProcessor->controls->inherit(*prior.rightProcessor->controls);}
                     else if(node.stereo)lane.rightProcessor->inheritState(*lane.processor);
                 }
                 break;
@@ -511,6 +527,8 @@ struct AudioGraph {
         for(int index:step.nodes){auto& node=nodes[index];
             for(std::size_t channel=0;channel<(node.stereo?2u:1u);channel++)for(std::size_t v=0;v<node.voiceCount();v++){
                 auto& lane=node.voice(v);auto& cache=lane.channelCache[channel];
+                auto* processor=(channel?lane.rightProcessor:lane.processor).get();
+                if((!step.blockOnly||processor->sampleFeedbackBoundary())&&processor->controls)processor->controls->begin(frames,preparedSampleRate,midiSource);
                 for(std::size_t port=0;port<lane.outputPointers.size();port++){
                     auto& events=lane.valueEvents[channel][port];cache.events[port].reset();
                     if(events.count&&events.events[events.count-1].kind==ValueEventKind::trigger&&events.events[events.count-1].sampleOffset+1==events.frames)cache.events[port].set(0);
@@ -523,7 +541,7 @@ struct AudioGraph {
             auto& node=nodes[index];for(std::size_t channel=0;channel<(node.stereo?2u:1u);channel++)for(std::size_t v=0;v<node.voiceCount();v++){
                 auto& lane=node.voice(v);auto* p=(channel?lane.rightProcessor:lane.processor).get();
                 for(std::size_t port=0;port<p->sources.size();port++){int ref=p->sources[port];lane.inputs[port]=nullptr;if(ref>=0){auto& source=nodes[ref%maxNodes];lane.inputs[port]=source.voice(source.voiceCount()>1?v:0).channelCache[source.stereo?channel:0].outputs[ref/maxNodes].data();}}
-                ProcessContext c{lane.inputs.data(),lane.inputs.size(),nullptr,static_cast<std::size_t>(frames),preparedSampleRate,silence.data()};c.blockFrames=frames;c.channelIndex=channel;
+                ProcessContext c{lane.inputs.data(),lane.inputs.size(),nullptr,static_cast<std::size_t>(frames),preparedSampleRate,silence.data()};c.blockFrames=frames;c.controls=p->controls.get();c.channelIndex=channel;
                 chunk=std::min(chunk,std::max(std::size_t(1),p->beginFeedbackBlock(c)));
             }
         }
@@ -537,14 +555,14 @@ struct AudioGraph {
                 }
                 for(std::size_t channel=0;channel<(node.stereo?2u:1u);channel++)for(std::size_t v=0;v<node.voiceCount();v++){
                     auto& lane=node.voice(v);auto* p=(channel?lane.rightProcessor:lane.processor).get();
-                    ProcessContext c{nullptr,0,lane.channelCache[channel].outputs[0].data(),static_cast<std::size_t>(frames),preparedSampleRate,silence.data()};c.blockFrames=frames;c.channelIndex=channel;p->processSample(c);
+                    ProcessContext c{nullptr,0,lane.channelCache[channel].outputs[0].data(),static_cast<std::size_t>(frames),preparedSampleRate,silence.data()};c.blockFrames=frames;c.controls=p->controls.get();c.channelIndex=channel;p->processSample(c);
                 }
             }
             for(int index:step.nodes)if(nodes[index].processor->sampleFeedbackBoundary()){
                 auto& node=nodes[index];for(std::size_t channel=0;channel<(node.stereo?2u:1u);channel++)for(std::size_t v=0;v<node.voiceCount();v++){
                     auto& lane=node.voice(v);auto* p=(channel?lane.rightProcessor:lane.processor).get();
                     for(std::size_t port=0;port<p->sources.size();port++){int ref=p->sources[port];lane.inputs[port]=nullptr;lane.sourceRates[port]='c';if(ref>=0){auto& source=nodes[ref%maxNodes];lane.inputs[port]=source.voice(source.voiceCount()>1?v:0).channelCache[source.stereo?channel:0].outputs[ref/maxNodes].data();lane.sourceRates[port]=source.outputRate(ref/maxNodes);}}
-                    ProcessContext c{lane.inputs.data(),lane.inputs.size(),nullptr,static_cast<std::size_t>(frames),preparedSampleRate,silence.data()};c.blockFrames=frames;c.sourceRates=lane.sourceRates.data();p->commitSample(c);
+                    ProcessContext c{lane.inputs.data(),lane.inputs.size(),nullptr,static_cast<std::size_t>(frames),preparedSampleRate,silence.data()};c.blockFrames=frames;c.controls=p->controls.get();c.sourceRates=lane.sourceRates.data();p->commitSample(c);
                 }
             }
             return;
@@ -565,7 +583,7 @@ struct AudioGraph {
                     }
                     for(std::size_t port=0;port<lane.outputPointers.size();port++)lane.outputPointers[port]=cache.outputs[port].data()+sample;
                     ProcessContext c{lane.inputs.data(),lane.inputs.size(),lane.outputPointers[0],node.controlRate?1:length,preparedSampleRate,silence.data()};
-                    c.blockFrames=frames;c.channelIndex=channel;c.outputs=lane.outputPointers.data();c.outputCount=lane.outputPointers.size();c.sourceRates=lane.sourceRates.data();c.sampleOffset=sample;c.samplewise=!node.controlRate;c.audioIO=io;c.midiSource=midiSource;
+                    c.blockFrames=frames;c.controls=p->controls.get();c.channelIndex=channel;c.outputs=lane.outputPointers.data();c.outputCount=lane.outputPointers.size();c.sourceRates=lane.sourceRates.data();c.sampleOffset=sample;c.controls=p->controls.get();c.samplewise=!node.controlRate;c.audioIO=io;c.midiSource=midiSource;
                     for(std::size_t port=0;port<lane.valueEventOutputs.size();port++)lane.valueEventOutputs[port]=&lane.valueEvents[channel][port];
                     c.valueEventOutputs=lane.valueEventOutputs.data();
                     bindFeedbackEvents(node,lane,channel,v);c.valueEventInputs=lane.valueEventInputs.data();
@@ -579,7 +597,7 @@ struct AudioGraph {
                 for(std::size_t channel=0;channel<(node.stereo?2u:1u);channel++)for(std::size_t v=0;v<node.voiceCount();v++){
                     auto& lane=node.voice(v);auto* p=(channel?lane.rightProcessor:lane.processor).get();
                     for(std::size_t port=0;port<p->sources.size();port++){int ref=p->sources[port];lane.inputs[port]=nullptr;lane.sourceRates[port]='c';if(ref>=0){auto& source=nodes[ref%maxNodes];auto& other=source.voice(source.voiceCount()>1?v:0);bool held=source.outputRate(ref/maxNodes)=='c';lane.inputs[port]=other.channelCache[source.stereo?channel:0].outputs[ref/maxNodes].data()+(held?0:sample);lane.sourceRates[port]=held?'c':'a';}}
-                    ProcessContext c{lane.inputs.data(),lane.inputs.size(),nullptr,length,preparedSampleRate,silence.data()};c.blockFrames=frames;c.channelIndex=channel;c.sourceRates=lane.sourceRates.data();c.sampleOffset=sample;c.samplewise=true;
+                    ProcessContext c{lane.inputs.data(),lane.inputs.size(),nullptr,length,preparedSampleRate,silence.data()};c.blockFrames=frames;c.controls=p->controls.get();c.channelIndex=channel;c.sourceRates=lane.sourceRates.data();c.sampleOffset=sample;c.samplewise=true;
                     bindFeedbackEvents(node,lane,channel,v);c.valueEventInputs=lane.valueEventInputs.data();p->commitSample(c);
                 }
             }
@@ -587,6 +605,8 @@ struct AudioGraph {
         for(int index:step.nodes){auto& node=nodes[index];
             for(std::size_t channel=0;channel<(node.stereo?2u:1u);channel++)for(std::size_t v=0;v<node.voiceCount();v++){
                 auto& lane=node.voice(v);auto& cache=lane.channelCache[channel];
+                auto* processor=(channel?lane.rightProcessor:lane.processor).get();
+                if((!step.blockOnly||processor->sampleFeedbackBoundary())&&processor->controls)processor->controls->begin(frames,preparedSampleRate,midiSource);
                 for(std::size_t port=0;port<lane.outputPointers.size();port++)if(node.outputRate(port)=='e'){
                     auto& events=lane.valueEvents[channel][port];
                     for(const auto& event:events){cache.events[port].set(event.sampleOffset);if(event.kind==ValueEventKind::trigger&&event.sampleOffset+1<static_cast<unsigned>(frames))cache.events[port].set(event.sampleOffset+1);}
@@ -682,6 +702,7 @@ struct AudioGraph {
                 ProcessContext context{lane.inputs.data(), lane.inputs.size(), lane.outputPointers[0],
                         node.controlRate || node.eventRate&&processor->producesMidi() ? std::size_t{1} : static_cast<std::size_t>(frames), preparedSampleRate, silence.data(),
                         static_cast<std::size_t>(frames), io, channel,lane.outputPointers.data(),lane.outputPointers.size(),lane.midiInputs.data(),&lane.midi,midiSource,crossChannel?lane.rightInputs.data():nullptr,lane.midiOutputPointers.data(),lane.sourceRates.data()};
+                context.controls=processor->controls.get();if(context.controls)context.controls->begin(frames,preparedSampleRate,midiSource);
                 context.resourceInputs=lane.resourceInputs.data();context.rightResourceInputs=lane.rightResourceInputs.data();
                 context.eventRefresh=updates.test(0);context.eventEvaluationCount=&lane.eventEvaluations[channel];
                 context.valueEventInputs=lane.valueEventInputs.data();context.rightValueEventInputs=lane.rightValueEventInputs.data();context.valueEventOutputs=lane.valueEventOutputs.data();

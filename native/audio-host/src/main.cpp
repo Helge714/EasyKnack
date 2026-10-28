@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
         int length = sizeof(address);
         if (getsockname(listener.value, reinterpret_cast<sockaddr*>(&address), &length))
             throw std::runtime_error("port query failed");
-        std::cout << "READY 11 " << ntohs(address.sin_port) << std::endl;
+        std::cout << "READY 12 " << ntohs(address.sin_port) << std::endl;
         fd_set ready;
         FD_ZERO(&ready); FD_SET(listener.value, &ready);
         timeval timeout{10, 0};
@@ -86,8 +86,8 @@ int main(int argc, char** argv) {
         setsockopt(client.value, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&deadline), sizeof(deadline));
         setsockopt(client.value, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<char*>(&deadline), sizeof(deadline));
         easyknack::CommandReader commands;
-        if (readLine(client.value,commands) != "HELLO 11 " + std::string(argv[1])) throw std::runtime_error("invalid handshake");
-        sendLine(client.value, "OK 11");
+        if (readLine(client.value,commands) != "HELLO 12 " + std::string(argv[1])) throw std::runtime_error("invalid handshake");
+        sendLine(client.value, "OK 12");
         std::uint64_t diagnosticGeneration=0;
         easyknack::AudioIOStatistics diagnosticBase;
         for (;;) {

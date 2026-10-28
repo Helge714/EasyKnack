@@ -31,7 +31,8 @@ struct BakedInput : NodeProcessor {
         if(midi){if(c.midiOutput){const auto* input=external?external->midi(port):nullptr;if(input)*c.midiOutput=*input;else *c.midiOutput={};}return;}
         const float* input=nullptr;
         if(external)input=c.channelIndex==0?external->input(port):external->rightInputs?external->rightInputs[port]:external->input(port);
-        if(input)std::copy_n(input,c.bufferSize,c.output);else std::fill_n(c.output,c.bufferSize,fallback);
+        if(input){auto values=external->numericInput(port,fallback);if(c.channelIndex==1&&external->rightInputs&&external->rightInputs[port])values={external->rightInputs[port],external->sourceRates&&external->sourceRates[port]=='c'?std::size_t{0}:std::size_t{1},fallback};for(std::size_t i=0;i<c.bufferSize;i++)c.output[i]=values[i];}
+        else std::fill_n(c.output,c.bufferSize,fallback);
     }
 };
 struct BakedOutput : NodeProcessor {
@@ -144,6 +145,7 @@ struct BakedGraphProcessor : NodeProcessor {
     }
     bool inputUsesBlockData(std::size_t)const noexcept override{return true;}
     void collectMidiDevices(std::vector<std::uint64_t>& devices)const override{
+        NodeProcessor::collectMidiDevices(devices);
         if(runtime){auto inner=runtime->graph.midiDevices();devices.insert(devices.end(),inner.begin(),inner.end());}
     }
     void selectVoice(std::size_t v)noexcept override{voiceIndex=v;}

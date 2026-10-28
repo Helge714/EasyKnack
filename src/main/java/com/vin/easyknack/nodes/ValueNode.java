@@ -2,6 +2,7 @@ package com.vin.easyknack.nodes;
 
 @RegisterNode(id = "easyknack.audio.value", title = "Value", category=NodeCategory.IO, kind=NodeKind.VALUE)
 public final class ValueNode extends BasicNode {
+    @Override public java.util.Map<PropertyId,Integer> manualControlPorts(){return java.util.Map.of(VALUE,0);}
     @Override public boolean supportsSpectralBins() { return true; }
     @Override public boolean supportsSampleFeedback(){return true;}
 

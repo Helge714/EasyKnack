@@ -12,7 +12,7 @@ public final class MidiInputNode extends BasicNode {
         n.addOutput(OUT,"MIDI").dataType(PortDataType.MIDI).signal(SignalCategory.MIDI).rate(ProcessingRate.EVENT);
         n.addEditor(DEVICE,"Device",new MidiDeviceEditor());
         boolean keyboard=MidiDevices.Device.reference(s.text(DEVICE,MidiDevices.KEYBOARD.reference())).id().equals(MidiDevices.KEYBOARD.id());
-        n.addEditor(TRANSPOSE,"Transpose",Editor.Slider.button(0,-48.0,48.0).integers().formats(UnitFormats.PITCH_SEMITONE)).visible(keyboard).tooltip(com.vin.easyknack.ui.AppText.literal("Keyboard transposition: 12 semitones = one octave. A plays C4 at zero."));
+        n.addEditor(TRANSPOSE,"Transpose",Editor.Slider.button(0,-48.0,48.0).integers().discrete().formats(UnitFormats.PITCH_SEMITONE)).visible(keyboard).tooltip(com.vin.easyknack.ui.AppText.literal("Keyboard transposition: 12 semitones = one octave. A plays C4 at zero."));
         n.addEditor(KEYBOARD,"Keyboard",new KeyboardMidiEditor()).visible(keyboard).enabled(keyboard).keepVisibleOnHide();
         n.addEditor(PANIC,"All notes off",new PanicEditor()).keepVisibleOnHide();
     }

@@ -17,8 +17,8 @@ public final class BitcrusherNode extends BasicNode {
 		node.addOutput(OUT, "Out").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
 		ProcessingRate.addEditor(node,RATE);
 		node.addInput(IN, "In", Editor.Slider.button(0.0, -1.0, 1.0)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
-		node.addInput(BITS, "Bits", Editor.Slider.button(8.0, 1.0, 24.0).integers()).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
-		node.addInput(DOWNSAMPLE, "Downsample", Editor.Slider.button(1.0, 1.0, 1024.0).integers()).rates(PortRates.AUDIO_CONTROL)
+		node.addInput(BITS, "Bits", Editor.Slider.button(8.0, 1.0, 24.0).integers().discrete()).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
+		node.addInput(DOWNSAMPLE, "Downsample", Editor.Slider.button(1.0, 1.0, 1024.0).integers().discrete()).rates(PortRates.AUDIO_CONTROL)
 				.signal(SignalCategory.VALUE);
 	}
 

@@ -22,7 +22,7 @@ public final class AdditiveOscillatorNode extends BasicNode {
         node.addOutput(OUT, "Audio Out");
         node.addInput(WAVEFORM, "Waveform", Editor.comboBox(List.of(Waveform.values()), Waveform.SINE, Waveform::id))
                 .dataType(PortDataType.WAVEFORM).signal(SignalCategory.WAVETABLE).rate(ProcessingRate.CONTROL);
-        node.addInput(HARMONICS, "Partials", Editor.Slider.bar(1, 1, 144).integers()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
+        node.addInput(HARMONICS, "Partials", Editor.Slider.bar(1, 1, 144).integers().discrete()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
         node.addInput(FALLOFF, "Falloff", Editor.Slider.button(1, 0d, 4d)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL).visible(multiple);
         node.addInput(SPREAD, "Spreading", Editor.Slider.button(0, -2400d, 2400d).formats(UnitFormats.PITCH_CENT)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL).visible(multiple);
         node.addInput(FREQUENCY, "Frequency", Editor.Slider.button(440, 0.00001, 20000.0).step(1).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);

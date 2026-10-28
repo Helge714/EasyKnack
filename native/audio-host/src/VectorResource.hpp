@@ -12,7 +12,8 @@ struct VectorResource final:DspResource {
     Vector3 at(std::size_t i)const noexcept{return count?samples[std::min(i,count-1)]:Vector3{};}
 };
 inline Vector3 vectorInput(const ProcessContext& c,std::size_t port,std::size_t i,Vector3 fallback)noexcept{
-    auto* r=c.resource(port);if(!r||r->kind()!=ResourceKind::vector)return fallback;
+    auto* r=c.resource(port);if(!r||r->kind()!=ResourceKind::vector){if(c.controls)for(std::size_t axis=0;axis<3;axis++)fallback[axis]=c.numericInput(32+port*3+axis,float(fallback[axis]))[i];return fallback;}
+    if(c.controls)for(std::size_t axis=0;axis<3;axis++)c.controls->connected(32+port*3+axis);
     auto* vector=static_cast<const VectorResource*>(r);
     return vector->at(c.sourceRates&&c.sourceRates[port]=='c'?0:c.sampleOffset+i);
 }

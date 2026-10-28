@@ -26,7 +26,7 @@ final class MultipleGroups {
     static boolean countPort(GLCompositePortMapping port){return GLNodeValue.of("count").equals(port.presentation().editorOptions().get(COUNT_ROLE));}
     static GLCompositePortMapping countPort(String id){
         var options=new HashMap<String,GLNodeValue>();options.put("applicationManaged",GLNodeValue.of(true));options.put(COUNT_ROLE,GLNodeValue.of("count"));
-        options.put("default",GLNodeValue.of(8.));options.put("minimum",GLNodeValue.of(0.));options.put("maximum",GLNodeValue.of(256.));options.put("numericType",GLNodeValue.of("integer"));options.put("presentation",GLNodeValue.of("button"));options.put(GroupInputSettings.RATE,GLNodeValue.of("control"));
+        options.put("default",GLNodeValue.of(8.));options.put("minimum",GLNodeValue.of(0.));options.put("maximum",GLNodeValue.of(256.));options.put("numericType",GLNodeValue.of("integer"));options.put("continuous",GLNodeValue.of(false));options.put("presentation",GLNodeValue.of("button"));options.put(GroupInputSettings.RATE,GLNodeValue.of("control"));
         return new GLCompositePortMapping(GLNodePortDescriptor.input(id,SignalCategory.VALUE.valueTypeId(),false,1),null,new GLCompositePortPresentation(GLNodeInputEditorRegistry.SLIDER,true,options));
     }
     static boolean multiple(GLNodeGraphAsset asset){return new NodeState(asset.metadata()).flag(MARKER,false);}

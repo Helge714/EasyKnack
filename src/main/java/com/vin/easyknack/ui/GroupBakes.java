@@ -201,6 +201,8 @@ final class GroupBakes implements AutoCloseable {
         var descriptor=registry.findComposite(node.typeId()).orElseThrow();
         var definition=(GroupSourceExporter.ExportDefinition)entry.source.definition();
         for(var port:definition.inputs)if(port.editor() instanceof Editor.Slider||port.editor() instanceof Editor.Toggle){
+            var assignment=node.properties().get(MidiDriverBinding.key(GroupUnits.key(port.mapping().publicPort().id())));
+            if(assignment!=null)values.put(MidiDriverBinding.key(port.id().value()),assignment);
             var mapping=port.mapping();var base=GroupUnits.base(registry,descriptor,mapping);
             var options=new NodeState(mapping.presentation().editorOptions());
             double value=new NodeState(node.properties()).number(GroupUnits.key(mapping.publicPort().id()),options.number("default",0));

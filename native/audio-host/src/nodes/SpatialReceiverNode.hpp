@@ -21,7 +21,7 @@ struct SpatialReceiverNode:NodeProcessor {
     void adoptState(NodeProcessor& other)noexcept override{auto& v=static_cast<SpatialReceiverNode&>(other);if(delay.size()==v.delay.size()){delay.swap(v.delay);write=v.write;}}
     void process(ProcessContext& c)noexcept override{
         if(c.channelIndex==0){auto left=c.numericInput(0);auto* right=c.rightInputs?c.rightInputs[0]:nullptr;for(std::size_t i=0;i<c.bufferSize;i++)(*mono)[i]=.5f*(left[i]+(right?right[c.sourceRates&&c.sourceRates[0]=='c'?0:i]:left[i]));}
-        bool moving=false;for(std::size_t p=1;p<5;p++)moving|=c.sourceRates&&c.sourceRates[p]=='a';
+        bool moving=c.controls&&c.controls->changing();for(std::size_t p=1;p<5;p++)moving|=c.sourceRates&&c.sourceRates[p]=='a';
         double distance=0,gain=1;
         for(std::size_t i=0;i<c.bufferSize;i++){
             if(i==0||moving){

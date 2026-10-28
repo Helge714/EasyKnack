@@ -112,6 +112,9 @@ public final class NodeBuilder {
             }
         }
     }
+    void applyInteractionPolicy(Map<PropertyId,Integer> nativePorts){
+        for(var row:rows)if(row.editor instanceof Editor.Slider slider&&!nativePorts.containsKey(row.key))row.editor=slider.discrete();
+    }
     void applyFormats(NodeState state) {
         for(var row:List.copyOf(rows))if(row.editor instanceof Editor.Slider slider){
             var formats=row.formats!=null?row.formats:slider.formats();
@@ -126,7 +129,7 @@ public final class NodeBuilder {
     }
     public List<Row> rows() { return List.copyOf(rows); }
     void translate(String nodeId) {
-        rows.forEach(row -> {row.label = NodeText.text(nodeId + "." + row.id(), row.label);row.tooltip=NodeText.text(nodeId+"."+row.id()+".tooltip",row.tooltip==null?"":row.tooltip);});
+        rows.forEach(row -> {row.label = NodeText.text(nodeId + "." + row.id(), row.label);row.tooltip=NodeText.text(nodeId+"."+row.id()+".tooltip",row.tooltip==null?"":row.tooltip);var slider=row.editor instanceof UnitSlider u?u.spec():row.editor instanceof Editor.Slider v?v:null;if(slider!=null||row.editor instanceof VectorEditor){String hint=com.vin.easyknack.ui.AppText.text(slider==null||slider.continuousChanges()?"control.tooltip.continuous":"control.tooltip.discrete");row.tooltip=row.tooltip==null||row.tooltip.isBlank()?hint:row.tooltip+"\n"+hint;}});
     }
     public List<GLNodePortDescriptor> ports() {
         return rows.stream().filter(r -> r.kind() != RowKind.EDITOR).map(r -> r.kind() == RowKind.OUTPUT
