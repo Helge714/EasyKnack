@@ -92,7 +92,7 @@ final class GroupSourceExporter {
         if(!result.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Cannot expand group: ")+result.diagnostics());
         var graph=materializeUnits(AutomaticRates.resolve(result.graph().orElseThrow()));
         com.vin.easyknack.audio.SampleFeedback.validate(graph);
-        var validationTypes=new GLNodeTypeRegistry();new NodeRegistry(validationTypes,new GLNodeCatalog());
+        var validationTypes=NodeRegistry.executionContracts().types();
         // Sentinel leaves deliberately have unbound inputs; only validate cycle timing here.
         if(GLNodeGraphValidator.validate(graph,validationTypes,GLGraphCyclePolicy.DELAYED_FEEDBACK).diagnostics().stream().anyMatch(d->d.code().equals("graph.cycle")))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Feedback requires a Delay in every cycle"));
         Map<GLNodeEndpoint,GLNodeEndpoint> sources=new HashMap<>();graph.connections().forEach(w->sources.put(w.input(),w.output()));

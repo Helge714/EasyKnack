@@ -238,7 +238,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         }
         std::string plan;std::getline(program,plan);
         state=std::make_shared<State>();state->gains.resize(maximum);
-        for(int i=0;i<maximum;i++){
+        for(int i=0;i<(parameterConfiguration?1:maximum);i++){
             auto instance=createInstance();instance->sources=sources;instance->configureGraph(plan,factory,inputNodes,outputNodes,{});
             for(const auto& policy:policies){
                 if(std::size_t(policy.first)>=instance->runtime->graph.nodes.size()||policy.second.size()!=instance->runtime->graph.nodes[policy.first].outputRates.size())throw std::runtime_error("Invalid instance rate policy target");
@@ -269,6 +269,26 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
             instance->planReduction();
             ProcessContext mono{};instance->resolveChannels(mono);
             state->instances.push_back(std::move(instance));
+        }
+    }
+    bool supportsLiveParameters()const noexcept override{return true;}
+    std::string parameterStructure()const override{
+        return std::to_string(maximum)+":"+std::to_string(explicitCombines)+":"+
+            (state&&!state->instances.empty()?state->instances[0]->parameterStructure():std::string{});
+    }
+    std::size_t parameterResourceSlots()const noexcept override{
+        std::size_t count=1;if(state)for(const auto& instance:state->instances)count+=instance->parameterResourceSlots();return count;
+    }
+    void applyLiveParameters(const NodeProcessor& configuration,ParameterRetirement& retired)noexcept override{
+        NodeProcessor::applyLiveParameters(configuration,retired);
+        const auto& incoming=static_cast<const MultipleGraphNode&>(configuration);
+        count=incoming.count;mean=incoming.mean;
+        if(primary&&state&&incoming.state&&!incoming.state->instances.empty()){
+            const auto& parameters=*incoming.state->instances[0];
+            for(auto& instance:state->instances){
+                instance->applyLiveParameters(parameters,retired);
+                if(!instance->runtime->inputs.empty())instance->setFallback(0,float(count));
+            }
         }
     }
     void prepare(double rate,std::size_t frames)override{

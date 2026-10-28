@@ -26,6 +26,14 @@ public final class WaveformSamples {
         for(int i=0;i<SIZE;i++)samples[i]=Float.intBitsToFloat(HexFormat.fromHexDigits(hex,i*8,i*8+8));
         validate(samples);return samples;
     }
+    private static final Map<String,String> ENCODED=new LinkedHashMap<>(32,.75f,true);
+    /** Validated immutable host samples; unchanged curves are not resampled on slider edits. */
+    public static synchronized String encodedValue(String value){
+        var cached=ENCODED.get(value);if(cached!=null)return cached;
+        String encoded=encode(fromValue(value));
+        if(ENCODED.size()>=32)ENCODED.remove(ENCODED.keySet().iterator().next());
+        ENCODED.put(value,encoded);return encoded;
+    }
     public static float[] fromValue(String value){
         if(value.startsWith(PREFIX))return decode(value.substring(PREFIX.length()));
         var curve=CurveData.decode(value);float[] result=new float[SIZE];

@@ -17,6 +17,19 @@ public final class NodeRegistry {
             throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Duplicate plugin node: ")+node.registration().id());
         DEFINITIONS=Collections.unmodifiableMap(next);
     }
+    /** Thread-confined execution contracts, invalidated whenever plugin definitions change. */
+    public record ExecutionContracts(GLNodeTypeRegistry types,NodeRegistry definitions){}
+    private record ExecutionCache(Map<String,BasicNode> generation,ExecutionContracts contracts){}
+    private static final ThreadLocal<ExecutionCache> EXECUTION=new ThreadLocal<>();
+    public static ExecutionContracts executionContracts(){
+        var generation=DEFINITIONS;var cached=EXECUTION.get();
+        if(cached==null||cached.generation()!=generation){
+            var types=new GLNodeTypeRegistry();
+            cached=new ExecutionCache(generation,new ExecutionContracts(types,new NodeRegistry(types,new GLNodeCatalog())));
+            EXECUTION.set(cached);
+        }
+        return cached.contracts();
+    }
     private final GLNodeTypeRegistry types;
     private final GLNodePropertySchemaRegistry schemas = new GLNodePropertySchemaRegistry();
     private final Map<String, String> defaultContracts = new HashMap<>();

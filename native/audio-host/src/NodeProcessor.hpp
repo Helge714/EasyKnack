@@ -65,6 +65,22 @@ struct ProcessContext {
     const float* inputOrSilence(std::size_t index) const noexcept { auto buffer = input(index); return buffer ? buffer : silence; }
 };
 
+// The control thread may parse a parameter snapshot without expanding instance counts.
+inline thread_local bool parameterConfiguration=false;
+struct ParameterConfigurationScope {
+    bool previous;
+    explicit ParameterConfigurationScope(bool enabled):previous(parameterConfiguration){parameterConfiguration=enabled||previous;}
+    ~ParameterConfigurationScope(){parameterConfiguration=previous;}
+};
+struct ParameterRetirement {
+    std::shared_ptr<const void>* slots;std::size_t capacity,used=0;
+    void keep(std::shared_ptr<const void> resource)noexcept{
+        // Capacity is computed from the published runtime, including voices and groups.
+        if(used>=capacity)std::terminate();
+        slots[used++]=std::move(resource);
+    }
+};
+
 /** Construct/configure on the control thread; process and inheritState on the audio thread. */
 struct NodeProcessor {
     // Opt in to zero-stride control inputs instead of temporary held buffers.
@@ -82,6 +98,11 @@ struct NodeProcessor {
     virtual ResourceKind outputResourceKind(std::size_t)const noexcept{return ResourceKind::none;}
     virtual DspResource* resourceOutput(std::size_t)noexcept{return nullptr;}
     virtual bool supportsLiveParameters() const noexcept { return false; }
+    virtual std::string parameterStructure()const{return {};}
+    virtual std::size_t parameterResourceSlots()const noexcept{return 1;}
+    virtual void applyLiveParameters(const NodeProcessor& configuration,ParameterRetirement& retired)noexcept{
+        retired.keep(takeParameterResource());applyParameters(configuration);
+    }
     // Validated configuration only; must retain state and perform no allocation.
     virtual void applyParameters(const NodeProcessor&) noexcept { }
     // Move the old immutable parameter resource to a control-thread retirement slot.

@@ -24,6 +24,8 @@ struct Node {
     std::string id;
     std::string processorId;
     std::string parameters;
+    std::shared_ptr<const std::string> liveParameters;
+    const std::string& parameterValues()const noexcept{return liveParameters?*liveParameters:parameters;}
     int voiceDomain=-1;
     std::vector<Node> additionalVoices;
     Node& voice(std::size_t i) noexcept {return i==0?*this:additionalVoices[i-1];}
@@ -210,6 +212,7 @@ struct AudioGraph {
 
     template<class Factory>
     static AudioGraph compile(const std::string& message, Factory createNodeProcessor, bool configurationOnly=false) {
+        ParameterConfigurationScope configurationScope(configurationOnly);
         std::istringstream in(message);
         std::string command;
         int count;
@@ -228,6 +231,7 @@ struct AudioGraph {
             if(!configurationOnly)node.processor->bindIdentity(node.id);
             auto parameterEnd = in.tellg();
             node.parameters=message.substr(static_cast<std::size_t>(parameterStart),static_cast<std::size_t>(parameterEnd-parameterStart));
+            node.liveParameters=std::make_shared<const std::string>(node.parameters);
             std::istringstream rightParameters(message.substr(static_cast<std::size_t>(parameterStart),
                     static_cast<std::size_t>(parameterEnd - parameterStart)));
             if(!configurationOnly){
@@ -381,9 +385,31 @@ struct AudioGraph {
                <<':'<<p.inputEndpoint()<<':'<<p.outputEndpoint()<<':'<<p.midiDevice();
             for(int source:p.sources)out<<','<<source;
             for(std::size_t i=0;i<p.outputCount();i++)out<<p.outputIsMidi(i);
+            out<<':'<<p.parameterStructure();
+            if(!p.supportsLiveParameters())out<<':'<<n.parameters;
             out<<';';
         }
         return out.str();
+    }
+
+    std::size_t parameterResourceSlots()const noexcept{
+        std::size_t count=nodes.size();for(const auto& n:nodes)for(std::size_t v=0;v<n.voiceCount();v++){
+            count+=n.voice(v).processor->parameterResourceSlots();
+            if(n.voice(v).rightProcessor)count+=n.voice(v).rightProcessor->parameterResourceSlots();
+        }return count;
+    }
+    void applyLiveParameters(const AudioGraph& configuration,ParameterRetirement& retired)noexcept{
+        for(std::size_t i=0;i<nodes.size();i++){
+            auto& node=nodes[i];const auto& incoming=configuration.nodes[i];
+            if(node.parameterValues()==incoming.parameterValues()||!incoming.processor->supportsLiveParameters())continue;
+            for(std::size_t v=0;v<node.voiceCount();v++){
+                auto& lane=node.voice(v);
+                lane.processor->applyLiveParameters(*incoming.processor,retired);
+                lane.rightProcessor->applyLiveParameters(*incoming.processor,retired);
+                lane.eventReady={};
+            }
+            retired.keep(node.liveParameters);node.liveParameters=incoming.liveParameters;
+        }
     }
 
     void adoptState(AudioGraph& old) noexcept {
@@ -406,7 +432,7 @@ struct AudioGraph {
         for (auto& node : nodes) for (const auto& previous : old.nodes)
             if (node.id == previous.id && node.processorId == previous.processorId) {
                 bool compatible=node.active&&previous.active&&node.eventRate&&previous.eventRate
-                    &&node.parameters==previous.parameters&&node.inputRates==previous.inputRates&&node.voiceCount()==previous.voiceCount();
+                    &&node.parameterValues()==previous.parameterValues()&&node.inputRates==previous.inputRates&&node.voiceCount()==previous.voiceCount();
                 if(compatible)for(int source:node.processor->sources)if(source>=0)
                     if(nodes[source%maxNodes].id!=old.nodes[source%maxNodes].id){compatible=false;break;}
                 if(compatible)for(std::size_t v=0;v<node.voiceCount();v++){
@@ -739,6 +765,7 @@ class AudioEngine {
     std::atomic<int> pendingParameters{-1};
     std::uint64_t publishedGeneration=0, activeGeneration=0;
     std::string publishedShape;
+    std::size_t publishedResourceSlots=0;
     std::vector<std::string> structuralParameters;
     std::array<std::uint64_t,3> graphGenerations{};
     float envelope = 0;
@@ -762,11 +789,11 @@ public:
             if(destination<0)std::this_thread::yield();
         }
         auto& slot=parameterSlots[destination];slot.configuration=std::move(configuration);slot.generation=publishedGeneration;
-        slot.retired.clear();slot.retired.resize((2048+maxNodes)*2);
+        slot.retired.clear();slot.retired.resize(publishedResourceSlots);
         pendingParameters.store(destination);return true;
     }
     void publish(AudioGraph graph) {
-        publishedShape=graph.parameterShape();structuralParameters.clear();
+        publishedShape=graph.parameterShape();publishedResourceSlots=graph.parameterResourceSlots();structuralParameters.clear();
         for(const auto& node:graph.nodes)structuralParameters.push_back(node.parameters);
         ++publishedGeneration;
         // Reclaim an unconsumed update first. During inheritState(), the audio
@@ -807,20 +834,9 @@ public:
             if(patch>=0){
                 auto& update=parameterSlots[patch];
                 if(active>=0 && update.generation==activeGeneration) {
-                    auto& graph=slots[active].graph;std::size_t retired=0;
-                    for(std::size_t i=0;i<graph.nodes.size();i++) {
-                        auto& node=graph.nodes[i];auto& configuration=update.configuration.nodes[i];auto& p=*configuration.processor;
-                        if(node.parameters==configuration.parameters)continue;
-                        if(p.supportsLiveParameters()) for(std::size_t v=0;v<node.voiceCount();v++) {
-                            auto& lane=node.voice(v);
-                            update.retired[retired++]=lane.processor->takeParameterResource();
-                            update.retired[retired++]=lane.rightProcessor->takeParameterResource();
-                            lane.processor->applyParameters(p);lane.rightProcessor->applyParameters(p);
-                            // Parameter edits must wake event-only expressions at block start.
-                            lane.eventReady={};
-                        }
-                        if(p.supportsLiveParameters())node.parameters.swap(configuration.parameters);
-                    }
+                    auto& graph=slots[active].graph;
+                    ParameterRetirement retired{update.retired.data(),update.retired.size()};
+                    graph.applyLiveParameters(update.configuration,retired);
                 }
                 update.busy.store(false);
             }

@@ -161,6 +161,23 @@ struct BakedGraphProcessor : NodeProcessor {
             for(std::size_t i=0;i<runtime->inputs.size();++i)
                 setFallback(i,static_cast<const BakedInput&>(*p.runtime->graph.nodes[p.runtime->inputs[i]].processor).fallback);
     }
+    std::string parameterStructure()const override{
+        if(!runtime)return {};
+        std::ostringstream out;out<<runtime->graph.parameterShape()<<" inputs";
+        for(int input:runtime->inputs)out<<','<<input;
+        out<<" outputs";for(int output:runtime->outputs)out<<','<<output;
+        out<<" policies";for(const auto& policy:runtime->outputPolicies)out<<','<<policy;
+        return out.str();
+    }
+    std::size_t parameterResourceSlots()const noexcept override{
+        return 1+(runtime?runtime->graph.parameterResourceSlots():0);
+    }
+    void applyLiveParameters(const NodeProcessor& configuration,ParameterRetirement& retired)noexcept override{
+        NodeProcessor::applyLiveParameters(configuration,retired);
+        const auto& incoming=static_cast<const BakedGraphProcessor&>(configuration);
+        if(primaryChannel&&(voiceIndex==0||voices()==1)&&runtime&&incoming.runtime)
+            runtime->graph.applyLiveParameters(incoming.runtime->graph,retired);
+    }
     void prepare(double rate,std::size_t frames) override {
         if(primaryChannel&&(voiceIndex==0||voices()==1)&&runtime)runtime->graph.prepare(rate,frames);
         sampleKernelsPrepared=true;

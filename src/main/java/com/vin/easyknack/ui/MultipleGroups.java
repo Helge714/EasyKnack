@@ -77,7 +77,7 @@ final class MultipleGroups {
         var flat=SpectralGroups.flatten(new GroupCompiler.Prepared(root,nestedRegistry),limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid Multiple Group: ")+flat.diagnostics());
         var source=flat.graph().orElseThrow();
         for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported node inside Multiple Group: ")+n.typeId());
-        var types=new GLNodeTypeRegistry();var definitions=new NodeRegistry(types,new GLNodeCatalog());
+        var contracts=NodeRegistry.executionContracts();var types=contracts.types();var definitions=contracts.definitions();
         source=com.vingame.glswing.node.execution.GLMutedGraphResolver.resolve(definitions.normalize(source),types);
         // An empty public boundary has no runtime consumer. Do not schedule orphaned
         // instance processors (including Combine sinks) behind disconnected outputs.

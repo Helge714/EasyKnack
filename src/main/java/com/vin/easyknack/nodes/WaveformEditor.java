@@ -26,7 +26,7 @@ public final class WaveformEditor implements Editor {
     }
 
     public GLNodeValue defaultValue(){return GLNodeValue.of(CurveData.encode(sine()));}
-    public void validate(GLNodeValue value){WaveformSamples.fromValue((String)value.toJavaValue());}
+    public void validate(GLNodeValue value){WaveformSamples.encodedValue((String)value.toJavaValue());}
     public Control create(String label,Consumer<GLNodeValue> changed){
         var editor=new WavetableCanvas();editor.onValue(v->changed.accept(GLNodeValue.of(v)));editor.setAxes(Double.NaN,.5);editor.setCurve(sine());editor.setResetCurve(sine());
         var previous=new GLFunctionCurve[]{sine()};

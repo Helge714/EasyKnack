@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Apply live parameter changes recursively inside Instance Groups and exported/baked graphs without rebuilding their runtime, resetting oscillator phases or regenerating unchanged Wavetables. Parse one instance template per update, share immutable Wavetables and reuse Java execution contracts. Structural edits still require preparation. Rebuild the host, SDK and source plugins together; document and wire-protocol versions are unchanged. Covered by the current development version.
+
 - Accept large graphs with embedded Wavetables through buffered host command reads (up to 64 MiB). Oversized commands are rejected without terminating the host or losing command framing. The current development version covers this fix; the protocol version is unchanged.
 
 - Support Wavetable nodes and typed external Wavetable inputs in Instance Groups, including shared processing, Bake and source export. Rebuild the audio host and plugin SDK together; existing document and protocol versions are unchanged. Covered by the current development version.

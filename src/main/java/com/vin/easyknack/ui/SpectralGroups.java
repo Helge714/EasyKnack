@@ -170,8 +170,8 @@ final class SpectralGroups {
     }
     private static GLNodeGraphSnapshot resolveMutes(GLNodeGraphSnapshot graph){
         if(graph.nodes().stream().noneMatch(GLNodeState::isMuted))return graph;
-        var types=new GLNodeTypeRegistry();
-        var definitions=new NodeRegistry(types,new GLNodeCatalog());
+        var contracts=NodeRegistry.executionContracts();var types=contracts.types();
+        var definitions=contracts.definitions();
         var eligible=new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),graph.nodes().stream()
             .map(n->NodeRegistry.require(n.typeId()).isMuteable()?n:n.withoutProperty(GLNodeState.MUTED)).toList(),graph.connections());
         // Resolve after flattening so bypasses can cross nested group boundaries,
