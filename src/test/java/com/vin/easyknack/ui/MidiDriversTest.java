@@ -10,6 +10,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MidiDriversTest {
+    @Test void inspectorIndicatorsExistImmediatelyAfterEverySelection()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var d=new ValueNode();var id=GLNodeId.random();c.workspace().currentGraph().edit("Value",e->e.addNode(new GLGraphNode(id,d.registration().id(),d.defaults())));
+            var drivers=MidiDrivers.of(c);drivers.assign(new MidiDrivers.Address("",id,"value"),binding(true));
+            var view=c.workspace().editor().getNodes().stream().filter(n->n instanceof BasicNodeView b&&b.nodeId().equals(id)).findFirst().orElseThrow();
+            for(int i=0;i<4;i++){
+                c.workspace().editor().setSelectedNode(view);c.workspace().propertyInspector().refresh();
+                var editor=findInspector(c.workspace().propertyInspector());
+                assertTrue(((GLControl)editor.control()).hasDriverIndicator());
+                c.workspace().editor().setSelectedNodes(List.of());
+            }
+        }});
+    }
+    private static com.vin.easyknack.nodes.InspectorEditor findInspector(com.vingame.glswing.component.GLContainer c){
+        if(c instanceof com.vin.easyknack.nodes.InspectorEditor e&&"value".equals(e.getName()))return e;
+        for(var child:c.getGLChildren()){var found=findInspector(child);if(found!=null)return found;}return null;
+    }
     static MidiDriverBinding binding(boolean cc){return new MidiDriverBinding("1","Computer keyboard",0,7,cc,new GLDriverMapping(0,1,false,false,false),false,64);}
     static void send(MidiDrivers drivers,int... messages){MidiDriverInput.publish(Arrays.stream(messages).mapToObj(m->new MidiDriverInput.Event("1",m)).toList());drivers.flush();}
     static int cc(int value){return 0xb0|7<<8|value<<16;}

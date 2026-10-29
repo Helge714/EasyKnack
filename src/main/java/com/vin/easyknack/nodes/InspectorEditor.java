@@ -11,8 +11,9 @@ public final class InspectorEditor extends GLContainer {
     private final BasicNode definition;
     private final GLLabel label;
     private boolean synchronizing;
+    private final GLNodeId nodeId;
     private InspectorEditor(NodeBuilder.Row row,BasicNode definition,GLGraphNode model,java.util.function.Consumer<GLNodeValue> changed){
-        this.row=row;this.definition=definition;
+        this.row=row;this.definition=definition;this.nodeId=model.id();
         row=definition.layout(new NodeState(model.properties())).rows().stream().filter(r->r.id().equals(this.row.id())).findFirst().orElse(row);
         editor=row.editor().create(row.label(),value->{if(!synchronizing)changed.accept(value);});
         if(editor.component() instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->{
@@ -31,6 +32,10 @@ public final class InspectorEditor extends GLContainer {
         if(row.isDriverAssignable())com.vin.easyknack.ui.MidiDrivers.attachInspector(model.id(),row.id(),editor.component());
         update(model);
         setPreferredGLSize(180,(label==null?0:24)+Math.max(30,editor.component().getPreferredGLSize().height()));
+    }
+    @Override protected void attached(com.vingame.glswing.component.GLParent parent){
+        super.attached(parent);
+        if(row.isDriverAssignable())com.vin.easyknack.ui.MidiDrivers.attachInspectorNow(nodeId,row.id(),editor.component());
     }
     public GLContainer control(){return editor.component();}
     private void update(GLGraphNode model){

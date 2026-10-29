@@ -38,10 +38,11 @@ public final class MidiDrivers implements AutoCloseable {
     }
     public static void attachInspector(GLNodeId node,String property,GLContainer component){
         java.awt.EventQueue.invokeLater(()->{
-            for(var owner:List.copyOf(owners.values()))if(!owner.closed&&inside(component,owner.owner.workspace())&&owner.owner.workspace().currentGraph().snapshot().findNode(node).isPresent()){
-                owner.attach(node,property,component);break;
-            }
+            attachInspectorNow(node,property,component);
         });
+    }
+    public static void attachInspectorNow(GLNodeId node,String property,GLContainer component){
+        for(var owner:List.copyOf(owners.values()))if(!owner.closed&&inside(component,owner.owner.workspace().propertyInspector())&&owner.owner.workspace().currentGraph().snapshot().findNode(node).isPresent()){owner.attach(node,property,component);break;}
     }
     private static boolean inside(GLContainer component,GLContainer root){for(var current=component;current!=null;current=current.getGLParent() instanceof GLContainer parent?parent:null)if(current==root)return true;return false;}
     private void attach(GLNodeId node,String property,GLContainer component){
