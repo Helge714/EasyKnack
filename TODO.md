@@ -23,7 +23,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Next technical work
 
-- [ ] Investigate the optional native all-contract sweep `SourceExportAndAnalysisTest.hostAcceptsEveryContractAndPublishesLiveAnalysis`: it currently rejects a processor with "processor does not support event rate". Identify the processor and audit its execution-domain/rate annotations; do not change DSP semantics merely to satisfy the sweep. Focused Complex Oscillator tests are separate.
+- [x] Audit the optional native contract sweep: Frame Trigger requires spectral
+  frame context. Validate all temporal contracts separately, reject bin-only nodes
+  before host submission, and verify frame triggers in native spectral execution.
 
 - [ ] Generate shared instance-processor capability declarations instead of keeping
   separate Java supported-node IDs and a native factory whitelist. Cover live
@@ -67,7 +69,7 @@ rate semantics or to resume kernel-driver installation.
 ## Latest validation (29 October 2026)
 
 - Core: full Maven test/install, 132 tests, no failures/errors, one optional skip.
-- EasyKnack: full Maven package, 589 tests, no failures/errors, 154 optional tests
+- EasyKnack: full Maven package, 590 tests, no failures/errors, 154 optional tests
   skipped in the regular profile. Selected native checks were run separately.
 - Additional native checks passed for Step Switch sample/trigger/index behavior,
   all-partial power stretching and legacy cent-contract conversion, generated Instance kernels, spectral hold/memory/formulas,

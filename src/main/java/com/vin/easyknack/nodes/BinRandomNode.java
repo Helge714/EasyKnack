@@ -2,6 +2,7 @@ package com.vin.easyknack.nodes;
 
 @RegisterNode(id="easyknack.spectral.binrandom",title="Bin Random",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
 public final class BinRandomNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     public static final PropertyId OUT=new PropertyId("out"),SEED=new PropertyId("seed"),MODE=new PropertyId("mode");
     public static final PropertyId BY_BIN=new PropertyId("by-bin"),BY_FRAME=new PropertyId("by-frame");
     @Override public java.util.Map<String,com.vingame.glswing.node.model.GLNodeValue> defaults(){

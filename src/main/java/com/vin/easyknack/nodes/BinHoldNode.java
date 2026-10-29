@@ -2,6 +2,7 @@ package com.vin.easyknack.nodes;
 
 @RegisterNode(id="easyknack.spectral.binhold",title="Bin Sample & Hold",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
 public final class BinHoldNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     public static final PropertyId IN=new PropertyId("in"),TRIGGER=new PropertyId("trigger"),OUT=new PropertyId("out");
     @Override public boolean supportsSpectralBins(){return true;}
     public void define(NodeBuilder n,NodeState s){

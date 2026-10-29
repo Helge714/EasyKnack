@@ -152,6 +152,10 @@ are not a synchronization mechanism.
 
 ## Spectrum and analysis nodes
 
+Bin nodes run inside a Spectral Group. They process FFT frames rather than
+standalone audio blocks; connect external values and triggers through the group's
+inputs. Numeric nodes such as Math can be used both inside and outside the group.
+
 | Node | Purpose and main controls |
 |---|---|
 | FFT | Convert audio windows into complex spectra. Size, window, overlap, channel and synchronous mode determine the analysis. |

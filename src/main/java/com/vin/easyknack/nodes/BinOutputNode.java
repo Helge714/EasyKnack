@@ -1,6 +1,7 @@
 package com.vin.easyknack.nodes;
 @RegisterNode(id="easyknack.spectral.binoutput",title="Bin Output",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
 public final class BinOutputNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     @Override public boolean supportsSpectralBins() { return true; }
     public static final PropertyId A=new PropertyId("a"),B=new PropertyId("b"),MODE=new PropertyId("mode"),OUT=new PropertyId("spectrum");
     public boolean isListedInCatalog(){return false;}

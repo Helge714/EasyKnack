@@ -41,17 +41,15 @@ class SourceExportAndAnalysisTest {
         assertTrue(generated.contains(NativeContractGenerator.fingerprint(d)));
     }
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
-    void hostAcceptsEveryContractAndPublishesLiveAnalysis()throws Exception{
+    void hostAcceptsTemporalContractsAndPublishesLiveAnalysis()throws Exception{
         try(var host=new com.vin.easyknack.audio.AudioHostClient()){
             host.start(com.vin.easyknack.audio.AudioHostClient.defaultExecutable(),true);
             for(var definition:NodeRegistry.definitionsList()){
                 var graph=new GLNodeGraph();graph.edit("Contract",e->e.addNode(new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults())));
-                if(definition instanceof BinContextNode||definition instanceof BinReadNode||definition instanceof BinOutputNode){
-                    assertThrows(IllegalArgumentException.class,()->com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()));
-                    var inputs=definition.processor().inputs();
-                    String command="GRAPH 1 contract "+definition.processor().id()+" !"+NativeContractGenerator.fingerprint(definition)+" "+definition.encode(new NodeState(definition.defaults()),p->-1)+" @ a "+(inputs.isEmpty()?"-":"c".repeat(inputs.size()));
-                    assertEquals("OK",host.command(command),definition.title());
-                }else assertEquals("OK",host.command(com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot())),definition.title());
+                if(definition.requiresSpectralContext()){
+                    var failure=assertThrows(IllegalArgumentException.class,()->com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()),definition.registration().id());
+                    assertTrue(failure.getMessage().contains(definition.title()));
+                }else assertEquals("OK",assertDoesNotThrow(()->host.command(com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot())),definition.registration().id()),definition.title());
             }
             var graph=new GLNodeGraph();var osc=new OscillatorNode();var correlation=new AutocorrelationNode();var scope=new OscilloscopeNode();
             var a=GLNodeId.random();var b=GLNodeId.random();var c=GLNodeId.random();

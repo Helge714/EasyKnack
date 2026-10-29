@@ -2,6 +2,7 @@ package com.vin.easyknack.nodes;
 /** Compiler bridge: collect external triggers between successive FFT frame ends. */
 @RegisterNode(id="easyknack.spectral.trigger",title="Frame Trigger",category=NodeCategory.SPECTRAL,kind=NodeKind.TRIGGER)
 public final class BinTriggerNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     public boolean supportsSpectralBins(){return true;}
     public boolean isListedInCatalog(){return false;}
     public void define(NodeBuilder n,NodeState s){

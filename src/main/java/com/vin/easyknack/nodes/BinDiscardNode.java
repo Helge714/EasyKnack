@@ -2,6 +2,7 @@ package com.vin.easyknack.nodes;
 
 @RegisterNode(id="easyknack.spectral.bindiscard",title="Bin Discard",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
 public final class BinDiscardNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     public static final PropertyId DISCARD=new PropertyId("discard");
     @Override public boolean supportsSpectralBins(){return true;}
     @Override public boolean isMuteable(){return false;}

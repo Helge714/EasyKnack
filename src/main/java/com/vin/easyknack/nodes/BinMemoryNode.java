@@ -1,6 +1,7 @@
 package com.vin.easyknack.nodes;
 @RegisterNode(id="easyknack.spectral.binmemory",title="Bin Smoothing",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
 public final class BinMemoryNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     public static final PropertyId IN=new PropertyId("in"),UPDATE=new PropertyId("update"),OUT=new PropertyId("out");
     public boolean supportsSpectralBins(){return true;}
     public void define(NodeBuilder n,NodeState s){

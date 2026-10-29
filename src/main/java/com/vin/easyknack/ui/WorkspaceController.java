@@ -727,6 +727,7 @@ final class WorkspaceController implements AutoCloseable {
     private boolean nodeAllowedInContext(com.vingame.glswing.node.model.GLNodeCatalogEntry entry){
         if(workspace.currentAssetId()!=null&&composites.findAsset(workspace.currentAssetId()).map(FormulaGroups::isFormula).orElse(false))return false;
         var definition=NodeRegistry.find(entry.type().id()).orElse(null);
+        if(definition!=null&&definition.requiresSpectralContext()&&!isSpectralContext())return false;
         if(isMultipleContext()&&!isSpectralContext())return entry.type().id().equals(FormulaGroups.CREATE)||entry.type().id().equals(SpectralGroups.CREATE_TYPE)||entry.type().id().equals(MultipleGroups.CREATE_TYPE)||MultipleGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).isPresent();
         if(isSpectralContext()){
             if(entry.type().id().equals(FormulaGroups.CREATE)||composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(FormulaGroups::isFormula).orElse(false))return true; if(!SpectralGroups.supports(definition))return false;
@@ -735,7 +736,7 @@ final class WorkspaceController implements AutoCloseable {
                 return workspace.currentGraph().snapshot().nodes().stream().noneMatch(n->NodeRegistry.find(n.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.BinOutputNode);
             return true;
         }
-        return !(definition instanceof com.vin.easyknack.nodes.BinMemoryNode||definition instanceof com.vin.easyknack.nodes.BinHoldNode||definition instanceof com.vin.easyknack.nodes.BinDiscardNode||definition instanceof com.vin.easyknack.nodes.InstanceCombineNode||definition instanceof com.vin.easyknack.nodes.InstanceContextNode||definition instanceof com.vin.easyknack.nodes.BinContextNode||definition instanceof com.vin.easyknack.nodes.BinOutputNode||definition instanceof com.vin.easyknack.nodes.BinReadNode||definition instanceof com.vin.easyknack.nodes.BinRandomNode);
+        return !(definition instanceof com.vin.easyknack.nodes.InstanceCombineNode||definition instanceof com.vin.easyknack.nodes.InstanceContextNode);
     }
     List<com.vingame.glswing.node.model.GLNodeCatalogEntry> availableNodes(){return catalog.entries().stream().filter(workspace::isNodeCreationAllowed).toList();}
     void addFormulaGroup(float x,float y){

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Validate bin-only processors against their required Spectral Group context before sending graphs to the host. Keep ordinary temporal contracts and FFT-frame trigger execution separate in regression tests. Existing DSP behavior, native contracts and protocol versions are unchanged; covered by the current development version.
+
 - Add an editable Test column after the Measurement Recorder index. Store labels per row in the document, preserve them during capture and column reordering, and include a `test` column after `measurement` in CSV exports. Label Undo retains later automatic captures. Existing tables start with blank labels; host protocol and document schema are unchanged. Covered by the current development version.
 
 - Add independently switchable buffered control interpolation (50 ms default) and finite movement-edge rounding (5 ms default), saved per document with driver overrides. Buffering replaces adaptive ramp latency; rounding preserves endpoints and linear interiors. Existing documents adopt these defaults when the new fields are absent. Host protocol advances to 13: rebuild Java, host and plugin SDK together. Product version remains covered by the current development baseline.

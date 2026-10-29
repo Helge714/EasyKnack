@@ -1,6 +1,7 @@
 package com.vin.easyknack.nodes;
 @RegisterNode(id="easyknack.spectral.binread",title="Bin Reader",category=NodeCategory.SPECTRAL,kind=NodeKind.ANALYSIS)
 public final class BinReadNode extends BasicNode {
+    @Override public boolean requiresSpectralContext(){return true;}
     @Override public boolean supportsSpectralBins() { return true; }
     public static final String EXPLICIT="easyknack.bin.explicit-spectrum";
     @Override public java.util.Map<String,com.vingame.glswing.node.model.GLNodeValue> defaults(){var values=new java.util.HashMap<>(super.defaults());values.put(EXPLICIT,com.vingame.glswing.node.model.GLNodeValue.of(true));return java.util.Map.copyOf(values);}

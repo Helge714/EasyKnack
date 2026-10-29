@@ -5,6 +5,18 @@ import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 import com.vin.easyknack.nodes.*;
 class SpectralPaletteTest {
+    @Test void frameOnlyProcessorsCannotBeEncodedAsTemporalNodes(){
+        for(var definition:List.of(new BinContextNode(),new BinReadNode(),new BinOutputNode(),new BinRandomNode(),new BinDiscardNode(),new BinHoldNode(),new BinMemoryNode(),new BinUniformNode(),new BinTriggerNode())){
+            assertTrue(definition.requiresSpectralContext(),definition.title());
+            var graph=new com.vingame.glswing.node.model.GLNodeGraph();
+            graph.edit("Frame-only node",e->e.addNode(new com.vingame.glswing.node.model.GLGraphNode(com.vingame.glswing.node.model.GLNodeId.random(),definition.registration().id(),definition.defaults())));
+            var failure=assertThrows(IllegalArgumentException.class,()->com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()));
+            assertTrue(failure.getMessage().contains(definition.title()));
+        }
+        assertFalse(new MathNode().requiresSpectralContext());assertTrue(new MathNode().supportsSpectralBins());
+        assertFalse(new SpectralGraphNode().requiresSpectralContext());
+    }
+
     @Test void popupPolicyAndCreationFollowTheCurrentGroup()throws Exception{
         SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
             var normal=c.availableNodes();

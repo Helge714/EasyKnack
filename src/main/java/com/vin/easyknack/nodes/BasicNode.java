@@ -33,6 +33,8 @@ public abstract class BasicNode {
     public boolean supportsTriggerFeedback() { return false; }
     /** Opt in for bin-independent scalar evaluation; no temporal state or smoothing across bins. */
     public boolean supportsSpectralBins() { return false; }
+    /** Requires FFT-bin context; unlike reusable numeric kernels, cannot run in the temporal graph. */
+    public boolean requiresSpectralContext() { return false; }
     /** Auto scheduling can be derived from an exported internal plan instead of all inputs equally. */
     public ProcessingRate resolveAutomaticRate(NodeState state,Map<PropertyId,ProcessingRate> inputs) {
         return inputs.values().stream().filter(rate->rate!=ProcessingRate.EVENT).reduce(ProcessingRate.CONTROL,ProcessingRate::maximum);

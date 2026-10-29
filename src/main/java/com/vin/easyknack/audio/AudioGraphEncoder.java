@@ -18,8 +18,9 @@ public final class AudioGraphEncoder {
         Map<GLNodeId, java.util.List<GLNodePortDescriptor>> ports = new HashMap<>();
         for (int i = 0; i < graph.nodes().size(); i++) {
             var node = graph.nodes().get(i);
-            if (java.util.Set.of("easyknack.spectral.binread", "easyknack.spectral.bincontext", "easyknack.spectral.binoutput").contains(node.typeId()))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Bin nodes belong inside a Spectral Group (Nodes > Add spectral group)."));
+            var definition=com.vin.easyknack.nodes.NodeRegistry.require(node.typeId());
+            if(definition.requiresSpectralContext())
+                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.format("spectral.contextRequired",definition.title(),node.id()));
             indices.put(node.id(), i);
             ports.put(node.id(), com.vin.easyknack.nodes.NodeRegistry.require(node.typeId())
                     .layout(new com.vin.easyknack.nodes.NodeState(node.properties())).ports());
