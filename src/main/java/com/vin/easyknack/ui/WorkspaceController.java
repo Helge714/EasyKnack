@@ -15,6 +15,7 @@ import com.vingame.glswing.node.composite.GLCompositeGraphFlattener;
 import com.vingame.glswing.node.composite.GLCompositeForwarding;
 import com.vingame.glswing.node.composite.GLCompositeExpansionLimits;
 import com.vingame.glswing.node.document.GLNodeGraphAsset;
+import com.vingame.glswing.node.document.GLNodeGraphDocument;
 import com.vingame.glswing.node.document.GLNodeGraphAssetKind;
 import com.vingame.glswing.node.execution.GLMutedGraphResolver;
 import com.vingame.glswing.node.model.GLNodeGraphSnapshot;
@@ -426,7 +427,18 @@ final class WorkspaceController implements AutoCloseable {
                         metadata.text("easyknack.title", "Audio Group"), com.vin.easyknack.nodes.NodeCategory.catalogPath(metadata.text("easyknack.category", "Audio / Groups")), Map.of(), "group"));
             }
         }
-        for (var asset : NodeDocuments.assets(document)) asset.graph().nodes().forEach(nodes::normalize);
+        // Materialize the oscillator's one-time semantic migration before editors
+        // read values or a later user edit could be mistaken for legacy cents.
+        var migratedRoot=document.root();var migratedAssets=new java.util.LinkedHashMap<>(document.embeddedAssets());
+        for(var asset:NodeDocuments.assets(document)){
+            var migrated=asset.graph().nodes().stream().map(node->{var normalized=nodes.normalize(node);
+                return NodeRegistry.find(node.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.AdditiveOscillatorNode?normalized:node;}).toList();
+            if(migrated.equals(asset.graph().nodes()))continue;
+            var snapshot=new GLNodeGraphSnapshot(asset.graph().graphId(),asset.graph().revision(),migrated,asset.graph().connections());
+            var replacement=new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),snapshot,asset.viewState(),asset.metadata(),asset.compositeDescriptor());
+            if(asset.id().equals(document.root().id()))migratedRoot=replacement;else if(migratedAssets.containsKey(asset.id()))migratedAssets.put(asset.id(),replacement);
+        }
+        document=new GLNodeGraphDocument(migratedRoot,migratedAssets,document.externalAssets());
         workspace.openDocument(title, document);
         graph = workspace.currentGraph();
         if(measurementRecorders!=null)measurementRecorders.documentChanged();

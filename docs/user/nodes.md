@@ -44,7 +44,7 @@ internal unit conversions. File-position sliders have duration-relative conversi
 | Trigger Input | Manually emit a trigger and distribute it to multiple destinations. |
 | Context Input | Supply context values such as channel position; use these to make channel-dependent processing explicit. |
 | Oscillator | Waveform, Frequency, Phase and Reset control a waveform generator. Phase offsets the cycle; Reset restarts it. |
-| Additive Oscillator | Generate partials of the chosen waveform. Partials, Falloff and Spread shape the result; frequency and phase control the bank. |
+| Additive Oscillator | Generate partials of the chosen waveform. Partials, Falloff and power-law [Stretch](complex-oscillator.md) shape the result; frequency and phase control the bank. |
 | Noise | Generate noise with a configurable seed. Use channel/instance context for independent sequences where needed. |
 | Digital Noise | Produce a random cycle-based factor, a trigger and the resulting Frequency. Strength 0 removes variation; Frequency can drive an oscillator directly. |
 | Clock | Produce regular triggers; frequency units include Hz and BPM. |

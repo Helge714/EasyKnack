@@ -55,21 +55,21 @@ class UnitsAndMixTest {
     @Test void inspectorFormatAndConnectedPortLabelTrackUnitWithoutChangingStoredValue() throws Exception {
         SwingUtilities.invokeAndWait(()->{
             try(var controller=new WorkspaceController()){
-                var ws=controller.workspace();var graph=ws.currentGraph();var def=new AdditiveOscillatorNode();var value=new ValueNode();
-                var id=GLNodeId.random();var source=GLNodeId.random();var props=new HashMap<>(def.defaults());props.put("spread",GLNodeValue.of(1200));
+                var ws=controller.workspace();var graph=ws.currentGraph();var def=new OscillatorNode();var value=new ValueNode();
+                var id=GLNodeId.random();var source=GLNodeId.random();var props=new HashMap<>(def.defaults());props.put("frequency",GLNodeValue.of(440));
                 graph.edit("Add",e->{e.addNode(new GLGraphNode(id,def.registration().id(),props));e.addNode(new GLGraphNode(source,value.registration().id(),value.defaults()));});
-                graph.edit("Units",e->e.setProperty(id,"spread.unit",GLNodeValue.of("factor")));
+                graph.edit("Units",e->e.setProperty(id,"frequency.unit",GLNodeValue.of("khz")));
                 var view=ws.editor().getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();
                 ws.editor().setSelectedNode(view);
-                var slider=view.getContents().stream().filter(c->c instanceof GLSlider s&&s.getText().equals("Spread")).map(GLSlider.class::cast).findFirst().orElseThrow();
-                assertEquals(2,slider.getValue(),1e-10);assertEquals("Spread [×]",slider.getName());
-                var inspector=ws.propertyInspector().getGLChildren().stream().filter(c->c instanceof GLSlider s&&s.getText().equals("Spread")).map(GLSlider.class::cast).findFirst().orElseThrow();
+                var slider=view.getContents().stream().filter(c->c instanceof GLSlider s&&s.getText().equals("Frequency")).map(GLSlider.class::cast).findFirst().orElseThrow();
+                assertEquals(.44,slider.getValue(),1e-10);assertEquals("Frequency [kHz]",slider.getName());
+                var inspector=ws.propertyInspector().getGLChildren().stream().filter(c->c instanceof GLSlider s&&s.getText().equals("Frequency")).map(GLSlider.class::cast).findFirst().orElseThrow();
                 assertEquals(slider.getPresentation(),inspector.getPresentation());assertEquals(slider.getUnit(),inspector.getUnit());
                 inspector.setValue(.5);
-                assertEquals(-1200,new NodeState(graph.snapshot().findNode(id).orElseThrow().properties()).number(AdditiveOscillatorNode.SPREAD,0),1e-8);
-                graph.edit("Connect",e->e.addConnection(new GLGraphConnection(GLNodeConnectionId.random(),new GLNodeEndpoint(source,ValueNode.OUT.value()),new GLNodeEndpoint(id,"spread"))));
-                String encoded=AudioGraphEncoder.encode(graph.snapshot());assertTrue(encoded.contains("unitconvert"));assertTrue(encoded.contains("factor cent @ c c"));
-                assertEquals(1,view.findPort("spread").getConnectionCount());
+                assertEquals(500,new NodeState(graph.snapshot().findNode(id).orElseThrow().properties()).number(OscillatorNode.FREQUENCY,0),1e-8);
+                graph.edit("Connect",e->e.addConnection(new GLGraphConnection(GLNodeConnectionId.random(),new GLNodeEndpoint(source,ValueNode.OUT.value()),new GLNodeEndpoint(id,"frequency"))));
+                String encoded=AudioGraphEncoder.encode(graph.snapshot());assertTrue(encoded.contains("unitconvert"));assertTrue(encoded.contains("khz hz @ c c"));
+                assertEquals(1,view.findPort("frequency").getConnectionCount());
             }
         });
     }

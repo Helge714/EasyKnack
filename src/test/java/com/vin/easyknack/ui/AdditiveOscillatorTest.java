@@ -22,7 +22,7 @@ class AdditiveOscillatorTest {
                 var editor = controller.workspace().editor();
                 var view = editor.getNodes().stream().filter(n -> AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();
                 var falloff = view.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Falloff")).findFirst().orElseThrow();
-                var spread = view.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Spread")).findFirst().orElseThrow();
+                var spread = view.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Stretch")).findFirst().orElseThrow();
                 assertFalse(falloff.isVisible()); assertFalse(spread.isVisible());
                 var connection = new GLGraphConnection(GLNodeConnectionId.random(), new GLNodeEndpoint(source, ValueNode.OUT.value()), new GLNodeEndpoint(id, AdditiveOscillatorNode.HARMONICS.value()));
                 controller.history().perform("Connect partials",
@@ -32,10 +32,10 @@ class AdditiveOscillatorTest {
                 controller.history().undo();
                 var restored = editor.getNodes().stream().filter(n -> AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();
                 assertEquals(0, restored.findPort("harmonics").getConnectionCount());
-                assertFalse(restored.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Falloff") || s.getText().equals("Spread")).anyMatch(s -> s.isVisible()));
+                assertFalse(restored.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Falloff") || s.getText().equals("Stretch")).anyMatch(s -> s.isVisible()));
                 controller.history().redo();
                 restored = editor.getNodes().stream().filter(n -> AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();
-                assertTrue(restored.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Falloff") || s.getText().equals("Spread")).allMatch(s -> s.isVisible()));
+                assertTrue(restored.getContents().stream().filter(GLSlider.class::isInstance).map(GLSlider.class::cast).filter(s -> s.getText().equals("Falloff") || s.getText().equals("Stretch")).allMatch(s -> s.isVisible()));
             }
         });
     }
@@ -80,7 +80,7 @@ class AdditiveOscillatorTest {
                     .filter(p -> p.id().equals("waveform")).findFirst().orElseThrow().valueTypeId());
         }
         var additive = new AdditiveOscillatorNode();
-        values = new HashMap<>(additive.defaults()); values.put("spread", GLNodeValue.of(-100));
+        values = new HashMap<>(additive.defaults()); values.put("spread", GLNodeValue.of(.7));
         var rows = additive.layout(new NodeState(values)).rows();
         assertEquals(NodeBuilder.RowKind.OUTPUT, rows.get(0).kind());
         assertEquals("waveform", rows.stream().filter(r -> r.kind() == NodeBuilder.RowKind.INPUT).findFirst().orElseThrow().id());
@@ -91,9 +91,31 @@ class AdditiveOscillatorTest {
             assertEquals(id.equals("harmonics"), (row.editor() instanceof com.vin.easyknack.nodes.UnitSlider unit ? unit.spec() : (Editor.Slider)row.editor()).bar());
         }
     }
+    @Test void loadedLegacyStretchIsConvertedBeforeItsFirstEdit()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var id=GLNodeId.random();var graph=new GLNodeGraph();var definition=new AdditiveOscillatorNode();
+            graph.edit("Legacy",e->e.addNode(new GLGraphNode(id,definition.registration().id(),Map.of("harmonics",GLNodeValue.of(4),"spread",GLNodeValue.of(1200.)))));
+            var root=new com.vingame.glswing.node.document.GLNodeGraphAsset("root",1,com.vingame.glswing.node.document.GLNodeGraphAssetKind.PROJECT,graph.snapshot(),com.vingame.glswing.node.binding.GLNodeEditorViewState.empty());
+            c.openDocument("Old",new com.vingame.glswing.node.document.GLNodeGraphDocument(root,Map.of(),List.of()));
+            assertEquals(2.,new NodeState(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties()).number("spread",0));
+            c.setNodeProperty(id,AdditiveOscillatorNode.SPREAD,GLNodeValue.of(1.4));
+            assertEquals(1.4,new NodeState(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties()).number("spread",0));
+        }});
+    }
+    @Test void powerStretchDefaultsAndLegacyScalarMigration(){
+        var node=new AdditiveOscillatorNode();assertEquals(1.,new NodeState(node.defaults()).number("spread",0));
+        var old=new NodeState(Map.of("spread",GLNodeValue.of(1200.),"spread.unit",GLNodeValue.of("octave")));
+        var migrated=node.normalizeState(old);assertEquals(2.,migrated.number("spread",0));assertFalse(migrated.values().containsKey("spread.unit"));
+        assertEquals(migrated,node.normalizeState(migrated));assertTrue(node.encode(old,p->-1).contains("power 2.0"));
+        for(double exponent:new double[]{0,.5,1,1.4,2,4}){
+            var values=new HashMap<>(node.defaults());values.put("spread",GLNodeValue.of(exponent));assertDoesNotThrow(()->node.layout(new NodeState(values)));
+        }
+        var layout=node.layout(new NodeState(node.defaults()));var row=layout.rows().stream().filter(r->r.id().equals("spread")).findFirst().orElseThrow();
+        assertNull(row.formats());assertEquals(0.,((Editor.Slider)row.editor()).min());assertEquals(4.,((Editor.Slider)row.editor()).max());
+    }
     @Test void validatesAndEncodesAllParameters() {
         var node = new AdditiveOscillatorNode();
-        assertEquals("-1 sine 1 1.0 0.0 -1 440.0 -1 0.0 inputs -1 -1 -1 -1", node.encode(new NodeState(node.defaults()), p -> -1));
+        assertEquals("-1 sine 1 1.0 power 1.0 -1 440.0 -1 0.0 inputs -1 -1 -1 -1", node.encode(new NodeState(node.defaults()), p -> -1));
         for (double invalid : new double[] {0, 145, 1.5}) {
             var values = new HashMap<>(node.defaults()); values.put("harmonics", GLNodeValue.of(invalid));
             assertThrows(IllegalArgumentException.class, () -> node.layout(new NodeState(values)));
@@ -121,11 +143,11 @@ class AdditiveOscillatorTest {
                 controller.setNodeProperty(id, AdditiveOscillatorNode.FALLOFF, GLNodeValue.of(2));
                 controller.setNodeProperty(id, AdditiveOscillatorNode.HARMONICS, GLNodeValue.of(1));
                 assertEquals(small, view.get().getContents().stream().filter(c -> c.isVisible()).count());
-                assertTrue(controller.audioGraph().replaceAll(" ![0-9a-f]{16} "," ").contains("sine 1 2.0 0.0"));
+                assertTrue(controller.audioGraph().replaceAll(" ![0-9a-f]{16} "," ").contains("sine 1 2.0 power 1.0"));
                 controller.history().undo();
                 assertSame(original, view.get(), "Visibility changes must preserve the dragged slider");
                 assertEquals(small + 2, view.get().getContents().stream().filter(c -> c.isVisible()).count());
-                assertTrue(controller.audioGraph().replaceAll(" ![0-9a-f]{16} "," ").contains("sine 144 2.0 0.0"));
+                assertTrue(controller.audioGraph().replaceAll(" ![0-9a-f]{16} "," ").contains("sine 144 2.0 power 1.0"));
                 assertEquals(cables, graph.snapshot().connections());
             }
         });

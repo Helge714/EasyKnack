@@ -314,3 +314,12 @@ The first published release version has not been designated yet.
   Rebuild Java, host and source plugins together (Step Switch parameter contract);
   existing documents start on step zero. Document schema and protocol are unchanged.
   Covered by the existing development version; oscillator spreading is unchanged.
+
+- Replace Complex Oscillator cent spreading with dimensionless power stretching:
+  partial n uses f0 * n^p (0-4, neutral 1). Keep the fundamental fixed and cache
+  ratios/logarithms. Old scalar cent settings map to clamp(1 + cents/1200, 0, 4);
+  this preserves the second partial where possible, not the previous full spectrum.
+  Existing modulation, inherited editor bounds/units and generated groups/plugins
+  require review and rebaking/re-export. Java and host must be rebuilt together.
+  Stable port IDs and document schema are unchanged. This intentional 0.x semantic
+  change is covered by the existing development version before its first release.

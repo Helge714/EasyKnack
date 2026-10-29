@@ -25,11 +25,11 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
     static constexpr std::size_t maximumPartials = 144;
     const Tables* tables = nullptr;
     std::array<double, maximumPartials> phases{}, ratios{}, weights{}, currentRatios{}, currentWeights{};
-    float cachedFalloff = 1, cachedSpread = 0;
+    float cachedFalloff = 1, cachedSpread = 1;
     unsigned cachedCount = 1, renderCount = 1;
     double currentFrequency = 440, currentPhase = 0;
     unsigned partials = 1, waveform = 0;
-    float falloff = 1, spread = 0, frequency = 440, phaseDegrees = 0;
+    float falloff = 1, spread = 1, frequency = 440, phaseDegrees = 0;
     bool spectrumReady=false;
 
     bool supportsLiveParameters() const noexcept override { return true; }
@@ -37,19 +37,21 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
         const auto& p=static_cast<const AdditiveOscillatorNode&>(configuration);
         partials=p.partials;waveform=p.waveform;falloff=p.falloff;spread=p.spread;frequency=p.frequency;phaseDegrees=p.phaseDegrees;
     }
-    template<class P> void configureParameters(const P& p){
+    template<class P> void configureParameters(const P& p,bool legacy=false){
         sources=p.sources();
         waveform=p.waveform_value=="sine"?0:p.waveform_value=="triangle"?1:p.waveform_value=="saw"?2:p.waveform_value=="square"?3:99;
         if(waveform==99)throw std::runtime_error("Unknown waveform");
-        partials=p.harmonics_value;falloff=p.falloff_value;spread=p.spread_value;frequency=p.frequency_value;phaseDegrees=p.phase_value;
+        partials=p.harmonics_value;falloff=p.falloff_value;spread=legacy?std::clamp(1.f+static_cast<float>(p.spread_value)/1200.f,0.f,4.f):p.spread_value;frequency=p.frequency_value;phaseDegrees=p.phase_value;
         updateSpectrum(falloff,spread,partials);currentRatios=ratios;currentWeights=weights;renderCount=partials;
         currentFrequency=frequency;currentPhase=phaseDegrees;tables=&builtinTables();
     }
     void configure(std::istream& in) override {
+        bool legacyReset=false;
         in>>std::ws;if(in.peek()=='!'){
             auto start=in.tellg();std::string marker;in>>marker;in.seekg(start);
-            if(marker=="!51e01ae3a60f12dc")configureParameters(parameters::LegacyAdditiveOscillatorNodeParameters::read(in));
-            else configureParameters(parameters::AdditiveOscillatorNodeParameters::read(in));return;
+            if(marker=="!51e01ae3a60f12dc"){configureParameters(parameters::LegacyAdditiveOscillatorNodeParameters::read(in),true);return;}
+            if(marker=="!e64d76dd5d57451d"){in>>marker;legacyReset=true;}
+            else {configureParameters(parameters::AdditiveOscillatorNodeParameters::read(in));return;}
         }
 
         int waveInput = readInput(in);
@@ -62,7 +64,7 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
         float count = readNumber(in, 1, maximumPartials);
         if (count != std::floor(count)) throw std::runtime_error("integer partial count required");
         partials = static_cast<unsigned>(count);
-        falloff = readNumber(in, 0, 4); spread = readNumber(in, -2400, 2400);
+        falloff = readNumber(in, 0, 4); spread = std::clamp(1.f+readNumber(in,-2400,2400)/1200.f,0.f,4.f);
         int frequencyInput = readInput(in); frequency = readNumber(in, 0.00001f, 20000);
         int phaseInput = readInput(in); phaseDegrees = readNumber(in, 0, 360);
         sources = {waveInput, frequencyInput, phaseInput};
@@ -71,21 +73,27 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
             std::string marker; in >> marker;
             if (marker != "inputs") throw std::runtime_error("invalid additive inputs");
             sources.push_back(readInput(in)); sources.push_back(readInput(in)); sources.push_back(readInput(in));
+            if(legacyReset)sources.push_back(readInput(in));
         }
         updateSpectrum(falloff, spread, partials);
         currentRatios = ratios; currentWeights = weights; renderCount = partials;
         currentFrequency = frequency; currentPhase = phaseDegrees;
         tables = &builtinTables();
     }
-    void updateSpectrum(float slope, float cents, unsigned count) noexcept {
-        const bool ratiosChanged=!spectrumReady||cents!=cachedSpread;
+    static const std::array<double,maximumPartials>& partialLogs() noexcept {
+        // Initialized by configure/updateSpectrum on the control thread; never allocates.
+        static const auto values=[] {std::array<double,maximumPartials> result{};for(unsigned h=0;h<maximumPartials;++h)result[h]=std::log2(h+1);return result;}();
+        return values;
+    }
+    void updateSpectrum(float slope, float exponent, unsigned count) noexcept {
+        const bool ratiosChanged=!spectrumReady||exponent!=cachedSpread;
         const bool weightsChanged=!spectrumReady||slope!=cachedFalloff;
-        const double detune=ratiosChanged?std::exp2(cents/1200.0):1;
+        const auto& logarithms=partialLogs();
         for (unsigned h = 0; h < maximumPartials; ++h) {
-            if(ratiosChanged)ratios[h]=h==0?1:(h+1)*detune;
+            if(ratiosChanged)ratios[h]=exponent==1?static_cast<double>(h+1):exponent==2?static_cast<double>(h+1)*(h+1):std::exp2(exponent*logarithms[h]);
             if(weightsChanged || (h<count)!=(h<cachedCount))weights[h]=h<count?std::pow(h+1,-slope):0;
         }
-        cachedFalloff=slope;cachedSpread=cents;cachedCount=count;spectrumReady=true;
+        cachedFalloff=slope;cachedSpread=exponent;cachedCount=count;spectrumReady=true;
     }
     void inheritState(const NodeProcessor& previous) noexcept override {
         const auto& old = static_cast<const AdditiveOscillatorNode&>(previous);
@@ -113,8 +121,8 @@ struct AdditiveOscillatorNode : NodeProcessor, Wavetables {
             double hz = std::clamp(clean(hzInput ? hzInput[i] : currentFrequency), 0.0, 20000.0);
             double offset = clean(phaseInput ? phaseInput[i] : currentPhase) / 360.0;
             float slope = falloffInput ? static_cast<float>(std::clamp(clean(falloffInput[i]), 0.0, 4.0)) : falloff;
-            float cents = spreadInput ? static_cast<float>(std::clamp(clean(spreadInput[i]), -2400.0, 2400.0)) : spread;
-            if (slope != cachedFalloff || cents != cachedSpread || count != cachedCount) updateSpectrum(slope, cents, count);
+            float exponent = spreadInput ? static_cast<float>(std::clamp(clean(spreadInput[i]), 0.0, 4.0)) : spread;
+            if (slope != cachedFalloff || exponent != cachedSpread || count != cachedCount) updateSpectrum(slope, exponent, count);
             double sum = 0, weightSum = 0;
             for (unsigned h = 0; h < renderCount; ++h) {
                 currentRatios[h] += smoothing * (ratios[h] - currentRatios[h]);

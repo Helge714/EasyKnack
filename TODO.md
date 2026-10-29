@@ -12,8 +12,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   specializations remain distinct. Internal edits invalidate the affected Bakes.
 - [x] Attach MIDI inspector indicators when controls enter the inspector hierarchy.
 - [x] Add Step Switch index selection and editable input names in the inspector.
-- [x] Verify Complex Oscillator spreading across all 144 partials. The fundamental
-  remains fixed; each overtone receives the same positive/negative cent offset.
+- [x] Replace Complex Oscillator cent spreading with power-law partial stretching
+  (exponent 0–4, neutral 1); verify all 144 ratios and one-time scalar migration.
+  Review old modulation, inherited group editors and generated exports manually.
 - [x] Finish review, validation and focused commits for accumulated Core and
   EasyKnack source changes. Keep machine-specific Eclipse settings local.
 - [ ] Manual acceptance: nested group Undo/Redo and directly forwarded ports;
@@ -21,6 +22,8 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   ordinary/Multiple Group Bakes; Step Switch mode changes and named inputs.
 
 ## Next technical work
+
+- [ ] Investigate the optional native all-contract sweep `SourceExportAndAnalysisTest.hostAcceptsEveryContractAndPublishesLiveAnalysis`: it currently rejects a processor with "processor does not support event rate". Identify the processor and audit its execution-domain/rate annotations; do not change DSP semantics merely to satisfy the sweep. Focused Complex Oscillator tests are separate.
 
 - [ ] Generate shared instance-processor capability declarations instead of keeping
   separate Java supported-node IDs and a native factory whitelist. Cover live
@@ -64,10 +67,10 @@ rate semantics or to resume kernel-driver installation.
 ## Latest validation (29 October 2026)
 
 - Core: full Maven test/install, 132 tests, no failures/errors, one optional skip.
-- EasyKnack: full Maven package, 583 tests, no failures/errors, 152 optional tests
+- EasyKnack: full Maven package, 589 tests, no failures/errors, 154 optional tests
   skipped in the regular profile. Selected native checks were run separately.
 - Additional native checks passed for Step Switch sample/trigger/index behavior,
-  all-partial spreading, generated Instance kernels, spectral hold/memory/formulas,
+  all-partial power stretching and legacy cent-contract conversion, generated Instance kernels, spectral hold/memory/formulas,
   filters, Blur synthesis/power, IFFT stability and unit conversions.
 - A real transient plugin build reused its cache; Force rebuild produced a fresh
   host while the earlier binary remained usable. The development host was rebuilt.
