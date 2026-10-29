@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.modulation.slew",title="Slew",category=NodeCategory.MODULATION,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.modulation.slew",title="Smoothing",category=NodeCategory.MATH,kind=NodeKind.VALUE)
 public final class SlewNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("in"),OUT=new PropertyId("out"),RISE=new PropertyId("rise"),FALL=new PropertyId("fall"),RATE=new PropertyId("rate");
     public void define(NodeBuilder n,NodeState s){

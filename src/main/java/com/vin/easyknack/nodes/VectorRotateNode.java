@@ -7,7 +7,7 @@ public final class VectorRotateNode extends BasicNode {
     public void define(NodeBuilder n,NodeState s){
         VectorSupport.output(n,OUT);
         VectorSupport.input(n,IN,"Vector",0,0,0);
-        n.addInput(ROTATION,"Rotation",new VectorEditor(0,0,0,new UnitFormats(UnitFormat.DEGREE,UnitFormat.DEGREE,java.util.List.of(UnitFormat.DEGREE,UnitFormat.RADIAN,UnitFormat.TURN)))).dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL).editorCopyable(false);
+        n.addInput(ROTATION,"Rotation",new VectorEditor(0,0,0,new UnitFormats(UnitFormat.DEGREE,UnitFormat.DEGREE,java.util.List.of(UnitFormat.DEGREE,UnitFormat.RADIAN,UnitFormat.TURN)))).dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL);
         VectorSupport.input(n,ORIGIN,"Origin",0,0,0);
         ProcessingRate.addEditor(n,VectorSupport.RATE);
     }

@@ -11,7 +11,7 @@ public final class AudioGraphEncoder {
     private AudioGraphEncoder() { }
 
     public static String encode(GLNodeGraphSnapshot graph) {
-        graph = com.vin.easyknack.nodes.AutomaticRates.resolve(graph);
+        graph = com.vin.easyknack.nodes.PortUnitConversions.materialize(com.vin.easyknack.nodes.AutomaticRates.resolve(graph));
         SampleFeedback.validate(graph);
         if (graph.nodes().size() > 256) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximal 256 Audio-Nodes"));
         Map<GLNodeId, Integer> indices = new HashMap<>();
@@ -45,25 +45,7 @@ public final class AudioGraphEncoder {
             if (inputs.put(connection.input(), source+256*slot) != null)
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Mehrere Quellen an einem Audioeingang"));
         }
-        // Materialize input-unit conversions as ordinary processors: rate scheduling, voice
-        // propagation and pruning then apply without special cases in the real-time engine.
-        var conversions=new java.util.ArrayList<String>();
-        for(var node:graph.nodes()) {
-            var layout=com.vin.easyknack.nodes.NodeRegistry.require(node.typeId()).layout(new com.vin.easyknack.nodes.NodeState(node.properties()));
-            for(var row:layout.rows())if(row.kind()==com.vin.easyknack.nodes.NodeBuilder.RowKind.INPUT
-                    && row.editor() instanceof com.vin.easyknack.nodes.UnitSlider slider
-                    && slider.selected()!=slider.formats().stored()) {
-                var endpoint=new GLNodeEndpoint(node.id(),row.id());
-                Integer source=inputs.get(endpoint);if(source==null)continue;
-                int index=graph.nodes().size()+conversions.size();
-                if(index>=256)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximal 256 Audio-Nodes einschließlich Einheitenumrechnungen"));
-                var converter=new com.vin.easyknack.nodes.UnitConverterNode();
-                var values=new com.vin.easyknack.nodes.NodeState(Map.of("value",GLNodeValue.of(0.0),"from",GLNodeValue.of(slider.selected().id()),"to",GLNodeValue.of(slider.formats().stored().id())));
-                conversions.add(" "+node.id()+".unit."+row.id()+" unitconvert !"+com.vin.easyknack.nodes.NativeContractGenerator.fingerprint(converter)+" "+converter.encode(values,key->source)+" @ "+row.rate().code()+" "+row.rate().code());
-                inputs.put(endpoint,index);
-            }
-        }
-        StringBuilder result = new StringBuilder("GRAPH ").append(graph.nodes().size()+conversions.size());
+        StringBuilder result = new StringBuilder("GRAPH ").append(graph.nodes().size());
         for (var node : graph.nodes()) {
             var definition = com.vin.easyknack.nodes.NodeRegistry.require(node.typeId());
             var layout = definition.layout(new com.vin.easyknack.nodes.NodeState(node.properties()));
@@ -86,7 +68,6 @@ public final class AudioGraphEncoder {
                                 return inputs.getOrDefault(endpoint, -1);
                             })).append(" @ ").append(outputRateMetadata(layout)).append(' ').append(inputRates.isEmpty() ? "-" : inputRates).append(com.vin.easyknack.ui.ControlMetadata.encode(node,definition,layout,connectedPorts.getOrDefault(node.id(),java.util.Set.of())));
         }
-        conversions.forEach(result::append);
         return result.toString();
     }
     public static String outputRateMetadata(com.vin.easyknack.nodes.NodeBuilder layout){

@@ -11,6 +11,18 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.ui.*;
 
 class DynamicNodeTest {
+    @Test void converterOutputLabelFollowsTargetUnit() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            try(var controller=new WorkspaceController()) {
+                var id=GLNodeId.random();var definition=new UnitConverterNode();
+                controller.workspace().currentGraph().edit("Converter",e->e.addNode(new GLGraphNode(id,definition.registration().id(),definition.defaults())));
+                ((GLComboBox<UnitFormat>)view(controller,id).getContents().stream().filter(GLComboBox.class::isInstance).findFirst().orElseThrow()).setSelectedItem(UnitFormat.HZ);
+                ((GLComboBox<UnitFormat>)view(controller,id).getContents().stream().filter(GLComboBox.class::isInstance).skip(1).findFirst().orElseThrow()).setSelectedItem(UnitFormat.MS);
+                var labels=view(controller,id).getContents().stream().filter(NodeTooltipLabel.class::isInstance).map(NodeTooltipLabel.class::cast).map(NodeTooltipLabel::getText).toList();
+                assertTrue(labels.stream().anyMatch(label->label.endsWith("[ms]")),labels.toString());
+            }
+        });
+    }
     @Test void processingRateSurvivesUndoAndComposites() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             try (var controller = new WorkspaceController()) {
@@ -112,7 +124,7 @@ class DynamicNodeTest {
         }, () -> false);
         assertFalse(guarded.canToggleMuted()); guarded.toggleMuted(); guarded.copy(); assertEquals(1, calls[0]);
     }
-    @Test void removingAnExportedDynamicInputUpdatesCompositeAndUndoRestoresOuterCable() throws Exception {
+    @Test void removingAnExportedDynamicInputPreservesPublicPortAndOuterCable() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             try (var controller = new WorkspaceController()) {
                 var workspace = controller.workspace(); var root = workspace.currentGraph();
@@ -125,14 +137,14 @@ class DynamicNodeTest {
                 controller.actions().openSelectedComposite();
                 var inner = workspace.currentGraph().snapshot().nodes().get(0).id();
                 controller.setNodeProperty(inner, MathNode.OPERATION, GLNodeValue.of("absolute"));
-                assertEquals(2, root.snapshot().connections().size());
+                assertEquals(3, root.snapshot().connections().size());
                 assertDoesNotThrow(controller::audioGraph);
                 controller.history().undo();
                 assertNotNull(view(controller, inner).findPort("b"));
                 assertTrue(root.snapshot().connections().contains(cable));
                 assertDoesNotThrow(controller::audioGraph);
                 controller.history().redo();
-                assertEquals(2, root.snapshot().connections().size());
+                assertEquals(3, root.snapshot().connections().size());
                 assertDoesNotThrow(controller::audioGraph);
             }
         });

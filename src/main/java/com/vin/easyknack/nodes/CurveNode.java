@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 import com.vingame.glswing.ui.GLFunctionCurve;
 
-@RegisterNode(id="easyknack.audio.curve",title="Curve",category=NodeCategory.MATH, kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.audio.curve",title="Curve Mapping",category=NodeCategory.MATH, kind=NodeKind.VALUE)
 public final class CurveNode extends BasicNode {
     @Override public boolean supportsSpectralBins() { return true; }
     @Override public boolean supportsSampleFeedback() { return true; }

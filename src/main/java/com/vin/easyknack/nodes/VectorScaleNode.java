@@ -7,7 +7,7 @@ public final class VectorScaleNode extends BasicNode {
     public void define(NodeBuilder n,NodeState s){
         VectorSupport.output(n,OUT);
         VectorSupport.input(n,IN,"Vector",0,0,0);
-        n.addInput(SCALE,"Scale",new VectorEditor(1,1,1,UnitFormats.PROPORTION)).dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL).editorCopyable(false);
+        n.addInput(SCALE,"Scale",new VectorEditor(1,1,1,UnitFormats.PROPORTION)).dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL);
         VectorSupport.input(n,ORIGIN,"Origin",0,0,0);
         ProcessingRate.addEditor(n,VectorSupport.RATE);
     }

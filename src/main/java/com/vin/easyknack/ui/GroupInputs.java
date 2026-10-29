@@ -31,8 +31,10 @@ final class GroupInputs {
     }
     static EditorTemplates.Template template(GLCompositePortMapping port){var value=port.presentation().editorOptions().get("template");return value==null?null:EditorTemplates.Template.read(value);}
     static boolean choice(GLCompositePortMapping port){return template(port)!=null||port.presentation().editorOptions().containsKey(CHOICE);}
-    static boolean editorOnly(GLCompositePortMapping port){return choice(port)&&!port.presentation().socketVisible();}
+    static boolean editorOnly(GLCompositePortMapping port){return (choice(port)||!GroupEditorCopies.targets(port).isEmpty())&&!port.presentation().socketVisible();}
     static GLCompositePortMapping normalize(GLCompositePortMapping port,GLNodeGraphAsset asset,GLCompositeGraphRegistry groups){
+        port=GroupEditorCopies.detachMissingSource(port);
+        if(!GroupEditorCopies.targets(port).isEmpty())port=new GLCompositePortMapping(port.publicPort(),null,new GLCompositePortPresentation(port.presentation().inputEditorId(),false,port.presentation().editorOptions()));
         if(template(port)==null)return port;
         var options=new HashMap<>(port.presentation().editorOptions());options.put(CHOICE,GLNodeValue.of(property(port)));
         var targets=new HashMap<String,String>();var values=new HashMap<String,Object>();
@@ -68,7 +70,9 @@ final class GroupInputs {
             var maps=new ArrayList<>(result.compositeDescriptor().propertyMappings().stream().filter(m->m.publicPropertyId().equals(id)).toList());
             if(new NodeState(port.presentation().editorOptions()).flag("autoBind",false)){
                 maps.clear();
-                for(var target:port.internalEndpoints()) {
+                var boundTargets=new LinkedHashSet<>(port.internalEndpoints());boundTargets.addAll(GroupEditorCopies.targets(port));
+                for(var target:boundTargets) {
+                    if(asset.graph().findNode(target.nodeId()).isEmpty())continue;
                     String key=target.nodeId()+"/"+target.portId();
                     var targets=port.presentation().editorOptions().get("targetProperties");
                     String property=targets==null?target.portId():String.valueOf(((Map<?,?>)targets.toJavaValue()).getOrDefault(key, null));
@@ -80,7 +84,7 @@ final class GroupInputs {
             }
             result=GroupChoices.store(result,new GroupChoices.Choice(id,port.publicPort().id(),t.editor()),maps);
         }
-        return result;
+        return GroupEditorCopies.materialize(result);
     }
     private static Map<String,GLNodeValue> targetMapping(GLCompositePortMapping port,String key,EditorTemplates.Template template){
         var tables=port.presentation().editorOptions().get("targetValues");

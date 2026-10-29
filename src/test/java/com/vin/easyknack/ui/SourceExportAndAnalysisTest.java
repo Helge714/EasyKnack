@@ -14,7 +14,7 @@ class SourceExportAndAnalysisTest {
         for(boolean nested:new boolean[]{false,true}){
             var doc=GroupUnitsTest.document(nested);
             var asset=doc.embeddedAssets().values().stream().filter(a->a.compositeDescriptor().nodeTypeId().equals(docType(nested))).findFirst().orElseThrow();
-            var metadata=new HashMap<>(asset.metadata());metadata.put("easyknack.title",GLNodeValue.of("Warm \"Filter\" / Test"));metadata.put("easyknack.category",GLNodeValue.of(NodeCategory.CONVERTER.path()));metadata.put("easyknack.kind",GLNodeValue.of("VALUE"));
+            var metadata=new HashMap<>(asset.metadata());metadata.put("easyknack.title",GLNodeValue.of("Warm \"Filter\" / Test"));metadata.put("easyknack.category",GLNodeValue.of(NodeCategory.MATH.path()));metadata.put("easyknack.kind",GLNodeValue.of("VALUE"));
             doc=doc.withEmbeddedAsset(new com.vingame.glswing.node.document.GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),asset.graph(),asset.viewState(),metadata,asset.compositeDescriptor()));
             var export=GroupSourceExporter.create(doc,doc.root().graph().findNode(GroupUnitsTest.GROUP).orElseThrow());
             assertEquals("Warm \"Filter\" / Test",export.displayName());assertEquals("Warm _Filter_ _ Test.knackplugin",export.suggestedFileName());
@@ -25,7 +25,7 @@ class SourceExportAndAnalysisTest {
             assertEquals(0,ToolProvider.getSystemJavaCompiler().run(null,log,log,"-proc:none","-classpath",System.getProperty("java.class.path"),"-d",directory.toString(),source.toString()),log.toString());
             try(var loader=new java.net.URLClassLoader(new java.net.URL[]{directory.toUri().toURL()},getClass().getClassLoader())){
                 var node=(BasicNode)loader.loadClass("com.vin.easyknack.nodes."+export.className()).getConstructor().newInstance();
-                assertEquals(export.displayName(),node.title());assertEquals(NodeCategory.CONVERTER,node.registration().category());assertEquals(NodeKind.VALUE,node.registration().kind());
+                assertEquals(export.displayName(),node.title());assertEquals(NodeCategory.MATH,node.registration().category());assertEquals(NodeKind.VALUE,node.registration().kind());
             }
             var archive=directory.resolve("node.zip");export.write(archive);
             try(var zip=new java.util.zip.ZipFile(archive.toFile())){assertNotNull(zip.getEntry("source.knack"));assertNotNull(zip.getEntry("native/"+export.className()+".hpp"));}

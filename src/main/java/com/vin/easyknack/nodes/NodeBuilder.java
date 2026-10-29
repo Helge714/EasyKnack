@@ -15,6 +15,14 @@ public final class NodeBuilder {
         public String tooltip() {return tooltip;}
         private Editor editor;
         private UnitFormats formats;
+        private UnitFormat unit;
+        private PropertyId unitProperty;
+        public UnitFormats formats(){return formats;}
+        public UnitFormat unit(){return unit;}
+        public PropertyId unitProperty(){return unitProperty==null?new PropertyId(id()+".unit"):unitProperty;}
+        public Row unitProperty(PropertyId key){unitProperty=key;return this;}
+        public String portLabel(){return formats==null?label:label.replaceFirst("\\s*\\[[^\\]]*\\]$", "")+" ["+unit.suffix()+"]";}
+
         public Row formats(UnitFormats value) { formats=value;return this; }
         private boolean alwaysVisible;
         private boolean editorCopyable=true,driverAssignable=true;
@@ -116,15 +124,21 @@ public final class NodeBuilder {
         for(var row:rows)if(row.editor instanceof Editor.Slider slider&&!nativePorts.containsKey(row.key))row.editor=slider.discrete();
     }
     void applyFormats(NodeState state) {
-        for(var row:List.copyOf(rows))if(row.editor instanceof Editor.Slider slider){
-            var formats=row.formats!=null?row.formats:slider.formats();
+        for(var row:List.copyOf(rows)) {
+            var slider=row.editor instanceof Editor.Slider value?value:null;
+            var formats=row.formats!=null?row.formats:slider==null?null:slider.formats();
             if(formats==null)continue;
-            var key=new PropertyId(row.id()+".unit");
+            if(row.kind!=RowKind.EDITOR && row.dataType!=PortDataType.SIGNAL)
+                throw new IllegalArgumentException("Scalar units require a numeric signal port");
+            var key=row.unitProperty();
             var selected=UnitFormat.fromId(state.text(key,formats.stored().id()));
-            if(!formats.choices().contains(selected))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported slider unit"));
-            row.editor=new UnitSlider(slider,formats,selected);
-            var choice=addEditor(key,row.label+" unit",Editor.comboBox(formats.choices(),formats.initial(),UnitFormat::id)).inspectorOnly();
-            choice.menuOnly=true;
+            if(!formats.choices().contains(selected))throw new IllegalArgumentException("Unsupported unit "+selected.id()+" for port "+row.id()+"; expected "+formats.choices());
+            row.formats=formats;row.unit=selected;
+            if(slider!=null)row.editor=new UnitSlider(slider,formats,selected);
+            if(rows.stream().noneMatch(r->r.key.equals(key))) {
+                var choice=addEditor(key,row.label+" unit",Editor.comboBox(formats.choices(),formats.initial(),UnitFormat::id)).inspectorOnly();
+                choice.menuOnly=true;
+            }
         }
     }
     public List<Row> rows() { return List.copyOf(rows); }

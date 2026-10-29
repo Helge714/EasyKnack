@@ -81,8 +81,8 @@ final class ReferenceProjects {
             var add=g.node("offset",new MathNode(),"operation","add","b",.1);
             var mix=g.node("fanout",new MixNode(),"factor",.3);
             var map=g.node("map",new MapRangeNode(),"from-min",-1,"from-max",1,"to-min",0,"to-max",1);
-            var units=g.node("percent",new GainConverterNode(),"from","factor","to","percent");
-            last=g.node("factor",new GainConverterNode(),"from","percent","to","factor");
+            var units=g.node("percent",new UnitConverterNode(),"from","factor","to","percent");
+            last=g.node("factor",new UnitConverterNode(),"from","percent","to","factor");
             g.wire(osc,"audio-out",sub,"In");g.wire(sub,"Out",add,"a");g.wire(sub,"Out",mix,"a");g.wire(add,"audio-out",mix,"b");
             g.wire(mix,"audio-out",map,"audio-in");g.wire(map,"audio-out",units,"value");g.wire(units,"out",last,"value");lastPort="out";
         }else if(name.equals("stereo")){

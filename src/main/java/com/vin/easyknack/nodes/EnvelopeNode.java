@@ -1,7 +1,7 @@
 package com.vin.easyknack.nodes;
 
 
-@RegisterNode(id="easyknack.audio.envelope",title="Envelope",category=NodeCategory.MODULATION, kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.audio.envelope",title="Envelope",category=NodeCategory.GENERATOR, kind=NodeKind.VALUE)
 public final class EnvelopeNode extends BasicNode {
     @Override public com.vingame.glswing.node.GLNodeResizeMode resizeMode(){return com.vingame.glswing.node.GLNodeResizeMode.BOTH;}
     public static final PropertyId CURVE=new PropertyId("curve"),OUT=new PropertyId("audio-out"),GATE=new PropertyId("gate"),

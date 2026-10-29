@@ -13,7 +13,7 @@ public final class AutocorrelationNode extends BasicNode {
     }
     @Override public com.vingame.glswing.node.GLNodeResizeMode resizeMode(){return com.vingame.glswing.node.GLNodeResizeMode.BOTH;}
     public void define(NodeBuilder n,NodeState s){
-        n.addOutput(FREQUENCY,"Frequency [Hz]").signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("Estimated fundamental in Hz; 0 when no periodic signal is detected. Updated every 4096 samples (85 ms at 48 kHz)."));
+        n.addOutput(FREQUENCY,"Frequency [Hz]").formats(UnitFormats.CLOCK).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("Estimated fundamental in Hz; 0 when no periodic signal is detected. Updated every 4096 samples (85 ms at 48 kHz)."));
         n.addOutput(CONFIDENCE,"Confidence").signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("Normalized correlation at the detected period: 0–1. Harmonic mixtures can produce octave ambiguity."));
         n.addOutput(ANALYSIS,"Analysis").dataType(PortDataType.ANALYSIS).signal(SignalCategory.ANALYSIS).rate(ProcessingRate.CONTROL)
             .tooltip(com.vin.easyknack.ui.AppText.literal("Shared autocorrelation curve for Analysis Viewer. Existing frequency and confidence outputs keep their positions."));

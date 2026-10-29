@@ -95,6 +95,11 @@ final class WorkspaceController implements AutoCloseable {
         midiDrivers=new MidiDrivers(this);
         measurementRecorders=new MeasurementRecorders(this);
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
+        workspace.interfaceEditor().setDefaultValueType(com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
+        workspace.setBoundaryPortFactory((port,endpoint)->{
+            var asset=composites.findAsset(workspace.currentAssetId()).orElseThrow();
+            return GroupEditorCopies.inheritPort(port,endpoint,asset,composites);
+        });
         editorTemplates=new EditorTemplates(inputEditors);
         inputEditors.register(new com.vingame.glswing.node.composite.GLNodeInputEditorDescriptor(GroupInputSettings.BUTTON,"Button",java.util.Set.of(com.vin.easyknack.nodes.SignalCategory.TRIGGER.valueTypeId()),Map.of()));
         inputEditors.register(new com.vingame.glswing.node.composite.GLNodeInputEditorDescriptor("easyknack.choice","Combobox",java.util.Set.of(com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId(),com.vin.easyknack.nodes.SignalCategory.WAVETABLE.valueTypeId(),com.vin.easyknack.nodes.SignalCategory.AUDIO.valueTypeId()),Map.of()));
@@ -139,6 +144,7 @@ final class WorkspaceController implements AutoCloseable {
     }
 
     private void compositePresentationChanged(){
+        groupBindings.refreshInspector();
         if(compositeColors!=null)compositeColors.schedule();
         if(workspace.currentGraph()!=null)for(var view:workspace.editor().getNodes())
             if(view instanceof GroupViewFactory.GroupView group)compositeColors.modelId(view).flatMap(workspace.currentGraph().snapshot()::findNode).ifPresent(group::update);
@@ -190,6 +196,7 @@ final class WorkspaceController implements AutoCloseable {
         var target = workspace.currentGraph();
         if (target == null) return;
         var node = target.snapshot().findNode(id).orElse(null);
+        if(coupledProperties(id).contains(GroupEditorCopies.controlledKey(property)))return;
         if (node == null || value.equals(node.properties().get(key)) && !node.isPropertyAutomatic(key)) return;
         var before = target.snapshot();
         var after = nodes.normalize(new GLNodeGraphSnapshot(before.graphId(), before.revision(), before.nodes().stream()
@@ -277,7 +284,7 @@ final class WorkspaceController implements AutoCloseable {
         } finally { changingProperties = previous; }
     }
 
-    /** A removed internal endpoint also removes its exported port, recursively through groups. */
+    /** Keep the public interface when internal nodes disappear; only detach missing endpoints. */
     private void reconcileCompositeInterfaces() {
         boolean changed;
         do {
@@ -291,8 +298,7 @@ final class WorkspaceController implements AutoCloseable {
                                 ? GLCompositeForwarding.valid(mapping,descriptor.portMappings())
                                 : asset.graph().findNode(endpoint.nodeId()).flatMap(node -> types.find(node.typeId()))
                                     .flatMap(type -> type.findPort(endpoint.portId())).isPresent()).toList();
-                    return mapping.isBound()&&remaining.isEmpty()?java.util.stream.Stream.<com.vingame.glswing.node.composite.GLCompositePortMapping>empty()
-                            :java.util.stream.Stream.of(mapping.withEndpoints(remaining));
+                    return java.util.stream.Stream.of(mapping.withEndpoints(remaining));
                 }).toList();
                 if (ports.equals(descriptor.portMappings())) continue;
                 com.vingame.glswing.node.composite.GLCompositeInterfaceTransactions.replacePorts(
@@ -492,6 +498,7 @@ final class WorkspaceController implements AutoCloseable {
         var models=new java.util.ArrayList<GLGraphNode>(graph.snapshot().nodes());
         composites.assets().forEach(a->models.addAll(a.graph().nodes()));
         nodes.refreshLanguage(catalog,models);
+        catalog.setCategoryOrder(com.vin.easyknack.nodes.NodeCategory.menuOrder());
         for(var entry:catalog.entries())catalog.replace(new com.vingame.glswing.node.model.GLNodeCatalogEntry(
                 entry.type(),AppText.translateExisting(entry.displayName()),AppText.translateExisting(entry.category()),entry.keywords(),entry.defaultProperties()));
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
@@ -500,8 +507,11 @@ final class WorkspaceController implements AutoCloseable {
         if(workspace.propertyInspector()!=null)workspace.propertyInspector().refresh();
         LiveLanguage.refresh(workspace);
     }
+    private final WorkspaceGroupBindings groupBindings=new WorkspaceGroupBindings();
     private void refreshNodePresentation() {
         if(closed)return;
+        groupBindings.refresh(workspace,composites);
+        var coupledAsset=workspace.currentAssetId()==null?null:composites.findAsset(workspace.currentAssetId()).orElse(null);
         // Also called after history commits: Core restores views after applying graph edits.
         var current = workspace.currentGraph();
         if (current != null) {
@@ -517,12 +527,17 @@ final class WorkspaceController implements AutoCloseable {
             var rates=effectiveRates;
             presented.keySet().retainAll(workspace.editor().getNodes());
             for (var view : workspace.editor().getNodes())
-                if (view instanceof BasicNodeView basic)
-                    snapshot.findNode(basic.nodeId()).map(n -> rates.containsKey(n.id())
+                if (view instanceof BasicNodeView basic) {
+                    basic.controlledByGroup(coupledProperties(basic.nodeId()));
+                    snapshot.findNode(basic.nodeId()).map(n->GroupEditorCopies.previewDefaults(coupledAsset,n)).map(n -> rates.containsKey(n.id())
                             ? n.withProperty(com.vin.easyknack.nodes.ProcessingRate.EFFECTIVE,rates.get(n.id())) : n).map(this::withPortRates).ifPresent(n->{if(connectionsChanged||!n.equals(presented.get(basic))){basic.update(n);presented.put(basic,n);}});
+                }
         }
         refreshGraphDiagnostics();
         if(midiDrivers!=null)midiDrivers.refresh();
+    }
+    private java.util.Set<com.vin.easyknack.nodes.PropertyId> coupledProperties(GLNodeId id){
+        return groupBindings.properties(workspace,composites,id);
     }
 
     private void prepareBakeInspector(){
@@ -701,13 +716,13 @@ final class WorkspaceController implements AutoCloseable {
         var definition=NodeRegistry.find(entry.type().id()).orElse(null);
         if(isMultipleContext()&&!isSpectralContext())return entry.type().id().equals(FormulaGroups.CREATE)||entry.type().id().equals(SpectralGroups.CREATE_TYPE)||entry.type().id().equals(MultipleGroups.CREATE_TYPE)||MultipleGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).isPresent();
         if(isSpectralContext()){
-            if(!SpectralGroups.supports(definition))return false;
+            if(entry.type().id().equals(FormulaGroups.CREATE)||composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(FormulaGroups::isFormula).orElse(false))return true; if(!SpectralGroups.supports(definition))return false;
             // One output is the program's root. Offer its replacement after deletion.
             if(definition instanceof com.vin.easyknack.nodes.BinOutputNode)
                 return workspace.currentGraph().snapshot().nodes().stream().noneMatch(n->NodeRegistry.find(n.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.BinOutputNode);
             return true;
         }
-        return !(definition instanceof com.vin.easyknack.nodes.BinDiscardNode||definition instanceof com.vin.easyknack.nodes.InstanceCombineNode||definition instanceof com.vin.easyknack.nodes.InstanceContextNode||definition instanceof com.vin.easyknack.nodes.BinContextNode||definition instanceof com.vin.easyknack.nodes.BinOutputNode||definition instanceof com.vin.easyknack.nodes.BinReadNode||definition instanceof com.vin.easyknack.nodes.BinRandomNode);
+        return !(definition instanceof com.vin.easyknack.nodes.BinMemoryNode||definition instanceof com.vin.easyknack.nodes.BinHoldNode||definition instanceof com.vin.easyknack.nodes.BinDiscardNode||definition instanceof com.vin.easyknack.nodes.InstanceCombineNode||definition instanceof com.vin.easyknack.nodes.InstanceContextNode||definition instanceof com.vin.easyknack.nodes.BinContextNode||definition instanceof com.vin.easyknack.nodes.BinOutputNode||definition instanceof com.vin.easyknack.nodes.BinReadNode||definition instanceof com.vin.easyknack.nodes.BinRandomNode);
     }
     List<com.vingame.glswing.node.model.GLNodeCatalogEntry> availableNodes(){return catalog.entries().stream().filter(workspace::isNodeCreationAllowed).toList();}
     void addFormulaGroup(float x,float y){

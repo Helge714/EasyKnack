@@ -38,8 +38,8 @@ class LiveSettingsTest {
                     assertEquals("New",label.getText());assertTrue(controller.workspace().editor().getNodes().stream().anyMatch(n->n.getTitle().equals("Oscillator")));
                     assertEquals("File",heading.getText());assertEquals("New",item.getText());
                     LiveLanguage.refresh(controller.workspace());
-                    assertEquals("Audio Out",portLabel.getText());assertEquals("Audio Out",customPortLabel.getText());
-                    assertTrue(labels(controller.workspace()).contains("Audio Out"));
+                    assertEquals("Audio Output",portLabel.getText());assertEquals("Audio Out",customPortLabel.getText());
+                    assertTrue(labels(controller.workspace()).contains("Audio Output"));
                     assertFalse(labels(controller.workspace()).contains("Audioausgang"));
                 }
             });

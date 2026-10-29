@@ -15,12 +15,15 @@ class EditorTemplatesTest {
     @Test void ratesFilterEditorChoicesAndModeResizesSettings()throws Exception{
         javax.swing.SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
             c.openDocument("Modes",GroupUnitsTest.document(false));c.editorTemplates().put(frequencies());var settings=selectInput(c);
-            assertEquals(List.of(GroupInputSettings.Kind.SLIDER,GroupInputSettings.Kind.CHECKBOX,GroupInputSettings.Kind.COMBO,GroupInputSettings.Kind.COPY),settings.kind.getItems());
+            assertEquals(List.of(GroupInputSettings.Kind.NONE,GroupInputSettings.Kind.SLIDER,GroupInputSettings.Kind.CHECKBOX,GroupInputSettings.Kind.COMBO,GroupInputSettings.Kind.COPY),settings.kind.getItems());
+            settings.initialUnit.setSelectedItem(com.vin.easyknack.nodes.UnitFormat.MS);
+            var port=c.workspace().interfaceEditor().selectedPort();assertEquals(com.vin.easyknack.nodes.UnitFormat.MS,GroupUnits.base(new GLCompositeGraphRegistry(),null,port));
+            assertTrue(GroupEditingTest.descendants(settings).anyMatch(v->v instanceof GLCheckBox box&&box.getText().equals(com.vin.easyknack.nodes.UnitFormat.MS.toString())&&box.isSelected()&&!box.isEnabled()));
             float sliderHeight=settings.getPreferredGLSize().height();settings.kind.setSelectedItem(GroupInputSettings.Kind.COMBO);
             assertTrue(settings.model.isVisible());assertFalse(settings.source.isVisible());assertTrue(settings.getPreferredGLSize().height()<sliderHeight);
             settings.rate.setSelectedItem(com.vin.easyknack.nodes.ProcessingRate.CONTROL);assertTrue(c.audioGraph().contains("rateconvert"));
             settings.rate.setSelectedItem(com.vin.easyknack.nodes.ProcessingRate.EVENT);
-            assertEquals(List.of(GroupInputSettings.Kind.BUTTON,GroupInputSettings.Kind.COPY),settings.kind.getItems());assertFalse(settings.model.isVisible());assertFalse(settings.source.isVisible());
+            assertEquals(List.of(GroupInputSettings.Kind.NONE,GroupInputSettings.Kind.BUTTON,GroupInputSettings.Kind.COPY),settings.kind.getItems());assertFalse(settings.model.isVisible());assertFalse(settings.source.isVisible());
             settings.rate.setSelectedItem(com.vin.easyknack.nodes.ProcessingRate.AUTO);assertEquals(GroupInputSettings.Kind.SLIDER,settings.kind.getSelectedItem());
         }});
     }
@@ -56,12 +59,13 @@ class EditorTemplatesTest {
             c.openDocument("Inherited",new GLNodeGraphDocument(doc.root(),Map.of(a.id(),a),List.of()));c.workspace().openComposite(a.id());c.workspace().inspectorTabs().setSelectedIndex(3);
             var ui=c.workspace().interfaceEditor();
             GroupEditingTest.descendants(ui).filter(n->n instanceof GLList<?> l&&l.getModel().getSize()>0&&l.getModel().getElementAt(0) instanceof GLCompositePortMapping m&&m.publicPort().direction()==GLPortDirection.INPUT).map(n->(GLList<?>)n).findFirst().orElseThrow().setSelectedIndex(0);
-            GroupEditingTest.descendants(ui).filter(GroupInputSettings.class::isInstance).map(GroupInputSettings.class::cast).findFirst().orElseThrow().kind.setSelectedItem(GroupInputSettings.Kind.COPY);
+            ui.updateSelectedPort(GroupEditorCopies.inheritPort(ui.selectedPort(),ui.selectedPort().internalEndpoint(),a,new GLCompositeGraphRegistry()));
             assertNotNull(GroupInputs.template(ui.selectedPort()));assertTrue(c.editorTemplates().all().isEmpty());
             assertTrue(GroupInputs.template(ui.selectedPort()).entries().size()>=4);assertEquals("waveform",c.snapshotDocument().embeddedAssets().get(a.id()).compositeDescriptor().propertyMappings().get(0).internalPropertyId());
             c.history().undo();assertTrue(c.editorTemplates().all().isEmpty());assertNull(GroupInputs.template(ui.selectedPort()));
             var inputSettings=GroupEditingTest.descendants(ui).filter(GroupInputSettings.class::isInstance).map(GroupInputSettings.class::cast).findFirst().orElseThrow();
-            for(int i=0;i<3;i++){inputSettings.kind.setSelectedItem(GroupInputSettings.Kind.SLIDER);inputSettings.kind.setSelectedItem(GroupInputSettings.Kind.COPY);}
+            assertTrue(GroupInputSettings.availableSources(a,com.vin.easyknack.nodes.ProcessingRate.AUTO).stream().noneMatch(source->source.property().equals("waveform")));
+            ui.updateSelectedPort(GroupEditorCopies.inheritPort(ui.selectedPort(),ui.selectedPort().internalEndpoint(),a,new GLCompositeGraphRegistry()));
             assertTrue(c.editorTemplates().all().isEmpty());
             var saved=c.snapshotDocument();c.openDocument("Reloaded local editor",saved);assertTrue(c.editorTemplates().all().isEmpty());
             assertEquals("easyknack.choice",c.snapshotDocument().embeddedAssets().get(a.id()).compositeDescriptor().portMappings().get(0).presentation().inputEditorId());
@@ -75,6 +79,7 @@ class EditorTemplatesTest {
             var boundary=c.workspace().editor().getNodes().stream().filter(n->n.findPort("Pitch")!=null).findFirst().orElseThrow();boundary.setLocation(-450,123);
             GroupEditingTest.descendants(ui).filter(n->n instanceof GLCheckBox b&&b.getText().equals("Show node socket")).map(GLCheckBox.class::cast).findFirst().orElseThrow().doClick();
             assertFalse(ui.selectedPort().presentation().socketVisible());
+            var settings=GroupEditingTest.descendants(ui).filter(GroupInputSettings.class::isInstance).map(GroupInputSettings.class::cast).findFirst().orElseThrow();assertFalse(settings.rate.isEnabled());assertEquals(com.vin.easyknack.nodes.ProcessingRate.CONTROL,settings.rate.getSelectedItem());
             var retained=c.workspace().editor().getNodes().stream().filter(n->n.findPort("Pitch")!=null).findFirst().orElseThrow();
             assertTrue(retained.findPort("Pitch").isSocketVisible());assertEquals(-450,retained.getX());assertEquals(123,retained.getY());
             assertTrue(c.workspace().editor().getConnections().stream().anyMatch(w->w.getOutput()==retained.findPort("Pitch")));

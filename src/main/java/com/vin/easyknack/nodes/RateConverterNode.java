@@ -2,7 +2,7 @@ package com.vin.easyknack.nodes;
 
 import java.util.List;
 
-@RegisterNode(id="easyknack.converter.rate", title="Rate Converter", category=NodeCategory.CONVERTER, kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.converter.rate", title="Rate Converter", category=NodeCategory.MATH, kind=NodeKind.VALUE)
 public final class RateConverterNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("value"), OUT=new PropertyId("out"),
             RATE=new PropertyId("rate"), REDUCTION=new PropertyId("reduction");

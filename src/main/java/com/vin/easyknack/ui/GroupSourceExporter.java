@@ -14,7 +14,7 @@ import com.vingame.glswing.node.model.*;
 
 /** Source bake: flatten once, prune dead branches, emit a statically wired native processor. */
 final class GroupSourceExporter {
-    record Port(GLCompositePortMapping mapping,PropertyId id,Editor editor,SignalCategory signal,Map<String,Double> choiceValues){
+    record Port(GLCompositePortMapping mapping,PropertyId id,Editor editor,SignalCategory signal,Map<String,Double> choiceValues,UnitFormats outputFormats){
         PortDataType dataType(){return switch(signal){case TRIGGER->PortDataType.TRIGGER;case MIDI->PortDataType.MIDI;case WAVETABLE->PortDataType.WAVEFORM;case HISTORY->PortDataType.HISTORY;case ANALYSIS->PortDataType.ANALYSIS;case SPECTRUM->PortDataType.SPECTRUM;case VECTOR->PortDataType.VECTOR;default->PortDataType.SIGNAL;};}
         int nativeKind(){return switch(signal){case MIDI->1;case HISTORY->2;case ANALYSIS->3;case SPECTRUM->4;case TRIGGER->5;case VECTOR->6;case WAVETABLE->7;default->0;};}
         boolean resource(){return nativeKind()>=2&&nativeKind()<=4||nativeKind()==7;}
@@ -48,6 +48,13 @@ final class GroupSourceExporter {
         var registry=new GLCompositeGraphRegistry();NodeDocuments.assets(document).forEach(registry::registerAsset);
         var descriptor=registry.findComposite(instance.typeId()).orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Select one group to export.")));
         var asset=registry.findAsset(descriptor.assetId()).orElseThrow();
+        var pending=new ArrayDeque<GLNodeGraphAsset>();var checked=new HashSet<String>();pending.add(asset);
+        while(!pending.isEmpty()){
+            var candidate=pending.removeFirst();if(!checked.add(candidate.id()))continue;
+            for(var port:candidate.compositeDescriptor().portMappings())if(!GroupEditorCopies.targets(port).isEmpty()&&!GroupInputs.choice(port))
+                throw new IllegalArgumentException(AppText.text("group.editor.exportUnsupported"));
+            for(var node:candidate.graph().nodes())registry.findComposite(node.typeId()).flatMap(d->registry.findAsset(d.assetId())).ifPresent(pending::add);
+        }
         String suffix=UUID.nameUUIDFromBytes((asset.id()+instance.id()).getBytes(StandardCharsets.UTF_8)).toString().replace("-","").substring(0,12);
         String className=(local?"LocalBakedGroup":"BakedGroup")+suffix,processor=(local?"local_baked_":"baked_")+suffix;
         var inputs=new ArrayList<Port>();var outputs=new ArrayList<Port>();
@@ -76,7 +83,8 @@ final class GroupSourceExporter {
                 }
             }
             if(input&&signal==SignalCategory.TRIGGER)slider=new Editor.Trigger();
-            var ports=input?inputs:outputs;ports.add(new Port(mapping,new PropertyId((input?"input_":"output_")+ports.size()),slider,signal,Map.copyOf(choiceValues)));
+            var ports=input?inputs:outputs;var outputBase=GroupUnits.base(registry,descriptor,mapping);var outputUnit=GroupUnits.selected(instance,mapping,outputBase);
+            ports.add(new Port(mapping,new PropertyId((input?"input_":"output_")+ports.size()),slider,signal,Map.copyOf(choiceValues),!input&&GroupUnits.numeric(mapping)?new UnitFormats(outputUnit,outputUnit,GroupUnits.allowed(mapping,outputBase)):null));
         }
         if(outputs.isEmpty()||outputs.size()>8)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Export requires between one and eight output ports."));
         // Sentinel leaves expose boundary endpoints through the existing nested-group flattener.
@@ -194,18 +202,7 @@ final class GroupSourceExporter {
         visiting.remove(id);done.add(id);order.add(graph.findNode(id).orElseThrow());
     }
     static GLNodeGraphSnapshot materializeUnits(GLNodeGraphSnapshot graph){
-        var nodes=new ArrayList<>(graph.nodes());var wires=new ArrayList<>(graph.connections());
-        for(var node:graph.nodes())for(var row:NodeRegistry.require(node.typeId()).layout(new NodeState(node.properties())).rows()){
-            if(row.kind()!=NodeBuilder.RowKind.INPUT||!(row.editor() instanceof UnitSlider slider)||slider.selected()==slider.formats().stored())continue;
-            var endpoint=new GLNodeEndpoint(node.id(),row.id());
-            var connection=wires.stream().filter(w->w.input().equals(endpoint)).findFirst().orElse(null);if(connection==null)continue;
-            var converter=new UnitConverterNode();var values=new HashMap<>(converter.defaults());
-            values.put("from",GLNodeValue.of(slider.selected().id()));values.put("to",GLNodeValue.of(slider.formats().stored().id()));
-            values.put("rate",GLNodeValue.of((row.adaptive()||new NodeState(node.properties()).text("rate","").equals("auto"))?"auto":row.rate().id()));
-            var id=GLNodeId.random();nodes.add(new GLGraphNode(id,converter.registration().id(),values));wires.remove(connection);
-            wires.add(wire(connection.output(),new GLNodeEndpoint(id,"value")));wires.add(wire(new GLNodeEndpoint(id,"out"),endpoint));
-        }
-        return new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,wires);
+        return PortUnitConversions.materialize(graph);
     }
     private static GLGraphConnection wire(GLNodeEndpoint out,GLNodeEndpoint in){return new GLGraphConnection(GLNodeConnectionId.random(),out,in);}
     private static ProcessingRate rate(BasicNode d,GLGraphNode n){return d.layout(new NodeState(n.properties())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(NodeBuilder.Row::rate).reduce(ProcessingRate.CONTROL,GroupPortRates::maximum);}
@@ -287,9 +284,12 @@ final class GroupSourceExporter {
         var s=(Editor.Slider)value;
         var f=s.formats();return "new Editor.Slider("+s.value()+", "+s.min()+", "+s.max()+", "+s.step()+", "+s.integral()+", "+s.bar()+", new UnitFormats(UnitFormat."+f.stored().name()+", UnitFormat."+f.initial().name()+", java.util.List.of("+String.join(",",f.choices().stream().map(u->"UnitFormat."+u.name()).toList())+")), "+s.continuousChanges()+")";
     }
+    private static String formatsSource(UnitFormats f){
+        return "new UnitFormats(UnitFormat."+f.stored().name()+",UnitFormat."+f.initial().name()+",java.util.List.of("+String.join(",",f.choices().stream().map(u->"UnitFormat."+u.name()).toList())+"))";
+    }
     private static String javaSource(String name,String processor,GLNodeGraphAsset asset,List<Port> inputs,List<Port> outputs,BakedRatePlan ratePlan,List<ChoiceParameter> choices,String monitorPath){
         String kind=new NodeState(asset.metadata()).text("easyknack.kind","AUDIO");
-        var category=Arrays.stream(NodeCategory.values()).filter(c->c.matches(new NodeState(asset.metadata()).text("easyknack.category",""))).findFirst().orElse(NodeCategory.EFFECT);
+        var category=Arrays.stream(NodeCategory.choices()).filter(c->c.matches(new NodeState(asset.metadata()).text("easyknack.category",""))).findFirst().orElse(NodeCategory.EFFECT);
         var s=new StringBuilder("package com.vin.easyknack.nodes;\n@RegisterNode(id=\"easyknack.baked.").append(processor.replace("_", "")).append("\",title=").append(quote(groupTitle(asset))).append(",category=NodeCategory.").append(category.name()).append(",kind=NodeKind.").append(NodeKind.valueOf(kind).name()).append(")\npublic final class ").append(name).append(" extends BasicNode {\n");
         s.append("    private record Choice(String id,String label){public String toString(){return label;}}\n");
         s.append("    private static final BakedRatePlan PLAN=").append(ratePlanSource(ratePlan)).append(";\n");
@@ -299,7 +299,7 @@ final class GroupSourceExporter {
         for(var p:concat(inputs,outputs))s.append("    public static final PropertyId ").append(p.id.value()).append("=new PropertyId(").append(quote(p.id.value())).append(");\n");
         s.append("    public void define(NodeBuilder n,NodeState s){\n");
         if(!monitorPath.isEmpty())s.append("        n.addEditor(new PropertyId(\"pitch_readout\"),\"Pitch\",new PitchReadoutEditor(").append(quote(monitorPath)).append(")).keepVisibleOnHide();\n");
-        for(var p:outputs)s.append("        n.addOutput(").append(p.id.value()).append(',').append(quote(p.mapping.publicPort().id())).append(").signal(SignalCategory.").append(p.signal.name()).append(").dataType(PortDataType.").append(p.dataType().name()).append(").rate(").append((p.signal==SignalCategory.MIDI||p.signal==SignalCategory.TRIGGER)?"ProcessingRate.EVENT":"ProcessingRate.fromId(s.text(ProcessingRate.EFFECTIVE+\".output_"+outputs.indexOf(p)+"\",PLAN.resolveOutputs(java.util.Map.of()).get("+outputs.indexOf(p)+").id()))").append(");\n");
+        for(var p:outputs)s.append("        n.addOutput(").append(p.id.value()).append(',').append(quote(p.mapping.publicPort().id())).append(")").append(p.outputFormats==null?"":".formats("+formatsSource(p.outputFormats)+")").append(".signal(SignalCategory.").append(p.signal.name()).append(").dataType(PortDataType.").append(p.dataType().name()).append(").rate(").append((p.signal==SignalCategory.MIDI||p.signal==SignalCategory.TRIGGER)?"ProcessingRate.EVENT":"ProcessingRate.fromId(s.text(ProcessingRate.EFFECTIVE+\".output_"+outputs.indexOf(p)+"\",PLAN.resolveOutputs(java.util.Map.of()).get("+outputs.indexOf(p)+").id()))").append(");\n");
         for(var id:editorOrder(asset,inputs,choices)){
             var port=inputs.stream().filter(p->p.id.value().equals(id)).findFirst();
             if(port.isPresent()){var p=port.get();s.append("        n.addInput(").append(p.id.value()).append(',').append(quote(p.mapping.publicPort().id()));if(p.editor!=null)s.append(',').append(editor(p.editor));s.append(").signal(SignalCategory.").append(p.signal.name()).append(')');s.append(".dataType(PortDataType.").append(p.dataType().name()).append(").rate(ProcessingRate.").append((p.signal==SignalCategory.MIDI||p.signal==SignalCategory.TRIGGER)?"EVENT":p.resource()?"CONTROL":"AUDIO").append(").socketVisible(").append(p.mapping.presentation().socketVisible()).append(")").append(inputRates(p)==null?"":".rates(PortRates."+inputRates(p).name()+")").append(";\n");}
@@ -347,7 +347,7 @@ final class GroupSourceExporter {
                 else {var choice=choices.stream().filter(c->c.id.value().equals(id)).findFirst().orElseThrow();n.addEditor(choice.id,choice.label,choice.editor);}
             }
         }
-        private void decorate(NodeBuilder.Row row,Port p,NodeState s){row.signal(p.signal).dataType(p.dataType()).rate((p.signal==SignalCategory.MIDI||p.signal==SignalCategory.TRIGGER)?ProcessingRate.EVENT:row.kind()==NodeBuilder.RowKind.OUTPUT?ProcessingRate.fromId(s.text(ProcessingRate.EFFECTIVE+".output_"+outputs.indexOf(p),ratePlan.resolveOutputs(Map.of()).get(outputs.indexOf(p)).id())):p.resource()?ProcessingRate.CONTROL:ProcessingRate.AUDIO);if(row.kind()==NodeBuilder.RowKind.INPUT&&inputRates(p)!=null)row.rates(inputRates(p));}
+        private void decorate(NodeBuilder.Row row,Port p,NodeState s){if(row.kind()==NodeBuilder.RowKind.OUTPUT)row.formats(p.outputFormats);row.signal(p.signal).dataType(p.dataType()).rate((p.signal==SignalCategory.MIDI||p.signal==SignalCategory.TRIGGER)?ProcessingRate.EVENT:row.kind()==NodeBuilder.RowKind.OUTPUT?ProcessingRate.fromId(s.text(ProcessingRate.EFFECTIVE+".output_"+outputs.indexOf(p),ratePlan.resolveOutputs(Map.of()).get(outputs.indexOf(p)).id())):p.resource()?ProcessingRate.CONTROL:ProcessingRate.AUDIO);if(row.kind()==NodeBuilder.RowKind.INPUT&&inputRates(p)!=null)row.rates(inputRates(p));}
         @Override public Map<String,GLNodeValue> defaults(){var values=new HashMap<>(super.defaults());values.put("rate",GLNodeValue.of("auto"));return values;}
         @Override public ProcessingRate resolveAutomaticRate(NodeState state,Map<PropertyId,ProcessingRate> incoming){return ratePlan.resolve(incoming);}
         @Override public List<ProcessingRate> resolveAutomaticOutputRates(NodeState state,Map<PropertyId,ProcessingRate> incoming){return ratePlan.resolveOutputs(incoming);}

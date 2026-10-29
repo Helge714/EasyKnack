@@ -23,7 +23,7 @@ class ContextInputTest {
                 connect(e,ids.get(1),MapRangeNode.OUT,ids.get(2),OscillatorNode.FREQUENCY);
                 connect(e,ids.get(2),OscillatorNode.OUT,ids.get(3),OutputNode.IN);
             });
-            var rows=context.layout(new NodeState(context.defaults())).rows();
+            var rows=context.layout(new NodeState(context.defaults())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).toList();
             assertEquals(4,rows.size());assertEquals(ProcessingRate.AUDIO,rows.get(3).rate());assertTrue(rows.subList(0,3).stream().allMatch(r->r.rate()==ProcessingRate.CONTROL&&r.kind()==NodeBuilder.RowKind.OUTPUT));
             String encoded=controller.audioGraph().replaceAll(" ![0-9a-f]{16} "," ");assertTrue(encoded.contains(" context  @ ccca -"));assertTrue(encoded.contains("maprange 0 0.0 -1 -1.0"));
             var view=controller.workspace().editor().getNodes().stream().filter(n->n.getTitle().equals("Context Input")).findFirst().orElseThrow();

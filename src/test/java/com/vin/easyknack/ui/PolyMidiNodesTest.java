@@ -50,8 +50,8 @@ class PolyMidiNodesTest {
     @Test void tooltipsDescribeMidiRangesAndDeviceSwitchKeepsRuntimeControls() throws Exception {
         SwingUtilities.invokeAndWait(()->{
             var definition=new MidiNoteNode();var view=definition.createView(new NodeViewContext((id,k,v)->{},new com.vingame.glswing.history.GLHistoryManager()),new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults()));
-            var tips=view.getContents().stream().filter(GLControl.class::isInstance).map(GLControl.class::cast).map(GLControl::getToolTipText).filter(Objects::nonNull).toList();
-            assertTrue(tips.stream().anyMatch(t->t.contains("One sample")));assertTrue(tips.stream().anyMatch(t->t.contains("0 = released")));assertTrue(tips.stream().anyMatch(t->t.contains("Range: 1.0 to 32.0")));
+            var tips=view.getContents().stream().filter(com.vingame.glswing.ui.GLToolTipTarget.class::isInstance).map(com.vingame.glswing.ui.GLToolTipTarget.class::cast).map(com.vingame.glswing.ui.GLToolTipTarget::getToolTipText).filter(Objects::nonNull).toList();
+            assertTrue(tips.stream().anyMatch(t->t.contains("One sample")));assertTrue(tips.stream().anyMatch(t->t.contains("0 = released")));assertTrue(tips.stream().anyMatch(t->t.contains("Range: 1 to 32")));
             var input=new MidiInputNode();var model=new GLGraphNode(GLNodeId.random(),input.registration().id(),input.defaults());
             assertEquals(MidiDevices.KEYBOARD.reference(),model.properties().get("device").toJavaValue());
             var inputView=input.createView(new NodeViewContext((id,k,v)->{},new com.vingame.glswing.history.GLHistoryManager()),model);

@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.modulation.triggercounter",title="Trigger Counter",category=NodeCategory.MODULATION,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.modulation.triggercounter",title="Trigger Counter",category=NodeCategory.TRIGGER,kind=NodeKind.VALUE)
 public final class TriggerCounterNode extends BasicNode {
     public boolean supportsSampleFeedback(){return true;}
     public boolean supportsTriggerFeedback(){return true;}

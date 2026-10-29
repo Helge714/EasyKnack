@@ -31,18 +31,18 @@ public record AnalysisEditor(boolean correlation,boolean resource) implements Ed
         private AnalysisChart.View viewport=AnalysisChart.View.FULL;
         private double cursorA=Double.NaN,cursorB=Double.NaN,dragX,dragY;
         private int dragMode;
-        public void resetView(){viewport=AnalysisChart.View.FULL;invalidateRecording();repaintGL();}
-        public void clearCursors(){cursorA=cursorB=Double.NaN;invalidateRecording();repaintGL();}
-        public void clearCursor(boolean first){if(first)cursorA=Double.NaN;else cursorB=Double.NaN;invalidateRecording();repaintGL();}
+        public void resetView(){viewport=AnalysisChart.View.FULL;updateReadout();invalidateRecording();repaintGL();}
+        public void clearCursors(){cursorA=cursorB=Double.NaN;updateReadout();invalidateRecording();repaintGL();}
+        public void clearCursor(boolean first){if(first)cursorA=Double.NaN;else cursorB=Double.NaN;updateReadout();invalidateRecording();repaintGL();}
         @Override protected String toolTipTextAt(com.vingame.glswing.input.GLMouseEvent e){return dragMode!=0?null:super.toolTipTextAt(e);}
         public AnalysisChart.Snapshot visibleSnapshot(){return snapshot().withView(source==null?AnalysisChart.View.FULL:viewport,cursorA,cursorB);}
         private double mouseFraction(double x){return Math.max(0,Math.min(1,(x-78)/Math.max(1,getWidth()-102)));}
-        private void moveCursor(double x){var s=visibleSnapshot();double value=s.xAt(mouseFraction(x));value=Math.copySign(s.sampleX(s.nearestIndex(value)),value);if(dragMode==1)cursorA=value;else cursorB=value;invalidateRecording();repaintGL();}
+        private void moveCursor(double x){var s=visibleSnapshot();double value=s.xAt(mouseFraction(x));value=Math.copySign(s.sampleX(s.nearestIndex(value)),value);if(dragMode==1)cursorA=value;else cursorB=value;updateReadout();invalidateRecording();repaintGL();}
         @Override public void mouseWheelMoved(com.vingame.glswing.input.GLMouseWheelEvent e){
             if(source==null)return;
             boolean vertical=e.getOriginalEvent().isShiftDown();
             double anchor=vertical?1-Math.max(0,Math.min(1,(e.getLocalY()-36)/Math.max(1,getHeight()-120))):mouseFraction(e.getLocalX());
-            viewport=viewport.zoom(anchor,Math.pow(1.2,e.getPreciseWheelRotation()),vertical);invalidateRecording();repaintGL();e.consume();
+            viewport=viewport.zoom(anchor,Math.pow(1.2,e.getPreciseWheelRotation()),vertical);updateReadout();invalidateRecording();repaintGL();e.consume();
         }
         @Override protected void controlMousePressed(com.vingame.glswing.input.GLMouseEvent e){
             GLToolTipManager.leave(this);
@@ -60,7 +60,7 @@ public record AnalysisEditor(boolean correlation,boolean resource) implements Ed
         @Override protected void controlMouseDragged(com.vingame.glswing.input.GLMouseEvent e){
             if(dragMode==0)return;
             if(dragMode==3){viewport=viewport.pan(-(e.getLocalX()-dragX)/Math.max(1,getWidth()-102)*(viewport.x1()-viewport.x0()),(e.getLocalY()-dragY)/Math.max(1,getHeight()-120)*(viewport.y1()-viewport.y0()));dragX=e.getLocalX();dragY=e.getLocalY();invalidateRecording();repaintGL();}
-            else moveCursor(e.getLocalX());e.consume();
+            else moveCursor(e.getLocalX());updateReadout();e.consume();
         }
         @Override protected void controlMouseReleased(com.vingame.glswing.input.GLMouseEvent e){if(dragMode!=0){dragMode=0;e.consume();}}
         @Override protected void controlMouseCaptureLost(com.vingame.glswing.input.GLMouseEvent e){dragMode=0;}
@@ -98,15 +98,14 @@ public record AnalysisEditor(boolean correlation,boolean resource) implements Ed
         public double verticalRange(){return root().range;}
         public float ordinate(double value,float height){return (float)(height*(1-value/verticalRange())/2);}
         public void bind(String id){nodeId=id;refresh();}
-        public void setPreview(boolean value){preview=value;caption.setVisible(!value);metrics();}
+        public void setPreview(boolean value){preview=value;caption.setVisible(!value);metrics();updateReadout();}
         private void metrics(){setIntrinsicPreferredGLSize(new GLSize(160,getGLTheme().values().getFloat(preview?"curve.previewHeight":"curve.height",preview?36:120)));}
         @Override protected void themeChanged(){super.themeChanged();metrics();}
         private void refresh(){
             var r=root();var current=AudioAnalysis.frame(r.nodeId);
             if(current!=r.lastReceived){r.lastReceived=current;if(current!=null)r.receivedAt=java.time.Instant.now().toString();}
-            var f=displayedFrame();
-            caption.setText(f==null?AppText.literal("Waiting for audio"):description());
-            setToolTipText(AppText.text(source!=null?"analysis.navigation":"analysis.hint"));invalidateRecording();repaintGL();
+            updateReadout();
+            invalidateRecording();repaintGL();
         }
         public String description(){
             var f=displayedFrame();if(f==null)return AppText.literal("Waiting for audio");
@@ -138,8 +137,25 @@ public record AnalysisEditor(boolean correlation,boolean resource) implements Ed
             if(!correlation)menu.addItem(AppText.literal(isTriggersVisible()?"Hide trigger lines":"Show trigger lines"),a->{setTriggersVisible(!isTriggersVisible());root().optionsChanged.run();});
             menu.show(host,e.getScreenX(),e.getScreenY());e.consume();
         }
-        @Override protected void controlMouseMoved(com.vingame.glswing.input.GLMouseEvent e){pointer=e.getLocalX();invalidateRecording();}
-        @Override protected void controlMouseExited(com.vingame.glswing.input.GLMouseEvent e){pointer=-1;invalidateRecording();}
+        @Override protected void controlMouseMoved(com.vingame.glswing.input.GLMouseEvent e){pointer=e.getLocalX();updateReadout();invalidateRecording();}
+        @Override protected void controlMouseExited(com.vingame.glswing.input.GLMouseEvent e){pointer=-1;updateReadout();invalidateRecording();}
+        // Update retained controls from input/data events, never while recording a frame.
+        private void updateReadout(){
+            var displayed=visibleSnapshot();double w=getWidth();
+            double left=source!=null?78:0,right=source!=null?24:0;
+            if(!preview&&pointer>=left&&pointer<w-right&&hasFrame()){
+                var s=displayed;var f=s.frame();
+                if(f!=null&&f.values().length>0){
+                    double ratio=Math.max(0,Math.min(1,(pointer-left)/Math.max(1,w-left-right)));
+                    double x=s.xAt(ratio);
+                    int index=s.nearestIndex(x);
+                    String readout=(isSpectrum()?"Bin "+index+" · "+Double.toString(s.sampleX(index))+" Hz":"i = "+index+" · "+AnalysisChart.number(Math.copySign(s.sampleX(index),x))+" ms")+" · y = "+Float.toString(f.values()[index]);
+                    caption.setText(readout);
+                    setToolTipText(readout);
+                }
+            }else {caption.setText(hasFrame()?description():AppText.literal("Waiting for audio"));setToolTipText(AppText.text(source!=null?"analysis.navigation":"analysis.hint"));}
+            String measurements=displayed.measurements();if(!measurements.isEmpty()){caption.setText(measurements);if(pointer<left||pointer>=w-right)setToolTipText(measurements+" · "+AppText.text("analysis.navigation"));}
+        }
         @Override protected void record(GLContext2D c){
             var displayed=visibleSnapshot();
             var style=getGLTheme().sliderStyle();int w=(int)getWidth(),h=(int)Math.max(1,getHeight()-(preview?0:22));
@@ -158,19 +174,6 @@ public record AnalysisEditor(boolean correlation,boolean resource) implements Ed
                     public void unclip(){c.endClip();}
                 },displayed,w,h,source!=null,Math.max(.001,c.getTransform().getMaximumScale()),palette);
             }finally{c.setStroke(old);}
-            double left=source!=null?78:0,right=source!=null?24:0;
-            if(!preview&&pointer>=left&&pointer<w-right){
-                var s=displayed;var f=s.frame();
-                if(f!=null&&f.values().length>0){
-                    double ratio=Math.max(0,Math.min(1,(pointer-left)/Math.max(1,w-left-right)));
-                    double x=s.xAt(ratio);
-                    int index=s.nearestIndex(x);
-                    String readout=(isSpectrum()?"Bin "+index+" · "+Double.toString(s.sampleX(index))+" Hz":"i = "+index+" · "+AnalysisChart.number(Math.copySign(s.sampleX(index),x))+" ms")+" · y = "+Float.toString(f.values()[index]);
-                    caption.setText(readout);
-                    setToolTipText(readout);
-                }
-            }else {caption.setText(hasFrame()?description():AppText.literal("Waiting for audio"));setToolTipText(AppText.text(source!=null?"analysis.navigation":"analysis.hint"));}
-            String measurements=displayed.measurements();if(!measurements.isEmpty()){caption.setText(measurements);if(pointer<left||pointer>=w-right)setToolTipText(measurements+" · "+AppText.text("analysis.navigation"));}
             caption.setBounds(4,h,Math.max(0,w-8),22);
         }
     }

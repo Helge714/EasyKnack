@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.vingame.glswing.node.model.GLNodeValue;
 
-@RegisterNode(id = "easyknack.audio.samplehold", title = "Sample & Hold", category=NodeCategory.MODULATION, kind = NodeKind.VALUE)
+@RegisterNode(id = "easyknack.audio.samplehold", title = "Sample & Hold", category=NodeCategory.MATH, kind = NodeKind.VALUE)
 public final class SampleHoldNode extends BasicNode {
 
 	public static final PropertyId IN = new PropertyId("audio-in");

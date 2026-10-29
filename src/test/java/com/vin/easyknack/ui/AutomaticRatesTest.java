@@ -63,7 +63,7 @@ class AutomaticRatesTest {
         });
         var encoded=AudioGraphEncoder.encode(graph.snapshot());
         assertTrue(encoded.contains("@ a ac"));assertTrue(encoded.contains("@ a acccc"));
-        for(BasicNode n:List.of(new MathNode(),new MapRangeNode(),new MixNode(),new CurveNode(),new GainConverterNode()))
+        for(BasicNode n:List.of(new MathNode(),new MapRangeNode(),new MixNode(),new CurveNode(),new UnitConverterNode()))
             assertEquals("auto",n.defaults().get("rate").toJavaValue());
     }
     @Test void channelNodesEncodeCrossedOutputsAndSurviveDocumentRoundTrip()throws Exception{

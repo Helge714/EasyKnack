@@ -4,7 +4,7 @@ import com.vin.easyknack.audio.AudioEndpoint;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
-@RegisterNode(id = "easyknack.audio.input", title = "Audio Input", category=NodeCategory.IO, kind=NodeKind.AUDIO)
+@RegisterNode(id = "easyknack.audio.input", title = "Audio Input", category=NodeCategory.INPUT, kind=NodeKind.AUDIO)
 public final class InputNode extends BasicNode {
     public enum Mode { COPY; @Override public String toString() { return "Copy"; } }
     public enum Channels { MONO, STEREO; @Override public String toString() { return this == MONO ? "Mono" : "Stereo"; } }

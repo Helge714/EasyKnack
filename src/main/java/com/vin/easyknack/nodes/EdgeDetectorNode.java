@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.vin.easyknack.model.EdgeMode;
 
-@RegisterNode(id = "easyknack.audio.edgedetector", title = "Trigger Converter", category = NodeCategory.CONVERTER, kind = NodeKind.TRIGGER)
+@RegisterNode(id = "easyknack.audio.edgedetector", title="Threshold Trigger", category=NodeCategory.TRIGGER, kind = NodeKind.TRIGGER)
 public final class EdgeDetectorNode extends BasicNode {
 
 	public static final PropertyId IN = new PropertyId("in");

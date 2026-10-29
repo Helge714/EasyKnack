@@ -52,6 +52,7 @@ public final class NodeRegistry {
     public NodeRegistry(GLNodeTypeRegistry types, GLNodeCatalog catalog) {
         this.types = types;
         catalog.setRecentLimit(0);
+        catalog.setCategoryOrder(NodeCategory.menuOrder());
         var numeric=Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),"easyknack.waveform");
         types.setValueTypeCompatibility((a,b)->a.equals(b)||numeric.contains(a)&&numeric.contains(b)||a.equals(PortDataType.SPECTRUM.id())&&b.equals(PortDataType.ANALYSIS.id()));
         catalog.setValueTypeCompatibility(types::compatibleValueTypes);
@@ -118,7 +119,7 @@ public final class NodeRegistry {
                         control.update().accept(model.properties().getOrDefault(row.id(),slider.defaultValue()));
                         slider.bindUnitMenu((com.vingame.glswing.ui.GLSlider)control.component(),unit->{
                             for(var parent=control.component().getGLParent();parent!=null;parent=parent instanceof com.vingame.glswing.component.GLContainer container?container.getGLParent():null)
-                                if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(row.id()+".unit",GLNodeValue.of(unit.id()));break;}
+                                if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(row.unitProperty().value(),GLNodeValue.of(unit.id()));break;}
                         });
                         ((com.vingame.glswing.ui.GLSlider)control.component()).getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->{
                             for(var parent=control.component().getGLParent();parent!=null;parent=parent instanceof com.vingame.glswing.component.GLContainer container?container.getGLParent():null)
@@ -162,15 +163,6 @@ public final class NodeRegistry {
         if(definition instanceof VoiceMergeNode && java.util.Set.of("spread","pitch").contains(new NodeState(node.properties()).text(VoiceMergeNode.MODE,"sum"))){
             definition=DEFINITIONS.get("easyknack.audio.legacyvoicemerge");
             node=node.withType(definition.registration().id(),node.typeVersion());
-        }
-        if(definition.getClass()==UnitConverterNode.class){
-            var old=new NodeState(node.properties());
-            var from=UnitFormat.fromId(old.text(UnitConverterNode.FROM,"factor"));
-            var to=UnitFormat.fromId(old.text(UnitConverterNode.TO,"percent"));
-            for(var candidate:DEFINITIONS.values())if(candidate instanceof UnitConverterNode converter && candidate.isListedInCatalog()
-                    && converter.pool().contains(from) && converter.pool().contains(to)){
-                definition=candidate;node=node.withType(candidate.registration().id(),node.typeVersion());break;
-            }
         }
         if(!node.properties().containsKey("rate") && (definition instanceof MathNode || definition instanceof MapRangeNode
                 || definition instanceof MixNode || definition instanceof CurveNode || definition instanceof UnitConverterNode))

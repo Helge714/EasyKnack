@@ -4,7 +4,7 @@ import java.util.function.ToIntFunction;
 import com.vin.easyknack.audio.MidiDevices;
 import com.vingame.glswing.node.model.GLNodeValue;
 
-@RegisterNode(id="easyknack.midi.input",title="MIDI Input",category=NodeCategory.MIDI, kind=NodeKind.MIDI)
+@RegisterNode(id="easyknack.midi.input",title="MIDI Input",category=NodeCategory.INPUT, kind=NodeKind.MIDI)
 public final class MidiInputNode extends BasicNode {
     public static final PropertyId OUT=new PropertyId("midi-out"),DEVICE=new PropertyId("device"),PANIC=new PropertyId("panic");
     public static final PropertyId KEYBOARD=new PropertyId("keyboard"),TRANSPOSE=new PropertyId("transpose");

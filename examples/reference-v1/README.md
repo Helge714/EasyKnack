@@ -6,7 +6,7 @@ Die Dokumente sind eigenständig und verändern keine persönlichen Projekte.
 
 | Projekt | Prüfzweck |
 |---|---|
-| `math.knack` | Math, Mix, MapRange, Gain Converter, Untergruppe, Konstanten und Fanout |
+| `math.knack` | Math, Mix, MapRange, Unit Converter, Untergruppe, Konstanten und Fanout |
 | `synth-1.knack`, `synth-8.knack`, `synth-32.knack` | MIDI Note, Envelope, Complex Oscillator mit 16 Teiltönen, Filter pro Stimme, Mean Merge |
 | `stereo.knack` | Context → Frequenzmapping → Oscillator, Pan, Separate und vertauschte Combine-Eingänge |
 | `rates.knack` | MIDI Delay, Event-Math, Oszillator, Control-RMS und geglätteter Audio-Verbraucher |

@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id = "easyknack.audio.clock", title = "Clock", category=NodeCategory.MODULATION, kind = NodeKind.TRIGGER)
+@RegisterNode(id = "easyknack.audio.clock", title = "Clock", category=NodeCategory.GENERATOR, kind = NodeKind.TRIGGER)
 public final class ClockNode extends BasicNode {
 
 	public static final PropertyId FREQUENCY = new PropertyId("frequency");

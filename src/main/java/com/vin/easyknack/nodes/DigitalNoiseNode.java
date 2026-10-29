@@ -20,11 +20,11 @@ public final class DigitalNoiseNode extends BasicNode {
 	@Override
 	public void define(NodeBuilder node, NodeState state) {
 
-		node.addOutput(FACTOR, "Factor").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
+		node.addOutput(FACTOR, "Factor").formats(new UnitFormats(UnitFormat.FACTOR,UnitFormat.FACTOR,java.util.List.of(UnitFormat.FACTOR,UnitFormat.PERCENT,UnitFormat.CENT,UnitFormat.SEMITONE,UnitFormat.OCTAVE))).signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
 				.tooltip(NodeText.text("digitalnoise.factor.help","Random factor held for one self-modulated cycle. Time-weighted deviations are symmetric in octaves. Strength 1 spans 0.5x to 2x; this does not fix the arithmetic mean frequency or linear spectral centroid."));
 		node.addOutput(TRIGGER, "Trigger").rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
 				.tooltip(com.vin.easyknack.ui.AppText.literal("One-sample pulse whenever a new random factor is drawn."));
-		node.addOutput(FREQUENCY_OUT, "Frequency").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
+		node.addOutput(FREQUENCY_OUT, "Frequency").formats(UnitFormats.CLOCK).signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
 				.tooltip(com.vin.easyknack.ui.AppText.literal("Base frequency multiplied by this sample's Factor, in Hz. Connect directly to an oscillator's Frequency input."));
 		node.addInput(FREQUENCY, "Frequency",
 				Editor.Slider.button(440, 0.00001, 20000.0).step(1).formats(UnitFormats.FREQUENCY))

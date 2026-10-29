@@ -103,3 +103,26 @@ format, so very long-running absolute time has less fractional precision.
 
 Avoid using an audio sawtooth as a phase ramp: its band-limited reset has ringing
 and a transition which cause a brief, unintended rotation after mapping to angles.
+
+## Group vector editors
+
+Connect a group Vector input to an internal Vector input, then choose **Copy Editor**
+in Group IO. The group keeps the source editor's XYZ controls, default values and
+unit choices, including angle and scale formats. Edit the copied default as an XYZ
+group in Group IO. Connected group inputs collapse to one row.
+
+For a standalone editor such as Vector Input / Position, choose its editor type
+and select the instances to couple. The internal controls show the group default
+and are disabled while coupled. Values and display units persist with the document.
+
+## Vector quantities
+
+Vector Input, Combine, Separate, Math, Length, Distance and Dot provide a **Quantity**
+setting in the inspector. Choose position/length, angle, scale or unitless values.
+Lengths use metres internally; angles use degrees; scale uses a factor. Display
+units can be changed to kilometres/centimetres/millimetres, radians/turns or percent.
+Changing quantity preserves the numeric components and resets incompatible units.
+Connections never change their units automatically. Set Combine to Angle when
+constructing a rotation vector. Rotate's rotation and Scale's scale inputs retain
+their respective fixed quantity; origins remain positions. Dot products remain
+raw numbers because their units are products of the input units.

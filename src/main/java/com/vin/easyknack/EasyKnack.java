@@ -24,7 +24,7 @@ public final class EasyKnack {
                 .locale(com.vin.easyknack.ui.ApplicationSettings.locale())
                 .title(com.vin.easyknack.ui.AppText.literal("EasyKnack — Audio Workspace"))
                 .backend(GLBackend.CANVAS)
-                .splash(splash -> splash.size(560, 392).padding(20))
+                .splash(splash -> splash.size(560, 392).padding(40))
                 .splashView(ApplicationArtwork::splash)
                 .size(1280, 800)
                 .minimumSize(900, 600)

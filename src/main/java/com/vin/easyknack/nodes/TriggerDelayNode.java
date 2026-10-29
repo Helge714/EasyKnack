@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.modulation.triggerdelay",title="Trigger Delay",category=NodeCategory.MODULATION,kind=NodeKind.TRIGGER)
+@RegisterNode(id="easyknack.modulation.triggerdelay",title="Trigger Delay",category=NodeCategory.TRIGGER,kind=NodeKind.TRIGGER)
 public final class TriggerDelayNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("trigger"),OUT=new PropertyId("trigger-out"),TIME=new PropertyId("time"),RESET=new PropertyId("reset");
     public boolean supportsSampleFeedback(){return true;}

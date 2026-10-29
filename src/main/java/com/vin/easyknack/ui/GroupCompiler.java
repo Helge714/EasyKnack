@@ -34,6 +34,23 @@ final class GroupCompiler {
                     properties.add(new GLCompositePropertyDescriptor(unit,"text",GLCompositeValueKind.TEXT,GLNodeValue.of("factor")));
                     bindings.add(new Adapter(p,UnitFormat.FACTOR,key,unit));ports.add(p.withEndpoints(List.of()));continue;
                 }
+                if(p.publicPort().direction()==GLPortDirection.OUTPUT && p.isBound() && GroupUnits.numeric(p)) {
+                    var base=GroupUnits.base(original,d,p);var sourceUnit=GroupUnits.target(original,d,p);
+                    var instances=java.util.stream.Stream.concat(java.util.stream.Stream.of(root),original.assets().stream()).flatMap(a->a.graph().nodes().stream()).filter(n->n.typeId().equals(d.nodeTypeId()));
+                    boolean convert=GroupUnits.initial(p,base)!=sourceUnit || instances.anyMatch(n->GroupUnits.selected(n,p,base)!=sourceUnit);
+                    if(!convert){ports.add(p);continue;}
+                    String ukey=GroupUnits.unitKey(p.publicPort().id());
+                    var id=new GLNodeId(UUID.nameUUIDFromBytes((asset.id()+"/output-unit/"+p.publicPort().id()).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+                    var def=new UnitConverterNode();var values=new HashMap<>(def.defaults());
+                    values.put("from",GLNodeValue.of(sourceUnit.id()));values.put("to",GLNodeValue.of(base.id()));
+                    nodes.add(new GLGraphNode(id,def.registration().id(),values));
+                    wires.add(new GLGraphConnection(new GLNodeConnectionId(UUID.nameUUIDFromBytes((id+"/wire").getBytes(java.nio.charset.StandardCharsets.UTF_8))),p.internalEndpoint(),new GLNodeEndpoint(id,"value")));
+                    ports.add(p.withEndpoints(List.of(new GLNodeEndpoint(id,"out"))));
+                    properties.removeIf(property->property.id().equals(ukey));
+                    properties.add(new GLCompositePropertyDescriptor(ukey,"text",GLCompositeValueKind.TEXT,GLNodeValue.of(base.id())));
+                    mappings.add(new GLCompositePropertyMapping(ukey,id,"to"));
+                    bindings.add(new Adapter(p,base,"",ukey));continue;
+                }
                 // Unbound inputs still own their editor values (including pending Formula ports).
                 // Declare them without creating DSP adapters until an internal target exists.
                 if(p.publicPort().direction()==GLPortDirection.INPUT && !p.isBound() && Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId())
@@ -46,6 +63,19 @@ final class GroupCompiler {
                     properties.add(new GLCompositePropertyDescriptor(key,"number",GLCompositeValueKind.DECIMAL,GLNodeValue.of(fallback)));
                     properties.add(new GLCompositePropertyDescriptor(unit,"text",GLCompositeValueKind.TEXT,GLNodeValue.of(base.id())));
                     ports.add(p);continue;
+                }
+                if(p.publicPort().direction()==GLPortDirection.INPUT && GroupVectorEditors.isVector(p)){
+                    String key=GroupUnits.key(p.publicPort().id());var fallback=p.presentation().editorOptions().get("default");
+                    properties.removeIf(v->v.id().equals(key));properties.add(new GLCompositePropertyDescriptor(key,"vector",GLCompositeValueKind.LIST,fallback));
+                    var endpoints=new ArrayList<GLNodeEndpoint>();
+                    for(var endpoint:p.internalEndpoints()){
+                        var id=new GLNodeId(UUID.nameUUIDFromBytes((asset.id()+"/vector-input/"+p.publicPort().id()+"/"+endpoint).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+                        var def=new VectorMathNode();var values=new HashMap<>(def.defaults());values.put("a",fallback);values.put("vectorUnit",p.presentation().editorOptions().get(GroupUnits.BASE));values.put("b",VectorEditor.value(0,0,0,GroupVectorEditors.editor(p).formats().stored()));values.put("rate",GLNodeValue.of(GroupInputSettings.selectedRate(p).id()));
+                        nodes.add(new GLGraphNode(id,def.registration().id(),values));endpoints.add(new GLNodeEndpoint(id,"a"));
+                        wires.add(new GLGraphConnection(new GLNodeConnectionId(UUID.nameUUIDFromBytes((id+"/wire").getBytes(java.nio.charset.StandardCharsets.UTF_8))),new GLNodeEndpoint(id,"vector"),endpoint));
+                        mappings.add(new GLCompositePropertyMapping(key,id,"a"));
+                    }
+                    ports.add(p.withEndpoints(endpoints));continue;
                 }
                 var requested=GroupInputSettings.selectedRate(p);
                 if(p.publicPort().direction()==GLPortDirection.INPUT&&p.isBound()&&GroupInputs.template(p)!=null&&!p.publicPort().valueTypeId().equals(SignalCategory.WAVETABLE.valueTypeId())&&(requested==ProcessingRate.AUDIO||requested==ProcessingRate.CONTROL)){
@@ -60,13 +90,13 @@ final class GroupCompiler {
                     }
                     ports.add(p.withEndpoints(endpoints));continue;
                 }
-                if(p.publicPort().direction()!=GLPortDirection.INPUT||!p.isBound()||!p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER)){ports.add(p);continue;}
+                if(p.publicPort().direction()!=GLPortDirection.INPUT||!p.isBound()||!GroupUnits.numeric(p)||!(p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER)||p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE))){ports.add(p);continue;}
                 String key=GroupUnits.key(p.publicPort().id()),ukey=GroupUnits.unitKey(p.publicPort().id());
                 var base=GroupUnits.base(original,d,p);
                 double fallback=new NodeState(p.presentation().editorOptions()).number("default",0);
                 var adapterEndpoints=new ArrayList<GLNodeEndpoint>();
                 for(var endpoint:p.internalEndpoints()) {
-                var target=GroupInputSettings.checkbox(p)?UnitFormat.FACTOR:GroupUnits.target(original,d,p.withEndpoints(List.of(endpoint)));
+                var target=GroupInputSettings.checkbox(p)?UnitFormat.FACTOR:GroupUnits.targetOrBase(original,d,p.withEndpoints(List.of(endpoint)),base);
                 if(!base.compatible(target))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Group input units do not match the internal input: ")+p.publicPort().id());
                 var id=new GLNodeId(UUID.nameUUIDFromBytes((asset.id()+"/unit/"+p.publicPort().id()+"/"+endpoint).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
                 var def=new UnitConverterNode();var values=new HashMap<>(def.defaults());
@@ -102,9 +132,11 @@ final class GroupCompiler {
         var graph=asset.graph();var nodes=graph.nodes().stream().map(raw->{
             var node=raw.withoutProperty(GroupBakes.PROPERTY);
             var bindings=adapters.get(node.typeId());if(bindings==null)return node;
-            var values=new HashMap<>(node.properties());values.keySet().removeIf(k->k.startsWith(GroupUnits.PREFIX));
+            var values=new HashMap<>(node.properties());
             for(var binding:bindings){
                 var selected=GroupUnits.selected(node,binding.port,binding.base);
+                if(binding.port.publicPort().direction()==GLPortDirection.OUTPUT){values.put(binding.unitKey,GLNodeValue.of(selected.id()));continue;}
+
                 double fallback=new NodeState(binding.port.presentation().editorOptions()).number("default",0);
                 double value=new NodeState(node.properties()).number(binding.valueKey,MultipleGroups.countPort(binding.port)?new NodeState(node.properties()).number(MultipleGroups.COUNT_PROPERTY,fallback):fallback);
                 if(GroupInputSettings.checkbox(binding.port))value=value==0?0:1;

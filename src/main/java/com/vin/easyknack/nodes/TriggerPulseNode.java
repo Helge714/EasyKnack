@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.converter.triggerpulse",title="Trigger to Pulse",category=NodeCategory.CONVERTER,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.converter.triggerpulse",title="Trigger to Pulse",category=NodeCategory.TRIGGER,kind=NodeKind.VALUE)
 public final class TriggerPulseNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("trigger"),OUT=new PropertyId("audio-out");
     public void define(NodeBuilder n,NodeState s){

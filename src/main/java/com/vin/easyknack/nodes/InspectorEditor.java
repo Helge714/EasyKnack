@@ -10,10 +10,11 @@ public final class InspectorEditor extends GLContainer {
     private final NodeBuilder.Row row;
     private final BasicNode definition;
     private final GLLabel label;
+    private boolean synchronizing;
     private InspectorEditor(NodeBuilder.Row row,BasicNode definition,GLGraphNode model,java.util.function.Consumer<GLNodeValue> changed){
         this.row=row;this.definition=definition;
         row=definition.layout(new NodeState(model.properties())).rows().stream().filter(r->r.id().equals(this.row.id())).findFirst().orElse(row);
-        editor=row.editor().create(row.label(),changed);
+        editor=row.editor().create(row.label(),value->{if(!synchronizing)changed.accept(value);});
         if(editor.component() instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->{
             for(var parent=getGLParent();parent!=null;parent=parent instanceof GLContainer c?c.getGLParent():null)
                 if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(GLGraphNode.AUTOMATIC_PREFIX+this.row.id(),GLNodeValue.of(true));break;}
@@ -33,11 +34,14 @@ public final class InspectorEditor extends GLContainer {
     }
     public GLContainer control(){return editor.component();}
     private void update(GLGraphNode model){
+        synchronizing=true;
+        try {
         var current=definition.layout(new NodeState(model.properties())).rows().stream().filter(r->r.id().equals(row.id())).findFirst().orElse(row);
         EditorPresentation.update(current,editor.component());if(label!=null)label.setText(current.label());
-        editor.update().accept(model.properties().getOrDefault(row.id(),row.editor().defaultValue()));
+        editor.update().accept(model.properties().getOrDefault(row.id(),current.editor().defaultValue()));
         definition.updateEditor(row.key(),editor.component(),new NodeState(model.properties()));
-        if(!row.isEnabled()&&editor.component() instanceof GLControl control)control.setEnabled(false);
+        if(editor.component() instanceof GLControl control)control.setEnabled(current.isEnabled());
+        } finally {synchronizing=false;}
     }
     @Override protected void resized(float width,float height){float top=label==null?0:24;if(label!=null)label.setBounds(0,0,width,24);editor.component().setBounds(0,top,width,Math.max(0,height-top));}
     @Override protected void record(com.vingame.glswing.rendering.GLContext2D context){}

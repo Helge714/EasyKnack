@@ -82,8 +82,8 @@ class SidebarAndPortTest {
                     assertEquals(2, workspace.editor().getNodes().size());
                     for (var node : workspace.editor().getNodes()) assertEquals(ApplicationTheme.current().signal(SignalCategory.VALUE), node.findPort("out").getColor());
                     assertTrue(workspace.openComposite("test.asset")); colors.refresh();
-                    assertEquals(1, workspace.editor().getNodes().size());
-                    assertEquals(ApplicationTheme.current().signal(SignalCategory.VALUE), workspace.editor().getNodes().get(0).findPort("out").getColor());
+                    assertEquals(2, workspace.editor().getNodes().size()); // Empty input boundary remains a drop target.
+                    assertEquals(ApplicationTheme.current().signal(SignalCategory.VALUE), workspace.editor().getNodes().stream().filter(n->n.findPort("out")!=null).findFirst().orElseThrow().findPort("out").getColor());
                 } finally { colors.close(); }
             }
         });

@@ -179,7 +179,7 @@ final class MultipleGroups {
             boolean context=graph.findNode(w.output().nodeId()).map(n->NodeRegistry.find(n.typeId()).orElse(null) instanceof InstanceContextNode).orElse(false);
             if(shared.contains(w.input().nodeId())&&!boundaries.contains(w.output().nodeId())&&(perInstance.contains(w.output().nodeId())||context)
                 ||boundaries.contains(w.output().nodeId())&&perInstance.contains(w.input().nodeId()))
-                result.add(new GLGraphDiagnostic(GLGraphDiagnostic.Severity.ERROR,"instance.boundary","Connect per-instance signals through Instance Combine. Shared signals cannot feed back into the instance area.",Set.of(),Set.of(w.id())));
+                result.add(new GLGraphDiagnostic(GLGraphDiagnostic.Severity.ERROR,"instance.boundary","Connect per-instance signals through Instance Merge. Shared signals cannot feed back into the instance area.",Set.of(),Set.of(w.id())));
         }
         return result;
     }

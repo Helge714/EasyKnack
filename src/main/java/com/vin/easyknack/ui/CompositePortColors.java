@@ -86,6 +86,7 @@ final class CompositePortColors implements GLNodeEditorListener {
         for (var mapping : descriptor.portMappings()) {
             var port = view.findPort(mapping.publicPort().id());
             if (port != null) {
+                if(!GroupEditorCopies.targets(mapping).isEmpty())port.setSocketVisible(false);
                 var category = Arrays.stream(SignalCategory.values())
                         .filter(c -> c.valueTypeId().equals(mapping.publicPort().valueTypeId()))
                         .findFirst().orElse(SignalCategory.AUDIO);

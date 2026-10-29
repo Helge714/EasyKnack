@@ -15,7 +15,8 @@ final class GroupInputTriggers {
             var materialized=FormulaGroups.materialize(asset);var mapped=materialized.compositeDescriptor().portMappings().stream().filter(p->p.publicPort().id().equals(port.publicPort().id())).findFirst().orElse(null);
             if(mapped!=null&&mapped.isBound())targets.add(path+mapped.internalEndpoint().nodeId()+":"+mapped.internalEndpoint().portId());visiting.remove(key);return;
         }
-        for(var endpoint:port.internalEndpoints()){
+        var endpoints=new LinkedHashSet<>(port.internalEndpoints());endpoints.addAll(GroupEditorCopies.targets(port));
+        for(var endpoint:endpoints){
             var node=asset.graph().findNode(endpoint.nodeId()).orElse(null);if(node==null)continue;
             var nested=groups.findComposite(node.typeId()).orElse(null);
             if(nested==null)targets.add(path+node.id()+":"+endpoint.portId());

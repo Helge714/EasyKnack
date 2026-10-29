@@ -10,7 +10,7 @@ public record UnitSlider(Editor.Slider spec,UnitFormats formats,UnitFormat selec
     public GLNodeValue defaultValue(){return spec.defaultValue();}
     public void validate(GLNodeValue value){spec.validate(value);}
     public String viewKey(){return spec.viewKey()+":"+selected.id();}
-    public String structuralKey(){return "unit:"+spec.structuralKey();}
+    public String structuralKey(){return "unit:"+spec.structuralKey()+":"+formats;}
     public double display(double value){return formats.stored().convert(value,selected);}
     public double stored(double value){return selected.convert(value,formats.stored());}
     @Override public Control create(String label,Consumer<GLNodeValue> changed){

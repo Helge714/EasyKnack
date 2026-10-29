@@ -1,7 +1,7 @@
 package com.vin.easyknack.nodes;
 
 /** An execution boundary, lowered by the Instance Group compiler. */
-@RegisterNode(id="easyknack.multiple.combine",title="Instance Combine",category=NodeCategory.ROUTING,kind=NodeKind.AUDIO)
+@RegisterNode(id="easyknack.multiple.combine",title="Instance Merge",category=NodeCategory.ROUTING,kind=NodeKind.AUDIO)
 public final class InstanceCombineNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("in"),WEIGHT=new PropertyId("weight"),OUT=new PropertyId("out"),MODE=new PropertyId("mode");
     @Override public boolean isMuteable(){return false;}

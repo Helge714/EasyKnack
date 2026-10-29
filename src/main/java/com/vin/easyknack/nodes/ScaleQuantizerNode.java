@@ -1,13 +1,13 @@
 package com.vin.easyknack.nodes;
 
 import java.util.List;
-@RegisterNode(id="easyknack.music.scalequantizer",title="Scale Quantizer",category=NodeCategory.CONVERTER,kind=NodeKind.VALUE)
+@RegisterNode(id="easyknack.music.scalequantizer",title="Scale Quantizer",category=NodeCategory.MATH,kind=NodeKind.VALUE)
 public final class ScaleQuantizerNode extends BasicNode {
     public static final PropertyId HYSTERESIS=new PropertyId("hysteresis");
     public static final UnitFormats HYSTERESIS_UNITS=new UnitFormats(UnitFormat.SEMITONE,UnitFormat.SEMITONE,List.of(UnitFormat.SEMITONE,UnitFormat.CENT));
     public static final PropertyId IN=new PropertyId("frequency"),OUT=new PropertyId("out"),MODE=new PropertyId("mode"),TARGET=new PropertyId("target"),ROOT=new PropertyId("root"),SCALE=new PropertyId("scale"),TUNING=new PropertyId("tuning"),RATE=new PropertyId("rate");
     public void define(NodeBuilder n,NodeState s){
-        n.addOutput(OUT,"Target [Hz]").signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
+        n.addOutput(OUT,"Target [Hz]").formats(UnitFormats.CLOCK).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         n.addEditor(MODE,"Mode",Editor.comboBox(List.of("Scale","Fixed"),"Scale",v->v.toLowerCase(java.util.Locale.ROOT)));
         n.addEditor(ROOT,"Root",Editor.comboBox(List.of("C","C#","D","D#","E","F","F#","G","G#","A","A#","B"),"C",v->Integer.toString(List.of("C","C#","D","D#","E","F","F#","G","G#","A","A#","B").indexOf(v))));
         n.addEditor(SCALE,"Scale",Editor.comboBox(List.of("Chromatic","Major","Minor","Major pentatonic","Minor pentatonic"),"Chromatic",v->v.toLowerCase(java.util.Locale.ROOT).replace(' ','_')));

@@ -11,7 +11,7 @@ public final class FormulaNode extends BasicNode {
     public static PropertyId output(int i){return new PropertyId("out"+i);}
     public static String hex(String text){return java.util.HexFormat.of().formatHex(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));}
     public boolean isListedInCatalog(){return false;}
-    public boolean supportsSampleFeedback(){return true;}
+    public boolean supportsSpectralBins(){return true;} public boolean supportsSampleFeedback(){return true;}
     public boolean supportsTriggerFeedback(){return true;}
     public static int count(NodeState s,String key,int fallback,int max){int n=(int)s.number(key,fallback);if(n<0||n>max)throw new IllegalArgumentException("Formula port limit exceeded");return n;}
     public void define(NodeBuilder n,NodeState s){

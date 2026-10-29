@@ -20,7 +20,7 @@ final class GroupSettings extends GLContainer {
     private final GroupInputSettings inputSettings;
     private final GLLabel kindLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Node type (title color)")),categoryLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Add menu category"));
     private final GLComboBox<NodeKind> kind=new GLComboBox<>(List.of(NodeKind.values()));
-    private final GLComboBox<NodeCategory> category=new GLComboBox<>(List.of(NodeCategory.values()));
+    private final GLComboBox<NodeCategory> category=new GLComboBox<>(List.of(NodeCategory.choices()));
     private final List<GLLabel> routingLabels=List.of(new GLLabel(com.vin.easyknack.ui.AppText.literal("Insert: input")),new GLLabel(com.vin.easyknack.ui.AppText.literal("Insert: output")),new GLLabel(com.vin.easyknack.ui.AppText.literal("Mute bypass: input")),new GLLabel(com.vin.easyknack.ui.AppText.literal("Mute bypass: output")));
     private final List<GLComboBox<String>> routing=List.of(new GLComboBox<>(),new GLComboBox<>(),new GLComboBox<>(),new GLComboBox<>());
     private static final List<String> ROUTING_KEYS=List.of(GroupRouting.INSERT_IN,GroupRouting.INSERT_OUT,GroupRouting.MUTE_IN,GroupRouting.MUTE_OUT);
@@ -89,12 +89,12 @@ final class GroupSettings extends GLContainer {
             general.setPreferredGLSize(280,112+4*54+(multiple?(legacy?112:56):0)+(spectral?72:0)+(formula?54:0));
             if(multiple){var state=new NodeState(asset.metadata());maximumInstances.setText(state.text(MultipleGroups.MAXIMUM,"16"));mergeMode.setSelectedItem(state.text(MultipleGroups.MERGE,"mean"));}
             kind.setEnabled(asset!=null);category.setEnabled(asset!=null);
-            if(asset!=null){var state=new NodeState(asset.metadata());kind.setSelectedItem(NodeKind.valueOf(state.text("easyknack.kind","AUDIO")));category.setSelectedItem(Arrays.stream(NodeCategory.values()).filter(c->c.matches(state.text("easyknack.category",""))).findFirst().orElse(NodeCategory.ROUTING));}
+            if(asset!=null){var state=new NodeState(asset.metadata());kind.setSelectedItem(NodeKind.valueOf(state.text("easyknack.kind","AUDIO")));category.setSelectedItem(Arrays.stream(NodeCategory.choices()).filter(c->c.matches(state.text("easyknack.category",""))).findFirst().orElse(NodeCategory.ROUTING));}
             for(int i=0;i<routing.size();i++){
                 var choices=new ArrayList<String>();choices.add("");
                 if(asset!=null){var d=asset.compositeDescriptor();var input=d.nodeType().findPort(new NodeState(asset.metadata()).text(ROUTING_KEYS.get(i-i%2),"")).orElse(null);
                     for(var mapping:d.portMappings()){if(MultipleGroups.countPort(mapping))continue;var p=mapping.publicPort();if(p.direction()==(i%2==0?GLPortDirection.INPUT:GLPortDirection.OUTPUT)&&(i%2==0||input==null||types.compatibleValueTypes(input.valueTypeId(),p.valueTypeId())))choices.add(p.id());}}
-                var box=routing.get(i);if(!box.getItems().equals(choices)){box.removeAllItems();choices.forEach(box::addItem);}String selected=asset==null?"":new NodeState(asset.metadata()).text(ROUTING_KEYS.get(i),"");box.setSelectedItem(choices.contains(selected)?selected:"");box.setEnabled(asset!=null);
+                var box=routing.get(i);if(!box.getItems().equals(choices)){box.removeAllItems();choices.forEach(box::addItem);}String selected=asset==null?"":new NodeState(asset.metadata()).text(ROUTING_KEYS.get(i),"");if(asset!=null&&!asset.metadata().containsKey(ROUTING_KEYS.get(i))){var inferred=GroupRouting.pair(asset,types,ROUTING_KEYS.get(i-i%2),ROUTING_KEYS.get(i-i%2+1));if(inferred!=null)selected=i%2==0?inferred.inputPortId():inferred.outputPortId();}box.setSelectedItem(choices.contains(selected)?selected:"");box.setEnabled(asset!=null);
             }
             inputSettings.refresh();setPreferredGLSize(280,inputSettings.getPreferredGLSize().height());inputSettings.setBounds(0,0,getWidth(),getPreferredGLSize().height());invalidateGLLayout();
         }finally{updating=false;}

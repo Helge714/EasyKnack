@@ -2,7 +2,7 @@ package com.vin.easyknack.nodes;
 
 import java.util.List;
 
-@RegisterNode(id = "easyknack.audio.additive", title = "Complex Oscillator", category=NodeCategory.GENERATOR, kind=NodeKind.AUDIO)
+@RegisterNode(id = "easyknack.audio.additive", title="Additive Oscillator", category=NodeCategory.GENERATOR, kind=NodeKind.AUDIO)
 public final class AdditiveOscillatorNode extends BasicNode {
     @Override public boolean supportsSampleFeedback() { return true; }
     public enum Waveform {

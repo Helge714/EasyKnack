@@ -46,17 +46,21 @@ class InspectorMenusTest {
         }});
     }
     @Test void converterPoolsAndMergeContractAreUnambiguous(){
-        for(var converter:List.of(new GainConverterNode(),new PitchConverterNode(),new FrequencyConverterNode(),new TimeConverterNode(),new PhaseConverterNode())){
-            var rows=converter.layout(new NodeState(converter.defaults())).rows();
-            var from=(Editor.ComboBox<?>)rows.stream().filter(r->r.key().equals(UnitConverterNode.FROM)).findFirst().orElseThrow().editor();
-            var to=(Editor.ComboBox<?>)rows.stream().filter(r->r.key().equals(UnitConverterNode.TO)).findFirst().orElseThrow().editor();
-            for(var a:from.items())for(var b:to.items())assertTrue(((UnitFormat)a).compatible((UnitFormat)b));
+        var converter=new UnitConverterNode();
+        for(var source:UnitFormat.values()){
+            var state=converter.normalizeState(new NodeState(Map.of("from",GLNodeValue.of(source.id()),"to",GLNodeValue.of("percent"))));
+            var rows=converter.layout(state).rows();var to=(Editor.ComboBox<?>)rows.stream().filter(r->r.key().equals(UnitConverterNode.TO)).findFirst().orElseThrow().editor();
+            for(var target:to.items())assertTrue(UnitConverterNode.canConvert(source,(UnitFormat)target));
+            assertTrue(to.items().contains(UnitFormat.fromId(state.text("to","percent"))));
         }
+        assertTrue(UnitConverterNode.destinations(UnitFormat.HZ).contains(UnitFormat.MS));
+        assertTrue(UnitConverterNode.destinations(UnitFormat.SAMPLE).contains(UnitFormat.BPM));
+        assertFalse(UnitConverterNode.destinations(UnitFormat.HZ).contains(UnitFormat.DB));
         var def=new VoiceMergeNode();var layout=def.layout(new NodeState(def.defaults()));
         assertEquals(List.of("audio-out","mode","audio-in"),layout.rows().stream().map(NodeBuilder.Row::id).toList());
         assertEquals(List.of("sum","mean"),((Editor.ComboBox<?>)layout.rows().get(1).editor()).items().stream().map(i->((VoiceMergeNode.Mode)i).id()).toList());
         var registry=new NodeRegistry(new GLNodeTypeRegistry(),new GLNodeCatalog());
         var legacy=new GLGraphNode(GLNodeId.random(),"easyknack.math.unitconverter",Map.of("from",GLNodeValue.of("hz"),"to",GLNodeValue.of("khz")));
-        assertTrue(NodeRegistry.require(registry.normalize(legacy).typeId()) instanceof FrequencyConverterNode);
+        assertTrue(NodeRegistry.require(registry.normalize(legacy).typeId()) instanceof UnitConverterNode);
     }
 }

@@ -2,12 +2,15 @@
 theme.type=metrics
 
 slider.preferredWidth=120
-node.cornerRadius=6
+metrics.cornerRadius=3
+metrics.controlHeight=24
+node.cornerRadius=4
 node.rowGap=6
 node.minimumWidth=140
 nodeEditor.horizontalNodeSpacing=60
 nodeEditor.verticalNodeSpacing=40
-node.contentPadding=12
+node.contentPadding=10, 8, 8
+node.titleHeight=26
 curve.height=110
 curve.previewHeight=32
 curve.inspectorHeight=200

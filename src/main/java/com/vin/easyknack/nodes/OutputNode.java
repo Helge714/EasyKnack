@@ -2,7 +2,7 @@ package com.vin.easyknack.nodes;
 
 import java.util.function.ToIntFunction;
 
-@RegisterNode(id = "easyknack.audio.output", title = "Audio Output", category=NodeCategory.IO, kind=NodeKind.AUDIO)
+@RegisterNode(id = "easyknack.audio.output", title = "Audio Output", category=NodeCategory.OUTPUT, kind=NodeKind.AUDIO)
 public final class OutputNode extends BasicNode {
     public static final PropertyId IN = new PropertyId("audio-in"), ENDPOINT = new PropertyId("endpoint");
     public static final PropertyId DEVICE_VOLUME = new PropertyId("device-volume-control"), VOLUME_KEYS = new PropertyId("volume-keys");

@@ -25,6 +25,8 @@ class AutoArrangeTest {
             c.openDocument("Layout",GroupUnitsTest.document(false));
             c.workspace().openComposite("test.asset");
             var editor=c.workspace().editor();var nodes=List.copyOf(editor.getNodes());
+            // New groups already start arranged; deliberately disturb their geometry.
+            nodes.get(0).setLocation(777,333);
             var before=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
             var graph=c.workspace().currentGraph().snapshot();
             var shortcut=new com.vingame.glswing.input.GLKeyEvent(new java.awt.event.KeyEvent(new java.awt.Canvas(),java.awt.event.KeyEvent.KEY_PRESSED,

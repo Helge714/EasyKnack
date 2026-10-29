@@ -23,11 +23,17 @@ public class BasicNodeView extends GLNode {
         private final java.util.Locale presentationLocale=ApplicationSettings.locale();
         private final List<Consumer<NodeState>> updates = new ArrayList<>();
         private final Map<PropertyId,GLContainer> controls = new LinkedHashMap<>();
-        private final Map<PropertyId,String> tooltips = new LinkedHashMap<>();
         protected final void onStateChanged(Consumer<NodeState> update) { updates.add(update); }
         private boolean synchronizing;
         private GLGraphNode lastModel;
+        private java.util.Locale bindingLocale;
         private Set<PropertyId> lastConnected=Set.of();
+        private Set<PropertyId> controlledByGroup=Set.of();
+        void controlledByGroup(Set<PropertyId> properties){
+            if(controlledByGroup.equals(properties))return;
+            controlledByGroup=Set.copyOf(properties);
+            var model=lastModel;lastModel=null;if(model!=null)updateBindings(model);
+        }
         private final Map<PropertyId,Boolean> rowVisibility=new HashMap<>();
         private boolean themeRefreshPending;
         private NodeKind category;
@@ -46,16 +52,12 @@ public class BasicNodeView extends GLNode {
             setResizeMode(definition.resizeMode());
             for (var row : layout.rows()) {
                 if (row.isInspectorOnly()) continue;
-                GLContainer content = row.editor() == null ? new NodeTooltipLabel(row.label(), row.kind()==NodeBuilder.RowKind.OUTPUT) : control(row);
+                GLContainer content = row.editor() == null ? new NodeTooltipLabel(row.portLabel(), row.kind()==NodeBuilder.RowKind.OUTPUT) : control(row);
                 controls.put(row.key(),content);
                 if(row.isDriverAssignable())MidiDrivers.attach(history,id,row.id(),content);
                 if(content instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->write(new PropertyId(GLGraphNode.AUTOMATIC_PREFIX+row.id()),GLNodeValue.of(true)));
-                if(content instanceof GLControl control) {
-                    String tip=row.editor() instanceof UnitSlider?(row.tooltip()==null||row.tooltip().isBlank()?"":row.tooltip()+"\n")+control.getToolTipText():row.tooltip();
-                    if(row.editor() instanceof Editor.Slider slider)tip=(tip==null||tip.isBlank()?row.label():tip)+"\nRange: "+(slider.min()==null?"unbounded":slider.min())+" to "+(slider.max()==null?"unbounded":slider.max())+(slider.unitSuffix().isBlank()?"":" "+slider.unitSuffix());
-                    tooltips.put(row.key(),tip);
-                    if(row.kind()!=NodeBuilder.RowKind.EDITOR && row.dataType()!=PortDataType.MIDI)tip=(tip==null||tip.isBlank()?row.label():tip)+"\n"+(row.kind()==NodeBuilder.RowKind.INPUT?row.rate().inputHint():row.rate().outputHint());
-                    else if(row.dataType()==PortDataType.MIDI)tip=(tip==null||tip.isBlank()?row.label():tip)+"\nMIDI events with sample positions; not an audio or control-rate value.";
+                if(content instanceof com.vingame.glswing.ui.GLToolTipTarget control) {
+                    String tip=NodeHints.tooltip(row);
                     control.setToolTipText(tip);
                 }
                 if (content instanceof GLControl control) control.setEnabled(row.isEnabled());
@@ -68,9 +70,10 @@ public class BasicNodeView extends GLNode {
                 setAlwaysVisible(content, row.alwaysVisible());
                 setContentVerticalGrow(content,row.verticalGrow());
                 if (port != null) {
+                    if(row.formats()!=null){content.setName(row.portLabel());port.setContextMenu(PortUnitMenus.create(row.formats().choices(),row.unit(),unit->write(row.unitProperty(),GLNodeValue.of(unit.id()))));}
                     if(row.editor() instanceof VectorEditor && content instanceof GLSliderGroup group)
                         setContentPortAnchor(content,group.getSliders().get(0));
-                    port.setToolTipText(content instanceof GLControl control && control.getToolTipText()!=null ? control.getToolTipText() : row.label());
+                    port.setToolTipText(NodeHints.tooltip(row));
                     port.setColor(ApplicationTheme.current().signal(row.signal()));
                     port.setShape(row.rate().shape());
                     port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM || row.dataType()==PortDataType.WAVEFORM);
@@ -146,7 +149,7 @@ public class BasicNodeView extends GLNode {
                 }
                 slider.setPresentation(spec.bar() ? GLSlider.Presentation.BAR : GLSlider.Presentation.BUTTONS);
                 slider.setUnit(spec.unitSuffix());
-                if(!spec.unitSuffix().isBlank())slider.setName(row.label()+" ["+spec.unitSuffix()+"]");
+                if(!spec.unitSuffix().isBlank())slider.setName(row.label().replaceFirst("\\s*\\[[^\\]]*\\]$", "")+" ["+spec.unitSuffix()+"]");
                 slider.setIntegerValuesOnly(spec.integral());
                 slider.setStep(spec.step()); slider.setDragSensitivity(spec.step());
                 slider.addChangeListener(event -> write(row.key(), GLNodeValue.of(slider.getValue())));
@@ -162,7 +165,7 @@ public class BasicNodeView extends GLNode {
             if (row.editor() instanceof Editor.ComboBox<?> spec) return combo(row, spec);
             var custom = row.editor().create(row.label(), value -> write(row.key(), value));
             if(row.editor() instanceof UnitSlider spec && custom.component() instanceof GLSlider slider)
-                spec.bindUnitMenu(slider,unit->write(new PropertyId(row.id()+".unit"),GLNodeValue.of(unit.id())));
+                spec.bindUnitMenu(slider,unit->write(row.unitProperty(),GLNodeValue.of(unit.id())));
             if(custom.component() instanceof GLSlider slider) {UnitSlider.bindHistory(slider,()->history);slider.setName(row.label()+ (slider.getUnit().isBlank()?"":" ["+slider.getUnit()+"]"));}
             if(custom.component() instanceof AnalysisEditor.Plot plot)plot.bind(id.toString());
             if(custom.component() instanceof ValueViewerPanel viewer)viewer.bind(id.toString());
@@ -179,7 +182,7 @@ public class BasicNodeView extends GLNode {
                     spec.id().apply(item).equals(state.text(row.key(), spec.id().apply(spec.value())))).findFirst().orElseThrow()));
             return combo;
         }
-        protected final void write(PropertyId key, GLNodeValue value) { if (!synchronizing) writer.set(id, key, value); }
+        protected final void write(PropertyId key, GLNodeValue value) { if (!synchronizing&&!controlledByGroup.contains(GroupEditorCopies.controlledKey(key))) writer.set(id, key, value); }
         public void update(GLGraphNode model) { updateBindings(model); }
         private void updateBindings(GLGraphNode model) {
             synchronizing = true;
@@ -188,7 +191,8 @@ public class BasicNodeView extends GLNode {
                         .filter(row -> row.kind() == NodeBuilder.RowKind.INPUT)
                         .filter(row -> findPort(row.id()) != null && findPort(row.id()).getActiveConnectionCount() > 0)
                         .map(NodeBuilder.Row::key).collect(java.util.stream.Collectors.toSet());
-                if(model.equals(lastModel) && connected.equals(lastConnected)) return;
+                if(model.equals(lastModel) && connected.equals(lastConnected) && ApplicationSettings.locale().equals(bindingLocale)) return;
+                bindingLocale=ApplicationSettings.locale();
                 boolean vectorConnectionsChanged=!connected.equals(lastConnected) && definition.layout(new NodeState(model.properties())).rows().stream().anyMatch(r->r.editor() instanceof VectorEditor);
                 lastModel=model;lastConnected=connected;
                 var state = new NodeState(model.properties(), connected);
@@ -206,9 +210,16 @@ public class BasicNodeView extends GLNode {
                     if(content!=null) {
                         setContentVerticalGrow(content,isContentHidden()?0:row.verticalGrow());
                         EditorPresentation.update(row,content);
+                        if(content instanceof NodeTooltipLabel label)label.setText(row.portLabel());
                         definition.updateEditor(row.key(),content,state);
                         setContentVisible(content,row.isVisible());rowVisibility.put(row.key(),row.isVisible());
-                        if(content instanceof GLControl control && !(row.editor() instanceof DeviceVolumeEditor)) control.setEnabled(row.isEnabled());
+                        if(row.editor() instanceof VectorEditor && content instanceof GLSliderGroup vectorGroup){
+                            for(var slider:vectorGroup.getSliders()){slider.setEnabled(row.isEnabled()&&!controlledByGroup.contains(row.key()));slider.setToolTipText(controlledByGroup.contains(row.key())?AppText.text("group.editor.controlled"):NodeHints.tooltip(row));}
+                        }
+                        if(content instanceof GLControl control && !(row.editor() instanceof DeviceVolumeEditor)) {
+                            control.setEnabled(row.isEnabled()&&!controlledByGroup.contains(row.key()));
+                            if(row.kind()==NodeBuilder.RowKind.EDITOR)control.setToolTipText(controlledByGroup.contains(row.key())?AppText.text("group.editor.controlled"):NodeHints.tooltip(row));
+                        }
                     }
                     if (row.kind() == NodeBuilder.RowKind.EDITOR) continue;
                     var port = findPort(row.id());
@@ -217,17 +228,14 @@ public class BasicNodeView extends GLNode {
                     port.setShape(row.rate().shape());
                     port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM || row.dataType()==PortDataType.WAVEFORM);
 
-                    String tip=tooltips.get(row.key());
-                    tip=(tip==null||tip.isBlank()?row.label():tip)+"\n"+(row.dataType()==PortDataType.MIDI
-                            ? "MIDI events with sample positions; not an audio or control-rate value."
-                            : row.kind()==NodeBuilder.RowKind.INPUT?row.rate().inputHint():row.rate().outputHint());
-                    if(row.kind()==NodeBuilder.RowKind.INPUT && row.rate()!=ProcessingRate.AUDIO && row.dataType()!=PortDataType.MIDI
+                    String tip=NodeHints.tooltip(row);
+                    if(row.kind()==NodeBuilder.RowKind.INPUT && row.rate()==ProcessingRate.CONTROL && (row.dataType()==PortDataType.SIGNAL)
                             && getGLParent() instanceof com.vingame.glswing.node.GLNodeEditor editor
                             && editor.getConnections().stream().anyMatch(c->c.getInput()==port && c.getOutput().getNode() instanceof BasicNodeView
                                 && c.getOutput().getShape()==GLNodePort.Shape.CIRCLE))
-                        tip=(tip==null?row.label():tip)+"\nAudioRate source connected: intermediate samples are not continuously processed. Select AudioRate for sample-by-sample processing.";
+                        tip=tip+"\n"+AppText.text("node.hint.downsample");
                     port.setToolTipText(tip==null?row.label():tip);
-                    if(content instanceof GLControl control)control.setToolTipText(tip);
+                    if(content instanceof com.vingame.glswing.ui.GLToolTipTarget control)control.setToolTipText(tip);
 
                 }
                 invalidateRecording();
@@ -242,7 +250,7 @@ public class BasicNodeView extends GLNode {
         }
     private static String structure(NodeBuilder layout) {
         return layout.rows().stream().filter(row -> !row.isInspectorOnly()).map(row -> row.kind() + ":" + row.id() + ":" + row.alwaysVisible() + ":" + row.socketVisible() + ":" + row.signal() + ":"
-                + (row.editor() == null ? "label" : row.editor().viewKey())).collect(java.util.stream.Collectors.joining("|"));
+                + (row.editor() == null ? "label" : row.editor().viewKey())+":"+row.unit()).collect(java.util.stream.Collectors.joining("|"));
     }
     public final GLNodeId nodeId() { return id; }
     public boolean isCurrent(GLGraphNode model, GLNodeTypeDescriptor type) {
@@ -276,7 +284,7 @@ public class BasicNodeView extends GLNode {
         }
     }
 
-    private GLControl row(String text) {
+    private GLLabel row(String text) {
         return new NodeTooltipLabel(text);
     }
 }

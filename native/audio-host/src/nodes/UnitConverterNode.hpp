@@ -12,6 +12,10 @@ inline UnitFormat readUnit(std::istream& in){
     throw std::runtime_error("Unknown unit");
 }
 inline int unitDimension(UnitFormat u){if(u>=UnitFormat::metre)return 5;if(u==UnitFormat::bpm)return 1;if(u==UnitFormat::sample)return 2;int i=static_cast<int>(u);return i<6?0:i<8?1:i<10?2:i<13?3:4;}
+inline bool unitsConvertible(UnitFormat from,UnitFormat to) noexcept {
+    const int a=unitDimension(from),b=unitDimension(to);
+    return a==b||((a==1||a==2)&&(b==1||b==2));
+}
 inline double unitToBase(double v,UnitFormat u,double rate=48000) noexcept {
     switch(u){
         case UnitFormat::percent:return v/100;
@@ -61,11 +65,11 @@ struct UnitConverterNode:NodeProcessor {
     }
     void configure(std::istream& in)override{
         in>>std::ws;if(in.peek()=='!'){auto p=parameters::UnitConverterNodeParameters::read(in);
-        sources=p.sources();value=p.value_value;std::istringstream a(p.from_value),b(p.to_value);from=readUnit(a);to=readUnit(b);if(unitDimension(from)!=unitDimension(to))throw std::runtime_error("Incompatible units");
+        sources=p.sources();value=p.value_value;std::istringstream a(p.from_value),b(p.to_value);from=readUnit(a);to=readUnit(b);if(!unitsConvertible(from,to))throw std::runtime_error("Incompatible units");
         return;}
 
         sources={readInput(in)};value=readNumber(in);from=readUnit(in);to=readUnit(in);
-        if(unitDimension(from)!=unitDimension(to))throw std::runtime_error("Incompatible units");
+        if(!unitsConvertible(from,to))throw std::runtime_error("Incompatible units");
     }
     bool supportsScalarInputs()const noexcept override{return true;}
     void process(ProcessContext& c)noexcept override{
@@ -75,7 +79,9 @@ struct UnitConverterNode:NodeProcessor {
         }
     }
     static float evaluate(double v,UnitFormat from,UnitFormat to,double rate=48000) noexcept {
-        double result=from==to?v:unitFromBase(unitToBase(v,from,rate),to,rate);
+        double base=unitToBase(v,from,rate);
+        if(unitDimension(from)!=unitDimension(to))base=base==0?0:1/base;
+        double result=from==to?v:unitFromBase(base,to,rate);
         return std::isfinite(result)?static_cast<float>(std::clamp(result,-1e30,1e30)):0;
     }
 };

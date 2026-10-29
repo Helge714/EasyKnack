@@ -5,7 +5,7 @@ package com.vin.easyknack.nodes;
 public final class PitchMonitorNode extends BasicNode {
     public static final PropertyId FREQUENCY=new PropertyId("frequency"),TARGET=new PropertyId("target"),CONFIDENCE=new PropertyId("confidence"),OUT=new PropertyId("out");
     public void define(NodeBuilder n,NodeState s){
-        n.addOutput(OUT,"Target [Hz]").signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
+        n.addOutput(OUT,"Target [Hz]").formats(UnitFormats.CLOCK).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         n.addEditor(new PropertyId("readout"),"Pitch",new PitchReadoutEditor("")).keepVisibleOnHide();
         n.addInput(FREQUENCY,"Detected [Hz]").signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         n.addInput(TARGET,"Target [Hz]").signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);

@@ -13,6 +13,7 @@ theme.type=colors
 @COLOR easyknack.signal.AUDIO=#796298
 @COLOR easyknack.signal.VALUE=#838383
 @COLOR easyknack.signal.WAVETABLE=#345DB8
+node.border=#00000000
 @COLOR curve.line=#DBBDFF
 @COLOR curve.handle=#F4EFFF
 @COLOR curve.marker=#E5AF55

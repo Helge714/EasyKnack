@@ -4,7 +4,7 @@ package com.vin.easyknack.nodes;
 public final class PitchHoldNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("frequency"),CONFIDENCE=new PropertyId("confidence"),THRESHOLD=new PropertyId("threshold"),INITIAL=new PropertyId("initial"),OUT=new PropertyId("out"),VALID=new PropertyId("valid"),RATE=new PropertyId("rate");
     public void define(NodeBuilder n,NodeState s){
-        n.addOutput(OUT,"Frequency [Hz]").signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
+        n.addOutput(OUT,"Frequency [Hz]").formats(UnitFormats.CLOCK).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         n.addOutput(VALID,"Valid").signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("1 while the current frequency is positive and finite and confidence meets the threshold; otherwise 0. This is a numeric gate, not a Trigger."));
         ProcessingRate.addEditor(n,RATE);
         n.addInput(IN,"Frequency",Editor.Slider.button(440,0.0,20000.0).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);

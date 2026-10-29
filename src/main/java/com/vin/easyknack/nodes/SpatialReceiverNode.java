@@ -5,7 +5,7 @@ public final class SpatialReceiverNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("audio-in"),OUT=new PropertyId("audio-out"),DISTANCE=new PropertyId("distance"),SOURCE=new PropertyId("source"),RECEIVER=new PropertyId("receiver"),ANGLE=new PropertyId("angle"),SPACING=new PropertyId("spacing"),MODE=new PropertyId("mode"),ATTENUATION=new PropertyId("attenuation"),REFERENCE=new PropertyId("reference"),PROPAGATION=new PropertyId("propagation");
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Audio Out");
-        n.addOutput(DISTANCE,"Distance [m]").signal(SignalCategory.VALUE).rate(ProcessingRate.fromId(s.text(ProcessingRate.EFFECTIVE+".output_1","control")));
+        n.addOutput(DISTANCE,"Distance [m]").formats(UnitFormats.LENGTH).signal(SignalCategory.VALUE).rate(ProcessingRate.fromId(s.text(ProcessingRate.EFFECTIVE+".output_1","control")));
         n.addEditor(MODE,"Channels",Editor.comboBox(List.of("mono","stereo"),"stereo",x->x));
         n.addInput(IN,"Audio In");VectorSupport.input(n,SOURCE,"Source Position",0,0,1);VectorSupport.input(n,RECEIVER,"Receiver Position",0,0,0);
         if(s.text(MODE,"stereo").equals("stereo"))n.addInput(ANGLE,"Yaw",Editor.Slider.button(0).formats(new UnitFormats(UnitFormat.DEGREE,UnitFormat.DEGREE,List.of(UnitFormat.DEGREE,UnitFormat.RADIAN,UnitFormat.TURN)))).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);

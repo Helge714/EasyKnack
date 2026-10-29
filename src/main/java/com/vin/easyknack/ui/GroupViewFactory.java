@@ -47,7 +47,11 @@ final class GroupViewFactory implements GLNodeViewFactory {
                 if(MultipleGroups.countPort(p))continue;
                 var port=p.publicPort();boolean output=port.direction()==GLPortDirection.OUTPUT;
                 com.vingame.glswing.component.GLContainer control;
-                if(!output&&p.presentation().inputEditorId().equals(GroupInputSettings.BUTTON)){
+                if(!output&&GroupVectorEditors.isVector(p)){
+                    var binding=GroupVectorEditors.editor(p).create(port.id(),v->{if(!updating)writer.set(node.id(),new PropertyId(GroupUnits.key(port.id())),v);});
+                    control=binding.component();controls.put(port.id(),binding);
+                    for(var slider:((GLSliderGroup)control).getSliders())UnitSlider.bindHistory(slider,()->history);
+                }else if(!output&&p.presentation().inputEditorId().equals(GroupInputSettings.BUTTON)){
                     var button=new GLButton(port.id());button.addActionListener(e->GroupInputTriggers.fire(groups,node.id().toString(),descriptor,p));control=button;
                 }else if(!output&&GroupInputs.choice(p)){
                     var choice=GroupChoices.choices(source,groups).stream().filter(c->c.id().equals(GroupInputs.property(p))).findFirst().orElse(null);
@@ -60,15 +64,27 @@ final class GroupViewFactory implements GLNodeViewFactory {
                     var options=new NodeState(p.presentation().editorOptions());var base=GroupUnits.base(groups,descriptor,p);var selected=GroupUnits.selected(node,p,base);
                     Double min=options.flag("minimumEnabled",true)?options.number("minimum",0):null,max=options.flag("maximumEnabled",true)?options.number("maximum",1):null;
                     var spec=new com.vin.easyknack.nodes.Editor.Slider(options.number("default",0),min,max,options.number("step",.01),options.text("numericType","float").equals("integer"),options.text("presentation","bar").equals("bar"));if(!options.flag("continuous",true))spec=spec.discrete();
-                    var format=new UnitSlider(spec,new UnitFormats(base,base,GroupUnits.allowed(p,base)),selected);
+                    var format=new UnitSlider(spec,new UnitFormats(base,GroupUnits.initial(p,base),GroupUnits.allowed(p,base)),selected);
                     var binding=format.create(port.id(),v->{if(!updating)writer.set(node.id(),new PropertyId(GroupUnits.key(port.id())),v);});
                     control=binding.component();controls.put(port.id(),binding);
                     UnitSlider.bindHistory((GLSlider)control,()->history);
                     format.bindUnitMenu((GLSlider)control,u->writer.set(node.id(),new PropertyId(GroupUnits.unitKey(port.id())),GLNodeValue.of(u.id())));
                 }else control=new NodeTooltipLabel(port.id(),output);
+                if(GroupUnits.numeric(p) && (output || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER) || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE))) {
+                    var base=GroupUnits.base(groups,descriptor,p);var selected=GroupUnits.selected(node,p,base);
+                    String label=port.id()+" ["+selected.suffix()+"]";control.setName(label);
+                    if(control instanceof GLLabel text)text.setText(label);
+                }
                 if(!output)MidiDrivers.attach(history,node.id(),GroupInputs.choice(p)?GroupInputs.property(p):GroupUnits.key(port.id()),control);
                 if(output)addOutput(port.id(),control);
                 else {var input=addInput(port.id(),control);input.setSocketVisible(p.presentation().socketVisible());input.setContentHiddenWhenConnected(controls.containsKey(port.id()) || GroupInputs.choice(p) || p.presentation().inputEditorId().equals(GroupInputSettings.BUTTON));}
+                if(control instanceof GLSliderGroup vectorGroup)setContentPortAnchor(control,vectorGroup.getSliders().get(0));
+                if(GroupUnits.numeric(p) && (output || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER) || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE))) {
+                    var base=GroupUnits.base(groups,descriptor,p);var selected=GroupUnits.selected(node,p,base);
+                    findPort(port.id()).setContextMenu(PortUnitMenus.create(GroupUnits.allowed(p,base),selected,
+                        u->writer.set(node.id(),new PropertyId(GroupUnits.unitKey(port.id())),GLNodeValue.of(u.id()))));
+                }
+
                 
             }
             for(var choice:GroupChoices.choices(groups.findAsset(descriptor.assetId()).orElseThrow(),groups)){

@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.audio.file",title="Audio File",category=NodeCategory.IO,kind=NodeKind.AUDIO)
+@RegisterNode(id="easyknack.audio.file",title="Audio File Player",category=NodeCategory.INPUT,kind=NodeKind.AUDIO)
 public final class AudioFileNode extends BasicNode {
     public static final PropertyId SPEED=new PropertyId("speed");
     @Override public com.vin.easyknack.ui.BasicNodeView createView(com.vin.easyknack.ui.NodeViewContext context,com.vingame.glswing.node.model.GLGraphNode model){return new com.vin.easyknack.ui.AudioFileView(this,context,model);}

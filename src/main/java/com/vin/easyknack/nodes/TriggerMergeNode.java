@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.modulation.triggermerge",title="Trigger Merge",category=NodeCategory.MODULATION,kind=NodeKind.TRIGGER)
+@RegisterNode(id="easyknack.modulation.triggermerge",title="Trigger Merge",category=NodeCategory.TRIGGER,kind=NodeKind.TRIGGER)
 public final class TriggerMergeNode extends BasicNode {
     public static final int MAX_INPUTS=16;
     public static final PropertyId OUT=new PropertyId("trigger-out"),COUNT=new PropertyId("inputs");
