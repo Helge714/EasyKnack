@@ -1,3 +1,5 @@
+> Historical design reference. See TODO.md for current priorities and decisions.
+
 # EasyKnack Event-Rate Refactor
 
 ## Goal

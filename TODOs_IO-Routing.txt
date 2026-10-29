@@ -1,3 +1,5 @@
+> Historical design reference. See TODO.md for current priorities and decisions.
+
 # EasyKnack Audio Routing / Virtual Audio TODO
 
 ## Current direction: external routing backends (2026-09-16)

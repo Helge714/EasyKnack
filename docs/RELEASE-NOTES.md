@@ -73,9 +73,16 @@
 
 - Make autosave interval and recovery retention configurable in Preferences. Prepare and compare detached document snapshots on a low-priority worker. Add a live connection-curvature slider from straight lines to the current theme geometry; cancelling restores the previous setting.
 
+
 - Add atomic crash-recovery snapshots every 30 seconds with a startup recovery dialog, original save targets, and seven-day retention. Ignored connections use muted opacity; unused muted-node inputs are included. Group titles show a geometric group marker.
 
+
 - Add document-local unused-group retention (off by default when saving), fit-all view (Ctrl+Shift+C), and audio start/stop shortcuts (Ctrl+Enter / Ctrl+Shift+Enter). Missing mute bypass sources now mark connections as ignored and expose destination editors. Existing document metadata remains compatible.
+
+
+- Groups can copy Vector editors with XYZ defaults and unit choices, including
+  rotation and scale editors. Standalone vector editors support shared coupling.
+  Updated Core capabilities allow explicitly copyable custom editors to be linked.
 
 - Replaced Vector Mapping with Vector Scale and Vector Rotate, each with an
   Audio/Control Origin input. Existing documents/plugins using Vector Mapping
@@ -86,6 +93,13 @@
   Formula kernels consistently use their declared input units in spectral graphs.
 - Unconnected numeric group inputs retain editable defaults without blocking audio,
   including newly added Formula inputs awaiting a valid code update.
+
+
+- Numeric ports with unit formats now expose a Unit context menu, including connected
+  inputs and group outputs. Labels show the selected unit. Output units change the
+  emitted numbers; input units interpret incoming numbers. Connecting ports never
+  changes units or converts a connection automatically. Settings persist through
+  save/load, undo, group baking and source export.
 
 
 - Vector ports now align with the first XYZ slider and collapse while connected.
@@ -102,10 +116,6 @@
   with channel-specific distances, yaw, spacing and optional propagation.
   Vector group boundaries support bake/export. Existing documents retain their
   behavior; documents using these nodes require this build or newer.
-
-- Explorer startup opens the requested document before showing the workspace,
-  without asking to discard the default graph. The splash shows the packaged
-  application version (or development status for unpackaged IDE launches).
 
 - Release packaging now includes verified GLSwing build inputs and WiX sources/
   notices. SDK and source-plugin exports carry license notices; existing plugins
@@ -162,12 +172,109 @@
 - Image-export geometry now uses GLSwing's shared dimension model; sizing and
   padding behavior are unchanged. No document or audio-protocol migration.
 
+- Unified live node/inspector tooltips, displayed-unit bounds, port terminology
+  and English/German rate explanations. Reference ports now describe their
+  actual data type instead of numeric control-rate behavior. Inspector refreshes
+  no longer emit parameter edits; hidden slider labels follow current units.
+  Added builtin inspector coverage and grouped Value Input document checks.
+
+- Value Input supports inspector-configured button/bar sliders and optional bounds;
+  narrowing bounds clamps the stored value. Fixed Step Switch input labels during
+  live language changes and repaired mixed encoding in the German language file.
+
+- Node-menu categories follow a fixed workflow order in both languages; nodes
+  inside each category remain alphabetically sorted.
+
+- Reorganized the node catalog by task, with separate Inputs, Outputs and Trigger
+  categories. Envelope and Clock are generators; Pitch Hold remains in Analysis.
+  Clarified node names in English and German, including Additive Oscillator,
+  Audio File Player, Recording Buffer, Threshold Trigger and Instance Merge.
+  Node IDs, DSP behavior and signal colors are unchanged; old plugin category
+  constants remain accepted as aliases.
+
+- Node port labels update when their parameters change, including the Unit Converter's output unit.
+
+- Breaking: the five unit-converter variants are replaced by one Unit Converter.
+  Old variant node IDs are removed without document migration. Choose the source
+  unit first, then a compatible target. Frequency and period convert reciprocally,
+  including BPM and samples at the host sample rate. Zero maps to zero.
+
+- Rewiring group boundary connections keeps the active drag alive; interface
+  reconciliation waits until release or cancellation. Copied sliders list their
+  allowed default units directly, without a redundant family submenu.
+
+- Copy Editor prioritizes the connected parameter and its units. Disconnecting
+  its source clears the inherited editor. Linked controls display group defaults
+  without overwriting their original values; hidden sockets lock numeric rates
+  to Control. Boundary changes now apply the application's presentation policy.
+
+- Copied editors retain a read-only rate and allow validated defaults (slider
+  value/unit, combobox entry or checkbox state). Node definitions can opt editor
+  rows out of copying; Step Switch custom controls are excluded. Group slider
+  units use one grouped default-unit menu; the default unit cannot be disabled.
+
+- Copied group editors inherit their style, bounds and allowed units, while
+  exposing their source, coupling targets and permitted defaults. “No editor” removes an editor and releases
+  its coupled internal controls without deleting the group port.
+
+- Quick-created group ports snap to the boundary preview and inherit semantic
+  type and declared rate, including Auto. Standalone editor selection is grouped
+  by node type and parameter, excludes input-backed and generated unit selectors,
+  and then exposes individual coupling targets. Coupled sliders also lock their
+  unit and automatic-value actions.
+
+- Group interfaces retain exposed ports when an internal node or dynamic port is
+  removed. New boundary nodes start beside the inner graph; inserting into boundary
+  wires and creating ports by dropping connections onto boundary nodes support undo.
+- New group ports default to Value and accept Unicode names. Group sliders offer
+  bar/button presentation, unit families, allowed units and a default display unit.
+- Group editors can control multiple matching standalone parameters. Original
+  controls are read-only in the node and inspector. Couplings are saved with the
+  document; older versions do not interpret these new editor options. Bake/export
+  supports coupled comboboxes; other standalone coupled editors currently require
+  live groups and are explicitly rejected by bake/export instead of silently frozen.
+- Requires the external GLSwing 0.2.0-SNAPSHOT library. No native host protocol change.
+
+- Analysis hover readouts update outside rendering, preventing repeated layout
+  invalidation that could stall picking and leave tooltips visible after exit.
+
+- Spectral Groups support Formula nodes, with per-bin/channel persistent state,
+  frame triggers and portable runtime/bake/export execution. File/delay Buffer
+  inputs and dependencies on generated per-sample audio are rejected in this domain.
+
+- Spectral Groups add Bin Memory with a 0â€“1 per-frame Update input, independent
+  state per bin/channel, and runtime/export support.
+- Filter adds orders 2/4/6/8 and optional bounded RMS level compensation. Existing
+  documents and old native parameter payloads retain order 2 with compensation off.
+- Spectral Groups add Bin Sample & Hold with a Capture button and Trigger input,
+  separate state per bin/channel, and timestamped external frame triggers.
+  Compatible rebuilds retain captures; changed FFT identity/size resets them.
+  Stateful groups retain empty held bins and use serial bin evaluation, also in exports.
+- Spectrum Blur Noise now limits phase deviation, phase movement and magnitude
+  fluctuation below one physical frequency cell. Tiny nonzero widths approach the
+  original signal continuously instead of switching immediately to full noise.
+  No parameter/document format changes; existing narrow-width Noise settings sound gentler.
+- IFFT adds optional Stability (0â€“1), a bounded continuous RMS correction after
+  overlap-add for narrow-band noise. Default zero preserves existing sound.
+  Correction adds no latency but can reduce intentional dynamics and broaden spectra.
+  Previous compiled IFFT contracts remain accepted with stability disabled.
+- Spectrum Blur offers Noise, Continuous and Preserve synthesis. New nodes use
+  noise with energy between bin centres; existing phase settings retain their mode.
+  Logarithmic noise shaping targets equal power per octave for flat envelopes.
+  Zero width remains an exact bypass. Java and host must be rebuilt together;
+  previous compiled parameter contracts remain supported.
+- Spectrum Blur now gathers neighbouring magnitudes using Gaussian, Box or Maximum
+  kernels. New nodes default to octave spacing; frame power normalization is optional.
+  Existing documents retain their selected width mode, but use the new Gaussian
+  behaviour unless another kernel is chosen. Previously compiled native payloads
+  retain their legacy blur behaviour until regenerated.
 - Audio diagnostic exports identify the packaged EasyKnack and GLSwing builds,
   including the source revision and whether uncommitted changes were present.
 - Local development launches are explicitly distinguished from packaged builds.
 
 The first published release version has not been designated yet.
 
+- Generic vector nodes now offer length, angle, scale and unitless quantities in the inspector, including compatible scalar output units. Existing vectors keep length as their default.
 - Instance Groups now support internal FFT / Spectral Group / IFFT chains, with independent frame state per instance, including source export. Public Instance Group boundaries remain numeric.
 
 - Instance Groups accept shared Spectrum inputs, including source export and Bake; per-instance processing retains independent state. Existing numeric instance-input contracts remain unchanged; the host and plugin SDK include the new typed resource boundary.
@@ -182,3 +289,20 @@ The first published release version has not been designated yet.
 - Newly extracted groups inherit their first output signal kind once. All signal categories have matching node kinds and shared highlight colors; trigger-producing, buffer and spectrum nodes use their corresponding palettes. Existing manual group kinds remain unchanged.
 
 - Group extraction preserves the semantic category of connected outputs instead of their shared numeric transport type. Editing group slider limits or defaults adjusts dependent values automatically.
+
+## Backlog stabilization (29 October 2026)
+
+- Reuse local group Bakes across equivalent instances, with independent DSP state,
+  stable compilation identity and shared invalidation after internal edits.
+- Establish MIDI driver indicators as inspector controls are attached.
+- Add Step Switch index mode and named inputs; existing documents default to
+  trigger mode. The Step Switch native parameter contract changes; rebuild Java,
+  host and source plugins together. No document schema or protocol change.
+- Verify identical cent detuning for all Complex Oscillator overtones while
+  preserving the fundamental. Archive obsolete backlog and implementation notes.
+- The existing 0.0.1-SNAPSHOT development version covers this work; no first
+  release baseline has been declared.
+
+- Consolidate and preserve the previously uncommitted group-editor, unit/vector,
+  node-catalog and spectral/filter improvements in focused local commits. Machine-
+  specific Eclipse configuration is intentionally excluded.
