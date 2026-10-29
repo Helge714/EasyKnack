@@ -5,7 +5,7 @@ import com.vingame.glswing.layout.GLInsets;
 import com.vingame.glswing.rendering.GLFont;
 
 /** Application translation and the framed step-row inset policy. */
-final class NodeTooltipLabel extends GLLabel {
+class NodeTooltipLabel extends GLLabel {
     private final boolean framed;
     NodeTooltipLabel(String text) { this(text, false); }
     NodeTooltipLabel(String text, boolean right) { this(text, right, false); }

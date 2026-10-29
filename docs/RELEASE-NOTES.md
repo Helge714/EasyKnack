@@ -306,3 +306,11 @@ The first published release version has not been designated yet.
 - Consolidate and preserve the previously uncommitted group-editor, unit/vector,
   node-catalog and spectral/filter improvements in focused local commits. Machine-
   specific Eclipse configuration is intentionally excluded.
+
+- Rename Step Switch inputs in place from the slider context menu or by clicking
+  a connected input label. Persist the selected step and allow manual selection
+  while audio is stopped. Revision-checked runtime feedback updates saved state
+  without adding Undo entries or replaying stale selections into the DSP.
+  Rebuild Java, host and source plugins together (Step Switch parameter contract);
+  existing documents start on step zero. Document schema and protocol are unchanged.
+  Covered by the existing development version; oscillator spreading is unchanged.

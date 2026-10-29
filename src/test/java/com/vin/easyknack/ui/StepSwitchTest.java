@@ -11,6 +11,60 @@ import com.vingame.glswing.node.GLNode;
 import com.vingame.glswing.node.model.*;
 
 class StepSwitchTest {
+    @Test void selectionWorksOfflineAndSurvivesSavingAndRuntimeFeedback()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var d=new StepSwitchNode();var id=GLNodeId.random();c.workspace().currentGraph().edit("Switch",e->e.addNode(new GLGraphNode(id,d.registration().id(),d.defaults())));
+            var v=(StepSwitchView)view(c,id);v.selectStep(2);assertEquals(2,v.activeStep());
+            var state=new NodeState(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties());long revision=StepSwitchNode.revision(state);
+            com.vin.easyknack.audio.AudioAnalysis.publish(Map.of(id.toString(),new com.vin.easyknack.audio.AudioAnalysis.Frame(0,revision-1,0,new float[]{0})));
+            assertEquals(2,v.activeStep(),"Ignore feedback from before the manual selection");
+            var bytes=new java.io.ByteArrayOutputStream();var codec=new KnackDocumentCodec();codec.write(c.snapshotDocument(),bytes);
+            c.openDocument("Restored",codec.read(new java.io.ByteArrayInputStream(bytes.toByteArray()),codec.currentSchemaVersion()));
+            assertEquals(2,((StepSwitchView)view(c,id)).activeStep());
+            com.vin.easyknack.audio.AudioAnalysis.publish(Map.of(id.toString(),new com.vin.easyknack.audio.AudioAnalysis.Frame(3,revision,0,new float[]{3})));
+            assertEquals(3,StepSwitchNode.selected(new NodeState(c.snapshotDocument().root().graph().findNode(id).orElseThrow().properties())));
+            assertFalse(c.history().canUndo(),"Runtime steps must not create Undo entries");
+            var restoredView=(StepSwitchView)view(c,id);restoredView.selectStep(2);
+            long abandoned=StepSwitchNode.revision(new NodeState(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties()));
+            c.history().undo();restoredView=(StepSwitchView)view(c,id);restoredView.selectStep(1);
+            assertTrue(StepSwitchNode.revision(new NodeState(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties()))>abandoned);
+            com.vin.easyknack.audio.AudioAnalysis.publish(Map.of(id.toString(),new com.vin.easyknack.audio.AudioAnalysis.Frame(2,abandoned,0,new float[]{2})));
+            assertEquals(1,((StepSwitchView)view(c,id)).activeStep());
+        }catch(Exception e){throw new AssertionError(e);}finally{com.vin.easyknack.audio.AudioAnalysis.clear();}});
+    }
+    @Test void namesCanBeEditedInTheRowAndByClickingConnectedLabels()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var d=new StepSwitchNode();var id=GLNodeId.random();c.workspace().currentGraph().edit("Switch",e->e.addNode(new GLGraphNode(id,d.registration().id(),d.defaults())));
+            var v=(StepSwitchView)view(c,id);v.renameStep(0);
+            var group=v.getContents().stream().filter(com.vingame.glswing.ui.GLLayoutGroup.class::isInstance).findFirst().orElseThrow();
+            var editor=(com.vingame.glswing.ui.GLTextEditor)group.getGLChildren().stream().filter(com.vingame.glswing.ui.GLTextEditor.class::isInstance).findFirst().orElseThrow();
+            assertTrue(editor.isVisible());editor.setText("Größe A");editor.commit();assertFalse(editor.isVisible());
+            assertEquals("Größe A",StepSwitchNode.label(new NodeState(c.workspace().currentGraph().snapshot().findNode(id).orElseThrow().properties()),0));
+            var source=c.workspace().editor().getNodes().stream().filter(n->n.findPort("audio-out")!=null).findFirst().orElseThrow();c.workspace().editor().connect(source.findPort("audio-out"),v.findPort("step-0"));
+            var label=group.getGLChildren().stream().filter(NodeTooltipLabel.class::isInstance).map(NodeTooltipLabel.class::cast).findFirst().orElseThrow();assertTrue(label.isVisible());
+            var awt=new java.awt.event.MouseEvent(new java.awt.Canvas(),java.awt.event.MouseEvent.MOUSE_PRESSED,0,0,2,2,1,false,java.awt.event.MouseEvent.BUTTON1);
+            var event=new com.vingame.glswing.input.GLMouseEvent(awt,new com.vingame.glswing.input.GLPickResult(1,label,2,2,2,2,1,0,0,1,0,0),0,0);
+            label.mousePressed(event);assertTrue(editor.isVisible());editor.setText("Ignored");editor.cancel();assertEquals("Größe A",label.getText());
+        }});
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void nativeRestoresSelectionAndDoesNotReapplyTelemetryAsAManualRequest()throws Exception{
+        var d=new StepSwitchNode();var values=new HashMap<>(d.defaults());values.put(StepSwitchNode.SELECTION.value(),StepSwitchNode.selection(2,4));
+        String payload="!"+NativeContractGenerator.fingerprint(d)+" "+d.encode(new NodeState(values),p->-1);
+        var dir=Files.createTempDirectory(Path.of("target"),"switch-state-");var source=dir.resolve("test.cpp");
+        Files.writeString(source,"""
+            #include "nodes/StepSwitchNode.hpp"
+            #include <cassert>
+            #include <sstream>
+            using namespace easyknack;
+            int main(){StepSwitchNode n;std::istringstream in("%s");n.configure(in);assert(n.index==2&&n.selectionRevision==4);
+              StepSwitchNode echo;echo.steps=4;echo.index=1;echo.selectionRevision=4;n.index=3;n.applyParameters(echo);assert(n.index==3);
+              echo.selectionRevision=5;n.applyParameters(echo);assert(n.index==1);
+              StepSwitchNode rebuilt;rebuilt.steps=4;rebuilt.selectionRevision=5;rebuilt.inheritState(n);assert(rebuilt.index==1);
+              rebuilt.index=0;rebuilt.selectionRevision=6;rebuilt.inheritState(n);assert(rebuilt.index==0);
+            }
+            """.formatted(payload));RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
+    }
     @Test void indexModeAndNamesPersistWithoutRewiringValueInputs()throws Exception{
         SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
             var d=new StepSwitchNode();var id=GLNodeId.random();
@@ -81,11 +135,12 @@ class StepSwitchTest {
     }
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void hostAcceptsManualButtonsAndPublishesSelection()throws Exception{
-        var n=new StepSwitchNode();String payload="!"+NativeContractGenerator.fingerprint(n)+" "+n.encode(new NodeState(n.defaults()),p->-1);
+        var n=new StepSwitchNode();var state=new HashMap<>(n.defaults());long request=0x123456789ABCL;state.put(StepSwitchNode.SELECTION.value(),StepSwitchNode.selection(0,request));String payload="!"+NativeContractGenerator.fingerprint(n)+" "+n.encode(new NodeState(state),p->-1);
         try(var client=new com.vin.easyknack.audio.AudioHostClient()){
             client.start(com.vin.easyknack.audio.AudioHostClient.defaultExecutable(),true);
             assertEquals("OK",client.command("GRAPH 2 switch stepswitch "+payload+" @ c ee"+"c".repeat(32)+" out out 0 0 @ a c"));
-            assertEquals("OK",client.command("PLAY"));awaitIndex(client,0);
+            assertEquals("OK",client.command("PLAY"));var initial=awaitIndex(client,0);
+            assertEquals(request,StepSwitchStates.reportedRevision(initial));
             assertEquals("OK",client.command("TRIGGER switch:next"));awaitIndex(client,1);
             assertEquals("OK",client.command("TRIGGER switch:select-3"));awaitIndex(client,3);
             // Repeated unchanged selections are covered with explicit DSP epochs below.
@@ -95,17 +150,17 @@ class StepSwitchTest {
             assertEquals("OK",client.command("STOP"));
         }
     }
-    private static void awaitIndex(com.vin.easyknack.audio.AudioHostClient client,int expected)throws Exception{
+    private static com.vin.easyknack.audio.AudioAnalysis.Frame awaitIndex(com.vin.easyknack.audio.AudioHostClient client,int expected)throws Exception{
         long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(3);
         do{
             var frame=com.vin.easyknack.audio.AudioAnalysis.parse(client.command("ANALYSIS")).get("switch");
-            if(frame!=null&&frame.frequency()==expected)return;
+            if(frame!=null&&frame.frequency()==expected)return frame;
             Thread.sleep(20);
         }while(System.nanoTime()<deadline);
-        fail("Host did not publish step "+expected);
+        return fail("Host did not publish step "+expected);
     }
     private static GLNode view(WorkspaceController c,GLNodeId id){return c.workspace().editor().getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(id::equals).isPresent()).findFirst().orElseThrow();}
-    @Test void groupedEditorsSelectWithoutModelChangesAndRemainAvailableWhenConnected()throws Exception{
+    @Test void groupedEditorsPersistSelectionAndRemainAvailableWhenConnected()throws Exception{
         SwingUtilities.invokeAndWait(()->{
             try(var c=new WorkspaceController()){
                 var graph=c.workspace().currentGraph();var node=new StepSwitchNode();var id=GLNodeId.random();
@@ -115,8 +170,8 @@ class StepSwitchTest {
                 assertEquals(4,groups.size());
                 var button=(com.vingame.glswing.ui.GLButton)groups.get(2).getGLChildren().stream().filter(com.vingame.glswing.ui.GLButton.class::isInstance).findFirst().orElseThrow();
                 var sent=new ArrayList<String>();com.vin.easyknack.audio.ManualTriggers.receiver(sent::add);
-                var before=graph.snapshot();button.doClick();assertEquals(List.of(id+":select-2"),sent);assertEquals(before,graph.snapshot());
-                com.vin.easyknack.audio.AudioAnalysis.publish(Map.of(id.toString(),new com.vin.easyknack.audio.AudioAnalysis.Frame(2,0,0,new float[]{2})));
+                var before=graph.snapshot();button.doClick();assertTrue(sent.isEmpty(),"The versioned parameter request must not also emit a duplicate manual trigger");assertEquals(2,StepSwitchNode.selected(new NodeState(graph.snapshot().findNode(id).orElseThrow().properties())));assertNotEquals(before,graph.snapshot());
+                com.vin.easyknack.audio.AudioAnalysis.publish(Map.of(id.toString(),new com.vin.easyknack.audio.AudioAnalysis.Frame(2,StepSwitchNode.revision(new NodeState(graph.snapshot().findNode(id).orElseThrow().properties())),0,new float[]{2})));
                 assertEquals(2,view.activeStep());assertEquals(button.getGLTheme().buttonStyle().pressedDarkColor(),button.getGLStyle().background());
                 var source=c.workspace().editor().getNodes().stream().filter(n->n.findPort("audio-out")!=null).findFirst().orElseThrow();
                 c.workspace().editor().connect(source.findPort("audio-out"),view.findPort("step-2"));

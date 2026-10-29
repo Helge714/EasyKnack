@@ -8,6 +8,7 @@ namespace easyknack {
 struct StepSwitchNode : NodeProcessor {
     static constexpr unsigned maximumSteps=32;
     unsigned steps=4,index=0;
+    std::uint64_t selectionRevision=0,reportedRevision=~std::uint64_t{};
     bool indexed=false; float selectedIndex=0;
     std::array<float,maximumSteps> values{};
     ManualTriggerReceiver next,reset;
@@ -27,15 +28,16 @@ struct StepSwitchNode : NodeProcessor {
     void shareChannelState(NodeProcessor& other)override{auto& p=static_cast<StepSwitchNode&>(other);next=p.next;reset=p.reset;selections=p.selections;}
     void shareVoiceState(NodeProcessor& other)override{shareChannelState(other);}
     void inheritState(const NodeProcessor& other)noexcept override{
-        auto& p=static_cast<const StepSwitchNode&>(other);index=p.index<steps?p.index:0;next.seen=p.next.seen;reset.seen=p.reset.seen;for(unsigned i=0;i<maximumSteps;i++)selections[i].seen=p.selections[i].seen;
+        auto& p=static_cast<const StepSwitchNode&>(other);if(selectionRevision==p.selectionRevision)index=p.index<steps?p.index:0;next.seen=p.next.seen;reset.seen=p.reset.seen;for(unsigned i=0;i<maximumSteps;i++)selections[i].seen=p.selections[i].seen;
     }
     bool supportsLiveParameters()const noexcept override{return true;}
     void applyParameters(const NodeProcessor& other)noexcept override{
-        auto& p=static_cast<const StepSwitchNode&>(other);steps=p.steps;values=p.values;indexed=p.indexed;selectedIndex=p.selectedIndex;if(index>=steps)index=0;
+        auto& p=static_cast<const StepSwitchNode&>(other);if(selectionRevision!=p.selectionRevision){index=p.index;selectionRevision=p.selectionRevision;}steps=p.steps;values=p.values;indexed=p.indexed;selectedIndex=p.selectedIndex;if(index>=steps)index=0;
     }
     void configure(std::istream& in)override{
         auto p=parameters::StepSwitchNodeParameters::read(in);sources=p.sources();indexed=p.mode_value=="index";selectedIndex=static_cast<float>(p.next_value);if(!std::isfinite(selectedIndex))throw std::runtime_error("Invalid step index");steps=static_cast<unsigned>(p.steps_value);
         if(steps<1||steps>maximumSteps)throw std::runtime_error("Invalid step count");
+        auto initial=std::stoul(p.initial_step_value);if(initial>=maximumSteps)throw std::runtime_error("Invalid initial step");index=initial<steps?initial:0;selectionRevision=std::stoull(p.selection_revision_value);
         values={static_cast<float>(p.step_0_value),
             static_cast<float>(p.step_1_value),
             static_cast<float>(p.step_2_value),
@@ -105,8 +107,9 @@ struct StepSwitchNode : NodeProcessor {
                 if(indexOutput)indexOutput[i]=static_cast<float>(index);shown=index;
             }
         }
-        if(mailbox&&c.channelIndex==0&&(reportCountdown--==0||frame->frequency!=shown)){
-            frame->frequency=shown;frame->valueCount=1;frame->values[0]=static_cast<float>(shown);mailbox->publish(*frame);reportCountdown=7;
+        if(mailbox&&c.channelIndex==0&&(reportCountdown--==0||frame->frequency!=shown||reportedRevision!=selectionRevision)){
+            reportedRevision=selectionRevision;frame->frequency=shown;frame->valueCount=5;frame->values[0]=static_cast<float>(shown);
+            for(unsigned i=0;i<4;++i)frame->values[i+1]=static_cast<float>((selectionRevision>>(16*i))&0xffff);mailbox->publish(*frame);reportCountdown=7;
         }
     }
 };

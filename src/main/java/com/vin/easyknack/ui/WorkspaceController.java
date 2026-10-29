@@ -52,6 +52,7 @@ final class WorkspaceController implements AutoCloseable {
     private final GLNodeWorkspace workspace;
     private MidiDrivers midiDrivers;
     private MeasurementRecorders measurementRecorders;
+    private StepSwitchStates stepSwitchStates;
     private final EditorTemplates editorTemplates;
     private final CompositePortColors compositeColors;
     private int compositeNumber;
@@ -93,7 +94,7 @@ final class WorkspaceController implements AutoCloseable {
                 GLGraphCyclePolicy.DELAYED_FEEDBACK, history, valueTypes, inputEditors,
                 nodes.schemas());
         midiDrivers=new MidiDrivers(this);
-        measurementRecorders=new MeasurementRecorders(this);
+        measurementRecorders=new MeasurementRecorders(this);stepSwitchStates=new StepSwitchStates(this);
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
         workspace.interfaceEditor().setDefaultValueType(com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
         workspace.setBoundaryPortFactory((port,endpoint)->{
@@ -818,6 +819,7 @@ final class WorkspaceController implements AutoCloseable {
         closed = true; audioUpdateTimer.stop();presented.clear();
         if(midiDrivers!=null)midiDrivers.close();
         if(measurementRecorders!=null)measurementRecorders.close();
+        if(stepSwitchStates!=null)stepSwitchStates.close();
         bakes.close();if(formulas!=null)formulas.close();formulaEditors.values().forEach(FormulaEditorPanel::close);formulaEditors.clear();
         history.removeListener(rateHistoryListener);
         compositeColors.close();

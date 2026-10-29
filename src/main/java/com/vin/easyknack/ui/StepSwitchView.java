@@ -1,11 +1,11 @@
 package com.vin.easyknack.ui;
 
 import com.vin.easyknack.nodes.StepSwitchNode;
+import com.vin.easyknack.nodes.NodeState;
 import com.vin.easyknack.audio.AudioAnalysis;
 import com.vingame.glswing.node.model.GLGraphNode;
 import com.vingame.glswing.ui.*;
 import com.vingame.glswing.layout.GLConstraints;
-import com.vin.easyknack.audio.ManualTriggers;
 import com.vin.easyknack.nodes.NodeText;
 import java.util.*;
 import com.vin.easyknack.nodes.NodeBuilder;
@@ -15,43 +15,71 @@ import com.vingame.glswing.ui.GLSlider;
 import com.vingame.glswing.history.GLHistoryManager;
 import com.vingame.glswing.node.model.GLNodeValue;
 
-/** Runtime selection is presentation only and never changes the saved graph or undo history. */
+/** Editable step labels and persisted selection, with revision-checked runtime feedback. */
 public final class StepSwitchView extends BasicNodeView {
     private int active;
+    private NodeState current;
+    private Map<Integer,Runnable> nameActions;
     private Map<Integer,SelectionButton> selections;
     private final Runnable refresh=this::refresh;
     public StepSwitchView(StepSwitchNode definition,NodeViewContext context,GLGraphNode model){
         super(definition,context,model);
         for(int i:selections.keySet())findPort(StepSwitchNode.input(i).value()).setContentHiddenWhenConnected(false);
+        current=new NodeState(model.properties());onStateChanged(state->{current=state;refresh();});
         AudioAnalysis.listen(refresh);refresh();
     }
     private void refresh(){
+        if(current==null)return;
         var frame=AudioAnalysis.frame(nodeId().toString());
-        int next=frame==null?0:(int)frame.frequency();
-        if(findPort(StepSwitchNode.input(next).value())==null)next=0;
-        active=next;
+        int next=StepSwitchNode.selected(current);
+        if(StepSwitchNode.indexed(current)&&!current.isConnected(StepSwitchNode.NEXT))next=(int)current.number(StepSwitchNode.NEXT,0);
+        else if(frame!=null&&StepSwitchStates.reportedRevision(frame)==StepSwitchNode.revision(current))next=(int)frame.frequency();
+        active=Math.max(0,Math.min(StepSwitchNode.count(current)-1,next));
         selections.forEach((i,button)->button.selected(i==active));
     }
+    void selectStep(int index){
+        if(current==null)return;
+        int next=Math.max(0,Math.min(StepSwitchNode.count(current)-1,index));
+        long revision=StepSwitchNode.nextRevision(current);
+        write(StepSwitchNode.SELECTION,StepSwitchNode.selection(next,revision));
+    }
+    void renameStep(int index){var action=nameActions.get(index);if(action!=null)action.run();}
     public int activeStep(){return active;}
     @Override protected GLContainer control(NodeBuilder.Row row){
-        if(row.id().startsWith("step-")){
+        if((row.key().equals(StepSwitchNode.NEXT)||row.key().equals(StepSwitchNode.RESET))&&row.editor() instanceof com.vin.easyknack.nodes.Editor.Trigger){
+            var button=new GLButton(row.label());button.addActionListener(e->selectStep(row.key().equals(StepSwitchNode.RESET)?0:(active+1)%StepSwitchNode.count(current)));return button;
+        }
+        if(row.id().startsWith("step-")&&!row.id().startsWith("step-name-")){
             int index=Integer.parseInt(row.id().substring(5));
             var slider=super.control(row);
-            var label=new NodeTooltipLabel(row.label(),false,true);label.setVisible(false);
+            var nameEditor=new GLTextEditor();nameEditor.setHistoryEnabled(false);nameEditor.setVisible(false);nameEditor.setName("step-name-editor-"+index);
+            final boolean[] editing={false};
+            var label=new NodeTooltipLabel(row.label(),false,true){
+                @Override public void mousePressed(GLMouseEvent event){
+                    if(event.getButton()==java.awt.event.MouseEvent.BUTTON1){renameStep(index);event.consume();}else super.mousePressed(event);
+                }
+            };label.setVisible(false);label.setToolTipText(AppText.text("stepswitch.renameHint"));
+            Runnable begin=()->{editing[0]=true;nameEditor.setText(StepSwitchNode.label(current,index));slider.setVisible(false);label.setVisible(false);nameEditor.setVisible(true);requestGLFocus(nameEditor);nameEditor.selectAll();};
+            Runnable finish=()->{editing[0]=false;nameEditor.setVisible(false);slider.setVisible(!current.isConnected(row.key()));label.setVisible(current.isConnected(row.key()));};
+            nameEditor.addActionListener(e->{write(StepSwitchNode.name(index),GLNodeValue.of(nameEditor.getText()));finish.run();});
+            nameEditor.addCancelListener(e->finish.run());
+            if(nameActions==null)nameActions=new LinkedHashMap<>();nameActions.put(index,begin);
+            if(slider instanceof GLSlider value)value.getContextMenu().addItem(AppText.text("stepswitch.rename"),e->begin.run());
             var button=new SelectionButton(Integer.toString(index+1));
-            button.setToolTipText(NodeText.text("easyknack.routing.stepswitch.select.tooltip","Select this step at the next audio block."));
-            button.addActionListener(e->ManualTriggers.fire(nodeId().toString(),"select-"+index));
+            button.setToolTipText(NodeText.text("easyknack.routing.stepswitch.select.tooltip","Select this step."));
+            button.addActionListener(e->selectStep(index));
             if(selections==null)selections=new LinkedHashMap<>();selections.put(index,button);
             var group=new GLLayoutGroup();
             group.addGL(slider,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
             group.addGL(label,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
+            group.addGL(nameEditor,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
             group.addGL(button,GLConstraints.at(1,0).fillBoth().connectAll());
             onStateChanged(state->{
-                String text=StepSwitchNode.label(state,index);
+                current=state;String text=StepSwitchNode.label(state,index);
                 button.setEnabled(!StepSwitchNode.indexed(state));
                 if(slider instanceof GLSlider value){value.setText(text);value.setName(text);}
                 label.setText(text);
-                slider.setVisible(!state.isConnected(row.key()));label.setVisible(state.isConnected(row.key()));
+                slider.setVisible(!editing[0]&&!state.isConnected(row.key()));label.setVisible(!editing[0]&&state.isConnected(row.key()));
             });
             return group;
         }
