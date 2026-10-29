@@ -45,6 +45,9 @@ final class GroupSourceExporter {
         return create(document,instance,false);
     }
     static Export create(GLNodeGraphDocument document,GLGraphNode instance,boolean local){
+        return createPrepared(document,local?GroupBakes.compilationNode(document,instance):instance,local);
+    }
+    private static Export createPrepared(GLNodeGraphDocument document,GLGraphNode instance,boolean local){
         var registry=new GLCompositeGraphRegistry();NodeDocuments.assets(document).forEach(registry::registerAsset);
         var descriptor=registry.findComposite(instance.typeId()).orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Select one group to export.")));
         var asset=registry.findAsset(descriptor.assetId()).orElseThrow();

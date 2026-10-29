@@ -39,11 +39,26 @@ class InstanceSourceSpecializationTest {
     @Test void bakeAndExportUseTheSameSpecialization(){
         var f=fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var bake=GroupSourceExporter.create(f.document(),f.instance(),true);
         String code=export.files().get("native/"+export.className()+".hpp");
-        String local=bake.files().get("native/"+bake.className()+".hpp").replace(bake.className(),export.className()).replace("local_baked_","baked_");
-        assertEquals(code,local);
+        String local=bake.files().get("native/"+bake.className()+".hpp").replace(bake.className(),export.className()).replace(bake.definition().processor().id(),export.definition().processor().id());
+        assertEquals(normalizePlanIdentities(code),normalizePlanIdentities(local));
         assertTrue(code.contains("struct CompiledInstance"));assertTrue(code.contains("MathNode::evaluate("));
         assertTrue(code.contains("processInstances<CompiledInstance>"));assertFalse(code.contains(":BakedGraphProcessor"));
         assertTrue(code.contains("audioKernel.process<CompiledInstance>(*this,inner)"));
+    }
+    private static String normalizePlanIdentities(String code){
+        // Local Bakes use a definition-scoped root identity; source exports retain
+        // the selected instance. Compare computation, not identity-only plan labels.
+        var pattern=java.util.regex.Pattern.compile("[0-9a-f]{64,}");
+        var matcher=pattern.matcher(code);var result=new StringBuffer();
+        while(matcher.find()){
+            String replacement=matcher.group();
+            if(replacement.length()%2==0){
+                var decoded=new String(HexFormat.of().parseHex(replacement),java.nio.charset.StandardCharsets.UTF_8);
+                if(decoded.contains("GRAPH "))replacement=HexFormat.of().formatHex(decoded.replaceAll("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}","node-identity").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            }
+            matcher.appendReplacement(result,java.util.regex.Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);return result.toString();
     }
     @ParameterizedTest @ValueSource(ints={0,1,2}) @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void generatedKernelPreservesRatesChannelsDefaultsAndState(int variant)throws Exception{

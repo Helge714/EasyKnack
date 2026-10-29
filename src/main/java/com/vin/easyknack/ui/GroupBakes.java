@@ -72,18 +72,26 @@ final class GroupBakes implements AutoCloseable {
         var node=find(doc,id);if(node==null)return null;
         var assets=new HashMap<String,GLNodeGraphAsset>();
         for(var a:NodeDocuments.assets(doc))if(a.compositeDescriptor()!=null)assets.put(a.compositeDescriptor().nodeTypeId(),a);
-        var signature=clean(node);
-        var definition=assets.get(node.typeId());
-        if(definition!=null)for(var port:definition.compositeDescriptor().portMappings())
-            if(port.publicPort().direction()==GLPortDirection.INPUT && port.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER))
-                signature=signature.withoutProperty(GroupUnits.key(port.publicPort().id()));
-        if(definition!=null){var registry=new GLCompositeGraphRegistry();NodeDocuments.assets(doc).forEach(registry::registerAsset);
-            for(var choice:GroupChoices.choices(definition,registry))signature=signature.withoutProperty(choice.id());}
-        var parts=new ArrayList<Object>();parts.add(signature);
+        var signature=compilationNode(doc,node);
+        var parts=new ArrayList<Object>();parts.add(List.of(signature.typeId(),signature.properties()));
         collect(node.typeId(),assets,new HashSet<>(),parts);
         // Outer interfaces can change how a nested instance is bound.
         for(var a:NodeDocuments.assets(doc))if(a.graph().findNode(id).isPresent()&&a.compositeDescriptor()!=null)parts.add(a.compositeDescriptor());
         return List.copyOf(parts);
+    }
+    static GLGraphNode compilationNode(GLNodeGraphDocument doc,GLGraphNode node){
+        var registry=new GLCompositeGraphRegistry();NodeDocuments.assets(doc).forEach(registry::registerAsset);
+        var descriptor=registry.findComposite(node.typeId()).orElse(null);if(descriptor==null)return clean(node);
+        var signature=clean(node);
+        var definition=registry.findAsset(descriptor.assetId()).orElse(null);
+        if(definition!=null)for(var port:definition.compositeDescriptor().portMappings())
+            if(port.publicPort().direction()==GLPortDirection.INPUT && port.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER))
+                signature=signature.withoutProperty(GroupUnits.key(port.publicPort().id()));
+        if(definition!=null){
+            for(var choice:GroupChoices.choices(definition,registry))signature=signature.withoutProperty(choice.id());}
+        var identity=node.typeId()+new TreeMap<>(signature.properties());
+        var id=new GLNodeId(UUID.nameUUIDFromBytes(identity.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        return new GLGraphNode(id,signature.typeId(),signature.properties());
     }
     private static GLGraphNode withoutProvenance(GLGraphNode node){
         for(var key:List.copyOf(node.properties().keySet()))if(key.startsWith(GLGraphNode.AUTOMATIC_PREFIX)||key.startsWith(GLGraphNode.AUTOMATIC_DEFAULT_PREFIX))node=node.withoutProperty(key);
@@ -96,6 +104,19 @@ final class GroupBakes implements AutoCloseable {
         parts.add(List.of(a.id(),a.compositeDescriptor(),a.graph().nodes().stream().map(n->withoutProvenance(n).withoutProperty(PROPERTY).withoutProperty(GLNodeState.HIDDEN)).toList(),a.graph().connections(),dspMetadata(a.metadata())));
         for(var n:a.graph().nodes())collect(n.typeId(),assets,seen,parts);
     }
+    private void reuse(GLNodeGraphDocument doc){
+        var available=new HashMap<Object,Entry>();
+        entries.values().stream().filter(e->e.enabled&&e.key!=null).forEach(e->available.put(e.key,e));
+        var types=new HashSet<String>();var controlled=new HashSet<GLNodeId>();
+        for(var asset:NodeDocuments.assets(doc))if(asset.compositeDescriptor()!=null){types.add(asset.compositeDescriptor().nodeTypeId());asset.compositeDescriptor().propertyMappings().forEach(p->controlled.add(p.internalNodeId()));}
+        for(var asset:NodeDocuments.assets(doc))for(var node:asset.graph().nodes()){
+            if(!types.contains(node.typeId())||controlled.contains(node.id()))continue;
+            var old=entries.get(node.id());
+            if(old!=null&&old.key!=null)continue;
+            var shared=available.get(key(doc,node.id()));if(shared==null)continue;
+            var e=new Entry();e.key=shared.key;e.source=shared.source;e.definition=shared.definition;e.enabled=true;e.wanted=true;e.status=shared.status;entries.put(node.id(),e);
+        }
+    }
     void validate(){
         if(closed||entries.isEmpty())return;var doc=document.get();boolean invalid=false;
         for(var item:entries.entrySet()){
@@ -105,7 +126,7 @@ final class GroupBakes implements AutoCloseable {
             }
         }
         if(invalid)generation++;
-        refresh();
+        reuse(doc);refresh();
     }
     void reset(){restoreTimer.stop();restoring.clear();generation++;entries.clear();host=null;refresh();}
     void disable(GLNodeId id){
@@ -124,16 +145,20 @@ final class GroupBakes implements AutoCloseable {
             for(var asset:NodeDocuments.assets(doc))if(asset.compositeDescriptor()!=null)
                 if(asset.compositeDescriptor().propertyMappings().stream().anyMatch(p->p.internalNodeId().equals(id)))
                     throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("This instance has properties controlled by its parent group. Bake the parent group instead."));
-            entry.source=GroupSourceExporter.create(doc,node,true);entry.key=key(doc,id);entry.enabled=false;entry.wanted=true;
+            var currentKey=key(doc,id);
+            if(!force){var shared=entries.values().stream().filter(e->e!=entry&&e.enabled&&Objects.equals(e.key,currentKey)).findFirst().orElse(null);
+                if(shared!=null){entry.key=currentKey;entry.source=shared.source;entry.definition=shared.definition;entry.enabled=true;entry.wanted=true;entry.status=shared.status;refresh();changed.run();return;}
+            }
+            entry.source=GroupSourceExporter.create(doc,node,true);entry.key=currentKey;entry.enabled=false;entry.wanted=true;
         }catch(Exception failure){entry.status=AppText.literal("Bake failed: ")+failure.getMessage();refresh();return;}
         var requested=new LinkedHashMap<GLNodeId,Entry>();
-        entries.forEach((key,value)->{if(value.enabled||key.equals(id))requested.put(key,value);});
+        entries.forEach((key,value)->{if(value.enabled||key.equals(id))requested.put(key,Objects.equals(value.key,entry.key)?entry:value);});
         var files=new TreeMap<String,String>();var names=new ArrayList<String>();
         for(var e:requested.values()){
             names.add("com.vin.easyknack.nodes."+e.source.className());
             e.source.files().forEach((path,text)->{if(path.startsWith("java/")||path.startsWith("native/"))files.put(path,text);});
         }
-        files.put("plugin.properties",new PluginManifest("easyknack_local_bakes","1",names).text());
+        files.put("plugin.properties",new PluginManifest("easyknack_local_bakes","1",names.stream().distinct().toList()).text());
         // A fresh content-addressed build also has a fresh executable path. Never
         // overwrite a cached host that may still be running on Windows.
         if(force)files.put("bake-request.txt",UUID.randomUUID().toString());
@@ -153,12 +178,12 @@ final class GroupBakes implements AutoCloseable {
                             .findFirst().orElseThrow(()->new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Compiled group definition missing")))));
                         NodeRegistry.installPlugins(build.definitions());host=build.host();
                         requested.forEach((key,e)->{
-                            e.definition=definitions.get(key);e.enabled=true;e.status=build.cached()?"Baked (cached)":"Baked";
+                            var target=entries.get(key);target.source=e.source;target.definition=definitions.get(key);target.enabled=true;target.status=build.cached()?"Baked (cached)":"Baked";
                         });
                     } catch(Exception failure) {
                         entry.enabled=false;entry.wanted=false;entry.status=AppText.literal("Bake failed: ")+failure.getMessage();
                     }
-                    refresh();changed.run();
+                    reuse(document.get());refresh();changed.run();
                 });
             }catch(Exception failure){javax.swing.SwingUtilities.invokeLater(()->{
                 if(closed)return;busy=false;
@@ -177,7 +202,7 @@ final class GroupBakes implements AutoCloseable {
         BiFunction<GLNodeEndpoint,Boolean,GLNodeEndpoint> endpoint=(old,input)->{
             var e=replacements.get(old.nodeId());if(e==null)return old;
             var source=e.source.source();
-            var n=find(source,old.nodeId());
+            var n=asset.graph().findNode(old.nodeId()).orElseThrow();
             var descriptor=NodeDocuments.assets(source).stream().map(GLNodeGraphAsset::compositeDescriptor).filter(Objects::nonNull).filter(d->d.nodeTypeId().equals(n.typeId())).findFirst().orElseThrow();
             var ports=descriptor.portMappings().stream().filter(p->!GroupInputs.editorOnly(p)&&(p.publicPort().direction()==GLPortDirection.INPUT)==input).toList();
             for(int i=0;i<ports.size();i++)if(ports.get(i).publicPort().id().equals(old.portId()))return new GLNodeEndpoint(old.nodeId(),(input?"input_":"output_")+i);

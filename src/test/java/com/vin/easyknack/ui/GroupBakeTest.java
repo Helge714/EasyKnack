@@ -13,6 +13,34 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.node.document.*;
 
 class GroupBakeTest {
+    @Test void duplicateInstancesReuseOneCompilationAndInvalidateTogether()throws Exception{
+        var p=ReferenceProjects.make("osc-gain-filter",0);verifySharedBake(p.document(),p.group());
+    }
+    @Test void multipleGroupDuplicatesReuseOneCompilation()throws Exception{
+        var f=MultipleGroupsTest.fixture(false,"mean");verifySharedBake(f.document(),f.instance());
+    }
+    private void verifySharedBake(GLNodeGraphDocument original,GLGraphNode instance)throws Exception{
+        var duplicate=GLNodeId.random();
+        var graph=new GLNodeGraph(original.root().graph());
+        graph.edit("Duplicate",e->e.addNode(new GLGraphNode(duplicate,instance.typeId(),instance.properties())));
+        var root=original.root();
+        var doc=new AtomicReference<>(new GLNodeGraphDocument(new GLNodeGraphAsset(root.id(),root.version(),root.kind(),graph.snapshot(),root.viewState(),root.metadata(),root.compositeDescriptor()),original.embeddedAssets(),original.externalAssets()));
+        var def=definition(GroupSourceExporter.create(doc.get(),instance,true));var calls=new AtomicInteger();
+        var manager=new GroupBakes(doc::get,(files,progress)->{calls.incrementAndGet();return new PluginManager.Build(Path.of("target/shared-bake"),List.of(def),Map.of(),false);},()->{});
+        try{
+            assertEquals(GroupBakes.key(doc.get(),instance.id()),GroupBakes.key(doc.get(),duplicate));
+            var other=doc.get().root().graph().findNode(duplicate).orElseThrow();
+            assertEquals(GroupSourceExporter.create(doc.get(),instance,true).files(),GroupSourceExporter.create(doc.get(),other,true).files());
+            edt(()->manager.bake(instance.id()));waitFor(manager);
+            edt(()->{assertTrue(manager.enabled(duplicate));manager.bake(duplicate);
+                var applied=manager.apply(doc.get().root());assertEquals(applied.graph().findNode(instance.id()).orElseThrow().typeId(),applied.graph().findNode(duplicate).orElseThrow().typeId());});
+            assertEquals(1,calls.get());
+            edt(()->{manager.disable(duplicate);manager.bake(instance.id(),true);});waitFor(manager);
+            edt(()->{assertTrue(manager.enabled(instance.id()));assertFalse(manager.enabled(duplicate));manager.bake(duplicate);assertTrue(manager.enabled(duplicate));});
+            assertEquals(2,calls.get(),"Re-enabling a compatible instance should reuse the loaded Bake");
+            edt(()->{doc.set(changed(doc.get()));manager.validate();assertFalse(manager.enabled(duplicate));assertFalse(manager.enabled(instance.id()));});
+        }finally{edt(manager::close);NodeRegistry.installPlugins(List.of());}
+    }
     @Test void forcedBakeRegeneratesEvenEnabledGroupWithUniqueBuildIdentity()throws Exception{
         var p=ReferenceProjects.make("osc-gain-filter",0);
         var def=definition(GroupSourceExporter.create(p.document(),p.group(),true));
