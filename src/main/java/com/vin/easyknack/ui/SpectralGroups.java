@@ -29,7 +29,7 @@ final class SpectralGroups {
     static List<GLGraphDiagnostic> diagnostics(GLNodeGraphSnapshot graph){
         var temporal=temporalNodes(graph);var result=new ArrayList<>(MultipleGroups.diagnostics(graph));
         for(var n:graph.nodes()){var d=NodeRegistry.find(n.typeId()).orElse(null);
-            if(temporal.contains(n.id())&&(d instanceof BinDiscardNode||d instanceof BinOutputNode))result.add(new GLGraphDiagnostic(GLGraphDiagnostic.Severity.ERROR,"spectral.frame-dependency",d.title()+" must depend only on FFT-frame values, not on generated audio.",Set.of(n.id()),Set.of()));}
+            if(temporal.contains(n.id())&&(d instanceof BinDiscardNode||d instanceof BinOutputNode||d instanceof BinHoldNode||d instanceof BinMemoryNode))result.add(new GLGraphDiagnostic(GLGraphDiagnostic.Severity.ERROR,"spectral.frame-dependency",d.title()+" must depend only on FFT-frame values, not on generated audio.",Set.of(n.id()),Set.of()));}
         return result;
     }
     static GLNodeGraphAsset create(){
@@ -66,8 +66,8 @@ final class SpectralGroups {
                 ||ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).count()>1
                 ||ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).count()>8
                 ||ports.stream().anyMatch(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&!Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId()))
-                ||inputs.size()>SpectralGraphNode.MAX_EXTERNAL||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId()).contains(p.publicPort().valueTypeId())||GroupInputSettings.selectedRate(p)==ProcessingRate.EVENT))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral group needs one Spectrum input, at most one Spectrum output and seven audio Combine outputs, and up to 16 numeric frame inputs."));
+                ||inputs.size()>SpectralGraphNode.MAX_EXTERNAL||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.TRIGGER.valueTypeId()).contains(p.publicPort().valueTypeId())))
+                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral group needs one Spectrum input, at most one Spectrum output and seven audio Combine outputs, and up to 16 numeric or trigger frame inputs."));
             var connected=graph.connections().stream().filter(w->w.input().nodeId().equals(node.id())).map(w->w.input().portId()).collect(java.util.stream.Collectors.toSet());
             var state=new NodeState(asset.metadata());
             int flags=(state.text(SKIP_EMPTY,"false").equals("true")?1:0)|(state.text(PARALLEL,"true").equals("true")?0:2);
@@ -75,7 +75,7 @@ final class SpectralGroups {
             for(var p:ports)renamed.put(new GLNodeEndpoint(node.id(),p.publicPort().id()),p.publicPort().direction()==GLPortDirection.OUTPUT?compiled.outputs().get(p.publicPort().id()):compiled.inputs().getOrDefault(p.publicPort().id(),new GLNodeEndpoint(node.id(),inputs.contains(p)?SpectralGraphNode.external(inputs.indexOf(p)).value():"spectrum")));
             nodes.addAll(compiled.shared());extraWires.addAll(compiled.wires());
             var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(compiled.program()));values.put("audioOutputs",GLNodeValue.of(compiled.audioOutputs()));
-            values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(compiled.manualTargets()));
+            values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(compiled.manualTargets()));values.put("triggerSlots",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->GroupInputSettings.selectedRate(inputs.get(i))==ProcessingRate.EVENT||inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.TRIGGER.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));
             for(String key:List.of(GLNodeState.MUTED,GLNodeState.HIDDEN))if(node.properties().containsKey(key))values.put(key,node.properties().get(key));
             nodes.add(new GLGraphNode(node.id(),new SpectralGraphNode().registration().id(),values));
         }
@@ -99,7 +99,7 @@ final class SpectralGroups {
                 e.addConnection(wire(boundary.id(),"spectrum",instance.id(),port.publicPort().id()));});
         graph.edit("Frame values",e->{for(int i=0;i<inputs.size();i++){
             var port=inputs.get(i);if(!connected.contains(port.publicPort().id()))continue;
-            var def=new BinUniformNode();var values=new HashMap<>(def.defaults());values.put("slot",GLNodeValue.of(i));
+            BasicNode def=GroupInputSettings.selectedRate(port)==ProcessingRate.EVENT||port.publicPort().valueTypeId().equals(SignalCategory.TRIGGER.valueTypeId())?new BinTriggerNode():new BinUniformNode();var values=new HashMap<>(def.defaults());values.put("slot",GLNodeValue.of(i));
             var uniform=new GLGraphNode(GLNodeId.random(),def.registration().id(),values);e.addNode(uniform);
             e.addConnection(wire(uniform.id(),"out",instance.id(),port.publicPort().id()));
         }});
@@ -149,13 +149,13 @@ final class SpectralGroups {
         for(var n:order){var def=NodeRegistry.require(n.typeId());
             boolean audio=def instanceof OscillatorNode||def instanceof NoiseNode||def instanceof DigitalNoiseNode||def instanceof InstanceCombineNode||source.connections().stream().anyMatch(w->w.input().nodeId().equals(n.id())&&temporal.contains(w.output().nodeId()));
             if(audio)temporal.add(n.id());
-            if(audio&&(def instanceof BinDiscardNode||def instanceof BinOutputNode))throw new IllegalArgumentException(def.title()+" must depend only on FFT-frame values, not on generated audio");
+            if(audio&&(def instanceof BinDiscardNode||def instanceof BinOutputNode||def instanceof BinHoldNode||def instanceof BinMemoryNode||def instanceof FormulaNode))throw new IllegalArgumentException(def.title()+" must depend only on FFT-frame values, not on generated audio");
             if(def instanceof OscillatorNode&&wires.containsKey(new GLNodeEndpoint(n.id(),"waveform")))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A custom wavetable needs a complete table, not a scalar bin value"));
             if(source.connections().stream().anyMatch(w->w.input().nodeId().equals(n.id())&&combines.stream().anyMatch(combine->combine.id().equals(w.output().nodeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Shared Combine outputs cannot feed back into the per-bin area"));
         }
         if(!combines.isEmpty()&&order.size()>64)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral audio program supports up to 64 per-bin nodes"));
         var result=new StringBuilder(flags!=0?"BIN2 ":"BIN1 ").append(order.size());if(flags!=0)result.append(' ').append(flags);
-        for(var node:order){var def=NodeRegistry.require(node.typeId());if(!supports(def))throw new IllegalArgumentException(def.title()+" is not a stateless bin operation. Use nodes supporting independent spectral-bin evaluation.");
+        for(var node:order){var def=NodeRegistry.require(node.typeId());if(def instanceof FormulaNode&&new NodeState(node.properties()).number("bufferInputs",0)!=0)throw new IllegalArgumentException("Spectral formulas accept numeric and trigger inputs, not file/delay buffers");if(!supports(def))throw new IllegalArgumentException(def.title()+" is not a stateless bin operation. Use nodes supporting independent spectral-bin evaluation.");
             result.append(' ').append(def.processor().id()).append(" !").append(NativeContractGenerator.fingerprint(def)).append(' ').append(def.encode(new NodeState(node.properties(),wires.containsKey(new GLNodeEndpoint(node.id(),"spectrum"))?Set.of(BinReadNode.SPECTRUM):Set.of()),port->{
                 var endpoint=wires.get(new GLNodeEndpoint(node.id(),port.value()));if(endpoint==null||def instanceof BinContextNode||def instanceof BinReadNode&&port.equals(BinReadNode.SPECTRUM))return -1;
                 var upstream=source.findNode(endpoint.nodeId()).orElseThrow();var layout=NodeRegistry.require(upstream.typeId()).layout(new NodeState(upstream.properties()));

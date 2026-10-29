@@ -2,22 +2,34 @@
 #include "ParameterContracts.hpp"
 #include "../NodeProcessor.hpp"
 #include "../SpectrumStream.hpp"
+#include "../EnvelopeStabilizer.hpp"
 namespace easyknack {
 struct IFFTNode : NodeProcessor {
     std::vector<double> sum,normalization;
     std::vector<std::complex<double>> work;
     std::uint64_t identity=0,nextBlock=0;
+    double stability=0;
+    EnvelopeStabilizer stabilizer;
     char executionRate()const noexcept override{return 'a';}
     bool canShareChannels()const noexcept override{return true;}
     ResourceKind inputResourceKind(std::size_t)const noexcept override{return ResourceKind::spectrum;}
-    void configure(std::istream& in)override{sources=parameters::IFFTNodeParameters::read(in).sources();}
-    void prepare(double,std::size_t block)override{sum.assign(2*(SpectrumStream::maxSize+block+1),0);normalization.assign(sum.size(),0);work.resize(SpectrumStream::maxSize);identity=0;}
-    void adoptState(NodeProcessor& previous)noexcept override{auto& old=static_cast<IFFTNode&>(previous);if(sum.size()==old.sum.size()){sum.swap(old.sum);normalization.swap(old.normalization);identity=old.identity;nextBlock=old.nextBlock;}}
+    bool supportsLiveParameters()const noexcept override{return true;}
+    void applyParameters(const NodeProcessor& p)noexcept override{stability=static_cast<const IFFTNode&>(p).stability;}
+    void configure(std::istream& in)override{
+        auto start=in.tellg();std::string marker;in>>marker;
+        if(marker=="!0aba7785f0529c4e"){
+            int source;if(!(in>>source)||source< -1||source>=2048)throw std::runtime_error("Invalid legacy IFFT source");
+            sources={source};stability=0;return;
+        }
+        in.seekg(start);auto p=parameters::IFFTNodeParameters::read(in);sources=p.sources();stability=p.stability_value;
+    }
+    void prepare(double rate,std::size_t block)override{sum.assign(2*(SpectrumStream::maxSize+block+1),0);normalization.assign(sum.size(),0);work.resize(SpectrumStream::maxSize);identity=0;stabilizer.prepare(rate);}
+    void adoptState(NodeProcessor& previous)noexcept override{auto& old=static_cast<IFFTNode&>(previous);if(sum.size()==old.sum.size()){sum.swap(old.sum);normalization.swap(old.normalization);identity=old.identity;nextBlock=old.nextBlock;stabilizer=old.stabilizer;}}
     void process(ProcessContext& c)noexcept override{
         auto* stream=static_cast<const SpectrumStream*>(c.resource(0));
-        if(!stream||!stream->size){std::fill_n(c.output,c.bufferSize,0);identity=0;return;}
+        if(!stream||!stream->size){std::fill_n(c.output,c.bufferSize,0);identity=0;stabilizer.reset();return;}
         RenderCadence::include(stream->hop);
-        if(identity!=stream->identity||nextBlock!=stream->blockStart){std::fill(sum.begin(),sum.end(),0);std::fill(normalization.begin(),normalization.end(),0);identity=stream->identity;}
+        if(identity!=stream->identity||nextBlock!=stream->blockStart){std::fill(sum.begin(),sum.end(),0);std::fill(normalization.begin(),normalization.end(),0);identity=stream->identity;stabilizer.reset();}
         nextBlock=stream->blockStart+c.bufferSize;const auto n=stream->size;const auto length=stream->windowFrames();
         for(std::size_t f=0;f<stream->count;f++){
             const auto& frame=stream->frames[f];std::copy_n(frame.bins.data(),n,work.data());spectrumTransform(work.data(),n,true);
@@ -31,7 +43,7 @@ struct IFFTNode : NodeProcessor {
             // The initial partial overlap contains only zero-padded history. Do
             // not amplify spectral rounding error at the first window's edge.
             auto slot=(stream->blockStart+i)%sum.size();double value=stream->blockStart+i>=length&&normalization[slot]>1e-12?sum[slot]/normalization[slot]:0;
-            c.output[i]=std::isfinite(value)?static_cast<float>(value):0;sum[slot]=0;normalization[slot]=0;
+            c.output[i]=static_cast<float>(stabilizer.process(value,stability));sum[slot]=0;normalization[slot]=0;
         }
     }
 };

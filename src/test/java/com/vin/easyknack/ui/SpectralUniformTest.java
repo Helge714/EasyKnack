@@ -13,12 +13,19 @@ import com.vingame.glswing.node.model.*;
 
 class SpectralUniformTest {
     record Fixture(GLNodeGraphDocument document,GLGraphNode instance){}
-    static Fixture fixture(){
+    static Fixture fixture(){return fixture(false);}
+    static Fixture fixture(boolean memory){
         var asset=SpectralGroups.create();var graph=new GLNodeGraph(asset.graph());
         var output=graph.snapshot().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinOutputNode).findFirst().orElseThrow();
         graph.edit("External value",e->{for(var w:graph.snapshot().connections())e.removeConnection(w.id());});
+        GLNodeId destination=output.id();
+        if(memory){
+            var id=add(graph,new BinMemoryNode());destination=id;
+            var context=graph.snapshot().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinContextNode).findFirst().orElseThrow();
+            graph.edit("Memory",e->{e.addConnection(SpectralGroupsTest.wire(context.id(),"real",id,"in"));e.addConnection(SpectralGroupsTest.wire(id,"out",output.id(),"a"));});
+        }
         var descriptor=asset.compositeDescriptor();var ports=new ArrayList<>(descriptor.portMappings());
-        ports.add(new GLCompositePortMapping(GLNodePortDescriptor.input("amount",SignalCategory.VALUE.valueTypeId(),false,1),new GLNodeEndpoint(output.id(),"a")));
+        ports.add(new GLCompositePortMapping(GLNodePortDescriptor.input("amount",SignalCategory.VALUE.valueTypeId(),false,1),new GLNodeEndpoint(destination,memory?"update":"a")));
         descriptor=new GLCompositeNodeDescriptor(descriptor.nodeTypeId(),descriptor.assetId(),1,ports);
         asset=new GLNodeGraphAsset(asset.id(),1,asset.kind(),graph.snapshot(),asset.viewState(),asset.metadata(),descriptor);
         var root=new GLNodeGraph();var value=add(root,new ValueNode());var instance=new GLGraphNode(GLNodeId.random(),descriptor.nodeTypeId(),Map.of());

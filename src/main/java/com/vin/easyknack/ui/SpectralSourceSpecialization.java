@@ -10,7 +10,7 @@ import com.vingame.glswing.node.model.*;
 final class SpectralSourceSpecialization {
     private record Step(String type,String nativeType,List<Integer> sources,Map<String,String> values) {}
     private record Program(String hex,List<Step> steps) {}
-    private static final Set<String> SUPPORTED=Set.of("bincontext","binread","binrandom","binuniform","binoutput","bindiscard","instancecontext","math","comparator","maprange","mix","clamp","unitconvert","value","curve");
+    private static final Set<String> SUPPORTED=Set.of("formula","binmemory","binhold","bintrigger","bincontext","binread","binrandom","binuniform","binoutput","bindiscard","instancecontext","math","comparator","maprange","mix","clamp","unitconvert","value","curve");
     record Result(String type,String code){}
     static Result emit(String name,List<GLGraphNode> nodes,Set<GLNodeId> dynamic){
         var programs=new LinkedHashMap<String,Program>();
@@ -26,7 +26,7 @@ final class SpectralSourceSpecialization {
         index=0;for(var p:programs.values()){
             boolean[] invariant=new boolean[p.steps().size()],condition=new boolean[p.steps().size()];
             for(int i=0;i<p.steps().size();i++){
-                var step=p.steps().get(i);invariant[i]=!Set.of("bincontext","binread","binrandom","binoutput","bindiscard","instancecontext").contains(step.type());
+                var step=p.steps().get(i);invariant[i]=!Set.of("formula","binmemory","binhold","bincontext","binread","binrandom","binoutput","bindiscard","instancecontext").contains(step.type());
                 for(int ref:step.sources())if(ref>=0&&!invariant[ref%256])invariant[i]=false;
                 if(step.type().equals("bindiscard"))markCondition(i,p.steps(),condition);
             }
@@ -44,7 +44,7 @@ final class SpectralSourceSpecialization {
     private static void append(StringBuilder s,Step step,int i){
         s.append("                {");
         if(step.type().startsWith("bin")&&!Set.of("binoutput","bindiscard").contains(step.type()))s.append("p").append(i).append(".bin=k;");
-        if(step.type().equals("instancecontext"))s.append("p").append(i).append(".index=k;");
+        if(step.type().equals("formula"))s.append("p").append(i).append(".bin=k;"); if(step.type().equals("instancecontext"))s.append("p").append(i).append(".index=k;");
         if(step.type().equals("math")){
             // Parse at export time, but evaluate via the same native arithmetic implementation.
             s.append("p").append(i).append(".processKernel(s").append(i).append(".scalar,MathOperation::").append(step.values().get("operation")).append(',').append(step.values().get("clamp")).append("!=0);");
@@ -70,7 +70,7 @@ final class SpectralSourceSpecialization {
                 }
                 for(int ref:refs)if(ref>=0&&(ref%256>=i||ref>=2048))return null;
                 if(type.equals("math")&&Arrays.stream(com.vin.easyknack.model.MathOperation.values()).noneMatch(op->op.id().equals(values.get("operation"))))return null;
-                steps.add(new Step(type,Path.of(d.processor().header()).getFileName().toString().replace(".hpp",""),refs,values));
+                steps.add(new Step(type,type.equals("formula")?"BinFormulaNode":Path.of(d.processor().header()).getFileName().toString().replace(".hpp",""),refs,values));
             }
             return at==tokens.length?new Program(hex,steps):null;
         }catch(IllegalArgumentException|IndexOutOfBoundsException e){return null;}

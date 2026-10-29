@@ -9,7 +9,12 @@ public final class SpectralGraphNode extends BasicNode {
         n.addOutput(OUT,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
         for(int i=0;i<(int)s.number("audioOutputs",0);i++)n.addOutput(new PropertyId("audio"+i),"Audio "+(i+1)).signal(SignalCategory.AUDIO).rate(ProcessingRate.AUDIO);
         n.addInput(IN,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
-        for(int i=0;i<MAX_EXTERNAL;i++)n.addInput(external(i),"Frame value "+(i+1)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
+        var triggers=java.util.Set.of(s.text("triggerSlots","").split(","));
+        for(int i=0;i<MAX_EXTERNAL;i++){
+            var row=n.addInput(external(i),"Frame value "+(i+1));
+            if(triggers.contains(Integer.toString(i)))row.signal(SignalCategory.TRIGGER).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT);
+            else row.signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
+        }
     }
     private static String emptyProgram(){var output=new BinOutputNode();return hex("BIN1 1 binoutput !"+NativeContractGenerator.fingerprint(output)+" "+output.encode(new NodeState(output.defaults()),p->-1));}
     public static String hex(String program){return java.util.HexFormat.of().formatHex(program.getBytes(java.nio.charset.StandardCharsets.UTF_8));}

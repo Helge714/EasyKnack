@@ -3,6 +3,8 @@
 
 # FFT and spectrum processing
 
+For capturing individual bin values, see [Holding values in a Spectral Group](SPECTRAL-HOLD.md).
+
 The palette contains one **FFT**, under **Spectral**. Its **Spectrum** output feeds
 IFFT, Spectrum Shift, spectral groups, Autocorrelation, Spectrum Statistics and the
 Analysis Viewer. Consumers reuse the existing complex coefficients rather than
@@ -76,8 +78,13 @@ The same rule applies to asynchronous FFTs: a preallocated history stores 131072
 samples per used numeric input (about 2.73 seconds at 48 kHz, 512 KiB per input and
 processing instance). Windows older than this history, preceding connection/start,
 or belonging to a reset timeline are omitted, never assigned a newer value.
-IFFT then uses any remaining overlapping windows, or silence. MIDI/trigger and
-additional Spectrum inputs are not supported by this boundary yet.
+IFFT then uses any remaining overlapping windows, or silence. Trigger inputs
+capture events in each frame's hop interval. MIDI resources and additional
+Spectrum inputs are not supported by this boundary yet.
+
+**Formula** can process each bin using arithmetic, conditions and independent
+persistent state. See [Spectral formulas](SPECTRAL-FORMULA.md) for the execution
+context and a complete Gaussian band-filter example.
 
 **Bin Random** produces independent uniform values in [0, 1). **Fixed per bin**
 keeps the same pattern across windows; **Per frame** changes it with the FFT window's

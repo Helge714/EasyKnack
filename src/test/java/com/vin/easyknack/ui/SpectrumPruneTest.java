@@ -10,7 +10,7 @@ class SpectrumPruneTest {
         var node=new SpectrumBlurNode();
         var values=new HashMap<>(node.defaults());values.put("mode",com.vingame.glswing.node.model.GLNodeValue.of("octaves"));
         var payload=node.encode(new NodeState(values),p->p.equals(SpectrumBlurNode.OCTAVES)?7:-1);
-        assertTrue(payload.endsWith("octaves 7 0.0"),payload);
+        assertTrue(payload.endsWith("octaves 7 0.0 gaussian 0 noise"),payload);
         values.put("mode",com.vingame.glswing.node.model.GLNodeValue.of("factor"));values.put("factor",com.vingame.glswing.node.model.GLNodeValue.of(2.));
         assertTrue(node.encode(new NodeState(values),p->p.equals(SpectrumBlurNode.FACTOR)?5:-1).contains("5 2.0 factor -1"));
     }
