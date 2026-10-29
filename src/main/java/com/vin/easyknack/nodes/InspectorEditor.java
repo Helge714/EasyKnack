@@ -20,7 +20,7 @@ public final class InspectorEditor extends GLContainer {
                 if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(GLGraphNode.AUTOMATIC_PREFIX+this.row.id(),GLNodeValue.of(true));break;}
         });
         // Combo boxes and custom visualizations need a name; buttons/sliders/labels label themselves.
-        label=editor.component() instanceof GLComboBox<?>?new GLLabel(row.label()):null;
+        label=(editor.component() instanceof GLComboBox<?> || row.editor() instanceof Editor.Text)?new GLLabel(row.label()):null;
         if(label!=null)addGL(label);addGL(editor.component());setName(row.id());
         if(editor.component() instanceof GLControl control && row.tooltip()!=null && !row.tooltip().isBlank())control.setToolTipText(row.tooltip());
         if(editor.component() instanceof WavetableViewerEditor.Plot plot)plot.bind(model.id().toString());

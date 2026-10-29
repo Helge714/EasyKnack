@@ -17,6 +17,15 @@ public interface Editor {
             return new Control(box,v->box.setSelected(((Number)v.toJavaValue()).doubleValue()!=0));
         }
     }
+    record Text(String value) implements Editor {
+        public GLNodeValue defaultValue(){return GLNodeValue.of(value);}
+        public void validate(GLNodeValue value){if(!(value instanceof GLNodeValue.TextValue))throw new IllegalArgumentException("Text required");}
+        public Control create(String label,java.util.function.Consumer<GLNodeValue> changed){
+            var text=new com.vingame.glswing.ui.GLTextEditor(value);text.setName(label);text.setHistoryEnabled(false);
+            text.addActionListener(e->changed.accept(GLNodeValue.of(text.getText())));
+            return new Control(text,v->text.setText((String)v.toJavaValue()));
+        }
+    }
     record Trigger() implements Editor {
         public GLNodeValue defaultValue(){return GLNodeValue.of(0.0);}
         public Control create(String label,java.util.function.Consumer<GLNodeValue> ignored){

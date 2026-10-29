@@ -8,6 +8,7 @@ namespace easyknack {
 struct StepSwitchNode : NodeProcessor {
     static constexpr unsigned maximumSteps=32;
     unsigned steps=4,index=0;
+    bool indexed=false; float selectedIndex=0;
     std::array<float,maximumSteps> values{};
     ManualTriggerReceiver next,reset;
     std::array<ManualTriggerReceiver,maximumSteps> selections;
@@ -18,9 +19,9 @@ struct StepSwitchNode : NodeProcessor {
     bool supportsControlRate()const noexcept override{return true;}
     bool supportsScalarInputs()const noexcept override{return true;}
     bool canShareChannels()const noexcept override{return true;}
-    bool inputUsesBlockData(std::size_t port)const noexcept override{return port<2;}
+    bool inputUsesBlockData(std::size_t port)const noexcept override{return port<2&&!indexed;}
     char resolveAutoRate(const char* rates,std::size_t count)noexcept override{
-        for(std::size_t i=0;i<count&&i<sources.size();i++)if(sources[i]>=0&&(i<2||rates[i]=='a'))return 'a';return 'c';
+        for(std::size_t i=0;i<count&&i<sources.size();i++)if(sources[i]>=0&&((i<2&&!indexed)||rates[i]=='a'))return 'a';return 'c';
     }
     void bindIdentity(const std::string& id)override{next.bind(id+":next");reset.bind(id+":reset");mailbox=analysisMailbox(id);for(unsigned i=0;i<maximumSteps;i++)selections[i].bind(id+":select-"+std::to_string(i));}
     void shareChannelState(NodeProcessor& other)override{auto& p=static_cast<StepSwitchNode&>(other);next=p.next;reset=p.reset;selections=p.selections;}
@@ -30,10 +31,10 @@ struct StepSwitchNode : NodeProcessor {
     }
     bool supportsLiveParameters()const noexcept override{return true;}
     void applyParameters(const NodeProcessor& other)noexcept override{
-        auto& p=static_cast<const StepSwitchNode&>(other);steps=p.steps;values=p.values;if(index>=steps)index=0;
+        auto& p=static_cast<const StepSwitchNode&>(other);steps=p.steps;values=p.values;indexed=p.indexed;selectedIndex=p.selectedIndex;if(index>=steps)index=0;
     }
     void configure(std::istream& in)override{
-        auto p=parameters::StepSwitchNodeParameters::read(in);sources=p.sources();steps=static_cast<unsigned>(p.steps_value);
+        auto p=parameters::StepSwitchNodeParameters::read(in);sources=p.sources();indexed=p.mode_value=="index";selectedIndex=static_cast<float>(p.next_value);if(!std::isfinite(selectedIndex))throw std::runtime_error("Invalid step index");steps=static_cast<unsigned>(p.steps_value);
         if(steps<1||steps>maximumSteps)throw std::runtime_error("Invalid step count");
         values={static_cast<float>(p.step_0_value),
             static_cast<float>(p.step_1_value),
@@ -97,7 +98,8 @@ struct StepSwitchNode : NodeProcessor {
         // A Control evaluation emits the block-start value; later triggers prepare the next block.
         for(std::size_t i=0;i<frames;i++){
             auto n=advance.at(i);auto r=restart.at(i);
-            if(r)index=0;else if(i==0&&selected>=0)index=static_cast<unsigned>(selected);else if(n)index=(index+static_cast<unsigned>(n%steps))%steps;
+            if(indexed){auto value=c.numericInput(0,selectedIndex)[std::min(i,c.bufferSize-1)];index=std::isfinite(value)?static_cast<unsigned>(std::clamp(std::floor(value),0.f,static_cast<float>(steps-1))):0;}
+            else if(r)index=0;else if(i==0&&selected>=0)index=static_cast<unsigned>(selected);else if(n)index=(index+static_cast<unsigned>(n%steps))%steps;
             if(i<c.bufferSize){
                 float value=c.numericInput(2+index,values[index])[i];c.output[i]=std::isfinite(value)?value:0;
                 if(indexOutput)indexOutput[i]=static_cast<float>(index);shown=index;

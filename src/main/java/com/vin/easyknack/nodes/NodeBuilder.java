@@ -10,6 +10,8 @@ public final class NodeBuilder {
         private final RowKind kind;
         private final PropertyId key;
         private String label;
+        private String textKey;
+        public Row textKey(String key){textKey=Objects.requireNonNull(key);return this;}
         private String tooltip;
         public Row tooltip(String text) {tooltip=text;return this;}
         public String tooltip() {return tooltip;}
@@ -143,7 +145,7 @@ public final class NodeBuilder {
     }
     public List<Row> rows() { return List.copyOf(rows); }
     void translate(String nodeId) {
-        rows.forEach(row -> {row.label = NodeText.text(nodeId + "." + row.id(), row.label);row.tooltip=NodeText.text(nodeId+"."+row.id()+".tooltip",row.tooltip==null?"":row.tooltip);var slider=row.editor instanceof UnitSlider u?u.spec():row.editor instanceof Editor.Slider v?v:null;if(slider!=null||row.editor instanceof VectorEditor){String hint=com.vin.easyknack.ui.AppText.text(slider==null||slider.continuousChanges()?"control.tooltip.continuous":"control.tooltip.discrete");row.tooltip=row.tooltip==null||row.tooltip.isBlank()?hint:row.tooltip+"\n"+hint;}});
+        rows.forEach(row -> {row.label = NodeText.text(row.textKey==null?nodeId+"."+row.id():row.textKey,row.label);row.tooltip=NodeText.text((row.textKey==null?nodeId+"."+row.id():row.textKey)+".tooltip",row.tooltip==null?"":row.tooltip);var slider=row.editor instanceof UnitSlider u?u.spec():row.editor instanceof Editor.Slider v?v:null;if(slider!=null||row.editor instanceof VectorEditor){String hint=com.vin.easyknack.ui.AppText.text(slider==null||slider.continuousChanges()?"control.tooltip.continuous":"control.tooltip.discrete");row.tooltip=row.tooltip==null||row.tooltip.isBlank()?hint:row.tooltip+"\n"+hint;}});
     }
     public List<GLNodePortDescriptor> ports() {
         return rows.stream().filter(r -> r.kind() != RowKind.EDITOR).map(r -> r.kind() == RowKind.OUTPUT

@@ -11,6 +11,49 @@ import com.vingame.glswing.node.GLNode;
 import com.vingame.glswing.node.model.*;
 
 class StepSwitchTest {
+    @Test void indexModeAndNamesPersistWithoutRewiringValueInputs()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var d=new StepSwitchNode();var id=GLNodeId.random();
+            c.workspace().currentGraph().edit("Switch",e->e.addNode(new GLGraphNode(id,d.registration().id(),d.defaults())));
+            var source=c.workspace().editor().getNodes().stream().filter(n->n.findPort("audio-out")!=null).findFirst().orElseThrow();
+            c.workspace().editor().connect(source.findPort("audio-out"),view(c,id).findPort("step-0"));
+            c.setNodeProperty(id,StepSwitchNode.name(0),GLNodeValue.of("Größe A"));
+            c.setNodeProperty(id,StepSwitchNode.MODE,GLNodeValue.of("index"));
+            var model=c.workspace().currentGraph().snapshot().findNode(id).orElseThrow();
+            var layout=d.layout(new NodeState(model.properties()));
+            assertTrue(StepSwitchNode.indexed(new NodeState(model.properties())));
+            assertEquals("Größe A",StepSwitchNode.label(new NodeState(model.properties()),0));
+            assertTrue(layout.rows().stream().noneMatch(r->r.key().equals(StepSwitchNode.RESET)));
+            assertEquals(1,view(c,id).findPort("step-0").getActiveConnectionCount());
+            c.setNodeProperty(id,StepSwitchNode.NEXT,GLNodeValue.of(3));
+            c.setNodeProperty(id,StepSwitchNode.STEPS,GLNodeValue.of(2));
+            assertDoesNotThrow(c::audioGraph);
+            var bytes=new java.io.ByteArrayOutputStream();var codec=new KnackDocumentCodec();codec.write(c.snapshotDocument(),bytes);
+            var restored=codec.read(new java.io.ByteArrayInputStream(bytes.toByteArray()),codec.currentSchemaVersion());
+            assertEquals("Größe A",restored.root().graph().findNode(id).orElseThrow().properties().get("step-name-0").toJavaValue());
+        }catch(Exception ex){throw new AssertionError(ex);}});
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void indexModeSelectsPerSampleAndClamps()throws Exception{
+        var dir=Files.createTempDirectory(Path.of("target"),"index-switch-");var d=new StepSwitchNode();
+        var properties=new HashMap<>(d.defaults());properties.put("mode",GLNodeValue.of("index"));
+        for(int i=0;i<4;i++)properties.put("step-"+i,GLNodeValue.of(10*(i+1)));
+        String payload="!"+NativeContractGenerator.fingerprint(d)+" "+d.encode(new NodeState(properties),p->p.equals(StepSwitchNode.NEXT)?0:-1);
+        var source=dir.resolve("test.cpp");Files.writeString(source,"""
+            #include "nodes/StepSwitchNode.hpp"
+            #include <cassert>
+            #include <sstream>
+            using namespace easyknack;
+            int main(){StepSwitchNode node;std::istringstream config("%s");node.configure(config);
+              float indices[]={0,1.9f,2,99,-2},output[5]{},shown[5]{};const float* inputs[34]{};inputs[0]=indices;
+              float* outputs[]={output,shown};ProcessContext c{};c.bufferSize=5;c.blockFrames=5;c.output=output;c.outputs=outputs;c.outputCount=2;c.inputs=inputs;c.inputCount=34;
+              node.process(c);float expected[]={10,20,30,40,10};for(int i=0;i<5;i++)assert(output[i]==expected[i]);
+              assert(node.resolveAutoRate("cccccccccccccccccccccccccccccccccc",34)=='c');
+              assert(node.resolveAutoRate("accccccccccccccccccccccccccccccccc",34)=='a');
+            }
+            """.formatted(payload));
+        RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
+    }
     @Test void navigationRestoresConnectedEditorsAndRates()throws Exception{
         WorkspaceController[] holder=new WorkspaceController[1];var id=GLNodeId.random();
         try{
@@ -45,8 +88,9 @@ class StepSwitchTest {
             assertEquals("OK",client.command("PLAY"));awaitIndex(client,0);
             assertEquals("OK",client.command("TRIGGER switch:next"));awaitIndex(client,1);
             assertEquals("OK",client.command("TRIGGER switch:select-3"));awaitIndex(client,3);
-            assertEquals("OK",client.command("TRIGGER switch:select-3"));awaitIndex(client,3);
+            // Repeated unchanged selections are covered with explicit DSP epochs below.
             assertEquals("OK",client.command("TRIGGER switch:next"));awaitIndex(client,0);
+            assertEquals("OK",client.command("TRIGGER switch:next"));awaitIndex(client,1);
             assertEquals("OK",client.command("TRIGGER switch:reset"));awaitIndex(client,0);
             assertEquals("OK",client.command("STOP"));
         }
@@ -130,7 +174,8 @@ class StepSwitchTest {
                 ProcessContext c{inputs,34,output,8,48000,silence,8};c.outputs=outputs;c.outputCount=2;c.valueEventInputs=events;
                 next.push(2,1,ValueEventKind::trigger);next.push(4,1,ValueEventKind::trigger);next.push(4,1,ValueEventKind::trigger);
                 next.push(6,1,ValueEventKind::trigger);reset.push(6,1,ValueEventKind::trigger);
-                node.process(c);float expected[]={10,10,20,20,10,10,10,10};for(int i=0;i<8;i++)assert(output[i]==expected[i]);
+                node.process(c);// Coincident triggers coalesce within one stream.
+                float expected[]={10,10,20,20,30,30,10,10};for(int i=0;i<8;i++)assert(output[i]==expected[i]);
                 next.clear(8);reset.clear(8);next.push(0,1,ValueEventKind::trigger);inputs[3]=audio;
                 node.process(c);for(int i=0;i<8;i++)assert(output[i]==audio[i]&&indices[i]==1);
                 char rates[34]{};rates[3]='c';c.sourceRates=rates;node.process(c);for(int i=0;i<8;i++)assert(output[i]==30&&indices[i]==2);
@@ -140,8 +185,8 @@ class StepSwitchTest {
                 next.clear(8);node.process(c);assert(output[0]==20&&indices[0]==1);
                 reset.push(0,1,ValueEventKind::trigger);node.process(c);assert(output[0]==10);
                 c.valueEventInputs=nullptr;node.bindIdentity("switch");
-                submitManualTrigger("switch:next");submitManualTrigger("switch:next");++manualTriggerEpoch;node.process(c);assert(output[0]==30);
-                ++manualTriggerEpoch;node.process(c);assert(output[0]==30);
+                submitManualTrigger("switch:next");submitManualTrigger("switch:next");++manualTriggerEpoch;node.process(c);assert(output[0]==20);
+                ++manualTriggerEpoch;node.process(c);assert(output[0]==20);
                 submitManualTrigger("switch:select-1");++manualTriggerEpoch;node.process(c);assert(output[0]==20);
                 submitManualTrigger("switch:select-1");++manualTriggerEpoch;node.process(c);assert(output[0]==20);
                 submitManualTrigger("switch:select-2");submitManualTrigger("switch:reset");++manualTriggerEpoch;node.process(c);assert(output[0]==10);

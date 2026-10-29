@@ -46,7 +46,13 @@ public final class StepSwitchView extends BasicNodeView {
             group.addGL(slider,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
             group.addGL(label,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
             group.addGL(button,GLConstraints.at(1,0).fillBoth().connectAll());
-            onStateChanged(state->{slider.setVisible(!state.isConnected(row.key()));label.setVisible(state.isConnected(row.key()));});
+            onStateChanged(state->{
+                String text=StepSwitchNode.label(state,index);
+                button.setEnabled(!StepSwitchNode.indexed(state));
+                if(slider instanceof GLSlider value){value.setText(text);value.setName(text);}
+                label.setText(text);
+                slider.setVisible(!state.isConnected(row.key()));label.setVisible(state.isConnected(row.key()));
+            });
             return group;
         }
         if(!row.key().equals(StepSwitchNode.STEPS))return super.control(row);
