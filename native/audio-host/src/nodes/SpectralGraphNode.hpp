@@ -14,6 +14,7 @@
 #include "DigitalNoiseNode.hpp"
 #include "InstanceContextNode.hpp"
 #include "InstanceCombineNode.hpp"
+#include "../LegacyGroupParameters.hpp"
 #include "MathNode.hpp"
 #include "ComparatorNode.hpp"
 #include "MapRangeNode.hpp"
@@ -93,10 +94,10 @@ struct SpectralGraphNode : NodeProcessor {
     void shareChannelState(NodeProcessor& other)override{bindIdentity(static_cast<SpectralGraphNode&>(other).logicalIdentity);}
     std::uint64_t renderedBinSamples=0,discardedBinFrames=0;
     std::size_t outputCount()const noexcept override{return spectrumPorts()+combines.size();}
-    static constexpr std::size_t uniformCount=16,historyCapacity=131072;
-    std::array<std::vector<float>,uniformCount> history;
-    std::array<bool,uniformCount> used{};
-    std::array<bool,uniformCount> triggerUsed{};
+    static constexpr std::size_t historyCapacity=131072;
+    std::vector<std::vector<float>> history;
+    std::vector<bool> used;
+    std::vector<bool> triggerUsed;
     std::uint64_t historyBegin=0,historyEnd=0,historyIdentity=0;
     bool historyValid=false;
     bool supportsScalarInputs()const noexcept override{return true;}
@@ -128,10 +129,11 @@ struct SpectralGraphNode : NodeProcessor {
     }
     void configure(std::istream& in)override{
         auto start=in.tellg();std::string marker,hex;in>>marker;
-        if(marker=="!62017619f30a4e31"){
+        bool sourceOnly=marker=="!62017619f30a4e31";
+        if(sourceOnly){
             int source;if(!(in>>source>>hex)||source< -1||source>=2048)throw std::runtime_error("Invalid legacy spectral parameters");sources={source};
-        }else{in.seekg(start);auto p=parameters::SpectralGraphNodeParameters::read(in);sources=p.sources();hex=p.program_value;}
-        steps.clear();valueSlots=0;result=nullptr;results.clear();extraStreams.clear();used.fill(false);triggerUsed.fill(false);statefulBins=false;combines.clear();discard=-1;programIdentity=hex;
+        }else{in.seekg(start);auto p=readSpectralGroupParameters(in);sources=p.sources();hex=p.program_value;}
+        steps.clear();valueSlots=0;result=nullptr;results.clear();extraStreams.clear();history.clear();used.assign(sources.size()-1,false);triggerUsed.assign(used.size(),false);statefulBins=false;combines.clear();discard=-1;programIdentity=hex;
         if(hex.size()>2000000||hex.size()%2)throw std::runtime_error("Invalid bin program");std::string decoded;decoded.reserve(hex.size()/2);
         auto digit=[](char c)->unsigned{if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;throw std::runtime_error("Invalid bin program encoding");};
         for(std::size_t i=0;i<hex.size();i+=2)decoded.push_back(static_cast<char>(digit(hex[i])*16+digit(hex[i+1])));
@@ -149,7 +151,7 @@ struct SpectralGraphNode : NodeProcessor {
             if(type=="instancecombine")combines.push_back(i);
             if(type=="bindiscard"){if(discard>=0)throw std::runtime_error("Use one Bin Discard");discard=int(i);}
             if(type=="binhold"||type=="binmemory")statefulBins=true; if(auto* formula=dynamic_cast<BinFormulaNode*>(step.processor.get()))statefulBins|=formula->hasState()||formula->triggerInputs!=0;
-            if(auto* uniform=dynamic_cast<BinUniformNode*>(step.processor.get())){used[uniform->slot]=true;triggerUsed[uniform->slot]=uniform->trigger;}
+            if(auto* uniform=dynamic_cast<BinUniformNode*>(step.processor.get())){if(uniform->slot>=used.size()){if(!sourceOnly)throw std::runtime_error("Frame input slot exceeds source list");used.resize(uniform->slot+1,false);triggerUsed.resize(used.size(),false);}used[uniform->slot]=true;triggerUsed[uniform->slot]=uniform->trigger;}
             if(auto* out=dynamic_cast<BinOutputNode*>(step.processor.get())){if(!result)result=out;results.push_back(out);}
             step.inputs.resize(step.processor->sources.size());step.rates.assign(step.inputs.size(),'c');step.valueOffset=valueSlots;valueSlots+=step.processor->outputCount();step.values.resize(step.processor->outputCount());step.outputs.resize(step.values.size());
             for(std::size_t port=0;port<step.inputs.size();port++){int ref=step.processor->sources[port];if(ref<0)continue;
@@ -158,7 +160,7 @@ struct SpectralGraphNode : NodeProcessor {
             if((type=="bindiscard"||type=="binoutput"||type=="binhold"||type=="binmemory"||type=="formula")&&step.audio)throw std::runtime_error("Frame processors cannot depend on temporal audio; use FFT-frame values");
         }
         if((results.empty()&&combines.empty())||program>>marker)throw std::runtime_error("Invalid bin program output");
-        outputFrames.assign(spectrumPorts(),nullptr);normalization.resize(combines.size());
+        history.resize(used.size());outputFrames.assign(spectrumPorts(),nullptr);normalization.resize(combines.size());
         for(std::size_t p=1;p<spectrumPorts();p++)extraStreams.push_back(std::make_unique<SpectrumStream>());
         // A held bin can remain nonzero after its live input becomes empty.
         if(statefulBins)skipEmptyBins=false;
@@ -192,7 +194,7 @@ struct SpectralGraphNode : NodeProcessor {
             frameWorker->configure(parameters);frameWorker->prepare(rate,block);
             try{worker=SpectralWorker::shared();}catch(const std::system_error&){frameWorker.reset();}
         }
-        for(std::size_t i=0;i<uniformCount;i++)if(used[i])history[i].assign(historyCapacity,0);
+        for(std::size_t i=0;i<used.size();i++)if(used[i])history[i].assign(historyCapacity,0);
         historyValid=false;
         bindIdentity(logicalIdentity);
         voices.clear();audioBuffers.clear();
@@ -224,7 +226,7 @@ struct SpectralGraphNode : NodeProcessor {
         if(!historyValid||source.identity!=historyIdentity||source.blockStart!=historyEnd){historyBegin=source.blockStart;historyValid=true;}
         historyIdentity=source.identity;
         auto count=c.blockFrames?c.blockFrames:c.bufferSize;
-        for(std::size_t port=0;port<uniformCount;port++)if(used[port]){
+        for(std::size_t port=0;port<used.size();port++)if(used[port]){
             auto input=c.numericInput(port+1);
             auto* events=triggerUsed[port]?c.events(port+1):nullptr;
             for(std::size_t i=0;i<count;i++)history[port][(source.blockStart+i)%historyCapacity]=events?0:input[i];

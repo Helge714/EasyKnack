@@ -21,7 +21,7 @@ final class InstanceSourceSpecialization {
             if(source==null||!source.equals(new GLNodeEndpoint(node.id(),"output"+i)))return null;
         }
         var slots=new ArrayList<Integer>();
-        for(var port:definition.processor().inputs()){
+        for(var port:definition.processor().inputs(new NodeState(node.properties()))){
             var source=wires.get(new GLNodeEndpoint(node.id(),port.value()));
             if(source!=null&&!external.contains(source.nodeId()))return null;
             slots.add(source==null?-1:external.indexOf(source.nodeId()));
@@ -47,13 +47,13 @@ final class InstanceSourceSpecialization {
         for(int i=0;i<inputs.size();i++)if(inputs.get(i).editor()!=null)
             s.append("        defaults[").append(i).append("]=static_cast<float>(p.").append(inputs.get(i).id().value()).append("_value);\n");
         s.append("    }\n    void process(ProcessContext& c)noexcept override{\n")
-            .append("        std::array<const float*,9> left{},right{};std::array<char,9> rates{};rates.fill('c');\n");
+            .append("        std::array<const float*,").append(slots.size()).append("> left{},right{};std::array<char,").append(slots.size()).append("> rates{};rates.fill('c');\n");
         for(int i=0;i<slots.size();i++)if(slots.get(i)>=0){int p=slots.get(i);
             s.append("        left[").append(i).append("]=c.input(").append(p).append(");if(!left[").append(i).append("])left[").append(i).append("]=&defaults[").append(p).append("];\n")
                 .append("        right[").append(i).append("]=c.rightInputs&&").append(p).append("<c.inputCount?c.rightInputs[").append(p).append("]:c.input(").append(p).append(");if(!right[").append(i).append("])right[").append(i).append("]=&defaults[").append(p).append("];\n")
                 .append("        rates[").append(i).append("]=c.rawInput(").append(p).append(")?(c.sourceRates?c.sourceRates[").append(p).append("]:'a'):c.input(").append(p).append(")?(c.numericInput(").append(p).append(").stride?'a':'c'):'c';\n");
         }
-        s.append("        auto inner=c;inner.inputs=left.data();inner.rightInputs=right.data();inner.sourceRates=rates.data();inner.inputCount=9;inner.controls=nullptr;\n")
+        s.append("        auto inner=c;inner.inputs=left.data();inner.rightInputs=right.data();inner.sourceRates=rates.data();inner.inputCount=").append(slots.size()).append(";inner.controls=nullptr;\n")
             .append(kernel==null?"":"        if(audioKernel.process<CompiledInstance>(*this,inner))return;\n")
             .append(kernel==null?"":"        if(inner.channelIndex==0){audioKernel.invalidate();for(auto& instance:state->instances)static_cast<CompiledInstance&>(*instance).scalarCacheValid=false;}\n")
             .append("        processInstances<").append(kernel==null?"Instance":"CompiledInstance").append(">(inner);\n    }\n};\n")

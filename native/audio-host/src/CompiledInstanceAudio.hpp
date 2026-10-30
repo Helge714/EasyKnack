@@ -26,6 +26,8 @@ struct CompiledInstanceAudio {
     template<class Instance> bool process(MultipleGraphNode& owner,ProcessContext& c)noexcept {
         const auto frames=c.blockFrames?c.blockFrames:c.bufferSize;
         if(!owner.state||owner.outputs!=1||frames>owner.framesReserved)return false;
+        // This narrow mono optimization falls back to the general compiled executor for wider interfaces.
+        if(owner.sources.size()>9)return false;
         if(c.channelIndex!=0)return false; // shared cached right output is copied by fallback
         auto& state=*owner.state;
         float requested=c.numericInput(0,float(owner.count))[0];

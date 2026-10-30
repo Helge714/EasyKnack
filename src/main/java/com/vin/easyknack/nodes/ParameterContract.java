@@ -6,9 +6,11 @@ import com.vingame.glswing.node.model.GLNodeValue;
 
 /** One declaration owns wire fields, input ordering and generated native parameter access. */
 public final class ParameterContract {
-    public enum Kind { SOURCE, VALUE, INTEGER, TOKEN, CURVE, MAPPED }
+    public enum Kind { SOURCE, SOURCE_LIST, VALUE, INTEGER, TOKEN, CURVE, MAPPED }
     public record Field(Kind kind, PropertyId id, String literal, Predicate<NodeState> enabled,
-            Function<NodeState,String> mapping) { }
+            Function<NodeState,String> mapping, Function<NodeState,List<PropertyId>> sourceIds) {
+        public Field(Kind kind,PropertyId id,String literal,Predicate<NodeState> enabled,Function<NodeState,String> mapping){this(kind,id,literal,enabled,mapping,null);}
+    }
     private final List<Field> fields;
     private ParameterContract(List<Field> fields) {
         this.fields=List.copyOf(fields);
@@ -18,7 +20,9 @@ public final class ParameterContract {
     }
     public static Builder builder(){return new Builder();}
     public List<Field> fields(){return fields;}
-    public List<PropertyId> inputs(){return fields.stream().filter(f->f.kind()==Kind.SOURCE).map(Field::id).toList();}
+    public List<PropertyId> inputs(){return inputs(new NodeState(Map.of()));}
+    public List<PropertyId> inputs(NodeState state){return fields.stream().flatMap(f->f.kind()==Kind.SOURCE?java.util.stream.Stream.of(f.id()):f.kind()==Kind.SOURCE_LIST?f.sourceIds().apply(state).stream():java.util.stream.Stream.empty()).toList();}
+    public static int inputCount(NodeState state,String property,int fallback){double n=state.number(property,fallback);if(!Double.isFinite(n)||n<0||n!=Math.rint(n)||n>Integer.MAX_VALUE)throw new IllegalArgumentException("Invalid input count");return (int)n;}
     public String encode(BasicNode owner, NodeState state, ToIntFunction<PropertyId> input){
         var defaults=owner.defaults();
         var merged=new HashMap<>(defaults);merged.putAll(state.values());
@@ -28,6 +32,7 @@ public final class ParameterContract {
         var out=new StringJoiner(" ");
         for(var f:fields){
             if(f.kind()==Kind.SOURCE){out.add(Integer.toString(f.enabled().test(resolved)?input.applyAsInt(f.id()):-1));continue;}
+            if(f.kind()==Kind.SOURCE_LIST){var ids=f.sourceIds().apply(resolved);out.add(Integer.toString(ids.size()));for(var id:ids)out.add(Integer.toString(input.applyAsInt(id)));continue;}
             if(f.kind()==Kind.TOKEN){out.add(f.literal());continue;}
             if(f.kind()==Kind.MAPPED){out.add(token(f.mapping().apply(resolved)));continue;}
             var value=merged.get(f.id().value());
@@ -54,6 +59,7 @@ public final class ParameterContract {
         private final List<Field> fields=new ArrayList<>();
         public Builder source(PropertyId id){return source(id,s->true);}
         public Builder source(PropertyId id,Predicate<NodeState> enabled){fields.add(new Field(Kind.SOURCE,id,null,enabled,null));return this;}
+        public Builder sources(PropertyId id,Function<NodeState,List<PropertyId>> ids){fields.add(new Field(Kind.SOURCE_LIST,id,null,null,null,ids));return this;}
         public Builder value(PropertyId id){fields.add(new Field(Kind.VALUE,id,null,null,null));return this;}
         public Builder integer(PropertyId id){fields.add(new Field(Kind.INTEGER,id,null,null,null));return this;}
         public Builder curve(PropertyId id){fields.add(new Field(Kind.CURVE,id,null,null,null));return this;}

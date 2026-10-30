@@ -18,11 +18,20 @@ Sum/Mean independently per stereo channel. Other resources and triggers may be
 routed internally. Instance Merge remains the numeric boundary between
 per-instance processing and shared processing.
 
-Output count is not limited to eight. The unchanged source-reference format uses
+Input and output counts are derived from each group interface. The unchanged source-reference format uses
 `node + 256 * output`; readers validate the referenced node and its actual output
 count. Prepared runtime, event-adapter, spectral and instance buffers follow the
 declared output counts. Graph-node/voice budgets and integer addressability remain
 separate constraints. Regressions: `DynamicOutputsTest`, `WideGroupOutputsTest`.
+
+`ParameterContract.sources(...)` declares a counted source list. Use
+`NativeProcessor.inputs(state)` for instance-specific ordering; the parameterless
+overload describes the default layout. Compiled group `inputs` metadata determines
+its list size. Generated readers validate list counts and entries; native
+`LegacyGroupParameters.hpp` also reads the previous fixed 8/16-source contracts.
+Spectral history/trigger masks and instance rate buffers are prepared to actual
+sizes. `WideGroupInputsTest` covers 20 numeric, 12 Spectrum and 24 frame inputs,
+including a high-slot trigger, export, persistence and old-contract loading.
 
 ## Deliberate exclusions
 

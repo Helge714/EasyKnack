@@ -64,7 +64,7 @@ final class SpectralGroups {
             var inputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&!p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).toList();
             if(ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).count()!=1
                 ||ports.stream().anyMatch(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&!Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId()))
-                ||inputs.size()>SpectralGraphNode.MAX_EXTERNAL||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.TRIGGER.valueTypeId()).contains(p.publicPort().valueTypeId())))
+                ||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.TRIGGER.valueTypeId()).contains(p.publicPort().valueTypeId())))
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("spectral.boundaryLimits"));
             var connected=graph.connections().stream().filter(w->w.input().nodeId().equals(node.id())).map(w->w.input().portId()).collect(java.util.stream.Collectors.toSet());
             var state=new NodeState(asset.metadata());
@@ -72,7 +72,7 @@ final class SpectralGroups {
             var compiled=program(node,original,limits,inputs,connected,flags);
             for(var p:ports)renamed.put(new GLNodeEndpoint(node.id(),p.publicPort().id()),p.publicPort().direction()==GLPortDirection.OUTPUT?compiled.outputs().get(p.publicPort().id()):compiled.inputs().getOrDefault(p.publicPort().id(),new GLNodeEndpoint(node.id(),inputs.contains(p)?SpectralGraphNode.external(inputs.indexOf(p)).value():"spectrum")));
             nodes.addAll(compiled.shared());extraWires.addAll(compiled.wires());
-            var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(compiled.program()));values.put("audioOutputs",GLNodeValue.of(compiled.audioOutputs()));values.put("spectrumOutputs",GLNodeValue.of(compiled.spectrumOutputs()));
+            var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(compiled.program()));values.put("audioOutputs",GLNodeValue.of(compiled.audioOutputs()));values.put("spectrumOutputs",GLNodeValue.of(compiled.spectrumOutputs()));values.put("inputs",GLNodeValue.of(inputs.size()));
             values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(compiled.manualTargets()));values.put("triggerSlots",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->GroupInputSettings.selectedRate(inputs.get(i))==ProcessingRate.EVENT||inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.TRIGGER.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));
             for(String key:List.of(GLNodeState.MUTED,GLNodeState.HIDDEN))if(node.properties().containsKey(key))values.put(key,node.properties().get(key));
             nodes.add(new GLGraphNode(node.id(),new SpectralGraphNode().registration().id(),values));

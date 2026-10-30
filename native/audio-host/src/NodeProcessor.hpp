@@ -155,16 +155,25 @@ struct NodeProcessor {
     virtual bool writesEventBuffer(std::size_t)const noexcept{return writesEventBuffers();}
     virtual bool processesEventBlocks() const noexcept { return evaluatesOnEvents(); }
     // Called by the scheduler on the control thread, independently of prepare overrides.
-    void prepareOutputStorage(){
+    void preparePortStorage(){
         if(outputCount()>8){eventSampleValues.resize(outputCount());eventSampleOutputs.resize(outputCount());}
+        if(sources.size()>256){eventCursors.resize(sources.size());eventHeld.resize(sources.size());eventSamples.resize(sources.size());eventInputPointers.resize(sources.size());}
     }
+    void prepareOutputStorage(){preparePortStorage();} // Source compatibility with earlier SDKs.
     std::vector<float> eventSampleValues;
     std::vector<float*> eventSampleOutputs;
+    std::vector<std::uint32_t> eventCursors;
+    std::vector<float> eventHeld,eventSamples;
+    std::vector<const float*> eventInputPointers;
     virtual void processEventBlock(ProcessContext& c) noexcept {
-        if(c.inputCount>256)return;
-        std::array<std::uint32_t,256> cursors{};
-        std::array<float,256> held{},sample{};
-        std::array<const float*,256> inputs{};
+        std::array<std::uint32_t,256> smallCursors{};
+        std::array<float,256> smallHeld{},smallSamples{};
+        std::array<const float*,256> smallInputs{};
+        auto* cursors=smallCursors.data();auto* held=smallHeld.data();auto* sample=smallSamples.data();auto* inputs=smallInputs.data();
+        if(c.inputCount>smallInputs.size()){
+            if(eventCursors.size()<c.inputCount)return;
+            cursors=eventCursors.data();held=eventHeld.data();sample=eventSamples.data();inputs=eventInputPointers.data();std::fill_n(cursors,c.inputCount,0);
+        }
         std::array<float,8> smallValues{};std::array<float*,8> smallOutputs{};
         float* values=smallValues.data();float** outputs=smallOutputs.data();
         if(c.outputCount>smallValues.size()){
@@ -174,12 +183,12 @@ struct NodeProcessor {
         for(std::size_t p=0;p<c.inputCount;p++)held[p]=c.events(p)?c.events(p)->initial:0;
         for(std::size_t p=0;p<c.outputCount;p++)outputs[p]=&values[p];
         bool force=c.eventRefresh;
-        auto evaluate=[&](std::uint32_t offset,ValueEventKind kind,std::size_t triggerPort=256,float trigger=0){
+        auto evaluate=[&](std::uint32_t offset,ValueEventKind kind,std::size_t triggerPort=std::numeric_limits<std::size_t>::max(),float trigger=0){
             for(std::size_t p=0;p<c.inputCount;p++){
                 sample[p]=p==triggerPort?trigger:c.events(p)?held[p]:c.valueAt(p,offset);
                 inputs[p]=c.events(p)||c.input(p)?&sample[p]:nullptr;
             }
-            auto event=c;event.inputs=inputs.data();event.output=values;event.outputs=outputs;event.bufferSize=1;event.legacyEventEvaluation=true;
+            auto event=c;event.inputs=inputs;event.output=values;event.outputs=outputs;event.bufferSize=1;event.legacyEventEvaluation=true;
             process(event);if(c.eventEvaluationCount)++*c.eventEvaluationCount;
             for(std::size_t p=0;p<c.outputCount;p++)if(auto* out=c.eventOutput(p))
                 if(force||kind==ValueEventKind::trigger||values[p]!=out->valueAt(offset))out->push(offset,values[p],kind);

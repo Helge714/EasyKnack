@@ -1,7 +1,8 @@
 package com.vin.easyknack.nodes;
 @RegisterNode(id="easyknack.multiple.compiled",title="Multiple Group",category=NodeCategory.ROUTING,kind=NodeKind.AUDIO)
 public final class MultipleGraphNode extends BasicNode {
-    public static final int MAX_INPUTS=8;
+    public static final int DEFAULT_INPUTS=8;
+    public static int inputCount(NodeState state){return ParameterContract.inputCount(state,"inputs",DEFAULT_INPUTS);}
     public static final PropertyId COUNT=new PropertyId("count"),MAXIMUM=new PropertyId("maximum"),MODE=new PropertyId("mode"),PROGRAM=new PropertyId("program");
     public static PropertyId input(int i){return new PropertyId("input"+i);}
     public static PropertyId output(int i){return new PropertyId("output"+i);}
@@ -13,7 +14,7 @@ public final class MultipleGraphNode extends BasicNode {
         var spectrum=java.util.Set.of(s.text("spectrumInputs","").split(","));
         var waveforms=java.util.Set.of(s.text("waveformInputs","").split(","));
         var vectors=java.util.Set.of(s.text("vectorInputs","").split(","));
-        for(int i=0;i<MAX_INPUTS;i++){
+        for(int i=0;i<inputCount(s);i++){
             var row=n.addInput(input(i),"In "+(i+1));
             if(waveforms.contains(Integer.toString(i)))row.dataType(PortDataType.WAVEFORM).signal(SignalCategory.WAVETABLE).rate(ProcessingRate.CONTROL);
             else if(spectrum.contains(Integer.toString(i)))row.dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
@@ -23,7 +24,7 @@ public final class MultipleGraphNode extends BasicNode {
         n.addEditor(MAXIMUM,"Maximum instances",Editor.Slider.button(16,1.0,256.0).integers().discrete());
         n.addEditor(MODE,"Merge",Editor.comboBox(java.util.List.of("sum","mean"),"sum",v->v));
     }
-    public NativeProcessor processor(){var b=ParameterContract.builder().source(COUNT).integer(COUNT).integer(MAXIMUM).value(MODE);for(int i=0;i<MAX_INPUTS;i++)b.source(input(i));
+    public NativeProcessor processor(){var b=ParameterContract.builder().source(COUNT).integer(COUNT).integer(MAXIMUM).value(MODE);b.sources(new PropertyId("inputs"),s->java.util.stream.IntStream.range(0,inputCount(s)).mapToObj(MultipleGraphNode::input).toList());
         return new NativeProcessor("multiplegraph","nodes/MultipleGraphNode.hpp",b.mapped(PROGRAM,s->s.text(PROGRAM,emptyProgram())).build());}
     private static String emptyProgram(){
         var value=new ValueNode();var output=new MultipleOutputNode();

@@ -176,7 +176,7 @@ struct AudioGraph {
         }
         preparedSampleRate=rate; preparedBlockFrames=frames;
         for(auto& node:nodes) for(std::size_t v=0;v<node.voiceCount();++v) {
-            node.voice(v).processor->prepareOutputStorage();node.voice(v).rightProcessor->prepareOutputStorage();
+            node.voice(v).processor->preparePortStorage();node.voice(v).rightProcessor->preparePortStorage();
             node.voice(v).processor->prepare(rate,frames);
             node.voice(v).rightProcessor->prepare(rate,frames);
         }

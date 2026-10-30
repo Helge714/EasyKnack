@@ -58,7 +58,7 @@ public final class ControlMetadata {
         for (var row : layout.rows()) {
             if (connected.contains(row.id())) continue;
             if (row.editor() instanceof VectorEditor vector) {
-                int port = definition.processor().inputs().indexOf(row.key());
+                int port = definition.processor().inputs(state).indexOf(row.key());
                 if (port < 0 && !(definition instanceof VectorNode)) continue;
                 port = Math.max(0, port);
                 double[] defaults = {vector.x(), vector.y(), vector.z()};

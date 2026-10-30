@@ -52,11 +52,11 @@ public final class AudioGraphEncoder {
             var outputRate=outputRows.stream().map(com.vin.easyknack.nodes.NodeBuilder.Row::rate)
                     .reduce((a,b)->a==com.vin.easyknack.nodes.ProcessingRate.AUDIO||b==com.vin.easyknack.nodes.ProcessingRate.AUDIO?com.vin.easyknack.nodes.ProcessingRate.AUDIO:a==com.vin.easyknack.nodes.ProcessingRate.EVENT||b==com.vin.easyknack.nodes.ProcessingRate.EVENT?com.vin.easyknack.nodes.ProcessingRate.EVENT:com.vin.easyknack.nodes.ProcessingRate.CONTROL).orElse(com.vin.easyknack.nodes.ProcessingRate.AUDIO);
             StringBuilder inputRates = new StringBuilder();
-            for (var key : definition.processor().inputs()) inputRates.append(layout.rows().stream()
+            for (var key : definition.processor().inputs(new com.vin.easyknack.nodes.NodeState(node.properties()))) inputRates.append(layout.rows().stream()
                     .filter(row -> row.kind() == com.vin.easyknack.nodes.NodeBuilder.RowKind.INPUT && row.key().equals(key))
                     .map(row -> row.rate().code()).findFirst().orElse('c'));
             for (var row : layout.rows()) if (row.kind() == com.vin.easyknack.nodes.NodeBuilder.RowKind.INPUT
-                    && !definition.processor().inputs().contains(row.key())) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing native input binding: ") + row.id());
+                    && !definition.processor().inputs(new com.vin.easyknack.nodes.NodeState(node.properties())).contains(row.key())) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing native input binding: ") + row.id());
             result.append(' ').append(node.id()).append(' ').append(definition.processor().id()).append(' ')
                     .append("!").append(com.vin.easyknack.nodes.NativeContractGenerator.fingerprint(definition)).append(' ')
                     .append(definition.encode(new com.vin.easyknack.nodes.NodeState(node.properties()),

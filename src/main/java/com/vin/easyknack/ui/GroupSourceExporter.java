@@ -266,19 +266,21 @@ final class GroupSourceExporter {
         for(var node:order)if(NodeRegistry.require(node.typeId()) instanceof SpectralGraphNode&&result.containsKey(node.id())){
             var def=NodeRegistry.require(node.typeId());
             var tokens=choicePayload(def,node,k->reference(sources.get(new GLNodeEndpoint(node.id(),k.value())),order,indices,external));
-            var changes=result.get(node.id());if(changes.keySet().stream().anyMatch(i->i<SpectralGraphNode.PROGRAM_TOKEN))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Choice changes spectral input wiring"));
-            var programChanges=new HashMap<Integer,String>();changes.forEach((index,value)->programChanges.put(index-SpectralGraphNode.PROGRAM_TOKEN,value));
-            var program=dynamicPayload(String.join(" ",Arrays.copyOfRange(tokens,SpectralGraphNode.PROGRAM_TOKEN,tokens.length)),programChanges);
+            int programToken=SpectralGraphNode.programToken(new NodeState(node.properties()));
+            var changes=result.get(node.id());if(changes.keySet().stream().anyMatch(i->i<programToken))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Choice changes spectral input wiring"));
+            var programChanges=new HashMap<Integer,String>();changes.forEach((index,value)->programChanges.put(index-programToken,value));
+            var program=dynamicPayload(String.join(" ",Arrays.copyOfRange(tokens,programToken,tokens.length)),programChanges);
             var expression="SpectralGraphNode::encodeProgram("+dynamicPlan(program,Map.of(node.id(),programChanges))+")";
-            result.put(node.id(),Map.of(SpectralGraphNode.PROGRAM_TOKEN,Base64.getUrlEncoder().withoutPadding().encodeToString(expression.getBytes(StandardCharsets.UTF_8))));
+            result.put(node.id(),Map.of(programToken,Base64.getUrlEncoder().withoutPadding().encodeToString(expression.getBytes(StandardCharsets.UTF_8))));
         }
         return result;
     }
     private static String[] choicePayload(BasicNode definition,GLGraphNode node,java.util.function.ToIntFunction<PropertyId> input){
         var payload=definition.encode(new NodeState(node.properties()),input).split(" ");
         if(!(definition instanceof SpectralGraphNode))return payload;
-        var program=new String(HexFormat.of().parseHex(payload[SpectralGraphNode.PROGRAM_TOKEN]),StandardCharsets.UTF_8).split(" ");
-        var expanded=new String[program.length+SpectralGraphNode.PROGRAM_TOKEN];System.arraycopy(payload,0,expanded,0,SpectralGraphNode.PROGRAM_TOKEN);System.arraycopy(program,0,expanded,SpectralGraphNode.PROGRAM_TOKEN,program.length);return expanded;
+        int programToken=SpectralGraphNode.programToken(new NodeState(node.properties()));
+        var program=new String(HexFormat.of().parseHex(payload[programToken]),StandardCharsets.UTF_8).split(" ");
+        var expanded=new String[program.length+programToken];System.arraycopy(payload,0,expanded,0,programToken);System.arraycopy(program,0,expanded,programToken,program.length);return expanded;
     }
     private static String editor(Editor value){
         if(value instanceof Editor.Trigger)return "new Editor.Trigger()";
@@ -359,7 +361,7 @@ final class GroupSourceExporter {
     private static BakedRatePlan ratePlan(List<GLGraphNode> nodes,Map<GLNodeEndpoint,GLNodeEndpoint> sources,List<GLNodeId> external,List<GLNodeId> targets,List<Port> outputs){
         var indices=new HashMap<GLNodeId,Integer>();for(int i=0;i<external.size();i++)indices.put(external.get(i),i);for(int i=0;i<nodes.size();i++)indices.put(nodes.get(i).id(),external.size()+i);
         var steps=new ArrayList<BakedRatePlan.Step>();
-        for(var node:nodes){var d=NodeRegistry.require(node.typeId());var properties=new HashMap<>(node.properties());if(d instanceof FormulaNode)properties.put("library",GLNodeValue.of("-"));steps.add(new BakedRatePlan.Step(d,properties,d.processor().inputs().stream().map(key->reference(sources.get(new GLNodeEndpoint(node.id(),key.value())),nodes,indices,external)).toList()));}
+        for(var node:nodes){var d=NodeRegistry.require(node.typeId());var properties=new HashMap<>(node.properties());if(d instanceof FormulaNode)properties.put("library",GLNodeValue.of("-"));steps.add(new BakedRatePlan.Step(d,properties,d.processor().inputs(new NodeState(properties)).stream().map(key->reference(sources.get(new GLNodeEndpoint(node.id(),key.value())),nodes,indices,external)).toList()));}
         var refs=new ArrayList<Integer>();for(int i=0;i<outputs.size();i++)refs.add(reference(sources.get(new GLNodeEndpoint(targets.get(i),outputs.get(i).endpoint(false))),nodes,indices,external));
         return new BakedRatePlan(external.size(),steps,refs);
     }
@@ -400,7 +402,7 @@ final class GroupSourceExporter {
             if(d instanceof FormulaNode){var values=new HashMap<>(state.values());values.put("library",GLNodeValue.of("-"));state=new NodeState(values);}
             plan.append(" node").append(i).append(' ').append(d instanceof FormulaNode?"formula_"+i:d.processor().id()).append(" !").append(NativeContractGenerator.fingerprint(d)).append(' ')
                 .append(dynamicPayload(d.encode(state,key->{int ref=reference(sources.get(new GLNodeEndpoint(n.id(),key.value())),nodes,indices,external);return ref>=0&&ref<inputs.size()&&inputs.get(ref).signal==SignalCategory.WAVETABLE?-10000-ref:ref;}),dynamic.getOrDefault(n.id(),Map.of()))).append(" @ ").append(com.vin.easyknack.audio.AudioGraphEncoder.outputRateMetadata(layout)).append(' ');
-            var bindings=d.processor().inputs();if(bindings.isEmpty())plan.append('-');
+            var bindings=d.processor().inputs(state);if(bindings.isEmpty())plan.append('-');
             else for(var key:bindings)plan.append(layout.rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.INPUT&&r.key().equals(key)).map(r->r.hostInputRate()).findFirst().orElse('c'));
             types.add(d instanceof FormulaNode?name+"Formula"+i:d instanceof SpectralGraphNode?spectral.type():nativeType(d));
         }

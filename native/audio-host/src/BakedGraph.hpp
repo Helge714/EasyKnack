@@ -75,6 +75,8 @@ struct BakedGraphProcessor : NodeProcessor {
         std::vector<int> inputs,outputs;
         std::vector<int> autoNodes;
         std::vector<std::string> outputPolicies;
+        std::vector<std::vector<char>> rateScratch;
+        std::vector<char> inferredRates;
         std::size_t voices=1;
     };
     std::shared_ptr<Runtime> runtime;
@@ -196,6 +198,8 @@ struct BakedGraphProcessor : NodeProcessor {
     void configureGraph(const std::string& graph,Factory factory,std::vector<int> inputs,std::vector<int> outputs,std::vector<int> autoNodes){
         runtime=std::make_shared<Runtime>();runtime->graph=AudioGraph::compile(graph,factory);
         runtime->inputs=std::move(inputs);runtime->outputs=std::move(outputs);
+        runtime->inferredRates.resize(runtime->inputs.size());runtime->rateScratch.resize(runtime->graph.nodes.size());
+        for(std::size_t i=0;i<runtime->graph.nodes.size();i++)runtime->rateScratch[i].resize(runtime->graph.nodes[i].processor->sources.size());
         runtime->autoNodes=std::move(autoNodes);
         runtime->outputPolicies.resize(runtime->graph.nodes.size());
         int domain=-1;bool midi=false;
@@ -229,7 +233,7 @@ struct BakedGraphProcessor : NodeProcessor {
     }
 
     void resolveAuto(int index)noexcept {
-        auto& node=runtime->graph.nodes[index];std::array<char,maxNodes> inputs{};
+        auto& node=runtime->graph.nodes[index];auto& inputs=runtime->rateScratch[index];
         const auto& policy=runtime->outputPolicies[index];
         for(std::size_t p=0;p<node.processor->sources.size();p++)inputs[p]=!policy.empty()&&node.inputRates[p]=='c'&&!node.processor->inputUsesBlockData(p)?'c':sourceRate(node.processor->sources[p]);
         char rate=node.processor->resolveAutoRate(inputs.data(),node.processor->sources.size());
@@ -276,9 +280,9 @@ struct BakedGraphProcessor : NodeProcessor {
         if(!runtime||frames>blockSize)return;
         if(c.channelIndex==0&&(voiceIndex==0||voices()==1)){
             resolveChannels(c);
-            std::array<char,maxNodes> inferred{};
-            for(std::size_t p=0;p<c.inputCount;p++)inferred[p]=c.input(p)?'a':'c';
-            resolveAutoRate(c.sourceRates?c.sourceRates:inferred.data(),c.inputCount);
+            auto& inferred=runtime->inferredRates;
+            for(std::size_t p=0;p<inferred.size();p++)inferred[p]=c.input(p)?'a':'c';
+            resolveAutoRate(c.sourceRates?c.sourceRates:inferred.data(),c.sourceRates?c.inputCount:inferred.size());
             for(int index:runtime->inputs){auto& n=runtime->graph.nodes[index];
                 auto& input=static_cast<BakedInput&>(*n.processor);input.external=&c;static_cast<BakedInput&>(*n.rightProcessor).external=&c;
             }

@@ -7,7 +7,7 @@ public final class BinUniformNode extends BasicNode {
     public boolean isListedInCatalog(){return false;}
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(new PropertyId("out"),"Value").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO);
-        n.addEditor(new PropertyId("slot"),"Slot",Editor.Slider.button(0,0.0,15.0).integers().discrete());
+        n.addEditor(new PropertyId("slot"),"Slot",Editor.Slider.button(0,0.0,null).integers().discrete());
     }
     public NativeProcessor processor(){return new NativeProcessor("binuniform","nodes/BinUniformNode.hpp",ParameterContract.builder().integer(new PropertyId("slot")).build());}
 }

@@ -11,11 +11,12 @@ public final class NativeContractGenerator {
     public static String name(BasicNode node){return node.nativeParameterType();}
     public static String fieldName(ParameterContract.Field f){
         String name=f.id().value().replaceAll("[^A-Za-z0-9_]","_");
-        return (Character.isDigit(name.charAt(0))?"p_":"")+name+(f.kind()==ParameterContract.Kind.SOURCE?"_source":"_value");
+        return (Character.isDigit(name.charAt(0))?"p_":"")+name+(f.kind()==ParameterContract.Kind.SOURCE?"_source":f.kind()==ParameterContract.Kind.SOURCE_LIST?"_sources":"_value");
     }
     private static String type(BasicNode node,ParameterContract.Field f){
         return switch(f.kind()){
             case SOURCE,INTEGER -> "int";
+            case SOURCE_LIST -> "std::vector<int>";
             case MAPPED -> "std::string";
             case CURVE -> "FunctionCurve";
             case VALUE -> node.defaults().get(f.id().value()).toJavaValue() instanceof Number ? "double"
@@ -41,13 +42,20 @@ public final class NativeContractGenerator {
             out.append("struct ").append(name(node)).append(" {\n");
             for(var f:node.processor().contract().fields())if(f.kind()!=ParameterContract.Kind.TOKEN)
                 out.append("    ").append(type(node,f)).append(' ').append(fieldName(f)).append("{};\n");
-            out.append("    std::vector<int> sources() const { return {");
-            out.append(String.join(",",node.processor().contract().fields().stream().filter(f->f.kind()==ParameterContract.Kind.SOURCE).map(NativeContractGenerator::fieldName).toList()));
-            out.append("}; }\n    static ").append(name(node)).append(" read(std::istream& in) {\n        ").append(name(node)).append(" p; std::string marker;\n")
+            if(node.processor().contract().fields().stream().anyMatch(f->f.kind()==ParameterContract.Kind.SOURCE_LIST)){
+                out.append("    std::vector<int> sources() const { std::vector<int> result;\n");
+                for(var f:node.processor().contract().fields())if(f.kind()==ParameterContract.Kind.SOURCE)out.append("        result.push_back(").append(fieldName(f)).append(");\n");else if(f.kind()==ParameterContract.Kind.SOURCE_LIST)out.append("        result.insert(result.end(),").append(fieldName(f)).append(".begin(),").append(fieldName(f)).append(".end());\n");
+                out.append("        return result; }\n");
+            }else{
+                out.append("    std::vector<int> sources() const { return {");
+                out.append(String.join(",",node.processor().contract().fields().stream().filter(f->f.kind()==ParameterContract.Kind.SOURCE).map(NativeContractGenerator::fieldName).toList()));out.append("}; }\n");
+            }
+            out.append("    static ").append(name(node)).append(" read(std::istream& in) {\n        ").append(name(node)).append(" p; std::string marker;\n")
                 .append("        if(!(in>>marker)||marker!=\"!").append(fingerprint(node)).append("\") throw std::runtime_error(\"Incompatible parameter contract: ").append(node.processor().id()).append("; rebuild Java and audio host together\");\n");
             for(var f:node.processor().contract().fields()){
                 if(f.kind()==ParameterContract.Kind.TOKEN){out.append("        if(!(in>>marker)||marker!=\"").append(f.literal()).append("\") throw std::runtime_error(\"Invalid parameter marker\");\n");continue;}
                 String field="p."+fieldName(f);
+                if(f.kind()==ParameterContract.Kind.SOURCE_LIST){out.append("        { int count;if(!(in>>count)||count<0)throw std::runtime_error(\"Invalid source list size\");for(int i=0;i<count;i++){int source;if(!(in>>source)||source< -1)throw std::runtime_error(\"Invalid source list entry\");").append(field).append(".push_back(source);}}\n");continue;}
                 if(f.kind()==ParameterContract.Kind.CURVE){out.append("        ").append(field).append(".read(in);\n");continue;}
                 out.append("        if(!(in>>").append(field).append(")) throw std::runtime_error(\"Missing parameter: ").append(f.id().value()).append("\");\n");
                 if(type(node,f).equals("double"))out.append("        if(!std::isfinite(").append(field).append(")) throw std::runtime_error(\"Non-finite parameter\");\n");

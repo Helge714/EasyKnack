@@ -20,7 +20,7 @@ public record BakedRatePlan(int inputCount,List<Step> steps,List<Integer> output
         boolean changed=false;int index=inputCount;
         for(var step:steps){
             var values=new HashMap<>(step.definition.defaults());values.putAll(step.properties);values.keySet().removeIf(key->key.equals(ProcessingRate.EFFECTIVE)||key.startsWith(ProcessingRate.EFFECTIVE+"."));
-            var inputs=new HashMap<PropertyId,ProcessingRate>();var ports=step.definition.processor().inputs();
+            var inputs=new HashMap<PropertyId,ProcessingRate>();var ports=step.definition.processor().inputs(new NodeState(values));
             for(int i=0;i<step.sources.size();i++)if(step.sources.get(i)>=0)inputs.put(ports.get(i),source(rates,step.sources.get(i)));
             values=new HashMap<>(AutomaticRates.resolveProperties(step.definition,values,inputs));
             var resolved=step.definition.layout(new NodeState(values)).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(NodeBuilder.Row::rate).toList();

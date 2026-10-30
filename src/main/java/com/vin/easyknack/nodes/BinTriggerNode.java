@@ -7,7 +7,7 @@ public final class BinTriggerNode extends BasicNode {
     public boolean isListedInCatalog(){return false;}
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(new PropertyId("out"),"Trigger").signal(SignalCategory.TRIGGER).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT);
-        n.addEditor(new PropertyId("slot"),"Slot",Editor.Slider.button(0,0.0,15.0).integers());
+        n.addEditor(new PropertyId("slot"),"Slot",Editor.Slider.button(0,0.0,null).integers());
     }
     public NativeProcessor processor(){return new NativeProcessor("bintrigger","nodes/BinTriggerNode.hpp",ParameterContract.builder().integer(new PropertyId("slot")).build());}
 }

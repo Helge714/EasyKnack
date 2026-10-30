@@ -9,5 +9,6 @@ public record NativeProcessor(String id, String header, ParameterContract contra
     }
     public NativeProcessor(String id, String header) { this(id, header, ParameterContract.builder().build()); }
     public java.util.List<PropertyId> inputs(){return contract.inputs();}
+    public java.util.List<PropertyId> inputs(NodeState state){return contract.inputs(state);}
 }
 

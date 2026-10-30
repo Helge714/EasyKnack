@@ -20,6 +20,10 @@ struct WideEvents:Wide {
     bool supportsEventRate()const noexcept override{return true;}
     bool evaluatesOnEvents()const noexcept override{return true;}
 };
+struct WideSum:NodeProcessor {
+    void configure(std::istream&)override{sources.assign(300,0);}
+    void process(ProcessContext& c)noexcept override{float sum=0;for(std::size_t p=0;p<c.inputCount;p++)sum+=c.numericInput(p)[0];c.output[0]=sum;}
+};
 struct WideResources:Wide {
     std::vector<std::unique_ptr<SpectrumStream>> resources;
     void configure(std::istream& in)override{Wide::configure(in);for(std::size_t p=0;p<count;p++){auto resource=std::make_unique<SpectrumStream>();resource->identity=p+1;resources.push_back(std::move(resource));}}
@@ -51,6 +55,10 @@ static void run(const std::string& command,float expected){
     assert(graph.nodes[0].outputPointers.size()==24);
 }
 int main(){
+    WideSum sum;std::istringstream unused;sum.configure(unused);sum.preparePortStorage();
+    float one=1,value=0,silence=0;std::vector<const float*> inputs(300,&one);std::vector<char> rates(300,'c');ValueEventBuffer events;events.clear(1);ValueEventBuffer* outputs[]={&events};
+    ProcessContext c{inputs.data(),inputs.size(),&value,1,48000,&silence,1};c.sourceRates=rates.data();c.valueEventOutputs=outputs;c.eventRefresh=true;
+    allocations=0;watching=true;sum.processEventBlock(c);watching=false;assert(allocations==0&&events.valueAt(0)==300);
     for(auto rate:{"a","c"})run(std::string("GRAPH 2 w wide 24 @ ")+rate+" - o sink 5888 @ a a",24);
     run("GRAPH 2 w events 24 @ e - o sink 5888 @ a a",24);
     // Current generated parameter readers must accept references beyond port 7.

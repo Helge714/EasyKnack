@@ -96,6 +96,12 @@ the audio Merge fade does not apply to Spectrum outputs.
 Output buffers are prepared before playback. Existing graph-node, per-bin program
 and instance budgets still apply when building large groups.
 
+Group inputs are also sized from the interface. Instance Groups accept numeric,
+Vector, Wavetable and Spectrum inputs without a fixed eight-input limit. Spectral
+Groups keep one source Spectrum and accept a variable number of numeric/trigger
+frame inputs, without the former 16-input limit. These frame inputs are sampled
+at the FFT window's timestamp, including when asynchronous frames arrive late.
+
 ## Formula Groups
 
 Create a Formula Group from the Math category and open it. Define ports in Group-IO

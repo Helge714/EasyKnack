@@ -23,6 +23,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 - [x] Remove the fixed eight-output execution/export limit; prepare dynamic output
   and spectral/instance work storage. Verify 24-port audio/control/event/resource
   routing without callback allocations and 12-port Spectrum/numeric groups.
+- [x] Replace fixed Instance/Spectral input fields with counted source lists;
+  preserve legacy contracts and update native buffers, rate plans and Bake/export.
+  Verify 20 numeric, 12 Spectrum and 24 frame inputs including high-slot triggers.
 - [ ] Manual acceptance: nested group Undo/Redo and directly forwarded ports;
   independently copied FFT window editors; repeated inspector selection; duplicate
   ordinary/Multiple Group Bakes; Step Switch mode changes and named inputs.
@@ -75,7 +78,7 @@ rate semantics or to resume kernel-driver installation.
 ## Latest validation (30 October 2026)
 
 - Core: full Maven test/install, 132 tests, no failures/errors, one optional skip.
-- EasyKnack: full Maven package, 596 tests, no failures/errors, 157 optional tests
+- EasyKnack: full Maven package, 598 tests, no failures/errors, 158 optional tests
   skipped in the regular profile. Selected native checks were run separately.
 - Additional native checks passed for Step Switch sample/trigger/index behavior,
   all-partial power stretching and legacy cent-contract conversion, generated Instance kernels, spectral hold/memory/formulas,
@@ -86,5 +89,9 @@ rate semantics or to resume kernel-driver installation.
   worker/Bake/export kernels, Instance Sum/Mean and mixed audio/Spectrum outputs.
 - Dynamic-output checks passed for high source-port references, rejected invalid
   references, 12-port persistence/export and existing spectral voice/state behavior.
+- Variable-input native checks passed for legacy group contracts, wide numeric and
+  Spectrum boundaries, frame capture/export, asynchronous value history and existing
+  Wavetable/choice exports. The generic event adapter handles 300 inputs without
+  callback allocations. The rebuilt development host passed the contract sweep.
 - Hardware, clean-machine installation and the manual acceptance list above remain
   separate checks; these results do not imply those tests were performed.
