@@ -39,6 +39,12 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Next technical work
 
+- [ ] Implement the bilingual, manually authored node-reference work order in
+  [NODE-DOCUMENTATION.md](docs/development/NODE-DOCUMENTATION.md): built-in pages,
+  Markdown/HTML rendering, offline/browser output, context-menu lookup by stable
+  node ID, plugin documentation and coverage/link checks. Use the latest additive
+  oscillator pilot; do not generate technical table cells from definitions.
+
 - [x] Audit the optional native contract sweep: Frame Trigger requires spectral
   frame context. Validate all temporal contracts separately, reject bin-only nodes
   before host submission, and verify frame triggers in native spectral execution.

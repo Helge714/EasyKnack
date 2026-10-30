@@ -46,7 +46,12 @@
 
 ## Documentation
 
-- User documentation is English, task-oriented and independent of Eclipse.
+- User documentation is task-oriented and independent of Eclipse. Node references
+  are maintained manually in German and English; follow
+  [docs/development/NODE-DOCUMENTATION.md](docs/development/NODE-DOCUMENTATION.md).
+- When a documented node's ports, controls, ranges, defaults, units, rates,
+  visibility, routing or behavior change, update both language references in the
+  same commit. Automate rendering and validation, not selected technical content.
 - Keep developer setup, historical decisions and debugging accounts separate from
   user instructions. Node details belong in a linked reference, not the quick start.
 - Preserve manual edits and keep GLSwing an external Maven dependency.
