@@ -8,7 +8,7 @@ Computes custom formulas through a configurable group interface.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| signal | [Value](../../user/en/data-types.md) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md) | Always |
+| signal | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Source | [Editor](../../user/en/reference-tables.md) | Formula editor | — | result = signal; | — | — | Inspector |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
 | Live preview | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Inspector |
@@ -18,7 +18,7 @@ Computes custom formulas through a configurable group interface.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| result | [Value](../../user/en/data-types.md) | ±∞ | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| result | [Value](../../user/en/data-types.md#value) | ±∞ | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

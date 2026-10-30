@@ -12,7 +12,7 @@ same menu.
 | Understand rates, data types, units and muting | [Fundamentals](en/index.md) · [Deutsch](de/index.md) |
 | Edit, save and share a graph | [Workspace and documents](workspace.md) |
 | Select devices or process another application's audio | [Audio and routing](audio.md) |
-| Find a node or understand rates and units | [Node reference](nodes.md) |
+| Find a node, its ports and inspector settings | [English node index](../nodes/en/index.md) · [Deutsch](../nodes/de/index.md) |
 | Apply random frequency modulation | [Digital Noise](digital-noise.md) |
 | Smooth mouse and MIDI control changes | [Manual control interpolation](manual-controls.md) |
 | Control editors with MIDI hardware | [MIDI editor drivers](midi-drivers.md) |

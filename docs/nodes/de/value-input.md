@@ -8,18 +8,18 @@ Stellt einen editierbaren Zahlenwert bereit.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Wert (Value) | [Wert](../../user/de/data-types.md) | Eingestellte Grenzen | — | 0 | — | — | Immer |
+| Wert (Value) | [Wert](../../user/de/data-types.md#value) | Eingestellte Grenzen | — | 0 | — | — | Immer |
 | Reglertyp (Slider type) | [Editor](../../user/de/reference-tables.md) | Buttons, Balken | — | Buttons | — | — | Inspektor |
 | Minimum aktivieren (Enable minimum) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Inspektor |
-| Minimum (Minimum) | [Wert](../../user/de/data-types.md) | ±∞ | — | 0 | — | — | Inspektor |
+| Minimum (Minimum) | [Wert](../../user/de/data-types.md#value) | ±∞ | — | 0 | — | — | Inspektor |
 | Maximum aktivieren (Enable maximum) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Inspektor |
-| Maximum (Maximum) | [Wert](../../user/de/data-types.md) | ±∞ | — | 1 | — | — | Inspektor |
+| Maximum (Maximum) | [Wert](../../user/de/data-types.md#value) | ±∞ | — | 1 | — | — | Inspektor |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Wertausgang (Value Out) | [Wert](../../user/de/data-types.md) | Eingestellte Grenzen | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Wertausgang (Value Out) | [Wert](../../user/de/data-types.md#value) | Eingestellte Grenzen | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

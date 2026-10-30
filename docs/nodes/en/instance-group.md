@@ -8,16 +8,16 @@ Runs an internal graph for multiple independent instances.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Count | [Value](../../user/en/data-types.md) | 0–256, integer | 0–Maximum, rounded down | 8 | — | [Control](../../user/en/rates.md) | Always |
-| Frequency | [Value](../../user/en/data-types.md) | ±∞ | ±∞ | 220 | — | [Auto](../../user/en/rates.md) | Always |
-| Maximum | [Value](../../user/en/data-types.md) | 1–256 | — | 16 | — | — | Inspector |
+| Count | [Value](../../user/en/data-types.md#value) | 0–256, integer | 0–Maximum, rounded down | 8 | — | [Control](../../user/en/rates.md#control) | Always |
+| Frequency | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 220 | — | [Auto](../../user/en/rates.md#auto) | Always |
+| Maximum | [Value](../../user/en/data-types.md#value) | 1–256 | — | 16 | — | — | Inspector |
 | General / IO / Editors | [Editor](../../user/en/reference-tables.md) | Group-defined | — | — | — | — | Inspector |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Audio](../../user/en/data-types.md) | ±∞ | [Audio](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Audio](../../user/en/data-types.md#audio) | ±∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

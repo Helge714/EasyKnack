@@ -8,7 +8,7 @@ Wandelt numerische Signale zwischen Audio und Control um.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Eingang (In) | [Wert](../../user/de/data-types.md) | ±∞ | ±∞ | 0 | — | [Audio](../../user/de/rates.md) | Immer |
+| Eingang (In) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
 | Ausgangsrate (Output Rate) | [Editor](../../user/de/reference-tables.md) | Control, Audio | — | Control | — | — | Immer |
 | Reduktion (Reduction) | [Editor](../../user/de/reference-tables.md) | Erstes, Letztes, Mittelwert, RMS, Minimum, Maximum, Absolutspitze | — | Erstes | — | — | Control-Ausgang |
 
@@ -16,7 +16,7 @@ Wandelt numerische Signale zwischen Audio und Control um.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Wert](../../user/de/data-types.md) | ±∞ | [Audio / Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio / Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

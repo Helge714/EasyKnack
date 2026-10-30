@@ -5,12 +5,83 @@ import json
 from html.parser import HTMLParser
 import os
 from pathlib import Path
+import re
 from urllib.parse import unquote, urlsplit
 
 from documentation_renderer import render
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / 'docs'
+
+
+def validate_catalog(data):
+    """Audit identities and maintained pages, never derive reference content."""
+    if data.get('schema') != 1:
+        raise ValueError('Unsupported node documentation catalog schema')
+    entries = data['nodes']
+    excluded = data.get('excluded', [])
+    for key in ('id', 'slug'):
+        if len({entry[key] for entry in entries}) != len(entries):
+            raise ValueError(f'Duplicate node documentation {key}')
+    ids = {entry['id'] for entry in entries}
+    omitted = {entry['id'] for entry in excluded}
+    if len(omitted) != len(excluded) or ids & omitted:
+        raise ValueError('Duplicate or documented exclusion in node catalog')
+    if any(not entry.get('reason', '').strip() for entry in excluded):
+        raise ValueError('Every node exclusion needs a reason')
+    registered = {}
+    for source in (ROOT / 'src/main/java/com/vin/easyknack/nodes').glob('*Node.java'):
+        text = source.read_text(encoding='utf-8')
+        match = re.search(r'@RegisterNode\(\s*id\s*=\s*"([^"]+)"', text)
+        if match:
+            hidden = bool(re.search(r'isListedInCatalog\s*\(\)\s*\{\s*return false', text))
+            registered[match[1]] = hidden
+    missing = registered.keys() - ids - omitted
+    if missing:
+        raise ValueError(f'Node documentation coverage missing: {sorted(missing)}')
+    invalid = {id for id in omitted if id not in registered or not registered[id]}
+    if invalid:
+        raise ValueError(f'Only registered internal/legacy nodes may be excluded: {sorted(invalid)}')
+    unknown = {entry['id'] for entry in entries
+               if entry['id'] not in registered and entry.get('kind') != 'group'}
+    if unknown:
+        raise ValueError(f'Unknown documented node IDs: {sorted(unknown)}')
+    for language in ('en', 'de'):
+        index = DOCS / 'nodes' / language / 'index.md'
+        index_text = index.read_text(encoding='utf-8')
+        for entry in entries:
+            slug = entry['slug']
+            if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug):
+                raise ValueError(f'Invalid documentation slug: {slug}')
+            page = index.parent / (slug + '.md')
+            if not page.is_file():
+                raise ValueError(f'Node translation missing: {page}')
+            if f']({slug}.md)' not in index_text:
+                raise ValueError(f'Node missing from {language} index: {slug}')
+            text = page.read_text(encoding='utf-8')
+            required = (['Overview', 'Inputs', 'Outputs', 'Behavior', 'Mute', 'Insertion', 'Delayable']
+                        if language == 'en' else
+                        ['Übersicht', 'Eingänge', 'Ausgänge', 'Verhalten', 'Mute', 'Einfügen', 'Delayable'])
+            headings = re.findall(r'^## (.+)$', text, flags=re.MULTILINE)
+            if headings != required:
+                raise ValueError(f'Unexpected node reference sections: {page}: {headings}')
+            expected = ([['Name', 'Data type', 'Editor range', 'Signal range', 'Default', 'Unit', 'Rate', 'Visibility'],
+                         ['Name', 'Data type', 'Range', 'Rate', 'Channel'],
+                         ['Mutable', 'Input', 'Output'], ['Input', 'Output'], ['Sample-wise feedback']]
+                        if language == 'en' else
+                        [['Bezeichnung', 'Datentyp', 'Reglerbereich', 'Signalbereich', 'Standardwert', 'Einheit', 'Rate', 'Sichtbarkeit'],
+                         ['Bezeichnung', 'Datentyp', 'Wertebereich', 'Rate', 'Kanal'],
+                         ['Mutable', 'Eingang', 'Ausgang'], ['Eingang', 'Ausgang'], ['Sampleweises Feedback']])
+            for heading, columns in zip([required[i] for i in (1, 2, 4, 5, 6)], expected):
+                section = re.search(r'^## ' + re.escape(heading) + r'\n(.*?)(?=^## |\Z)', text,
+                                    flags=re.MULTILINE | re.DOTALL)[1]
+                rows = [line.strip().strip('|').split('|') for line in section.splitlines() if line.startswith('|')]
+                if len(rows) < 3 or any(len(row) != len(columns) for row in rows):
+                    raise ValueError(f'Wrong table columns or missing rows: {page}: {heading}')
+                labels = [re.sub(r'\[([^]]+)\]\([^)]+\)', r'\1', cell.strip()) for cell in rows[0]]
+                if labels != columns:
+                    raise ValueError(f'Wrong table headings: {page}: {heading}: {labels}')
+    return len(entries)
 
 
 class Links(HTMLParser):
@@ -37,12 +108,12 @@ def main():
     sources = set((DOCS / 'user/de').glob('*.md')) | set((DOCS / 'user/en').glob('*.md'))
     catalog = DOCS / 'nodes/catalog.json'
     if catalog.is_file():
-        entries = json.loads(catalog.read_text(encoding='utf-8'))['nodes']
+        data = json.loads(catalog.read_text(encoding='utf-8'))
+        validate_catalog(data)
+        entries = data['nodes']
         for language in ('de', 'en'):
             sources.add(DOCS / 'nodes' / language / 'index.md')
             sources.update(DOCS / 'nodes' / language / (node['slug']+'.md') for node in entries)
-        if len({node['id'] for node in entries}) != len(entries) or len({node['slug'] for node in entries}) != len(entries):
-            raise ValueError('Duplicate node documentation ID or slug')
     sources.update((ROOT / page).resolve() for page in args.page)
     names = [{p.name for p in (DOCS / 'user' / language).glob('*.md')} for language in ('de', 'en')]
     if names[0] != names[1]:

@@ -9,15 +9,15 @@ Smooths rising and falling values exponentially.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Audio | — | — | Inspector |
-| In | [Value](../../user/en/data-types.md) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md) | Always |
-| Rise | [Value](../../user/en/data-types.md) | 0–60 s | 0–60 s | 0.03 s | s, ms, smp | [Auto](../../user/en/rates.md) | Always |
-| Fall | [Value](../../user/en/data-types.md) | 0–60 s | 0–60 s | 0.03 s | s, ms, smp | [Auto](../../user/en/rates.md) | Always |
+| In | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+| Rise | [Value](../../user/en/data-types.md#value) | 0–60 s | 0–60 s | 0.03 s | [s](../../user/en/units.md), [ms](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+| Fall | [Value](../../user/en/data-types.md#value) | 0–60 s | 0–60 s | 0.03 s | [s](../../user/en/units.md), [ms](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md) | ±∞ | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Value](../../user/en/data-types.md#value) | ±∞ | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

@@ -9,18 +9,18 @@ Generates a curve-shaped envelope from Gate and Trigger.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Envelope | [Editor](../../user/en/reference-tables.md) | Curve editor | — | ADSR | — | — | Always |
-| Gate | [Value](../../user/en/data-types.md) | 0–1 | ±∞ | 0 | — | [Audio](../../user/en/rates.md) | Always |
-| Trigger | [Trigger](../../user/en/data-types.md) | Button | — | — | — | [Trigger](../../user/en/rates.md) | Always |
-| Attack + Decay | [Value](../../user/en/data-types.md) | 0–60 000 ms | 0–60 000 ms | 300 ms | ms, s, smp | [Auto](../../user/en/rates.md) | Always |
-| Release | [Value](../../user/en/data-types.md) | 0–60 000 ms | 0–60 000 ms | 300 ms | ms, s, smp | [Auto](../../user/en/rates.md) | Always |
-| Sustain position | [Value](../../user/en/data-types.md) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/en/rates.md) | Always |
+| Gate | [Value](../../user/en/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Audio](../../user/en/rates.md#audio) | Always |
+| Trigger | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
+| Attack + Decay | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+| Release | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+| Sustain position | [Value](../../user/en/data-types.md#value) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Hold | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Envelope | [Value](../../user/en/data-types.md) | 0–1 | [Audio](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Envelope | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

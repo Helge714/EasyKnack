@@ -11,15 +11,15 @@ Filters audio with a resonant lowpass, highpass or bandpass.
 | Mode | [Editor](../../user/en/reference-tables.md) | Lowpass, Highpass, Bandpass | — | Lowpass | — | — | Always |
 | Order | [Editor](../../user/en/reference-tables.md) | 2, 4, 6, 8 | — | 2 | — | — | Always |
 | Level compensation | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
-| Audio In | [Audio](../../user/en/data-types.md) | — | ±∞ | — | — | [Audio](../../user/en/rates.md) | Always |
-| Cutoff | [Value](../../user/en/data-types.md) | 5–20 000 Hz | 5 Hz–0.45 × fs | 1000 Hz | Hz, kHz | [Audio](../../user/en/rates.md) | Always |
-| Resonance | [Value](../../user/en/data-types.md) | 0.1–30 Q | 0.1–30 Q | 0.707 Q | Q | [Audio](../../user/en/rates.md) | Always |
+| Audio In | [Audio](../../user/en/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/en/rates.md#audio) | Always |
+| Cutoff | [Value](../../user/en/data-types.md#value) | 5–20 000 Hz | 5 Hz–0.45 × fs | 1000 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | [Audio](../../user/en/rates.md#audio) | Always |
+| Resonance | [Value](../../user/en/data-types.md#value) | 0.1–30 Q | 0.1–30 Q | 0.707 Q | [Q](../../user/en/units.md) | [Audio](../../user/en/rates.md#audio) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Audio Out | [Audio](../../user/en/data-types.md) | ±∞ | [Audio](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Audio Out | [Audio](../../user/en/data-types.md#audio) | ±∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

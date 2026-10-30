@@ -8,7 +8,7 @@ Supplies deterministic random numbers per bin and frame.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Seed | [Value](../../user/en/data-types.md) | 0–2 147 483 647, integer | — | 0 | — | — | Always |
+| Seed | [Value](../../user/en/data-types.md#value) | 0–2 147 483 647, integer | — | 0 | — | — | Always |
 | Vary by bin | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Always |
 | Vary by frame | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
 
@@ -16,7 +16,7 @@ Supplies deterministic random numbers per bin and frame.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Random | [Value](../../user/en/data-types.md) | 0–1, excluding 1 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Random | [Value](../../user/en/data-types.md#value) | 0–1, excluding 1 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

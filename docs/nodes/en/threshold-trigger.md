@@ -10,14 +10,14 @@ Emits triggers when a value crosses a threshold.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Edge | [Editor](../../user/en/reference-tables.md) | Rising, Falling, Both | — | Rising | — | — | Always |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
-| In | [Value](../../user/en/data-types.md) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/en/rates.md) | Always |
-| Threshold | [Value](../../user/en/data-types.md) | ±1 000 000 | ±∞ | 0.5 | — | [Auto](../../user/en/rates.md) | Always |
+| In | [Value](../../user/en/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+| Threshold | [Value](../../user/en/data-types.md#value) | ±1 000 000 | ±∞ | 0.5 | — | [Auto](../../user/en/rates.md#auto) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Trigger | [Trigger](../../user/en/data-types.md) | — | [Trigger](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Trigger | [Trigger](../../user/en/data-types.md#trigger) | — | [Trigger](../../user/en/rates.md#trigger) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

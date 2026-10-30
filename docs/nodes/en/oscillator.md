@@ -8,16 +8,16 @@ Generates a periodic waveform.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Waveform | [Wavetable resource](../../user/en/data-types.md) | Sine, Triangle, Sawtooth, Square | — | Sine | — | [Control](../../user/en/rates.md) | Always |
-| Frequency | [Value](../../user/en/data-types.md) | 1e-5–20 000 Hz | 0–20 000 Hz | 440 Hz | Hz, kHz | [Auto](../../user/en/rates.md) | Always |
-| Phase | [Value](../../user/en/data-types.md) | ±∞ turn | ±∞ turn | 0 turn | turn, °, rad | [Auto](../../user/en/rates.md) | Always |
-| Reset | [Trigger](../../user/en/data-types.md) | Button | — | — | — | [Trigger](../../user/en/rates.md) | Always |
+| Waveform | [Wavetable resource](../../user/en/data-types.md#wavetable) | Sine, Triangle, Sawtooth, Square | — | Sine | — | [Control](../../user/en/rates.md#control) | Always |
+| Frequency | [Value](../../user/en/data-types.md#value) | 1e-5–20 000 Hz | 0–20 000 Hz | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | [Auto](../../user/en/rates.md#auto) | Always |
+| Phase | [Value](../../user/en/data-types.md#value) | ±∞ turn | ±∞ turn | 0 turn | [turn](../../user/en/units.md#angle), [°](../../user/en/units.md#angle), [rad](../../user/en/units.md#angle) | [Auto](../../user/en/rates.md#auto) | Always |
+| Reset | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Audio Out | [Audio](../../user/en/data-types.md) | ±1 | [Audio](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Audio Out | [Audio](../../user/en/data-types.md#audio) | ±1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

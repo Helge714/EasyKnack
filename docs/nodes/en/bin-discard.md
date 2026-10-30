@@ -8,7 +8,7 @@ Skips a bin before its remaining processing.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Discard | [Value](../../user/en/data-types.md) | Off / On | 0 keeps; nonzero discards | Off | — | [Auto](../../user/en/rates.md) | Always |
+| Discard | [Value](../../user/en/data-types.md#value) | Off / On | 0 keeps; nonzero discards | Off | — | [Auto](../../user/en/rates.md#auto) | Always |
 
 ## Outputs
 

@@ -14,10 +14,10 @@ Stellt Index und Anzahl der aktuellen Instanzen bereit.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Index | [Wert](../../user/de/data-types.md) | 0–Count−1 | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Anzahl (Count) | [Wert](../../user/de/data-types.md) | 0–Maximum | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Position | [Wert](../../user/de/data-types.md) | 0–1 | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Startwert (Seed) | [Wert](../../user/de/data-types.md) | 0–16 777 215 | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Index | [Wert](../../user/de/data-types.md#value) | 0–Count−1 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Anzahl (Count) | [Wert](../../user/de/data-types.md#value) | 0–Maximum | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Position | [Wert](../../user/de/data-types.md#value) | 0–1 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Startwert (Seed) | [Wert](../../user/de/data-types.md#value) | 0–16 777 215 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

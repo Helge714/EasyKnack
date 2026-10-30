@@ -14,7 +14,7 @@ Erstellt eine editierbare periodische Wavetable-Ressource.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Wellenform (Waveform) | [Wavetable-Ressource](../../user/de/data-types.md) | — | [Control](../../user/de/rates.md) | — |
+| Wellenform (Waveform) | [Wavetable-Ressource](../../user/de/data-types.md#wavetable) | — | [Control](../../user/de/rates.md#control) | — |
 
 ## Verhalten
 

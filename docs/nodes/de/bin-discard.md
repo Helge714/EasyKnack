@@ -8,7 +8,7 @@
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Verwerfen (Discard) | [Wert](../../user/de/data-types.md) | Aus / An | 0 behält; ungleich 0 verwirft | Aus | — | [Auto](../../user/de/rates.md) | Immer |
+| Verwerfen (Discard) | [Wert](../../user/de/data-types.md#value) | Aus / An | 0 behält; ungleich 0 verwirft | Aus | — | [Auto](../../user/de/rates.md#auto) | Immer |
 
 ## Ausgänge
 

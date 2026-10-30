@@ -9,21 +9,21 @@ Wählt einen Eingang per Trigger oder numerischem Index.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Datentyp (Data type) | [Editor](../../user/de/reference-tables.md) | Value, Vector, Wavetable, Buffer, Spectrum, Analysis | — | Wert | — | — | Inspektor |
-| Schritte (Steps) | [Wert](../../user/de/data-types.md) | 1–32 | — | 4 | — | — | Immer |
+| Schritte (Steps) | [Wert](../../user/de/data-types.md#value) | 1–32 | — | 4 | — | — | Immer |
 | Auswahl (Selection) | [Editor](../../user/de/reference-tables.md) | Trigger, Index | — | Trigger | — | — | Inspektor |
-| Weiter (Next) | [Trigger](../../user/de/data-types.md) | Button | — | — | — | [Trigger](../../user/de/rates.md) | Trigger-Modus |
-| Zurücksetzen (Reset) | [Trigger](../../user/de/data-types.md) | Button | — | — | — | [Trigger](../../user/de/rates.md) | Trigger-Modus |
-| Gewählter Index (Selected index) | [Wert](../../user/de/data-types.md) | 0–31, ganzzahlig | 0–Steps−1, abgerundet | 0 | — | [Auto](../../user/de/rates.md) | Index-Modus |
-| Eingang 1…N (Input 1…N) | [Gewählter Typ](../../user/de/data-types.md) | ±∞ für Wert; kein Ressourceneditor | Gewählter Datentyp | 0 für Wert | — | [Auto](../../user/de/rates.md) | Immer |
+| Weiter (Next) | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Trigger-Modus |
+| Zurücksetzen (Reset) | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Trigger-Modus |
+| Gewählter Index (Selected index) | [Wert](../../user/de/data-types.md#value) | 0–31, ganzzahlig | 0–Steps−1, abgerundet | 0 | — | [Auto](../../user/de/rates.md#auto) | Index-Modus |
+| Eingang 1…N (Input 1…N) | [Gewählter Typ](../../user/de/data-types.md) | ±∞ für Wert; kein Ressourceneditor | Gewählter Datentyp | 0 für Wert | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Schrittname 1…N (Step name 1…N) | [Editor](../../user/de/reference-tables.md) | Text | — | Eingang 1…N | — | — | Inspektor |
-| Rate (Rate) | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor; Wert/Vector |
+| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor; Wert/Vector |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Wert / Auswahl (Value / Selected) | [Gewählter Typ](../../user/de/data-types.md) | Gewählter Eingang | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Index | [Wert](../../user/de/data-types.md) | 0–Steps−1 | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Wert / Auswahl (Value / Selected) | [Gewählter Typ](../../user/de/data-types.md) | Gewählter Eingang | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
+| Index | [Wert](../../user/de/data-types.md#value) | 0–Steps−1 | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

@@ -13,10 +13,12 @@ navigation, language selection, file coverage and link validation. The same
 complete pages must work offline, in the application and outside it, without
 application-only placeholders or a running audio host.
 
-The approved layout pilot is
-[the third German additive oscillator draft](../nodes/de/additive-oscillator-v3.md).
-Earlier drafts are comparison material, not templates. The pilot currently has
-only a German page. Bilingual coverage and production integration remain pending.
+The canonical layout reference is the additive oscillator in
+[English](../nodes/en/additive-oscillator.md) and
+[German](../nodes/de/additive-oscillator.md). Earlier drafts are comparison
+material, excluded from the public catalog. Both node indices cover every public
+built-in node, the four group types and the user-facing spectral context nodes.
+Production help integration remains pending.
 
 Shared foundations now live in [English](../user/en/index.md) and
 [German](../user/de/index.md): rates, data types/channels, units and muting.
@@ -45,10 +47,11 @@ behavior changes.
   `--page docs/<page>.md` adds a page to the current preview set. HTML pages are
   derived files, not another manually maintained source. Do not edit or commit
   generated output. It may be removed by a clean build and regenerated.
-- The preview supports the Markdown subset used by the current reference pages
-  and checks local links, generated section targets and paired foundation pages.
-  It currently includes the bilingual foundations and the latest German node
-  pilot. Links to unconverted legacy pages open their checkout Markdown files.
+- The preview supports the Markdown subset used by the reference pages and checks
+  local links, generated section targets, paired foundation pages, node sections,
+  catalog/index coverage and registered built-in identities. It includes all
+  cataloged bilingual node pages and foundations. Links to unconverted legacy
+  pages open their checkout Markdown files.
   This preview is not yet the application's help integration or a portable
   published documentation bundle; those remain separate implementation work.
 - Replace legacy pages individually after their replacement covers the relevant
@@ -56,9 +59,8 @@ behavior changes.
   and any packaging references are updated. Retain old pages until then. Move
   debugging/history material to developer history rather than copying it into
   the new user reference. Do not bulk-delete old documentation.
-- Consolidate pilot drafts into one canonical page per language when approved;
-  keep comparison drafts out of the eventual public node catalog. This cleanup
-  has not been performed merely by introducing the preview build.
+- Keep comparison drafts out of the public node catalog; use the canonical
+  additive oscillator pages for subsequent edits.
 
 ## Files, identity and languages
 
@@ -67,6 +69,10 @@ behavior changes.
 - Associate each reference with the stable node registration ID when implementing
   the documentation catalog. Renaming a node or translating its title must not
   break the association. Do not use a user's instance title as identity.
+- Maintain the manual identity catalog in `docs/nodes/catalog.json`; its schema,
+  context/group identities and deliberate internal/legacy exclusions are described
+  in [the catalog guide](../nodes/README.md). Registration scanning validates
+  coverage only; it must never populate technical table cells.
 - English titles and port names contain only the English name. German titles and
   port names use **German name (English name)**.
 - Maintain equivalent technical content in both languages. When ports, controls,
@@ -189,9 +195,6 @@ section or imply that support itself makes an undelayed feedback loop valid.
 
 ## Integration work still to implement
 
-- Apply this reference format to built-in nodes in both languages. Promote one
-  canonical additive oscillator page per language after review; comparison drafts
-  must not become duplicate entries in the public catalog.
 - Add a node-context-menu documentation action, resolving the stable node ID and
   current language. Fall back to English when a translation is missing. Do not
   display unavailable documentation as if it existed.
@@ -202,9 +205,9 @@ section or imply that support itself makes an undelayed feedback loop valid.
   Missing documentation must not prevent installation; disable the documentation
   action when no page exists. Define manifest paths and safe local resource
   resolution as part of that implementation, rather than assuming an existing API.
-- Add coverage and link checks for built-in pages and plugin documentation
-  validation. These checks do not prove that prose matches DSP behavior; review
-  both language versions against the implementation during relevant code changes.
+- Extend validation to plugin documentation when its contract is defined. Existing
+  built-in coverage/link checks do not prove that prose matches DSP behavior;
+  review both language versions against the implementation during relevant changes.
 
 ## Completion check for each reference
 

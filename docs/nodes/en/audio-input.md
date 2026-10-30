@@ -1,0 +1,43 @@
+# Audio Input
+
+## Overview
+
+Captures audio from a selected source.
+
+## Inputs
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Source | [Editor](../../user/en/reference-tables.md) | Available capture sources | — | System mix | — | — | Always |
+| Mode | [Editor](../../user/en/reference-tables.md) | Copy | — | Copy | — | — | System mix or application |
+| Channels | [Editor](../../user/en/reference-tables.md) | Mono / Stereo | — | Stereo | — | — | Always |
+
+## Outputs
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Audio Out | [Audio](../../user/en/data-types.md#audio) | ±1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+
+## Behavior
+
+Capture can use a device, the system mix or an application. Copy captures the signal without suppressing the original playback. For exclusive rerouting, select a virtual routing device and route the source application to that device in Windows. Mono combines channels; Stereo preserves left and right.
+
+## Mute
+
+| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Yes | — | — |
+
+## Insertion
+
+| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
+| --- |
+| Not supported |
+
+[Node index](index.md) · [Deutsch](../de/audio-input.md)

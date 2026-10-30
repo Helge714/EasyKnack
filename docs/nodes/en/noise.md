@@ -8,7 +8,7 @@ Generates seeded noise with a selectable spectral color.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Seed | [Value](../../user/en/data-types.md) | −1–16 777 215 | −1–16 777 215, rounded | −1 | — | [Control](../../user/en/rates.md) | Always |
+| Seed | [Value](../../user/en/data-types.md#value) | −1–16 777 215 | −1–16 777 215, rounded | −1 | — | [Control](../../user/en/rates.md#control) | Always |
 | Noise | [Editor](../../user/en/reference-tables.md) | White, Pink, Brown, Blue | — | White | — | — | Always |
 | Rate | [Editor](../../user/en/reference-tables.md) | Audio, Control | — | Audio | — | — | Inspector |
 
@@ -16,7 +16,7 @@ Generates seeded noise with a selectable spectral color.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Audio](../../user/en/data-types.md) | ±1 | [Audio / Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Audio](../../user/en/data-types.md#audio) | ±1 | [Audio / Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

@@ -8,14 +8,14 @@ Verzögert ein Signal und sichert Feedbackschleifen ab.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Eingang (In) | [Audio](../../user/de/data-types.md) | ±∞ | ±∞ | 0 | — | [Audio](../../user/de/rates.md) | Immer |
-| Zeit (Time) | [Wert](../../user/de/data-types.md) | 0–10 s | 0–10 s | 0.25 s | s, ms, smp | [Control](../../user/de/rates.md) | Immer |
+| Eingang (In) | [Audio](../../user/de/data-types.md#audio) | ±∞ | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
+| Zeit (Time) | [Wert](../../user/de/data-types.md#value) | 0–10 s | 0–10 s | 0.25 s | [s](../../user/de/units.md), [ms](../../user/de/units.md), [smp](../../user/de/units.md) | [Control](../../user/de/rates.md#control) | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Audio](../../user/de/data-types.md) | ±∞ | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Audio](../../user/de/data-types.md#audio) | ±∞ | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

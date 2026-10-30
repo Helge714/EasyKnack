@@ -8,14 +8,14 @@ Distributes an audio signal between left and right.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Audio In | [Audio](../../user/en/data-types.md) | — | ±∞ | — | — | [Audio](../../user/en/rates.md) | Always |
-| Pan | [Value](../../user/en/data-types.md) | ±1 | ±1 | 0 | — | [Audio](../../user/en/rates.md) | Always |
+| Audio In | [Audio](../../user/en/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/en/rates.md#audio) | Always |
+| Pan | [Value](../../user/en/data-types.md#value) | ±1 | ±1 | 0 | — | [Audio](../../user/en/rates.md#audio) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Stereo Out | [Audio](../../user/en/data-types.md) | ±∞ | [Audio](../../user/en/rates.md) | Stereo |
+| Stereo Out | [Audio](../../user/en/data-types.md#audio) | ±∞ | [Audio](../../user/en/rates.md#audio) | Stereo |
 
 ## Behavior
 

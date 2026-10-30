@@ -8,18 +8,18 @@ Supplies an editable numeric value.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Value | [Value](../../user/en/data-types.md) | Configured limits | — | 0 | — | — | Always |
+| Value | [Value](../../user/en/data-types.md#value) | Configured limits | — | 0 | — | — | Always |
 | Slider type | [Editor](../../user/en/reference-tables.md) | Buttons, Bar | — | Buttons | — | — | Inspector |
 | Enable minimum | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Inspector |
-| Minimum | [Value](../../user/en/data-types.md) | ±∞ | — | 0 | — | — | Inspector |
+| Minimum | [Value](../../user/en/data-types.md#value) | ±∞ | — | 0 | — | — | Inspector |
 | Enable maximum | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Inspector |
-| Maximum | [Value](../../user/en/data-types.md) | ±∞ | — | 1 | — | — | Inspector |
+| Maximum | [Value](../../user/en/data-types.md#value) | ±∞ | — | 1 | — | — | Inspector |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Value Out | [Value](../../user/en/data-types.md) | Configured limits | [Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Value Out | [Value](../../user/en/data-types.md#value) | Configured limits | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

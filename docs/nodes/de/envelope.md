@@ -9,18 +9,18 @@ Erzeugt eine kurvenförmige Hüllkurve aus Gate und Trigger.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Hüllkurve (Envelope) | [Editor](../../user/de/reference-tables.md) | Kurveneditor | — | ADSR | — | — | Immer |
-| Gate | [Wert](../../user/de/data-types.md) | 0–1 | ±∞ | 0 | — | [Audio](../../user/de/rates.md) | Immer |
-| Trigger | [Trigger](../../user/de/data-types.md) | Button | — | — | — | [Trigger](../../user/de/rates.md) | Immer |
-| Attack + Decay | [Wert](../../user/de/data-types.md) | 0–60 000 ms | 0–60 000 ms | 300 ms | ms, s, smp | [Auto](../../user/de/rates.md) | Immer |
-| Ausklingen (Release) | [Wert](../../user/de/data-types.md) | 0–60 000 ms | 0–60 000 ms | 300 ms | ms, s, smp | [Auto](../../user/de/rates.md) | Immer |
-| Halteposition (Sustain position) | [Wert](../../user/de/data-types.md) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/de/rates.md) | Immer |
+| Gate | [Wert](../../user/de/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
+| Trigger | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
+| Attack + Decay | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Ausklingen (Release) | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Halteposition (Sustain position) | [Wert](../../user/de/data-types.md#value) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Halten (Hold) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | An | — | — | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Hüllkurve (Envelope) | [Wert](../../user/de/data-types.md) | 0–1 | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Hüllkurve (Envelope) | [Wert](../../user/de/data-types.md#value) | 0–1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

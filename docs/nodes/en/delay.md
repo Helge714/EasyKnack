@@ -8,14 +8,14 @@ Delays a signal and protects feedback cycles.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| In | [Audio](../../user/en/data-types.md) | ±∞ | ±∞ | 0 | — | [Audio](../../user/en/rates.md) | Always |
-| Time | [Value](../../user/en/data-types.md) | 0–10 s | 0–10 s | 0.25 s | s, ms, smp | [Control](../../user/en/rates.md) | Always |
+| In | [Audio](../../user/en/data-types.md#audio) | ±∞ | ±∞ | 0 | — | [Audio](../../user/en/rates.md#audio) | Always |
+| Time | [Value](../../user/en/data-types.md#value) | 0–10 s | 0–10 s | 0.25 s | [s](../../user/en/units.md), [ms](../../user/en/units.md), [smp](../../user/en/units.md) | [Control](../../user/en/rates.md#control) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Audio](../../user/en/data-types.md) | ±∞ | [Audio](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Audio](../../user/en/data-types.md#audio) | ±∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

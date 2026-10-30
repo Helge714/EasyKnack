@@ -9,12 +9,12 @@ Selects one input by trigger or numeric index.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Data type | [Editor](../../user/en/reference-tables.md) | Value, Vector, Wavetable, Buffer, Spectrum, Analysis | — | Value | — | — | Inspector |
-| Steps | [Value](../../user/en/data-types.md) | 1–32 | — | 4 | — | — | Always |
+| Steps | [Value](../../user/en/data-types.md#value) | 1–32 | — | 4 | — | — | Always |
 | Selection | [Editor](../../user/en/reference-tables.md) | Trigger, Index | — | Trigger | — | — | Inspector |
-| Next | [Trigger](../../user/en/data-types.md) | Button | — | — | — | [Trigger](../../user/en/rates.md) | Trigger mode |
-| Reset | [Trigger](../../user/en/data-types.md) | Button | — | — | — | [Trigger](../../user/en/rates.md) | Trigger mode |
-| Selected index | [Value](../../user/en/data-types.md) | 0–31, integer | 0–Steps−1, rounded down | 0 | — | [Auto](../../user/en/rates.md) | Index mode |
-| Input 1…N | [Selected type](../../user/en/data-types.md) | ±∞ for Value; no resource editor | Selected data type | 0 for Value | — | [Auto](../../user/en/rates.md) | Always |
+| Next | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Trigger mode |
+| Reset | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Trigger mode |
+| Selected index | [Value](../../user/en/data-types.md#value) | 0–31, integer | 0–Steps−1, rounded down | 0 | — | [Auto](../../user/en/rates.md#auto) | Index mode |
+| Input 1…N | [Selected type](../../user/en/data-types.md) | ±∞ for Value; no resource editor | Selected data type | 0 for Value | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Step name 1…N | [Editor](../../user/en/reference-tables.md) | Text | — | Input 1…N | — | — | Inspector |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector; Value/Vector |
 
@@ -22,8 +22,8 @@ Selects one input by trigger or numeric index.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Value / Selected | [Selected type](../../user/en/data-types.md) | Selected input | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Index | [Value](../../user/en/data-types.md) | 0–Steps−1 | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Value / Selected | [Selected type](../../user/en/data-types.md) | Selected input | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
+| Index | [Value](../../user/en/data-types.md#value) | 0–Steps−1 | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

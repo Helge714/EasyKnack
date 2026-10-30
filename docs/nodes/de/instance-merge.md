@@ -9,14 +9,14 @@ Reduziert Instanzbeiträge zu einem gemeinsamen Signal.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Zusammenführung (Combine) | [Editor](../../user/de/reference-tables.md) | Summe, Mittelwert, Gewichteter Mittelwert | — | Mittelwert | — | — | Immer |
-| Instanzsignal (Per-instance signal) | [Wert](../../user/de/data-types.md) | ±∞ | ±∞ | 0 | — | [Auto](../../user/de/rates.md) | Immer |
-| Instanzgewicht (Per-instance weight) | [Wert](../../user/de/data-types.md) | 0–1 | 0–∞ | 1 | — | [Auto](../../user/de/rates.md) | Immer |
+| Instanzsignal (Per-instance signal) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Instanzgewicht (Per-instance weight) | [Wert](../../user/de/data-types.md#value) | 0–1 | 0–∞ | 1 | — | [Auto](../../user/de/rates.md#auto) | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Zusammengeführt (Combined) | [Audio](../../user/de/data-types.md) | ±∞ | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Zusammengeführt (Combined) | [Audio](../../user/de/data-types.md#audio) | ±∞ | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

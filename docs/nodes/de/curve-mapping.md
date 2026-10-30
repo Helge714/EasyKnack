@@ -10,18 +10,18 @@ Bildet Werte durch eine editierbare Kurve ab.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Kurve (Curve) | [Editor](../../user/de/reference-tables.md) | Kurveneditor | — | Identität | — | — | Immer |
 | Außerhalb des Bereichs (Outside range) | [Editor](../../user/de/reference-tables.md) | Begrenzen, Linear fortsetzen | — | Begrenzen | — | — | Immer |
-| Rate (Rate) | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
-| Wert (Value) | [Wert](../../user/de/data-types.md) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md) | Immer |
-| Eingangsminimum (Input min) | [Wert](../../user/de/data-types.md) | ±1 000 000 | — | 0 | — | — | Immer |
-| Eingangsmaximum (Input max) | [Wert](../../user/de/data-types.md) | ±1 000 000 | — | 1 | — | — | Immer |
-| Ausgangsminimum (Output min) | [Wert](../../user/de/data-types.md) | ±1 000 000 | — | 0 | — | — | Immer |
-| Ausgangsmaximum (Output max) | [Wert](../../user/de/data-types.md) | ±1 000 000 | — | 1 | — | — | Immer |
+| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
+| Wert (Value) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Eingangsminimum (Input min) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 0 | — | — | Immer |
+| Eingangsmaximum (Input max) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 1 | — | — | Immer |
+| Ausgangsminimum (Output min) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 0 | — | — | Immer |
+| Ausgangsmaximum (Output max) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 1 | — | — | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Wert](../../user/de/data-types.md) | ±1e12 | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | ±1e12 | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

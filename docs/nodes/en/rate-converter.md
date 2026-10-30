@@ -8,7 +8,7 @@ Converts numeric signals between Audio and Control.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| In | [Value](../../user/en/data-types.md) | ±∞ | ±∞ | 0 | — | [Audio](../../user/en/rates.md) | Always |
+| In | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Audio](../../user/en/rates.md#audio) | Always |
 | Output Rate | [Editor](../../user/en/reference-tables.md) | Control, Audio | — | Control | — | — | Always |
 | Reduction | [Editor](../../user/en/reference-tables.md) | First, Last, Mean, RMS, Minimum, Maximum, Absolute peak | — | First | — | — | Control output |
 
@@ -16,7 +16,7 @@ Converts numeric signals between Audio and Control.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md) | ±∞ | [Audio / Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Value](../../user/en/data-types.md#value) | ±∞ | [Audio / Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

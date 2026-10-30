@@ -8,7 +8,7 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Öffentliche Eingänge (Public inputs) | [Schnittstellenabhängig](../../user/de/data-types.md) | Schnittstellenabhängig | Schnittstellenabhängig | Schnittstellenabhängig | — | [Auto](../../user/de/rates.md) | Immer |
+| Öffentliche Eingänge (Public inputs) | [Schnittstellenabhängig](../../user/de/data-types.md) | Schnittstellenabhängig | Schnittstellenabhängig | Schnittstellenabhängig | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Allgemein (General) | [Editor](../../user/de/reference-tables.md) | Name, Kategorie, Typ, Routing, Bake | — | Gruppendefiniert | — | — | Inspektor |
 | IO | [Editor](../../user/de/reference-tables.md) | Ports, Editoren, Einheiten, Standardwerte, Raten | — | Gruppendefiniert | — | — | Inspektor |
 | Editoren (Editors) | [Editor](../../user/de/reference-tables.md) | Editorvorlagen des Dokuments | — | — | — | — | Inspektor |
@@ -17,7 +17,7 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Öffentliche Ausgänge (Public outputs) | [Schnittstellenabhängig](../../user/de/data-types.md) | Schnittstellenabhängig | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Öffentliche Ausgänge (Public outputs) | [Schnittstellenabhängig](../../user/de/data-types.md) | Schnittstellenabhängig | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

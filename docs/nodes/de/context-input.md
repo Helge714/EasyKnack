@@ -14,10 +14,10 @@ Stellt Kanal-, Zeit- und Blockkontext bereit.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Kanal (Channel) | [Wert](../../user/de/data-types.md) | ±1 | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Sample-Rate (Sample Rate) | [Wert](../../user/de/data-types.md) | 48 000 Hz | [Control](../../user/de/rates.md) | Mono |
-| Blockgröße (Block Size) | [Wert](../../user/de/data-types.md) | 1–256 smp | [Control](../../user/de/rates.md) | Mono |
-| Zeit (Time) | [Wert](../../user/de/data-types.md) | 0–∞ s | [Audio](../../user/de/rates.md) | Mono |
+| Kanal (Channel) | [Wert](../../user/de/data-types.md#value) | ±1 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Sample-Rate (Sample Rate) | [Wert](../../user/de/data-types.md#value) | 48 000 Hz | [Control](../../user/de/rates.md#control) | Mono |
+| Blockgröße (Block Size) | [Wert](../../user/de/data-types.md#value) | 1–256 smp | [Control](../../user/de/rates.md#control) | Mono |
+| Zeit (Time) | [Wert](../../user/de/data-types.md#value) | 0–∞ s | [Audio](../../user/de/rates.md#audio) | Mono |
 
 ## Verhalten
 

@@ -2,6 +2,11 @@
 
 [User guide](README.md)
 
+The complete per-node references are available in
+[English](../nodes/en/index.md) and [German](../nodes/de/index.md).
+They include inspector settings, ranges, units, rates, Mute, insertion and
+sample-feedback support. This page remains a compact overview.
+
 Use the Add Node search to find a node by the English names below. The palette is
 context-sensitive: some nodes are available only inside the appropriate group.
 Hover ports and controls for the current range and unit; the Inspector exposes

@@ -8,7 +8,7 @@ Exposes a reusable interface to an internal graph.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Public inputs | [Interface-defined](../../user/en/data-types.md) | Interface-defined | Interface-defined | Interface-defined | — | [Auto](../../user/en/rates.md) | Always |
+| Public inputs | [Interface-defined](../../user/en/data-types.md) | Interface-defined | Interface-defined | Interface-defined | — | [Auto](../../user/en/rates.md#auto) | Always |
 | General | [Editor](../../user/en/reference-tables.md) | Name, category, type, routing, Bake | — | Group-defined | — | — | Inspector |
 | IO | [Editor](../../user/en/reference-tables.md) | Ports, editors, units, defaults, rates | — | Group-defined | — | — | Inspector |
 | Editors | [Editor](../../user/en/reference-tables.md) | Document editor templates | — | — | — | — | Inspector |
@@ -17,7 +17,7 @@ Exposes a reusable interface to an internal graph.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Public outputs | [Interface-defined](../../user/en/data-types.md) | Interface-defined | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Public outputs | [Interface-defined](../../user/en/data-types.md) | Interface-defined | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

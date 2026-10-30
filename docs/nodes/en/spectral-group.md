@@ -8,8 +8,8 @@ Processes each bin of an incoming spectrum.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Spectrum | [Spectrum resource](../../user/en/data-types.md) | — | — | — | — | [Control](../../user/en/rates.md) | Always |
-| Frame inputs | [Value](../../user/en/data-types.md) | Interface-defined | Audio / Control / Trigger | Interface-defined | — | [Auto](../../user/en/rates.md) | Always |
+| Spectrum | [Spectrum resource](../../user/en/data-types.md#spectrum) | — | — | — | — | [Control](../../user/en/rates.md#control) | Always |
+| Frame inputs | [Value](../../user/en/data-types.md#value) | Interface-defined | Audio / Control / Trigger | Interface-defined | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Skip empty bins | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Inspector |
 | Parallel bins | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Inspector |
 | General / IO / Editors | [Editor](../../user/en/reference-tables.md) | Group-defined | — | — | — | — | Inspector |
@@ -18,7 +18,7 @@ Processes each bin of an incoming spectrum.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Spectrum resource](../../user/en/data-types.md) | — | [Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Spectrum resource](../../user/en/data-types.md#spectrum) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

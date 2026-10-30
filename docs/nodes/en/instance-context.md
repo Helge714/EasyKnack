@@ -14,10 +14,10 @@ Supplies the current instance index and count.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Index | [Value](../../user/en/data-types.md) | 0–Count−1 | [Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Count | [Value](../../user/en/data-types.md) | 0–Maximum | [Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Position | [Value](../../user/en/data-types.md) | 0–1 | [Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Seed | [Value](../../user/en/data-types.md) | 0–16 777 215 | [Control](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Index | [Value](../../user/en/data-types.md#value) | 0–Count−1 | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
+| Count | [Value](../../user/en/data-types.md#value) | 0–Maximum | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
+| Position | [Value](../../user/en/data-types.md#value) | 0–1 | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
+| Seed | [Value](../../user/en/data-types.md#value) | 0–16 777 215 | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

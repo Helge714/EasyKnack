@@ -10,15 +10,15 @@ Wendet eine wählbare mathematische Operation an.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Operation | [Editor](../../user/de/reference-tables.md) | Add, Subtract, Multiply, Divide, Power, Remainder, Modulo, Minimum, Maximum, Floor, Ceil, Round, Fract, Sqrt, Root, Exp, Log, Log Base, Absolute, Negate | — | Multiply | — | — | Immer |
 | Begrenzen ±1 (Clamp ±1) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Immer |
-| Rate (Rate) | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
-| A | [Wert](../../user/de/data-types.md) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md) | Immer |
-| B | [Wert](../../user/de/data-types.md) | ±1 000 000 | ±∞ | 1 | — | [Auto](../../user/de/rates.md) | Nur binäre Operation |
+| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
+| A | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| B | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | ±∞ | 1 | — | [Auto](../../user/de/rates.md#auto) | Nur binäre Operation |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Wert](../../user/de/data-types.md) | ±∞ | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

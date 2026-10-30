@@ -8,15 +8,15 @@ Erzeugt Rauschen mit wählbarer spektraler Färbung und Startwert.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Startwert (Seed) | [Wert](../../user/de/data-types.md) | −1–16 777 215 | −1–16 777 215, gerundet | −1 | — | [Control](../../user/de/rates.md) | Immer |
+| Startwert (Seed) | [Wert](../../user/de/data-types.md#value) | −1–16 777 215 | −1–16 777 215, gerundet | −1 | — | [Control](../../user/de/rates.md#control) | Immer |
 | Rauschen (Noise) | [Editor](../../user/de/reference-tables.md) | Weiß, Rosa, Braun, Blau | — | Weiß | — | — | Immer |
-| Rate (Rate) | [Editor](../../user/de/reference-tables.md) | Audio, Control | — | Audio | — | — | Inspektor |
+| Rate | [Editor](../../user/de/reference-tables.md) | Audio, Control | — | Audio | — | — | Inspektor |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Audio](../../user/de/data-types.md) | ±1 | [Audio / Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Audio](../../user/de/data-types.md#audio) | ±1 | [Audio / Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

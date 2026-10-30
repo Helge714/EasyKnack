@@ -10,14 +10,14 @@ Converts a number between compatible units.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | From | [Editor](../../user/en/reference-tables.md) | Supported units | — | Factor | — | — | Always |
 | To | [Editor](../../user/en/reference-tables.md) | Compatible target units | — | Percent | — | — | Always |
-| Value | [Value](../../user/en/data-types.md) | ±∞ | ±∞ | 0 | Selected source unit | [Auto](../../user/en/rates.md) | Always |
+| Value | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | Selected source unit | [Auto](../../user/en/rates.md#auto) | Always |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md) | ±1e30 | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Value](../../user/en/data-types.md#value) | ±1e30 | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

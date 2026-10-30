@@ -8,20 +8,20 @@ Exposes the current bin of a Spectral Group.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Spectrum | [Spectrum resource](../../user/en/data-types.md) | — | — | — | — | [Control](../../user/en/rates.md) | Always |
+| Spectrum | [Spectrum resource](../../user/en/data-types.md#spectrum) | — | — | — | — | [Control](../../user/en/rates.md#control) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Real | [Value](../../user/en/data-types.md) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Imaginary | [Value](../../user/en/data-types.md) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Magnitude | [Value](../../user/en/data-types.md) | 0–∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Phase | [Value](../../user/en/data-types.md) | ±π rad | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Frequency | [Value](../../user/en/data-types.md) | 0–fs/2 Hz | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Bin index | [Value](../../user/en/data-types.md) | 0–N/2 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Position | [Value](../../user/en/data-types.md) | 0–1 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
-| Frame time | [Value](../../user/en/data-types.md) | ±∞ s | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Real | [Value](../../user/en/data-types.md#value) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Imaginary | [Value](../../user/en/data-types.md#value) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Magnitude | [Value](../../user/en/data-types.md#value) | 0–∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Phase | [Value](../../user/en/data-types.md#value) | ±π rad | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Frequency | [Value](../../user/en/data-types.md#value) | 0–fs/2 Hz | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Bin index | [Value](../../user/en/data-types.md#value) | 0–N/2 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Position | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Frame time | [Value](../../user/en/data-types.md#value) | ±∞ s | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

@@ -8,16 +8,16 @@ Misst vergangene Zeit und Triggerabstände.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Trigger | [Trigger](../../user/de/data-types.md) | Button | — | — | — | [Trigger](../../user/de/rates.md) | Immer |
-| Glättung (Smoothing) | [Wert](../../user/de/data-types.md) | 0–1 | 0–1 | 0 | — | [Auto](../../user/de/rates.md) | Immer |
+| Trigger | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
+| Glättung (Smoothing) | [Wert](../../user/de/data-types.md#value) | 0–1 | 0–1 | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Einheit (Unit) | [Editor](../../user/de/reference-tables.md) | s, ms, smp | — | s | — | — | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Vergangen (Elapsed) | [Wert](../../user/de/data-types.md) | 0–∞, gewählte Einheit | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Intervall (Interval) | [Wert](../../user/de/data-types.md) | 0–∞, gewählte Einheit | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Vergangen (Elapsed) | [Wert](../../user/de/data-types.md#value) | 0–∞, gewählte Einheit | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Intervall (Interval) | [Wert](../../user/de/data-types.md#value) | 0–∞, gewählte Einheit | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

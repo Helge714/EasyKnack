@@ -2,6 +2,215 @@
   "schema": 1,
   "nodes": [
     {
+      "id": "easyknack.analysis.analysisaverage",
+      "slug": "analysis-average",
+      "category": "analysis",
+      "title": {
+        "en": "Analysis Average",
+        "de": "Analysemittelung"
+      },
+      "source": "AnalysisAverageNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.spectrumviewer",
+      "slug": "analysis-viewer",
+      "category": "analysis",
+      "title": {
+        "en": "Analysis Viewer",
+        "de": "Analyseanzeige"
+      },
+      "source": "SpectrumViewerNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.correlation",
+      "slug": "autocorrelation",
+      "category": "analysis",
+      "title": {
+        "en": "Autocorrelation",
+        "de": "Autokorrelation"
+      },
+      "source": "SpectrumCorrelationNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.correlationfeatures",
+      "slug": "correlation-features",
+      "category": "analysis",
+      "title": {
+        "en": "Correlation Features",
+        "de": "Korrelationsmerkmale"
+      },
+      "source": "CorrelationFeaturesNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.level",
+      "slug": "level-detector",
+      "category": "analysis",
+      "title": {
+        "en": "Level Detector",
+        "de": "Pegeldetektor"
+      },
+      "source": "LevelAnalysisNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.recorder",
+      "slug": "measurement-recorder",
+      "category": "analysis",
+      "title": {
+        "en": "Measurement Recorder",
+        "de": "Messwertrekorder"
+      },
+      "source": "MeasurementRecorderNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.oscilloscope",
+      "slug": "oscilloscope",
+      "category": "analysis",
+      "title": {
+        "en": "Oscilloscope",
+        "de": "Oszilloskop"
+      },
+      "source": "OscilloscopeNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.pitchdetection",
+      "slug": "pitch-detection",
+      "category": "analysis",
+      "title": {
+        "en": "Pitch Detection",
+        "de": "Tonhöhenerkennung"
+      },
+      "source": "PitchDetectionNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.pitchhold",
+      "slug": "pitch-hold",
+      "category": "analysis",
+      "title": {
+        "en": "Pitch Hold",
+        "de": "Tonhöhe halten"
+      },
+      "source": "PitchHoldNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.pitchmonitor",
+      "slug": "pitch-monitor",
+      "category": "analysis",
+      "title": {
+        "en": "Pitch Monitor",
+        "de": "Tonhöhenmonitor"
+      },
+      "source": "PitchMonitorNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.spectralfeatures",
+      "slug": "spectral-features",
+      "category": "analysis",
+      "title": {
+        "en": "Spectral Features",
+        "de": "Spektrale Merkmale"
+      },
+      "source": "SpectralFeaturesNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.spectrumstatistics",
+      "slug": "spectrum-statistics",
+      "category": "analysis",
+      "title": {
+        "en": "Spectrum Statistics",
+        "de": "Spektralstatistik"
+      },
+      "source": "SpectrumStatisticsNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.valueaverage",
+      "slug": "value-average",
+      "category": "analysis",
+      "title": {
+        "en": "Value Average",
+        "de": "Wertemittelung"
+      },
+      "source": "ValueAverageNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.valueviewer",
+      "slug": "value-viewer",
+      "category": "analysis",
+      "title": {
+        "en": "Value Viewer",
+        "de": "Werteanzeige"
+      },
+      "source": "ValueViewerNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.waveform.viewer",
+      "slug": "wavetable-viewer",
+      "category": "analysis",
+      "title": {
+        "en": "Wavetable Viewer",
+        "de": "Wavetable-Anzeige"
+      },
+      "source": "WavetableViewerNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.resource.positionreader",
+      "slug": "buffer-reader-position",
+      "category": "buffer",
+      "title": {
+        "en": "Buffer Reader (Position)",
+        "de": "Buffer-Reader (Position)"
+      },
+      "source": "PositionReaderNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.resource.historyreader",
+      "slug": "buffer-reader-speed",
+      "category": "buffer",
+      "title": {
+        "en": "Buffer Reader (Speed)",
+        "de": "Buffer-Reader (Geschwindigkeit)"
+      },
+      "source": "HistoryReaderNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.resource.filebuffer",
+      "slug": "file-buffer",
+      "category": "buffer",
+      "title": {
+        "en": "File Buffer",
+        "de": "Dateibuffer"
+      },
+      "source": "FileBufferNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.resource.history",
+      "slug": "recording-buffer",
+      "category": "buffer",
+      "title": {
+        "en": "Recording Buffer",
+        "de": "Aufnahmebuffer"
+      },
+      "source": "HistoryBufferNode.java",
+      "kind": "node"
+    },
+    {
       "id": "easyknack.audio.bitcrusher",
       "slug": "bitcrusher",
       "category": "effect",
@@ -9,7 +218,8 @@
         "en": "Bitcrusher",
         "de": "Bitcrusher"
       },
-      "source": "BitcrusherNode.java"
+      "source": "BitcrusherNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.delay",
@@ -19,7 +229,8 @@
         "en": "Delay",
         "de": "Verzögerung"
       },
-      "source": "DelayNode.java"
+      "source": "DelayNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.filter",
@@ -29,7 +240,8 @@
         "en": "Filter",
         "de": "Filter"
       },
-      "source": "FilterNode.java"
+      "source": "FilterNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.additive",
@@ -39,7 +251,8 @@
         "en": "Additive Oscillator",
         "de": "Additiver Oszillator"
       },
-      "source": "AdditiveOscillatorNode.java"
+      "source": "AdditiveOscillatorNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.clock",
@@ -49,7 +262,8 @@
         "en": "Clock",
         "de": "Taktgeber"
       },
-      "source": "ClockNode.java"
+      "source": "ClockNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.digitalnoise",
@@ -59,7 +273,8 @@
         "en": "Digital Noise",
         "de": "Digital Noise"
       },
-      "source": "DigitalNoiseNode.java"
+      "source": "DigitalNoiseNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.envelope",
@@ -69,7 +284,8 @@
         "en": "Envelope",
         "de": "Hüllkurve"
       },
-      "source": "EnvelopeNode.java"
+      "source": "EnvelopeNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.noise",
@@ -79,7 +295,8 @@
         "en": "Noise",
         "de": "Rauschen"
       },
-      "source": "NoiseNode.java"
+      "source": "NoiseNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.oscillator",
@@ -89,7 +306,8 @@
         "en": "Oscillator",
         "de": "Oszillator"
       },
-      "source": "OscillatorNode.java"
+      "source": "OscillatorNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.waveform",
@@ -99,7 +317,8 @@
         "en": "Waveform",
         "de": "Wellenform"
       },
-      "source": "WaveformNode.java"
+      "source": "WaveformNode.java",
+      "kind": "node"
     },
     {
       "id": "group:formula",
@@ -109,7 +328,8 @@
         "en": "Formula Group",
         "de": "Formelgruppe"
       },
-      "source": "ui/FormulaGroups.java"
+      "source": "ui/FormulaGroups.java",
+      "kind": "group"
     },
     {
       "id": "group:instance",
@@ -119,7 +339,8 @@
         "en": "Instance Group",
         "de": "Instanzgruppe"
       },
-      "source": "ui/MultipleGroups.java"
+      "source": "ui/MultipleGroups.java",
+      "kind": "group"
     },
     {
       "id": "group:ordinary",
@@ -129,7 +350,8 @@
         "en": "Node Group",
         "de": "Nodegruppe"
       },
-      "source": "ui/GroupRouting.java"
+      "source": "ui/GroupRouting.java",
+      "kind": "group"
     },
     {
       "id": "group:spectral",
@@ -139,7 +361,30 @@
         "en": "Spectral Group",
         "de": "Spektralgruppe"
       },
-      "source": "ui/SpectralGroups.java"
+      "source": "ui/SpectralGroups.java",
+      "kind": "group"
+    },
+    {
+      "id": "easyknack.audio.file",
+      "slug": "audio-file-player",
+      "category": "input",
+      "title": {
+        "en": "Audio File Player",
+        "de": "Audiodatei-Player"
+      },
+      "source": "AudioFileNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.audio.input",
+      "slug": "audio-input",
+      "category": "input",
+      "title": {
+        "en": "Audio Input",
+        "de": "Audio-Eingang"
+      },
+      "source": "InputNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.context.input",
@@ -149,7 +394,19 @@
         "en": "Context Input",
         "de": "Kontexteingang"
       },
-      "source": "ContextInputNode.java"
+      "source": "ContextInputNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.midi.input",
+      "slug": "midi-input",
+      "category": "input",
+      "title": {
+        "en": "MIDI Input",
+        "de": "MIDI-Eingang"
+      },
+      "source": "MidiInputNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.input.trigger",
@@ -159,7 +416,8 @@
         "en": "Trigger Input",
         "de": "Triggereingang"
       },
-      "source": "TriggerInputNode.java"
+      "source": "TriggerInputNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.value",
@@ -169,7 +427,19 @@
         "en": "Value Input",
         "de": "Werteingang"
       },
-      "source": "ValueNode.java"
+      "source": "ValueNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.value",
+      "slug": "vector-input",
+      "category": "input",
+      "title": {
+        "en": "Vector Input",
+        "de": "Vektoreingang"
+      },
+      "source": "VectorNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.clamp",
@@ -179,7 +449,8 @@
         "en": "Clamp",
         "de": "Begrenzung"
       },
-      "source": "ClampNode.java"
+      "source": "ClampNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.comparator",
@@ -189,7 +460,8 @@
         "en": "Comparator",
         "de": "Vergleicher"
       },
-      "source": "ComparatorNode.java"
+      "source": "ComparatorNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.curve",
@@ -199,7 +471,8 @@
         "en": "Curve Mapping",
         "de": "Kurvenabbildung"
       },
-      "source": "CurveNode.java"
+      "source": "CurveNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.maprange",
@@ -209,7 +482,8 @@
         "en": "Map Range",
         "de": "Bereichsabbildung"
       },
-      "source": "MapRangeNode.java"
+      "source": "MapRangeNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.math",
@@ -219,7 +493,8 @@
         "en": "Math",
         "de": "Mathematik"
       },
-      "source": "MathNode.java"
+      "source": "MathNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.converter.rate",
@@ -229,7 +504,8 @@
         "en": "Rate Converter",
         "de": "Ratenkonverter"
       },
-      "source": "RateConverterNode.java"
+      "source": "RateConverterNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.samplehold",
@@ -239,7 +515,8 @@
         "en": "Sample & Hold",
         "de": "Abtasten und Halten"
       },
-      "source": "SampleHoldNode.java"
+      "source": "SampleHoldNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.music.scalequantizer",
@@ -249,7 +526,8 @@
         "en": "Scale Quantizer",
         "de": "Skalenquantisierer"
       },
-      "source": "ScaleQuantizerNode.java"
+      "source": "ScaleQuantizerNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.slew",
@@ -259,7 +537,8 @@
         "en": "Smoothing",
         "de": "Glättung"
       },
-      "source": "SlewNode.java"
+      "source": "SlewNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.math.unitconverter",
@@ -269,7 +548,63 @@
         "en": "Unit Converter",
         "de": "Einheitenkonverter"
       },
-      "source": "UnitConverterNode.java"
+      "source": "UnitConverterNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.midi.cc",
+      "slug": "midi-cc",
+      "category": "midi",
+      "title": {
+        "en": "MIDI CC",
+        "de": "MIDI CC"
+      },
+      "source": "MidiCCNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.midi.delay",
+      "slug": "midi-delay",
+      "category": "midi",
+      "title": {
+        "en": "MIDI Delay",
+        "de": "MIDI-Verzögerung"
+      },
+      "source": "MidiDelayNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.midi.note",
+      "slug": "midi-note",
+      "category": "midi",
+      "title": {
+        "en": "MIDI Note",
+        "de": "MIDI-Note"
+      },
+      "source": "MidiNoteNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.midi.transpose",
+      "slug": "midi-transpose",
+      "category": "midi",
+      "title": {
+        "en": "MIDI Transpose",
+        "de": "MIDI-Transposition"
+      },
+      "source": "MidiTransposeNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.audio.output",
+      "slug": "audio-output",
+      "category": "output",
+      "title": {
+        "en": "Audio Output",
+        "de": "Audio-Ausgang"
+      },
+      "source": "OutputNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.channelcombine",
@@ -279,7 +614,8 @@
         "en": "Channel Combine",
         "de": "Kanäle verbinden"
       },
-      "source": "ChannelCombineNode.java"
+      "source": "ChannelCombineNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.channelseparate",
@@ -289,7 +625,8 @@
         "en": "Channel Separate",
         "de": "Kanäle trennen"
       },
-      "source": "ChannelSeparateNode.java"
+      "source": "ChannelSeparateNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.gain",
@@ -299,7 +636,8 @@
         "en": "Gain",
         "de": "Verstärkung"
       },
-      "source": "GainNode.java"
+      "source": "GainNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.multiple.context",
@@ -309,7 +647,8 @@
         "en": "Instance Context",
         "de": "Instanzkontext"
       },
-      "source": "InstanceContextNode.java"
+      "source": "InstanceContextNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.multiple.combine",
@@ -319,7 +658,8 @@
         "en": "Instance Merge",
         "de": "Instanzenzusammenführung"
       },
-      "source": "InstanceCombineNode.java"
+      "source": "InstanceCombineNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.mix",
@@ -329,7 +669,8 @@
         "en": "Mix",
         "de": "Mischung"
       },
-      "source": "MixNode.java"
+      "source": "MixNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.pan",
@@ -339,7 +680,19 @@
         "en": "Pan",
         "de": "Panorama"
       },
-      "source": "PanNode.java"
+      "source": "PanNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.spatial.receiver",
+      "slug": "spatial-receiver",
+      "category": "routing",
+      "title": {
+        "en": "Spatial Receiver",
+        "de": "Räumlicher Empfänger"
+      },
+      "source": "SpatialReceiverNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.routing.stepswitch",
@@ -349,7 +702,8 @@
         "en": "Step Switch",
         "de": "Schrittumschalter"
       },
-      "source": "StepSwitchNode.java"
+      "source": "StepSwitchNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.voicemerge",
@@ -359,7 +713,8 @@
         "en": "Voice Merge",
         "de": "Stimmenzusammenführung"
       },
-      "source": "VoiceMergeNode.java"
+      "source": "VoiceMergeNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.spectral.bincontext",
@@ -369,7 +724,8 @@
         "en": "Bin Context",
         "de": "Binkontext"
       },
-      "source": "BinContextNode.java"
+      "source": "BinContextNode.java",
+      "kind": "context"
     },
     {
       "id": "easyknack.spectral.bindiscard",
@@ -379,7 +735,8 @@
         "en": "Bin Discard",
         "de": "Bin verwerfen"
       },
-      "source": "BinDiscardNode.java"
+      "source": "BinDiscardNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.spectral.binoutput",
@@ -389,7 +746,8 @@
         "en": "Bin Output",
         "de": "Binausgang"
       },
-      "source": "BinOutputNode.java"
+      "source": "BinOutputNode.java",
+      "kind": "context"
     },
     {
       "id": "easyknack.spectral.binrandom",
@@ -399,7 +757,8 @@
         "en": "Bin Random",
         "de": "Binzufall"
       },
-      "source": "BinRandomNode.java"
+      "source": "BinRandomNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.spectral.binread",
@@ -409,7 +768,8 @@
         "en": "Bin Reader",
         "de": "Binleser"
       },
-      "source": "BinReadNode.java"
+      "source": "BinReadNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.spectral.binhold",
@@ -419,7 +779,8 @@
         "en": "Bin Sample & Hold",
         "de": "Bin abtasten und halten"
       },
-      "source": "BinHoldNode.java"
+      "source": "BinHoldNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.spectral.binmemory",
@@ -429,7 +790,19 @@
         "en": "Bin Smoothing",
         "de": "Binglättung"
       },
-      "source": "BinMemoryNode.java"
+      "source": "BinMemoryNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.analysis.spectrum",
+      "slug": "fft",
+      "category": "spectrum",
+      "title": {
+        "en": "FFT",
+        "de": "FFT"
+      },
+      "source": "SpectrumNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.spectral.ifft",
@@ -439,7 +812,52 @@
         "en": "IFFT",
         "de": "Inverse FFT"
       },
-      "source": "IFFTNode.java"
+      "source": "IFFTNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.spectral.blur",
+      "slug": "spectrum-blur",
+      "category": "spectrum",
+      "title": {
+        "en": "Spectrum Blur",
+        "de": "Spektrum weichzeichnen"
+      },
+      "source": "SpectrumBlurNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.spectral.prune",
+      "slug": "spectrum-prune",
+      "category": "spectrum",
+      "title": {
+        "en": "Spectrum Prune",
+        "de": "Spektrum ausdünnen"
+      },
+      "source": "SpectrumPruneNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.spectral.shift",
+      "slug": "spectrum-shift",
+      "category": "spectrum",
+      "title": {
+        "en": "Spectrum Shift",
+        "de": "Spektrumverschiebung"
+      },
+      "source": "SpectrumShiftNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.spectrum.waveform",
+      "slug": "spectrum-to-waveform",
+      "category": "spectrum",
+      "title": {
+        "en": "Spectrum to Waveform",
+        "de": "Spektrum zu Wellenform"
+      },
+      "source": "SpectrumWaveformNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.audio.edgedetector",
@@ -449,7 +867,8 @@
         "en": "Threshold Trigger",
         "de": "Schwellwerttrigger"
       },
-      "source": "EdgeDetectorNode.java"
+      "source": "EdgeDetectorNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.triggercounter",
@@ -459,7 +878,8 @@
         "en": "Trigger Counter",
         "de": "Triggerzähler"
       },
-      "source": "TriggerCounterNode.java"
+      "source": "TriggerCounterNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.triggerdelay",
@@ -469,7 +889,8 @@
         "en": "Trigger Delay",
         "de": "Triggerverzögerung"
       },
-      "source": "TriggerDelayNode.java"
+      "source": "TriggerDelayNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.triggerdivider",
@@ -479,7 +900,8 @@
         "en": "Trigger Divider",
         "de": "Triggerteiler"
       },
-      "source": "TriggerDividerNode.java"
+      "source": "TriggerDividerNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.triggerfilter",
@@ -489,7 +911,8 @@
         "en": "Trigger Filter",
         "de": "Triggerfilter"
       },
-      "source": "TriggerFilterNode.java"
+      "source": "TriggerFilterNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.triggermerge",
@@ -499,7 +922,8 @@
         "en": "Trigger Merge",
         "de": "Triggerzusammenführung"
       },
-      "source": "TriggerMergeNode.java"
+      "source": "TriggerMergeNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.modulation.triggertimer",
@@ -509,7 +933,8 @@
         "en": "Trigger Timer",
         "de": "Triggerzeitmesser"
       },
-      "source": "TriggerTimerNode.java"
+      "source": "TriggerTimerNode.java",
+      "kind": "node"
     },
     {
       "id": "easyknack.converter.triggerpulse",
@@ -519,8 +944,190 @@
         "en": "Trigger to Pulse",
         "de": "Trigger zu Impuls"
       },
-      "source": "TriggerPulseNode.java"
+      "source": "TriggerPulseNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.combine",
+      "slug": "vector-combine",
+      "category": "vector",
+      "title": {
+        "en": "Vector Combine",
+        "de": "Vektor zusammensetzen"
+      },
+      "source": "VectorCombineNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.distance",
+      "slug": "vector-distance",
+      "category": "vector",
+      "title": {
+        "en": "Vector Distance",
+        "de": "Vektorabstand"
+      },
+      "source": "VectorDistanceNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.dot",
+      "slug": "vector-dot-product",
+      "category": "vector",
+      "title": {
+        "en": "Vector Dot Product",
+        "de": "Skalarprodukt"
+      },
+      "source": "VectorDotNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.length",
+      "slug": "vector-length",
+      "category": "vector",
+      "title": {
+        "en": "Vector Length",
+        "de": "Vektorlänge"
+      },
+      "source": "VectorLengthNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.math",
+      "slug": "vector-math",
+      "category": "vector",
+      "title": {
+        "en": "Vector Math",
+        "de": "Vektormathematik"
+      },
+      "source": "VectorMathNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.rotate",
+      "slug": "vector-rotate",
+      "category": "vector",
+      "title": {
+        "en": "Vector Rotate",
+        "de": "Vektor drehen"
+      },
+      "source": "VectorRotateNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.scale",
+      "slug": "vector-scale",
+      "category": "vector",
+      "title": {
+        "en": "Vector Scale",
+        "de": "Vektor skalieren"
+      },
+      "source": "VectorScaleNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.vector.separate",
+      "slug": "vector-separate",
+      "category": "vector",
+      "title": {
+        "en": "Vector Separate",
+        "de": "Vektor zerlegen"
+      },
+      "source": "VectorSeparateNode.java",
+      "kind": "node"
     }
   ],
-  "excluded": []
+  "excluded": [
+    {
+      "id": "easyknack.analysis.autocorrelation",
+      "reason": "Legacy audio-input autocorrelation; replaced by FFT and Autocorrelation."
+    },
+    {
+      "id": "easyknack.analysis.fft",
+      "reason": "Legacy shared-analysis processor; replaced by FFT."
+    },
+    {
+      "id": "easyknack.analysis.statistics",
+      "reason": "Legacy predecessor of Spectrum Statistics."
+    },
+    {
+      "id": "easyknack.analysis.view",
+      "reason": "Legacy analysis presentation adapter."
+    },
+    {
+      "id": "easyknack.analysis.viewer",
+      "reason": "Legacy predecessor of Analysis Viewer."
+    },
+    {
+      "id": "easyknack.audio.blockdelay",
+      "reason": "Legacy delay; replaced by Delay."
+    },
+    {
+      "id": "easyknack.audio.legacyvoicemerge",
+      "reason": "Legacy stereo voice merger; replaced by Voice Merge and Pan."
+    },
+    {
+      "id": "easyknack.audio.sampledelay",
+      "reason": "Legacy delay; replaced by Delay."
+    },
+    {
+      "id": "easyknack.formula.kernel",
+      "reason": "Internal compiled Formula Group kernel; documented by formula-group."
+    },
+    {
+      "id": "easyknack.multiple.compiled",
+      "reason": "Internal compiled Instance Group; documented by instance-group."
+    },
+    {
+      "id": "easyknack.multiple.input",
+      "reason": "Internal numeric Instance Group boundary."
+    },
+    {
+      "id": "easyknack.multiple.output",
+      "reason": "Internal numeric Instance Group boundary."
+    },
+    {
+      "id": "easyknack.multiple.spectruminput",
+      "reason": "Internal Spectrum Instance Group boundary."
+    },
+    {
+      "id": "easyknack.multiple.spectrumoutput",
+      "reason": "Internal Spectrum Instance Group boundary."
+    },
+    {
+      "id": "easyknack.multiple.vectorinput",
+      "reason": "Internal Vector Instance Group boundary."
+    },
+    {
+      "id": "easyknack.multiple.waveforminput",
+      "reason": "Internal Wavetable Instance Group boundary."
+    },
+    {
+      "id": "easyknack.spectral.compiled",
+      "reason": "Internal compiled Spectral Group; documented by spectral-group."
+    },
+    {
+      "id": "easyknack.spectral.fft",
+      "reason": "Legacy FFT Stream; replaced by FFT."
+    },
+    {
+      "id": "easyknack.spectral.trigger",
+      "reason": "Internal trigger-to-frame bridge; documented by spectral-group."
+    },
+    {
+      "id": "easyknack.spectral.uniform",
+      "reason": "Internal numeric-to-frame bridge; documented by spectral-group."
+    },
+    {
+      "id": "easyknack.spectrum.relay",
+      "reason": "Internal Spectrum boundary adapter."
+    },
+    {
+      "id": "easyknack.vector.relay",
+      "reason": "Internal Vector boundary adapter."
+    },
+    {
+      "id": "easyknack.waveform.relay",
+      "reason": "Internal Wavetable boundary adapter."
+    }
+  ]
 }

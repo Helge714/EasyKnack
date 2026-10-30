@@ -10,14 +10,14 @@ Rechnet eine Zahl zwischen kompatiblen Einheiten um.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Von (From) | [Editor](../../user/de/reference-tables.md) | Unterstützte Einheiten | — | Faktor | — | — | Immer |
 | Nach (To) | [Editor](../../user/de/reference-tables.md) | Kompatible Zieleinheiten | — | Prozent | — | — | Immer |
-| Wert (Value) | [Wert](../../user/de/data-types.md) | ±∞ | ±∞ | 0 | Gewählte Quelleinheit | [Auto](../../user/de/rates.md) | Immer |
-| Rate (Rate) | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
+| Wert (Value) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 0 | Gewählte Quelleinheit | [Auto](../../user/de/rates.md#auto) | Immer |
+| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Wert](../../user/de/data-types.md) | ±1e30 | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | ±1e30 | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

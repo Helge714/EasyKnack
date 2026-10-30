@@ -14,7 +14,7 @@ Creates an editable periodic Wavetable resource.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Waveform | [Wavetable resource](../../user/en/data-types.md) | — | [Control](../../user/en/rates.md) | — |
+| Waveform | [Wavetable resource](../../user/en/data-types.md#wavetable) | — | [Control](../../user/en/rates.md#control) | — |
 
 ## Behavior
 

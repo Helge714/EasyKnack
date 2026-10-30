@@ -44,11 +44,13 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   Generated output goes to `target/docs/`. Replace legacy pages individually after
   bilingual content and incoming links/packaging have been reviewed.
 
-- [ ] Implement the bilingual, manually authored node-reference work order in
-  [NODE-DOCUMENTATION.md](docs/development/NODE-DOCUMENTATION.md): built-in pages,
-  production Markdown/HTML rendering and portable offline output, context-menu lookup by stable
-  node ID, plugin documentation and coverage/link checks. Use the latest additive
-  oscillator pilot; do not generate technical table cells from definitions.
+- [x] Write the bilingual, manual built-in references following
+  [NODE-DOCUMENTATION.md](docs/development/NODE-DOCUMENTATION.md), including
+  inspector settings, groups and spectral context nodes. Validate catalog,
+  paired pages, section structure, index coverage, links and anchors.
+- [ ] Integrate production Markdown/HTML rendering and portable offline output,
+  context-menu lookup by stable node ID, and plugin documentation. Retain manual
+  technical tables; migrate remaining legacy guide links and packaging individually.
 
 - [x] Audit the optional native contract sweep: Frame Trigger requires spectral
   frame context. Validate all temporal contracts separately, reject bin-only nodes

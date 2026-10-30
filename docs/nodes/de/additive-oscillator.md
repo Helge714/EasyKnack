@@ -13,7 +13,7 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 | Abfall (Falloff) | [Wert](../../user/de/data-types.md#value) | 0–4 | 0–4 | 1 | — | [Auto](../../user/de/rates.md#auto) | Teiltöne > 1 oder Teiltöne verbunden |
 | Streckung (Stretch) | [Wert](../../user/de/data-types.md#value) | 0–4 | 0–4 | 1 | — | [Auto](../../user/de/rates.md#auto) | Teiltöne > 1 oder Teiltöne verbunden |
 | Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0,00001–20.000 Hz | 0–20.000 Hz | 440 Hz | [Hz](../../user/de/units.md#frequency), [kHz](../../user/de/units.md#frequency) | [Auto](../../user/de/rates.md#auto) | Immer |
-| Phase (Phase) | [Wert](../../user/de/data-types.md#value) | 0–1 turn | ±∞ turn | 0 turn | [turn](../../user/de/units.md#angle), [°](../../user/de/units.md#angle), [rad](../../user/de/units.md#angle) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Phase | [Wert](../../user/de/data-types.md#value) | 0–1 turn | ±∞ turn | 0 turn | [turn](../../user/de/units.md#angle), [°](../../user/de/units.md#angle), [rad](../../user/de/units.md#angle) | [Auto](../../user/de/rates.md#auto) | Immer |
 | Zurücksetzen (Reset) | [Trigger](../../user/de/data-types.md#trigger) | — | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
 
 ## Ausgänge

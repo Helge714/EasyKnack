@@ -8,8 +8,8 @@ Verarbeitet jeden Bin eines eingehenden Spektrums.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md) | — | — | — | — | [Control](../../user/de/rates.md) | Immer |
-| Frame-Eingänge (Frame inputs) | [Wert](../../user/de/data-types.md) | Schnittstellenabhängig | Audio / Control / Trigger | Schnittstellenabhängig | — | [Auto](../../user/de/rates.md) | Immer |
+| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
+| Frame-Eingänge (Frame inputs) | [Wert](../../user/de/data-types.md#value) | Schnittstellenabhängig | Audio / Control / Trigger | Schnittstellenabhängig | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Leere Bins überspringen (Skip empty bins) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Inspektor |
 | Parallele Bins (Parallel bins) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | An | — | — | Inspektor |
 | Allgemein / IO / Editoren (General / IO / Editors) | [Editor](../../user/de/reference-tables.md) | Gruppendefiniert | — | — | — | — | Inspektor |
@@ -18,7 +18,7 @@ Verarbeitet jeden Bin eines eingehenden Spektrums.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Spectrum-Ressource](../../user/de/data-types.md) | — | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

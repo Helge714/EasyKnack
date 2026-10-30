@@ -8,20 +8,20 @@ Liest einen indizierten Bin des ursprünglichen Eingangsspektrums.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md) | — | — | — | — | [Control](../../user/de/rates.md) | Immer |
-| Binindex (Bin index) | [Wert](../../user/de/data-types.md) | ±∞ | Randmodusabhängig | 0 | — | [Auto](../../user/de/rates.md) | Immer |
+| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
+| Binindex (Bin index) | [Wert](../../user/de/data-types.md#value) | ±∞ | Randmodusabhängig | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Außerhalb des Spektrums (Outside spectrum) | [Editor](../../user/de/reference-tables.md) | Null, Begrenzen, Wrap | — | Null | — | — | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Realteil (Real) | [Wert](../../user/de/data-types.md) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Imaginärteil (Imaginary) | [Wert](../../user/de/data-types.md) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Betrag (Magnitude) | [Wert](../../user/de/data-types.md) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Phase | [Wert](../../user/de/data-types.md) | ±π rad | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Amplitude | [Wert](../../user/de/data-types.md) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Frequenz (Frequency) | [Wert](../../user/de/data-types.md) | 0–fs/2 Hz | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Realteil (Real) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Imaginärteil (Imaginary) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Betrag (Magnitude) | [Wert](../../user/de/data-types.md#value) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Phase | [Wert](../../user/de/data-types.md#value) | ±π rad | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Amplitude | [Wert](../../user/de/data-types.md#value) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0–fs/2 Hz | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

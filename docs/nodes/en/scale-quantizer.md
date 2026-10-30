@@ -12,16 +12,16 @@ Rounds frequencies to an equal-tempered scale.
 | Root | [Editor](../../user/en/reference-tables.md) | C, C#, D, D#, E, F, F#, G, G#, A, A#, B | — | C | — | — | Always |
 | Scale | [Editor](../../user/en/reference-tables.md) | Chromatic, Major, Minor, Major pentatonic, Minor pentatonic | — | Chromatic | — | — | Always |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
-| Frequency | [Value](../../user/en/data-types.md) | 0–20 000 Hz | Positive Hz | 440 Hz | Hz, kHz | [Auto](../../user/en/rates.md) | Always |
-| Fixed target | [Value](../../user/en/data-types.md) | 1–20 000 Hz | Positive Hz | 440 Hz | Hz, kHz | [Auto](../../user/en/rates.md) | Always |
-| A4 tuning | [Value](../../user/en/data-types.md) | 400–480 Hz | — | 440 Hz | Hz, kHz | — | Inspector |
-| Hysteresis | [Value](../../user/en/data-types.md) | 0–12 st | 0–12 st | 0.1 st | st, cent | [Auto](../../user/en/rates.md) | Always |
+| Frequency | [Value](../../user/en/data-types.md#value) | 0–20 000 Hz | Positive Hz | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | [Auto](../../user/en/rates.md#auto) | Always |
+| Fixed target | [Value](../../user/en/data-types.md#value) | 1–20 000 Hz | Positive Hz | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | [Auto](../../user/en/rates.md#auto) | Always |
+| A4 tuning | [Value](../../user/en/data-types.md#value) | 400–480 Hz | — | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | — | Inspector |
+| Hysteresis | [Value](../../user/en/data-types.md#value) | 0–12 st | 0–12 st | 0.1 st | [st](../../user/en/units.md), [cent](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
 
 ## Outputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Target | [Value](../../user/en/data-types.md) | 0–∞ Hz | [Auto](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Target | [Value](../../user/en/data-types.md#value) | 0–∞ Hz | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

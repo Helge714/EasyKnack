@@ -9,14 +9,14 @@ Schreibt einen komplexen Spectrum-Ausgang aus Binwerten.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Komponenten (Components) | [Editor](../../user/de/reference-tables.md) | Real / Imaginär, Betrag / Phase | — | Real / Imaginär | — | — | Immer |
-| Realteil / Betrag (Real / Magnitude) | [Wert](../../user/de/data-types.md) | ±∞ | ±∞; polarer Betrag ≥ 0 | 0 | — | [Auto](../../user/de/rates.md) | Immer |
-| Imaginärteil / Phase (Imaginary / Phase) | [Wert](../../user/de/data-types.md) | ±∞ | ±∞ | 0 | — | [Auto](../../user/de/rates.md) | Immer |
+| Realteil / Betrag (Real / Magnitude) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞; polarer Betrag ≥ 0 | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Imaginärteil / Phase (Imaginary / Phase) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md) | — | [Control](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

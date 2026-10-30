@@ -8,13 +8,13 @@ Wandelt Triggerereignisse in numerische Sampleimpulse um.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Trigger | [Trigger](../../user/de/data-types.md) | — | — | — | — | [Trigger](../../user/de/rates.md) | Immer |
+| Trigger | [Trigger](../../user/de/data-types.md#trigger) | — | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Impuls (Pulse) | [Wert](../../user/de/data-types.md) | 0–∞ | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Impuls (Pulse) | [Wert](../../user/de/data-types.md#value) | 0–∞ | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

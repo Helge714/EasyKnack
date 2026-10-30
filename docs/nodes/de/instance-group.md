@@ -8,16 +8,16 @@ Führt einen internen Graphen für mehrere unabhängige Instanzen aus.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Anzahl (Count) | [Wert](../../user/de/data-types.md) | 0–256, ganzzahlig | 0–Maximum, abgerundet | 8 | — | [Control](../../user/de/rates.md) | Immer |
-| Frequenz (Frequency) | [Wert](../../user/de/data-types.md) | ±∞ | ±∞ | 220 | — | [Auto](../../user/de/rates.md) | Immer |
-| Maximum (Maximum) | [Wert](../../user/de/data-types.md) | 1–256 | — | 16 | — | — | Inspektor |
+| Anzahl (Count) | [Wert](../../user/de/data-types.md#value) | 0–256, ganzzahlig | 0–Maximum, abgerundet | 8 | — | [Control](../../user/de/rates.md#control) | Immer |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 220 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Maximum (Maximum) | [Wert](../../user/de/data-types.md#value) | 1–256 | — | 16 | — | — | Inspektor |
 | Allgemein / IO / Editoren (General / IO / Editors) | [Editor](../../user/de/reference-tables.md) | Gruppendefiniert | — | — | — | — | Inspektor |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Audio](../../user/de/data-types.md) | ±∞ | [Audio](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang (Out) | [Audio](../../user/de/data-types.md#audio) | ±∞ | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
