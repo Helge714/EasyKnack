@@ -9,11 +9,11 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 | Bezeichnung | Datentyp | Reglerbereich | Signalbereich | Standardwert | Einheit | Rate | Sichtbarkeit |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Wellenform (Waveform) | Wavetable-Ressource | Sinus, Dreieck, Sägezahn, Rechteck | — | Sinus | — | Control | Immer |
-| Teiltöne (Partials) | Wert | 1–144, ganzzahlig | 1–144, abgerundet | 1 | — | Control | Immer |
-| Abfall (Falloff) | Wert | 0–4 | 0–4 | 1 | — | Auto | Teiltöne > 1 oder Teiltöne verbunden |
-| Streckung (Stretch) | Wert | 0–4 | 0–4 | 1 | — | Auto | Teiltöne > 1 oder Teiltöne verbunden |
-| Frequenz (Frequency) | Wert | 0,00001–20.000 Hz | 0–20.000 Hz | 440 Hz | Hz, kHz | Auto | Immer |
-| Phase (Phase) | Wert | [0, 1] turn | (−∞, +∞) turn | 0 turn | turn, °, rad | Auto | Immer |
+| Teiltöne (Partials) | Wert | von 1 bis 144, ganzzahlig | von 1 bis 144, abgerundet | 1 | — | Control | Immer |
+| Abfall (Falloff) | Wert | von 0 bis 4 | von 0 bis 4 | 1 | — | Auto | Teiltöne > 1 oder Teiltöne verbunden |
+| Streckung (Stretch) | Wert | von 0 bis 4 | von 0 bis 4 | 1 | — | Auto | Teiltöne > 1 oder Teiltöne verbunden |
+| Frequenz (Frequency) | Wert | von 0,00001 bis 20.000 Hz | von 0 bis 20.000 Hz | 440 Hz | Hz, kHz | Auto | Immer |
+| Phase (Phase) | Wert | von 0 bis 1 turn | ±∞ turn | 0 turn | turn, °, rad | Auto | Immer |
 | Zurücksetzen (Reset) | Trigger | — | — | — | — | Trigger | Immer |
 
 ## Ausgänge
