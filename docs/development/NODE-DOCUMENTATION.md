@@ -118,6 +118,9 @@ DE: Bezeichnung | Datentyp | Reglerbereich | Signalbereich | Standardwert | Einh
   verbunden**, etc. Include relevant inspector-only controls in the reference;
   mark editor-only parameters with no connected range/rate as **—**, rather than
   inventing a port or omitting an option because there is no Settings section.
+- Put inspector-only settings in the same Inputs table, with **Inspector / Inspektor**
+  in Visibility. If conditional, retain that location alongside the short condition.
+  Do not invent a separate Settings section or omit controls without sockets.
 - Use **—** for a missing or inapplicable value, not an invented numeric zero.
 
 ### 3. Outputs / Ausgänge

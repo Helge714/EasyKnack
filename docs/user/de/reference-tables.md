@@ -48,4 +48,10 @@ Zuordnung oder eine nicht anwendbare Angabe. Die
 Datentyp, Einheit, Rate und Kanal sind unter [Datentypen](data-types.md),
 [Einheiten](units.md) und [Raten](rates.md) erklärt.
 
+<a id="feedback"></a>
+## Sampleweises Feedback
+
+Gibt an, ob der Node innerhalb eines sampleweise berechneten Feedbackpfads
+verwendet werden darf. Eine geeignete Delay-Grenze bleibt erforderlich.
+
 [Grundlagen](index.md) · [English](../en/reference-tables.md)

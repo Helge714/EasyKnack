@@ -1,0 +1,526 @@
+{
+  "schema": 1,
+  "nodes": [
+    {
+      "id": "easyknack.audio.bitcrusher",
+      "slug": "bitcrusher",
+      "category": "effect",
+      "title": {
+        "en": "Bitcrusher",
+        "de": "Bitcrusher"
+      },
+      "source": "BitcrusherNode.java"
+    },
+    {
+      "id": "easyknack.audio.delay",
+      "slug": "delay",
+      "category": "effect",
+      "title": {
+        "en": "Delay",
+        "de": "Verzögerung"
+      },
+      "source": "DelayNode.java"
+    },
+    {
+      "id": "easyknack.audio.filter",
+      "slug": "filter",
+      "category": "effect",
+      "title": {
+        "en": "Filter",
+        "de": "Filter"
+      },
+      "source": "FilterNode.java"
+    },
+    {
+      "id": "easyknack.audio.additive",
+      "slug": "additive-oscillator",
+      "category": "generator",
+      "title": {
+        "en": "Additive Oscillator",
+        "de": "Additiver Oszillator"
+      },
+      "source": "AdditiveOscillatorNode.java"
+    },
+    {
+      "id": "easyknack.audio.clock",
+      "slug": "clock",
+      "category": "generator",
+      "title": {
+        "en": "Clock",
+        "de": "Taktgeber"
+      },
+      "source": "ClockNode.java"
+    },
+    {
+      "id": "easyknack.audio.digitalnoise",
+      "slug": "digital-noise",
+      "category": "generator",
+      "title": {
+        "en": "Digital Noise",
+        "de": "Digital Noise"
+      },
+      "source": "DigitalNoiseNode.java"
+    },
+    {
+      "id": "easyknack.audio.envelope",
+      "slug": "envelope",
+      "category": "generator",
+      "title": {
+        "en": "Envelope",
+        "de": "Hüllkurve"
+      },
+      "source": "EnvelopeNode.java"
+    },
+    {
+      "id": "easyknack.audio.noise",
+      "slug": "noise",
+      "category": "generator",
+      "title": {
+        "en": "Noise",
+        "de": "Rauschen"
+      },
+      "source": "NoiseNode.java"
+    },
+    {
+      "id": "easyknack.audio.oscillator",
+      "slug": "oscillator",
+      "category": "generator",
+      "title": {
+        "en": "Oscillator",
+        "de": "Oszillator"
+      },
+      "source": "OscillatorNode.java"
+    },
+    {
+      "id": "easyknack.waveform",
+      "slug": "waveform",
+      "category": "generator",
+      "title": {
+        "en": "Waveform",
+        "de": "Wellenform"
+      },
+      "source": "WaveformNode.java"
+    },
+    {
+      "id": "group:formula",
+      "slug": "formula-group",
+      "category": "group",
+      "title": {
+        "en": "Formula Group",
+        "de": "Formelgruppe"
+      },
+      "source": "ui/FormulaGroups.java"
+    },
+    {
+      "id": "group:instance",
+      "slug": "instance-group",
+      "category": "group",
+      "title": {
+        "en": "Instance Group",
+        "de": "Instanzgruppe"
+      },
+      "source": "ui/MultipleGroups.java"
+    },
+    {
+      "id": "group:ordinary",
+      "slug": "node-group",
+      "category": "group",
+      "title": {
+        "en": "Node Group",
+        "de": "Nodegruppe"
+      },
+      "source": "ui/GroupRouting.java"
+    },
+    {
+      "id": "group:spectral",
+      "slug": "spectral-group",
+      "category": "group",
+      "title": {
+        "en": "Spectral Group",
+        "de": "Spektralgruppe"
+      },
+      "source": "ui/SpectralGroups.java"
+    },
+    {
+      "id": "easyknack.context.input",
+      "slug": "context-input",
+      "category": "input",
+      "title": {
+        "en": "Context Input",
+        "de": "Kontexteingang"
+      },
+      "source": "ContextInputNode.java"
+    },
+    {
+      "id": "easyknack.input.trigger",
+      "slug": "trigger-input",
+      "category": "input",
+      "title": {
+        "en": "Trigger Input",
+        "de": "Triggereingang"
+      },
+      "source": "TriggerInputNode.java"
+    },
+    {
+      "id": "easyknack.audio.value",
+      "slug": "value-input",
+      "category": "input",
+      "title": {
+        "en": "Value Input",
+        "de": "Werteingang"
+      },
+      "source": "ValueNode.java"
+    },
+    {
+      "id": "easyknack.audio.clamp",
+      "slug": "clamp",
+      "category": "math",
+      "title": {
+        "en": "Clamp",
+        "de": "Begrenzung"
+      },
+      "source": "ClampNode.java"
+    },
+    {
+      "id": "easyknack.audio.comparator",
+      "slug": "comparator",
+      "category": "math",
+      "title": {
+        "en": "Comparator",
+        "de": "Vergleicher"
+      },
+      "source": "ComparatorNode.java"
+    },
+    {
+      "id": "easyknack.audio.curve",
+      "slug": "curve-mapping",
+      "category": "math",
+      "title": {
+        "en": "Curve Mapping",
+        "de": "Kurvenabbildung"
+      },
+      "source": "CurveNode.java"
+    },
+    {
+      "id": "easyknack.audio.maprange",
+      "slug": "map-range",
+      "category": "math",
+      "title": {
+        "en": "Map Range",
+        "de": "Bereichsabbildung"
+      },
+      "source": "MapRangeNode.java"
+    },
+    {
+      "id": "easyknack.audio.math",
+      "slug": "math",
+      "category": "math",
+      "title": {
+        "en": "Math",
+        "de": "Mathematik"
+      },
+      "source": "MathNode.java"
+    },
+    {
+      "id": "easyknack.converter.rate",
+      "slug": "rate-converter",
+      "category": "math",
+      "title": {
+        "en": "Rate Converter",
+        "de": "Ratenkonverter"
+      },
+      "source": "RateConverterNode.java"
+    },
+    {
+      "id": "easyknack.audio.samplehold",
+      "slug": "sample-hold",
+      "category": "math",
+      "title": {
+        "en": "Sample & Hold",
+        "de": "Abtasten und Halten"
+      },
+      "source": "SampleHoldNode.java"
+    },
+    {
+      "id": "easyknack.music.scalequantizer",
+      "slug": "scale-quantizer",
+      "category": "math",
+      "title": {
+        "en": "Scale Quantizer",
+        "de": "Skalenquantisierer"
+      },
+      "source": "ScaleQuantizerNode.java"
+    },
+    {
+      "id": "easyknack.modulation.slew",
+      "slug": "smoothing",
+      "category": "math",
+      "title": {
+        "en": "Smoothing",
+        "de": "Glättung"
+      },
+      "source": "SlewNode.java"
+    },
+    {
+      "id": "easyknack.math.unitconverter",
+      "slug": "unit-converter",
+      "category": "math",
+      "title": {
+        "en": "Unit Converter",
+        "de": "Einheitenkonverter"
+      },
+      "source": "UnitConverterNode.java"
+    },
+    {
+      "id": "easyknack.audio.channelcombine",
+      "slug": "channel-combine",
+      "category": "routing",
+      "title": {
+        "en": "Channel Combine",
+        "de": "Kanäle verbinden"
+      },
+      "source": "ChannelCombineNode.java"
+    },
+    {
+      "id": "easyknack.audio.channelseparate",
+      "slug": "channel-separate",
+      "category": "routing",
+      "title": {
+        "en": "Channel Separate",
+        "de": "Kanäle trennen"
+      },
+      "source": "ChannelSeparateNode.java"
+    },
+    {
+      "id": "easyknack.audio.gain",
+      "slug": "gain",
+      "category": "routing",
+      "title": {
+        "en": "Gain",
+        "de": "Verstärkung"
+      },
+      "source": "GainNode.java"
+    },
+    {
+      "id": "easyknack.multiple.context",
+      "slug": "instance-context",
+      "category": "routing",
+      "title": {
+        "en": "Instance Context",
+        "de": "Instanzkontext"
+      },
+      "source": "InstanceContextNode.java"
+    },
+    {
+      "id": "easyknack.multiple.combine",
+      "slug": "instance-merge",
+      "category": "routing",
+      "title": {
+        "en": "Instance Merge",
+        "de": "Instanzenzusammenführung"
+      },
+      "source": "InstanceCombineNode.java"
+    },
+    {
+      "id": "easyknack.audio.mix",
+      "slug": "mix",
+      "category": "routing",
+      "title": {
+        "en": "Mix",
+        "de": "Mischung"
+      },
+      "source": "MixNode.java"
+    },
+    {
+      "id": "easyknack.audio.pan",
+      "slug": "pan",
+      "category": "routing",
+      "title": {
+        "en": "Pan",
+        "de": "Panorama"
+      },
+      "source": "PanNode.java"
+    },
+    {
+      "id": "easyknack.routing.stepswitch",
+      "slug": "step-switch",
+      "category": "routing",
+      "title": {
+        "en": "Step Switch",
+        "de": "Schrittumschalter"
+      },
+      "source": "StepSwitchNode.java"
+    },
+    {
+      "id": "easyknack.audio.voicemerge",
+      "slug": "voice-merge",
+      "category": "routing",
+      "title": {
+        "en": "Voice Merge",
+        "de": "Stimmenzusammenführung"
+      },
+      "source": "VoiceMergeNode.java"
+    },
+    {
+      "id": "easyknack.spectral.bincontext",
+      "slug": "bin-context",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Context",
+        "de": "Binkontext"
+      },
+      "source": "BinContextNode.java"
+    },
+    {
+      "id": "easyknack.spectral.bindiscard",
+      "slug": "bin-discard",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Discard",
+        "de": "Bin verwerfen"
+      },
+      "source": "BinDiscardNode.java"
+    },
+    {
+      "id": "easyknack.spectral.binoutput",
+      "slug": "bin-output",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Output",
+        "de": "Binausgang"
+      },
+      "source": "BinOutputNode.java"
+    },
+    {
+      "id": "easyknack.spectral.binrandom",
+      "slug": "bin-random",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Random",
+        "de": "Binzufall"
+      },
+      "source": "BinRandomNode.java"
+    },
+    {
+      "id": "easyknack.spectral.binread",
+      "slug": "bin-reader",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Reader",
+        "de": "Binleser"
+      },
+      "source": "BinReadNode.java"
+    },
+    {
+      "id": "easyknack.spectral.binhold",
+      "slug": "bin-sample-hold",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Sample & Hold",
+        "de": "Bin abtasten und halten"
+      },
+      "source": "BinHoldNode.java"
+    },
+    {
+      "id": "easyknack.spectral.binmemory",
+      "slug": "bin-smoothing",
+      "category": "spectrum",
+      "title": {
+        "en": "Bin Smoothing",
+        "de": "Binglättung"
+      },
+      "source": "BinMemoryNode.java"
+    },
+    {
+      "id": "easyknack.spectral.ifft",
+      "slug": "ifft",
+      "category": "spectrum",
+      "title": {
+        "en": "IFFT",
+        "de": "Inverse FFT"
+      },
+      "source": "IFFTNode.java"
+    },
+    {
+      "id": "easyknack.audio.edgedetector",
+      "slug": "threshold-trigger",
+      "category": "trigger",
+      "title": {
+        "en": "Threshold Trigger",
+        "de": "Schwellwerttrigger"
+      },
+      "source": "EdgeDetectorNode.java"
+    },
+    {
+      "id": "easyknack.modulation.triggercounter",
+      "slug": "trigger-counter",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger Counter",
+        "de": "Triggerzähler"
+      },
+      "source": "TriggerCounterNode.java"
+    },
+    {
+      "id": "easyknack.modulation.triggerdelay",
+      "slug": "trigger-delay",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger Delay",
+        "de": "Triggerverzögerung"
+      },
+      "source": "TriggerDelayNode.java"
+    },
+    {
+      "id": "easyknack.modulation.triggerdivider",
+      "slug": "trigger-divider",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger Divider",
+        "de": "Triggerteiler"
+      },
+      "source": "TriggerDividerNode.java"
+    },
+    {
+      "id": "easyknack.modulation.triggerfilter",
+      "slug": "trigger-filter",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger Filter",
+        "de": "Triggerfilter"
+      },
+      "source": "TriggerFilterNode.java"
+    },
+    {
+      "id": "easyknack.modulation.triggermerge",
+      "slug": "trigger-merge",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger Merge",
+        "de": "Triggerzusammenführung"
+      },
+      "source": "TriggerMergeNode.java"
+    },
+    {
+      "id": "easyknack.modulation.triggertimer",
+      "slug": "trigger-timer",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger Timer",
+        "de": "Triggerzeitmesser"
+      },
+      "source": "TriggerTimerNode.java"
+    },
+    {
+      "id": "easyknack.converter.triggerpulse",
+      "slug": "trigger-to-pulse",
+      "category": "trigger",
+      "title": {
+        "en": "Trigger to Pulse",
+        "de": "Trigger zu Impuls"
+      },
+      "source": "TriggerPulseNode.java"
+    }
+  ],
+  "excluded": []
+}

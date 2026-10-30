@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build and validate the bilingual documentation preview using Python 3.10+."""
 import argparse
+import json
 from html.parser import HTMLParser
 import os
 from pathlib import Path
@@ -34,7 +35,14 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     sources = set((DOCS / 'user/de').glob('*.md')) | set((DOCS / 'user/en').glob('*.md'))
-    sources.add(DOCS / 'nodes/de/additive-oscillator-v3.md')
+    catalog = DOCS / 'nodes/catalog.json'
+    if catalog.is_file():
+        entries = json.loads(catalog.read_text(encoding='utf-8'))['nodes']
+        for language in ('de', 'en'):
+            sources.add(DOCS / 'nodes' / language / 'index.md')
+            sources.update(DOCS / 'nodes' / language / (node['slug']+'.md') for node in entries)
+        if len({node['id'] for node in entries}) != len(entries) or len({node['slug'] for node in entries}) != len(entries):
+            raise ValueError('Duplicate node documentation ID or slug')
     sources.update((ROOT / page).resolve() for page in args.page)
     names = [{p.name for p in (DOCS / 'user' / language).glob('*.md')} for language in ('de', 'en')]
     if names[0] != names[1]:
@@ -82,7 +90,7 @@ def main():
                 raise ValueError(f'Missing section: {destination} -> {url}')
     print(f'Built {len(destinations)} pages; checked {count} local links, section IDs and language coverage.')
     print(output / 'user/de/index.html')
-    print(output / 'nodes/de/additive-oscillator-v3.html')
+    print(output / 'nodes/de/index.html')
 
 
 if __name__ == '__main__':

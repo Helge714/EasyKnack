@@ -45,4 +45,10 @@ entry. The [Mute table](muting.md) also states whether Mute is supported.
 Data type, unit, rate and channel are explained under [Data types](data-types.md),
 [Units](units.md) and [Rates](rates.md).
 
+<a id="feedback"></a>
+## Sample-wise feedback
+
+States whether the node can participate in a sample-wise feedback path.
+An appropriate delay boundary is still required.
+
 [Fundamentals](index.md) · [Deutsch](../de/reference-tables.md)

@@ -1,0 +1,44 @@
+# Nodegruppe (Node Group)
+
+## Übersicht
+
+Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Öffentliche Eingänge (Public inputs) | [Schnittstellenabhängig](../../user/de/data-types.md) | Schnittstellenabhängig | Schnittstellenabhängig | Schnittstellenabhängig | — | [Auto](../../user/de/rates.md) | Immer |
+| Allgemein (General) | [Editor](../../user/de/reference-tables.md) | Name, Kategorie, Typ, Routing, Bake | — | Gruppendefiniert | — | — | Inspektor |
+| IO | [Editor](../../user/de/reference-tables.md) | Ports, Editoren, Einheiten, Standardwerte, Raten | — | Gruppendefiniert | — | — | Inspektor |
+| Editoren (Editors) | [Editor](../../user/de/reference-tables.md) | Editorvorlagen des Dokuments | — | — | — | — | Inspektor |
+
+## Ausgänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Öffentliche Ausgänge (Public outputs) | [Schnittstellenabhängig](../../user/de/data-types.md) | Schnittstellenabhängig | [Auto](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+
+## Verhalten
+
+Öffne die Gruppe zur Bearbeitung von Graph und Schnittstelle. Jeder öffentliche Port behält seinen gewählten Datentyp und seine Rate; die Tabelle bezeichnet konfigurierbare Ports und keine fest numerische Schnittstelle. Group-General legt Titelgestaltung sowie Mute- und Einfügepaare fest; Group-IO Portreihenfolge, Editoren und Bereiche. Übernommene Editoren erben ihre Darstellung und können kompatible interne Parameter steuern. Einheitenadapter erhalten die internen Einheiten an der Grenze. Bake optimiert die übernommene innere Definition; öffentliche Parameteränderungen bleiben Parameter. [Instance Groups](instance-group.md), [Spectral Groups](spectral-group.md) und [Formula Groups](formula-group.md) besitzen eigene Ausführungsregeln.
+
+## Mute
+
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | Gewählter Durchreicheingang (Configured bypass input) | Gewählter Durchreicheausgang (Configured bypass output) |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| Gewählter Einfügeeingang (Configured insertion input) | Gewählter Einfügeausgang (Configured insertion output) |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Vom inneren Graphen abhängig |
+
+[Node-Verzeichnis](index.md) · [English](../en/node-group.md)
