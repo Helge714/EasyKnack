@@ -7,7 +7,17 @@ import com.vingame.glswing.node.model.GLNodeValue;
 public final class StepSwitchNode extends BasicNode {
     public static final int MAX_STEPS=32;
     public static final PropertyId STEPS=new PropertyId("steps"),NEXT=new PropertyId("next"),RESET=new PropertyId("reset"),
-        OUT=new PropertyId("value"),INDEX=new PropertyId("index"),RATE=new PropertyId("rate"),MODE=new PropertyId("mode"),SELECTION=new PropertyId("easyknack.stepswitch.selection");
+        OUT=new PropertyId("value"),INDEX=new PropertyId("index"),RATE=new PropertyId("rate"),MODE=new PropertyId("mode"),TYPE=new PropertyId("type"),SELECTION=new PropertyId("easyknack.stepswitch.selection");
+    public enum Type {
+        VALUE(PortDataType.SIGNAL,SignalCategory.VALUE), VECTOR(PortDataType.VECTOR,SignalCategory.VECTOR),
+        WAVETABLE(PortDataType.WAVEFORM,SignalCategory.WAVETABLE), BUFFER(PortDataType.HISTORY,SignalCategory.HISTORY),
+        SPECTRUM(PortDataType.SPECTRUM,SignalCategory.SPECTRUM), ANALYSIS(PortDataType.ANALYSIS,SignalCategory.ANALYSIS);
+        public final PortDataType dataType;public final SignalCategory signal;
+        Type(PortDataType dataType,SignalCategory signal){this.dataType=dataType;this.signal=signal;}
+        public String id(){return name().toLowerCase(Locale.ROOT);}
+        @Override public String toString(){return NodeText.text("stepswitch.type."+id(),name());}
+    }
+    public static Type type(NodeState s){return Type.valueOf(s.text(TYPE,"value").toUpperCase(Locale.ROOT));}
     public static int selected(NodeState s){int index=(int)selectionNumber(s,"index");return index>=0&&index<count(s)?index:0;}
     public static long revision(NodeState s){return Math.min(9007199254740991L,Math.max(0,(long)selectionNumber(s,"revision")));}
     private static long lastRequest;
@@ -21,8 +31,14 @@ public final class StepSwitchNode extends BasicNode {
     public static PropertyId input(int index){return new PropertyId("step-"+index);}
     public static int count(NodeState s){return Math.max(1,Math.min(MAX_STEPS,(int)s.number(STEPS,4)));}
     @Override public void define(NodeBuilder n,NodeState s){
-        n.addOutput(OUT,"Value").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
-        n.addOutput(INDEX,"Index").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.text("stepswitch.index.help"));
+        var type=type(s);boolean numeric=type==Type.VALUE;
+        var output=n.addOutput(OUT,"Value").dataType(type.dataType).signal(type.signal);
+        if(!numeric)output.textKey("stepswitch.selected");
+        if(numeric||type==Type.VECTOR)output.rates(PortRates.AUDIO_CONTROL);else output.rate(ProcessingRate.CONTROL);
+        var indexOutput=n.addOutput(INDEX,"Index").signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.text("stepswitch.index.help"));
+        if(numeric)indexOutput.rates(PortRates.AUDIO_CONTROL);else indexOutput.rate(ProcessingRate.CONTROL);
+        n.addEditor(TYPE,"Data type",Editor.comboBox(List.of(Type.values()),Type.VALUE,Type::id)).inspectorOnly()
+            .tooltip(com.vin.easyknack.ui.AppText.text("stepswitch.resource.help"));
         n.addEditor(STEPS,"Steps",Editor.Slider.button(4,1.,(double)MAX_STEPS).integers().discrete()).editorCopyable(false).keepVisibleOnHide()
             .tooltip("Number of inputs, 1–32. Removing the active step returns to the first input. Undo restores removed connections.");
         n.addEditor(MODE,"Selection",Editor.comboBox(List.of(Mode.values()),Mode.TRIGGER,Mode::id)).inspectorOnly();
@@ -32,10 +48,13 @@ public final class StepSwitchNode extends BasicNode {
             .tooltip("Each trigger advances one step and wraps at the end. Unconnected: click to advance at the next block.");
         if(!indexed(s))n.addInput(RESET,"Reset",new Editor.Trigger()).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT).signal(SignalCategory.TRIGGER)
             .tooltip("Select the first input. Reset wins over Next at the same sample.");
-        for(int i=0;i<count(s);i++)n.addInput(input(i),label(s,i),Editor.Slider.button(0)).editorCopyable(false)
-            .rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
+        for(int i=0;i<count(s);i++){
+            var row=numeric?n.addInput(input(i),label(s,i),Editor.Slider.button(0)):n.addInput(input(i),label(s,i));
+            row.editorCopyable(false).dataType(type.dataType).signal(type.signal).optional();
+            if(numeric||type==Type.VECTOR)row.rates(PortRates.AUDIO_CONTROL);else row.rate(ProcessingRate.CONTROL);
+        }
         for(int i=0;i<count(s);i++)n.addEditor(name(i),NodeText.text("easyknack.routing.stepswitch.stepName","Step name")+" "+(i+1),new Editor.Text("")).inspectorOnly();
-        ProcessingRate.addEditor(n,RATE).tooltip("Auto uses AudioRate when a trigger or audio input is connected, otherwise ControlRate. ControlRate samples at block start and defers later triggers to the next block. Audio switching is immediate and can click.");
+        if(numeric||type==Type.VECTOR)ProcessingRate.addEditor(n,RATE).tooltip(numeric?"Auto uses AudioRate when a trigger or audio input is connected, otherwise ControlRate. ControlRate samples at block start and defers later triggers to the next block. Audio switching is immediate and can click.":com.vin.easyknack.ui.AppText.text("stepswitch.resource.help"));
     }
     @Override public Map<String,GLNodeValue> defaults(){
         var values=new HashMap<>(super.defaults());for(int i=0;i<MAX_STEPS;i++)values.putIfAbsent(input(i).value(),GLNodeValue.of(0.));values.put(NEXT.value(),GLNodeValue.of(0.));values.put(SELECTION.value(),selection(0,0));return Map.copyOf(values);
@@ -43,7 +62,7 @@ public final class StepSwitchNode extends BasicNode {
     private static final ParameterContract CONTRACT=contract();
     private static ParameterContract contract(){
         var b=ParameterContract.builder().integer(STEPS).mapped(new PropertyId("initial-step"),s->Integer.toString(selected(s))).mapped(new PropertyId("selection-revision"),s->Long.toString(revision(s))).value(MODE).value(NEXT).source(NEXT).source(RESET,s->!indexed(s));
-        for(int i=0;i<MAX_STEPS;i++){final int index=i;b.source(input(i),s->index<count(s)).value(input(i));}return b.build();
+        for(int i=0;i<MAX_STEPS;i++){final int index=i;b.source(input(i),s->index<count(s)).value(input(i));}return b.mapped(TYPE,s->type(s).id()).build();
     }
     @Override public NativeProcessor processor(){return new NativeProcessor("stepswitch","nodes/StepSwitchNode.hpp",CONTRACT);}
     @Override public ProcessingRate resolveAutomaticRate(NodeState s,Map<PropertyId,ProcessingRate> incoming){

@@ -14,6 +14,9 @@ Step Switch supports independent trigger/index selection per instance, including
 nested groups and Bake/export. Its visible highlight and saved selection represent
 the first instance (the all-zero instance path when nested); manual selection
 addresses all replicas. Only that representative publishes selection telemetry.
+Its Value, Vector, Wavetable, Buffer, Spectrum and Analysis modes also work inside
+instances. Resource selection is block-aligned and forwards the source handle;
+the group's existing public-boundary type restrictions still apply.
 
 The public boundary currently accepts numeric, Vector, Spectrum and Wavetable
 inputs and dynamically sized numeric or Spectrum outputs. Spectrum outputs use typed

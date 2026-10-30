@@ -16,6 +16,12 @@ struct StepSwitchNode : NodeProcessor {
     std::shared_ptr<AnalysisMailbox> mailbox;
     std::unique_ptr<AnalysisFrame> frame;
     bool reportSelection=true;
+    ResourceKind resourceKind=ResourceKind::none;
+    DspResource* resource=nullptr;
+    ResourceKind inputResourceKind(std::size_t port)const noexcept override{return port>=2?resourceKind:ResourceKind::none;}
+    ResourceKind outputResourceKind(std::size_t port)const noexcept override{return port==0?resourceKind:ResourceKind::none;}
+    DspResource* resourceOutput(std::size_t port)noexcept override{return port==0?resource:nullptr;}
+    std::string parameterStructure()const override{return std::to_string(static_cast<int>(resourceKind));}
     unsigned reportCountdown=0;
     std::size_t outputCount()const noexcept override{return 2;}
     bool supportsControlRate()const noexcept override{return true;}
@@ -37,7 +43,25 @@ struct StepSwitchNode : NodeProcessor {
         auto& p=static_cast<const StepSwitchNode&>(other);if(selectionRevision!=p.selectionRevision){index=p.index;selectionRevision=p.selectionRevision;}steps=p.steps;values=p.values;indexed=p.indexed;selectedIndex=p.selectedIndex;if(index>=steps)index=0;
     }
     void configure(std::istream& in)override{
+        auto begin=in.tellg();std::string marker;in>>marker;
+        // Older source exports retain the numeric-only contract.
+        if(marker=="!13e990f788f8b055"){
+            std::string mode;
+            if(!(in>>steps>>index>>selectionRevision>>mode>>selectedIndex)||steps<1||steps>maximumSteps||index>=maximumSteps||!std::isfinite(selectedIndex)||(mode!="trigger"&&mode!="index"))throw std::runtime_error("Invalid legacy Step Switch");
+            indexed=mode=="index";if(index>=steps)index=0;resourceKind=ResourceKind::none;sources.resize(2+maximumSteps);
+            for(unsigned i=0;i<2;i++)if(!(in>>sources[i])||sources[i]< -1)throw std::runtime_error("Invalid legacy Step Switch source");
+            for(unsigned i=0;i<maximumSteps;i++)if(!(in>>sources[2+i]>>values[i])||sources[2+i]< -1||!std::isfinite(values[i]))throw std::runtime_error("Invalid legacy Step Switch value");
+            return;
+        }
+        in.clear();in.seekg(begin);
         auto p=parameters::StepSwitchNodeParameters::read(in);sources=p.sources();indexed=p.mode_value=="index";selectedIndex=static_cast<float>(p.next_value);if(!std::isfinite(selectedIndex))throw std::runtime_error("Invalid step index");steps=static_cast<unsigned>(p.steps_value);
+        if(p.type_value=="value")resourceKind=ResourceKind::none;
+        else if(p.type_value=="vector")resourceKind=ResourceKind::vector;
+        else if(p.type_value=="wavetable")resourceKind=ResourceKind::waveform;
+        else if(p.type_value=="buffer")resourceKind=ResourceKind::history;
+        else if(p.type_value=="spectrum")resourceKind=ResourceKind::spectrum;
+        else if(p.type_value=="analysis")resourceKind=ResourceKind::analysis;
+        else throw std::runtime_error("Invalid Step Switch data type");
         if(steps<1||steps>maximumSteps)throw std::runtime_error("Invalid step count");
         auto initial=std::stoul(p.initial_step_value);if(initial>=maximumSteps)throw std::runtime_error("Invalid initial step");index=initial<steps?initial:0;selectionRevision=std::stoull(p.selection_revision_value);
         values={static_cast<float>(p.step_0_value),
@@ -104,9 +128,14 @@ struct StepSwitchNode : NodeProcessor {
             auto n=advance.at(i);auto r=restart.at(i);
             if(indexed){auto value=c.numericInput(0,selectedIndex)[std::min(i,c.bufferSize-1)];index=std::isfinite(value)?static_cast<unsigned>(std::clamp(std::floor(value),0.f,static_cast<float>(steps-1))):0;}
             else if(r)index=0;else if(i==0&&selected>=0)index=static_cast<unsigned>(selected);else if(n)index=(index+static_cast<unsigned>(n%steps))%steps;
+            if(resourceKind!=ResourceKind::none&&i==0){
+                shown=index;resource=const_cast<DspResource*>(c.resource(2+shown));
+                if(resource&&resource->kind()!=resourceKind&&!(resourceKind==ResourceKind::analysis&&resource->kind()==ResourceKind::spectrum))resource=nullptr;
+            }
             if(i<c.bufferSize){
-                float value=c.numericInput(2+index,values[index])[i];c.output[i]=std::isfinite(value)?value:0;
-                if(indexOutput)indexOutput[i]=static_cast<float>(index);shown=index;
+                if(resourceKind==ResourceKind::none){float value=c.numericInput(2+index,values[index])[i];c.output[i]=std::isfinite(value)?value:0;shown=index;}
+                else c.output[i]=0;
+                if(indexOutput)indexOutput[i]=static_cast<float>(shown);
             }
         }
         if(mailbox&&c.channelIndex==0&&(reportCountdown--==0||frame->frequency!=shown||reportedRevision!=selectionRevision)){

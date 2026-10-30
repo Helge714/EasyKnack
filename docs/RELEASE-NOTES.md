@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Vector, Wavetable, Buffer, Spectrum and Analysis modes to Step Switch, with typed optional resource inputs and block-aligned, zero-copy selection. Keep per-step buttons, names, numeric Index and Instance/Bake/export support. MIDI remains excluded. The Step Switch parameter fingerprint changes; previous numeric source exports remain readable. Rebuild Java, host and plugin SDK together; document schema and host protocol are unchanged. Covered by the current development version before its first release.
+
 - Support Step Switch inside Instance Groups, nested instances and Bake/export. Keep selection independent per instance; show and save the first instance's selection, with manual selection shared across replicas. Rebuild the host and plugin SDK together. Parameter fingerprints, document schema and host protocol are unchanged; covered by the current development version before its first release.
 
 - Remove fixed 8-input Instance and 16-frame-input Spectral Group limits. Counted Java/C++ source lists drive actual port layouts, rate plans, frame history, native execution and Bake/export. Keep one source Spectrum per Spectral Group and the existing supported boundary types. Previous fixed group contracts remain readable. Rebuild Java, host and plugin SDK together; parameter fingerprints change for compiled groups, while document schema and host protocol remain unchanged. Covered by the current development version before its first release.

@@ -34,6 +34,9 @@ public final class NodeBuilder {
         public Row editorCopyable(boolean value){editorCopyable=value;return this;}
         public boolean isEditorCopyable(){return editorCopyable;}
         private boolean socketVisible=true;
+        private boolean optional;
+        /** An unconnected resource input may be empty, rather than invalidating the graph. */
+        public Row optional(){requirePort();optional=true;return this;}
         public boolean socketVisible(){return socketVisible;}
         public Row socketVisible(boolean value){requirePort();socketVisible=value;return this;}
         private boolean inspectorOnly;
@@ -150,7 +153,7 @@ public final class NodeBuilder {
     public List<GLNodePortDescriptor> ports() {
         return rows.stream().filter(r -> r.kind() != RowKind.EDITOR).map(r -> r.kind() == RowKind.OUTPUT
                 ? GLNodePortDescriptor.output(r.id(), r.dataType.id(),r.timing,Integer.MAX_VALUE)
-                : GLNodePortDescriptor.input(r.id(), r.dataType.id(), r.editor() == null, 1)).toList();
+                : GLNodePortDescriptor.input(r.id(), r.dataType.id(), r.editor() == null&&!r.optional, 1)).toList();
     }
     public Map<String, GLNodeValue> defaults() {
         Map<String, GLNodeValue> result = new LinkedHashMap<>();

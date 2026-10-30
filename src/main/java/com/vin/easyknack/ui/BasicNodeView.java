@@ -52,7 +52,7 @@ public class BasicNodeView extends GLNode {
             setResizeMode(definition.resizeMode());
             for (var row : layout.rows()) {
                 if (row.isInspectorOnly()) continue;
-                GLContainer content = row.editor() == null ? new NodeTooltipLabel(row.portLabel(), row.kind()==NodeBuilder.RowKind.OUTPUT) : control(row);
+                GLContainer content = portContent(row);
                 controls.put(row.key(),content);
                 if(row.isDriverAssignable())MidiDrivers.attach(history,id,row.id(),content);
                 if(content instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->write(new PropertyId(GLGraphNode.AUTOMATIC_PREFIX+row.id()),GLNodeValue.of(true)));
@@ -135,6 +135,10 @@ public class BasicNodeView extends GLNode {
                         autoHeight && Math.abs(getHeight() - heightBefore) < .5f
                                 ? preferred.height() : Math.max(getHeight(), preferred.height()));
             });
+        }
+        /** Allows custom nodes to decorate resource-port labels as well as editors. */
+        protected GLContainer portContent(NodeBuilder.Row row) {
+            return row.editor()==null?new NodeTooltipLabel(row.portLabel(),row.kind()==NodeBuilder.RowKind.OUTPUT):control(row);
         }
         protected GLContainer control(NodeBuilder.Row row) {
             if (row.editor() instanceof Editor.Slider spec) {

@@ -3,6 +3,20 @@
 Connect the values to switch between to the numbered inputs. Set **Steps** to the
 number of inputs required. Connected inputs can carry audio or control values.
 
+Choose **Data type** in the inspector: **Value**, **Vector**, **Wavetable**,
+**Buffer**, **Spectrum** or **Analysis**. All numbered inputs and the selected
+output share that type; Index always remains numeric. Only Value inputs have
+sliders. Resource inputs may be left empty; selecting one supplies no resource.
+For resources, click an input label to rename it, and use its numbered button to select it.
+
+Resource selection is held for one DSP block. A trigger at block start applies
+immediately; later triggers affect the next block. The Index output reports the
+resource selected for that block. Vector resources retain their audio/control
+rate, including their per-sample values. Resources are forwarded without copying;
+all connected sources still run. This is a hard switch: changing FFT window size,
+hop size or source timing before an IFFT can create a gap or audible jump. Use
+aligned sources when continuous reconstruction matters. MIDI is not supported.
+
 In the inspector, choose **Selection**:
 
 - **Trigger**: each **Next** trigger advances one step and wraps at the end.

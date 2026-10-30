@@ -45,13 +45,17 @@ public final class StepSwitchView extends BasicNodeView {
     }
     void renameStep(int index){var action=nameActions.get(index);if(action!=null)action.run();}
     public int activeStep(){return active;}
+    @Override protected GLContainer portContent(NodeBuilder.Row row){
+        return row.kind()==NodeBuilder.RowKind.INPUT&&row.id().startsWith("step-")?control(row):super.portContent(row);
+    }
     @Override protected GLContainer control(NodeBuilder.Row row){
         if((row.key().equals(StepSwitchNode.NEXT)||row.key().equals(StepSwitchNode.RESET))&&row.editor() instanceof com.vin.easyknack.nodes.Editor.Trigger){
             var button=new GLButton(row.label());button.addActionListener(e->selectStep(row.key().equals(StepSwitchNode.RESET)?0:(active+1)%StepSwitchNode.count(current)));return button;
         }
         if(row.id().startsWith("step-")&&!row.id().startsWith("step-name-")){
             int index=Integer.parseInt(row.id().substring(5));
-            var slider=super.control(row);
+            boolean resource=row.editor()==null;
+            var slider=resource?new NodeTooltipLabel(row.label(),false,true):super.control(row);
             var nameEditor=new GLTextEditor();nameEditor.setHistoryEnabled(false);nameEditor.setVisible(false);nameEditor.setName("step-name-editor-"+index);
             final boolean[] editing={false};
             var label=new NodeTooltipLabel(row.label(),false,true){
@@ -60,7 +64,7 @@ public final class StepSwitchView extends BasicNodeView {
                 }
             };label.setVisible(false);label.setToolTipText(AppText.text("stepswitch.renameHint"));
             Runnable begin=()->{editing[0]=true;nameEditor.setText(StepSwitchNode.label(current,index));slider.setVisible(false);label.setVisible(false);nameEditor.setVisible(true);requestGLFocus(nameEditor);nameEditor.selectAll();};
-            Runnable finish=()->{editing[0]=false;nameEditor.setVisible(false);slider.setVisible(!current.isConnected(row.key()));label.setVisible(current.isConnected(row.key()));};
+            Runnable finish=()->{editing[0]=false;nameEditor.setVisible(false);slider.setVisible(!resource&&!current.isConnected(row.key()));label.setVisible(resource||current.isConnected(row.key()));};
             nameEditor.addActionListener(e->{write(StepSwitchNode.name(index),GLNodeValue.of(nameEditor.getText()));finish.run();});
             nameEditor.addCancelListener(e->finish.run());
             if(nameActions==null)nameActions=new LinkedHashMap<>();nameActions.put(index,begin);
@@ -79,7 +83,7 @@ public final class StepSwitchView extends BasicNodeView {
                 button.setEnabled(!StepSwitchNode.indexed(state));
                 if(slider instanceof GLSlider value){value.setText(text);value.setName(text);}
                 label.setText(text);
-                slider.setVisible(!editing[0]&&!state.isConnected(row.key()));label.setVisible(!editing[0]&&state.isConnected(row.key()));
+                slider.setVisible(!resource&&!editing[0]&&!state.isConnected(row.key()));label.setVisible(!editing[0]&&(resource||state.isConnected(row.key())));
             });
             return group;
         }

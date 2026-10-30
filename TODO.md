@@ -5,6 +5,10 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Current stabilization pass
 
+- [x] Extend Step Switch with Vector, Wavetable, Buffer, Spectrum and Analysis
+  routing, block-aligned resource selection, editor-free step controls and
+  Instance/Bake/export support. Preserve the previous numeric source contract.
+
 - [x] Support Step Switch in nested Instance Groups and Bake/export, with
   independent selection state and one representative UI telemetry publisher.
 
