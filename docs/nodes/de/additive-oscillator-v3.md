@@ -6,7 +6,7 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 
 ## Eingänge
 
-| Bezeichnung | Datentyp | Reglerbereich | Signalbereich | Standardwert | Einheit | Rate | Sichtbarkeit |
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Wellenform (Waveform) | [Wavetable-Ressource](../../user/de/data-types.md#wavetable) | Sinus, Dreieck, Sägezahn, Rechteck | — | Sinus | — | [Control](../../user/de/rates.md#control) | Immer |
 | Teiltöne (Partials) | [Wert](../../user/de/data-types.md#value) | 1–144, ganzzahlig | 1–144, abgerundet | 1 | — | [Control](../../user/de/rates.md#control) | Immer |
@@ -18,7 +18,7 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 
 ## Ausgänge
 
-| Bezeichnung | Datentyp | Wertebereich | Rate | Kanal |
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
 | Audioausgang (Audio Out) | [Audio](../../user/de/data-types.md#audio) | ±1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
@@ -57,18 +57,18 @@ Die übrigen Funktionen entsprechen dem normalen Oszillator.
 
 ## Mute
 
-| [Mutable](../../user/de/muting.md) | Eingang | Ausgang |
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
 | --- | --- | --- |
 | Ja | — | — |
 
 ## Einfügen
 
-| Eingang | Ausgang |
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
 | --- | --- |
 | — | — |
 
 ## Delayable
 
-| Sampleweises Feedback |
+| [Sampleweises Feedback](../../SAMPLE-FEEDBACK.md) |
 | --- |
 | Unterstützt |

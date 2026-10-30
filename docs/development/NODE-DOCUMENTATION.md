@@ -21,11 +21,44 @@ only a German page. Bilingual coverage and production integration remain pending
 Shared foundations now live in [English](../user/en/index.md) and
 [German](../user/de/index.md): rates, data types/channels, units and muting.
 Link directly on the relevant table terms (Audio, Control, Auto, resource types,
-unit symbols, Mutable), rather than inserting link lists below section headings.
+unit symbols, Mutable) and column headings (Data type, Rate, Unit, Channel, etc.),
+rather than inserting link lists below section headings. Use the shared reference
+table legend for editor/signal ranges, defaults, visibility and port mappings.
 Use the shared pages' stable term anchors, identical in both languages. Rate Auto
 links to rate selection; channel Auto links to channels. Do not repeat their
 explanations. Maintain both language versions and existing anchors when shared
 behavior changes.
+
+## Sources, HTML preview and gradual replacement
+
+- `docs/` contains the authoritative, version-controlled Markdown. Start at
+  [the documentation index](../README.md). Node references and shared foundations
+  live beside the existing guides; do not move authored content into `target/`.
+- `scripts/build-docs.py` and `scripts/documentation_renderer.py` reproduce the
+  current HTML preview using Python 3.10+ and its standard library:
+
+  ```text
+  python scripts/build-docs.py
+  ```
+
+  Output defaults to `target/docs/`. `--output <directory>` selects another folder;
+  `--page docs/<page>.md` adds a page to the current preview set. HTML pages are
+  derived files, not another manually maintained source. Do not edit or commit
+  generated output. It may be removed by a clean build and regenerated.
+- The preview supports the Markdown subset used by the current reference pages
+  and checks local links, generated section targets and paired foundation pages.
+  It currently includes the bilingual foundations and the latest German node
+  pilot. Links to unconverted legacy pages open their checkout Markdown files.
+  This preview is not yet the application's help integration or a portable
+  published documentation bundle; those remain separate implementation work.
+- Replace legacy pages individually after their replacement covers the relevant
+  user-facing content, both language versions are reviewed, and incoming links
+  and any packaging references are updated. Retain old pages until then. Move
+  debugging/history material to developer history rather than copying it into
+  the new user reference. Do not bulk-delete old documentation.
+- Consolidate pilot drafts into one canonical page per language when approved;
+  keep comparison drafts out of the eventual public node catalog. This cleanup
+  has not been performed merely by introducing the preview build.
 
 ## Files, identity and languages
 

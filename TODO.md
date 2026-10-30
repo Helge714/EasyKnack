@@ -39,9 +39,14 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Next technical work
 
+- [x] Keep authored documentation under `docs/`; add a reproducible Python HTML
+  preview build in `scripts/build-docs.py` with heading/term links and validation.
+  Generated output goes to `target/docs/`. Replace legacy pages individually after
+  bilingual content and incoming links/packaging have been reviewed.
+
 - [ ] Implement the bilingual, manually authored node-reference work order in
   [NODE-DOCUMENTATION.md](docs/development/NODE-DOCUMENTATION.md): built-in pages,
-  Markdown/HTML rendering, offline/browser output, context-menu lookup by stable
+  production Markdown/HTML rendering and portable offline output, context-menu lookup by stable
   node ID, plugin documentation and coverage/link checks. Use the latest additive
   oscillator pilot; do not generate technical table cells from definitions.
 
