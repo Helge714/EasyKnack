@@ -6,25 +6,21 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 
 ## Eingänge
 
-[Datentypen](../../user/de/data-types.md) · [Einheiten](../../user/de/units.md) · [Raten](../../user/de/rates.md)
-
 | Bezeichnung | Datentyp | Reglerbereich | Signalbereich | Standardwert | Einheit | Rate | Sichtbarkeit |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Wellenform (Waveform) | Wavetable-Ressource | Sinus, Dreieck, Sägezahn, Rechteck | — | Sinus | — | Control | Immer |
-| Teiltöne (Partials) | Wert | 1–144, ganzzahlig | 1–144, abgerundet | 1 | — | Control | Immer |
-| Abfall (Falloff) | Wert | 0–4 | 0–4 | 1 | — | Auto | Teiltöne > 1 oder Teiltöne verbunden |
-| Streckung (Stretch) | Wert | 0–4 | 0–4 | 1 | — | Auto | Teiltöne > 1 oder Teiltöne verbunden |
-| Frequenz (Frequency) | Wert | 0,00001–20.000 Hz | 0–20.000 Hz | 440 Hz | Hz, kHz | Auto | Immer |
-| Phase (Phase) | Wert | 0–1 turn | ±∞ turn | 0 turn | turn, °, rad | Auto | Immer |
-| Zurücksetzen (Reset) | Trigger | — | — | — | — | Trigger | Immer |
+| Wellenform (Waveform) | [Wavetable-Ressource](../../user/de/data-types.md#wavetable) | Sinus, Dreieck, Sägezahn, Rechteck | — | Sinus | — | [Control](../../user/de/rates.md#control) | Immer |
+| Teiltöne (Partials) | [Wert](../../user/de/data-types.md#value) | 1–144, ganzzahlig | 1–144, abgerundet | 1 | — | [Control](../../user/de/rates.md#control) | Immer |
+| Abfall (Falloff) | [Wert](../../user/de/data-types.md#value) | 0–4 | 0–4 | 1 | — | [Auto](../../user/de/rates.md#auto) | Teiltöne > 1 oder Teiltöne verbunden |
+| Streckung (Stretch) | [Wert](../../user/de/data-types.md#value) | 0–4 | 0–4 | 1 | — | [Auto](../../user/de/rates.md#auto) | Teiltöne > 1 oder Teiltöne verbunden |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0,00001–20.000 Hz | 0–20.000 Hz | 440 Hz | [Hz](../../user/de/units.md#frequency), [kHz](../../user/de/units.md#frequency) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Phase (Phase) | [Wert](../../user/de/data-types.md#value) | 0–1 turn | ±∞ turn | 0 turn | [turn](../../user/de/units.md#angle), [°](../../user/de/units.md#angle), [rad](../../user/de/units.md#angle) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Zurücksetzen (Reset) | [Trigger](../../user/de/data-types.md#trigger) | — | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
 
 ## Ausgänge
 
-[Kanäle und Datentypen](../../user/de/data-types.md)
-
 | Bezeichnung | Datentyp | Wertebereich | Rate | Kanal |
 | --- | --- | --- | --- | --- |
-| Audioausgang (Audio Out) | Audio | ±1 | Audio | Auto |
+| Audioausgang (Audio Out) | [Audio](../../user/de/data-types.md#audio) | ±1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
@@ -61,9 +57,7 @@ Die übrigen Funktionen entsprechen dem normalen Oszillator.
 
 ## Mute
 
-[Mute-Grundlagen](../../user/de/muting.md)
-
-| Mutable | Eingang | Ausgang |
+| [Mutable](../../user/de/muting.md) | Eingang | Ausgang |
 | --- | --- | --- |
 | Ja | — | — |
 

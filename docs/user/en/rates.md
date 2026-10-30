@@ -7,9 +7,9 @@ Rate determines **when** values are evaluated.
 
 | Rate | Meaning | Numeric port appearance |
 | --- | --- | --- |
-| Audio | One value per sample | Circle |
-| Control | One value per audio block, held throughout that block | Diamond |
-| Auto | Select Audio or Control according to the node's rules | Resolved rate's shape |
+| <a id="audio"></a>Audio | One value per sample | Circle |
+| <a id="control"></a>Control | One value per audio block, held throughout that block | Diamond |
+| <a id="auto"></a>Auto | Select Audio or Control according to the node's rules | Resolved rate's shape |
 
 The current DSP configuration uses 48,000 samples per second and blocks of up to
 256 samples. A full block lasts approximately 5.33 ms.
@@ -38,7 +38,7 @@ peak is more suitable for measuring its level.
 
 ## Trigger and MIDI
 
-**Trigger** denotes individual events that initiate an action. Its port uses a
+<a id="trigger"></a>**Trigger** denotes individual events that initiate an action. Its port uses a
 double diamond. “Sample-accurate” describes event timing resolution, not another
 rate. A trigger is not a held number. Use the appropriate trigger converters
 when converting between these representations.

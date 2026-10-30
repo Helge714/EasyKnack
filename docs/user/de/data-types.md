@@ -7,11 +7,11 @@ Der Datentyp beschreibt den Inhalt einer Verbindung. Er ist von ihrer
 
 | Datentyp | Inhalt |
 | --- | --- |
-| Wert | Zahlen für Berechnungen und Steuerung, beispielsweise Frequenz oder Mischfaktor |
-| Audio | Numerische Samples für die Klangverarbeitung |
-| Trigger | Einzelne Ereignisse ohne dauerhaft gehaltenen Zahlenwert |
-| MIDI | Nachrichten wie Note On, Note Off, Control Change und Pitch Bend |
-| Vektor | Drei zusammengehörige Komponenten, beispielsweise X, Y und Z |
+| <a id="value"></a>Wert | Zahlen für Berechnungen und Steuerung, beispielsweise Frequenz oder Mischfaktor |
+| <a id="audio"></a>Audio | Numerische Samples für die Klangverarbeitung |
+| <a id="trigger"></a>Trigger | Einzelne Ereignisse ohne dauerhaft gehaltenen Zahlenwert |
+| <a id="midi"></a>MIDI | Nachrichten wie Note On, Note Off, Control Change und Pitch Bend |
+| <a id="vector"></a>Vektor | Drei zusammengehörige Komponenten, beispielsweise X, Y und Z |
 
 Audio und Wert verwenden kompatible numerische Signale. Ein Math-Node kann
 deshalb auch Audio verarbeiten. Eine andere Farbe allein bedeutet weder einen
@@ -29,16 +29,18 @@ skalaren Wert zu liefern.
 
 | Ressource | Inhalt | Typische Verwendung |
 | --- | --- | --- |
-| Wavetable | Eine periodische Wellenform mit Abtastwerten | Wellenformeingang eines Oszillators |
-| Buffer | Gespeicherte Audiosamples mit Länge und Schreibposition beziehungsweise Dateiende | Buffer Reader |
-| Spectrum | Komplexe FFT-Bins mit Frequenz-, Fenster- und Zeitbezug | Spektralbearbeitung und IFFT |
-| Analysis | Analyseergebnis, beispielsweise ein Spektrum oder eine Autokorrelation | Viewer und Merkmalsberechnung |
+| <a id="wavetable"></a>Wavetable | Eine periodische Wellenform mit Abtastwerten | Wellenformeingang eines Oszillators |
+| <a id="buffer"></a>Buffer | Gespeicherte Audiosamples mit Länge und Schreibposition beziehungsweise Dateiende | Buffer Reader |
+| <a id="spectrum"></a>Spectrum | Komplexe FFT-Bins mit Frequenz-, Fenster- und Zeitbezug | Spektralbearbeitung und IFFT |
+| <a id="analysis"></a>Analysis | Analyseergebnis, beispielsweise ein Spektrum oder eine Autokorrelation | Viewer und Merkmalsberechnung |
 
 Spectrum kann an geeignete Analysis-Eingänge angeschlossen werden. Ein beliebiges
 Analysis-Ergebnis ist umgekehrt nicht automatisch ein rekonstruierbares Spectrum.
 Eine Ressource wird mit einem passenden Reader oder Verarbeitungs-Node ausgewertet.
 Das Weiterreichen einer Ressource bedeutet nicht, dass ihre gesamte Datenmenge
 an jeder Verbindung kopiert wird.
+
+<a id="channels"></a>
 
 ## Kanäle
 

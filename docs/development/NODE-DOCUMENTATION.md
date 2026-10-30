@@ -20,8 +20,12 @@ only a German page. Bilingual coverage and production integration remain pending
 
 Shared foundations now live in [English](../user/en/index.md) and
 [German](../user/de/index.md): rates, data types/channels, units and muting.
-Link these from the relevant reference sections instead of repeating their
-explanations. Maintain both language versions when shared behavior changes.
+Link directly on the relevant table terms (Audio, Control, Auto, resource types,
+unit symbols, Mutable), rather than inserting link lists below section headings.
+Use the shared pages' stable term anchors, identical in both languages. Rate Auto
+links to rate selection; channel Auto links to channels. Do not repeat their
+explanations. Maintain both language versions and existing anchors when shared
+behavior changes.
 
 ## Files, identity and languages
 

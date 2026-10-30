@@ -33,9 +33,9 @@ reinterprets the signal.
 
 | Quantity | Units | Relationship |
 | --- | --- | --- |
-| Frequency | Hz, kHz, BPM | 1 kHz = 1,000 Hz; 60 BPM = 1 Hz |
+| <a id="frequency"></a>Frequency | Hz, kHz, BPM | 1 kHz = 1,000 Hz; 60 BPM = 1 Hz |
 | Time | s, ms, smp | 1 s = 1,000 ms; at 48,000 Hz: 1 s = 48,000 smp |
-| Angle | turn, °, rad | 1 turn = 360° = 2π rad |
+| <a id="angle"></a>Angle | turn, °, rad | 1 turn = 360° = 2π rad |
 | Length | m, km, cm, mm | 1 m = 100 cm = 1,000 mm |
 | Amplitude ratio | Factor, %, dB | Factor 1 = 100 % = 0 dB; dB = 20 · log10(factor) for positive factors |
 | Pitch ratio | Factor, cent, st, oct | Factor 2 = 1 oct = 12 st = 1,200 cent |

@@ -7,9 +7,9 @@ Die Rate bestimmt, **wann** Werte ausgewertet werden. Der
 
 | Rate | Bedeutung | Darstellung am numerischen Port |
 | --- | --- | --- |
-| Audio | Ein Wert pro Sample | Kreis |
-| Control | Ein Wert pro Audioblock; innerhalb des Blocks gehalten | Raute |
-| Auto | Automatische Wahl zwischen Audio und Control nach den Regeln des Nodes | Form der aufgelösten Rate |
+| <a id="audio"></a>Audio | Ein Wert pro Sample | Kreis |
+| <a id="control"></a>Control | Ein Wert pro Audioblock; innerhalb des Blocks gehalten | Raute |
+| <a id="auto"></a>Auto | Automatische Wahl zwischen Audio und Control nach den Regeln des Nodes | Form der aufgelösten Rate |
 
 Die aktuelle DSP-Konfiguration verwendet 48.000 Samples pro Sekunde und Blöcke
 mit bis zu 256 Samples. Ein vollständiger Block dauert etwa 5,33 ms.
@@ -39,7 +39,7 @@ Für dessen Pegel sind RMS oder Absolutspitze geeigneter.
 
 ## Trigger und MIDI
 
-**Trigger** bezeichnet einzelne Ereignisse, die eine Aktion auslösen. Der Port
+<a id="trigger"></a>**Trigger** bezeichnet einzelne Ereignisse, die eine Aktion auslösen. Der Port
 wird als Doppelraute dargestellt. „Samplegenau“ beschreibt die zeitliche
 Auflösung eines Ereignisses, keine zusätzliche Rate. Ein Trigger ist kein
 gehaltener Zahlenwert. Zur Umwandlung dienen entsprechende Trigger-Konverter.

@@ -35,9 +35,9 @@ nur am Eingang zu wählen ist eine gezielte Neuinterpretation des Signals.
 
 | Größe | Einheiten | Beziehung |
 | --- | --- | --- |
-| Frequenz | Hz, kHz, BPM | 1 kHz = 1.000 Hz; 60 BPM = 1 Hz |
+| <a id="frequency"></a>Frequenz | Hz, kHz, BPM | 1 kHz = 1.000 Hz; 60 BPM = 1 Hz |
 | Zeit | s, ms, smp | 1 s = 1.000 ms; bei 48.000 Hz: 1 s = 48.000 smp |
-| Winkel | turn, °, rad | 1 turn = 360° = 2π rad |
+| <a id="angle"></a>Winkel | turn, °, rad | 1 turn = 360° = 2π rad |
 | Länge | m, km, cm, mm | 1 m = 100 cm = 1.000 mm |
 | Amplitudenverhältnis | Faktor, %, dB | Faktor 1 = 100 % = 0 dB; dB = 20 · log10(Faktor) für positive Faktoren |
 | Tonhöhenverhältnis | Faktor, cent, st, oct | Faktor 2 = 1 oct = 12 st = 1.200 cent |
