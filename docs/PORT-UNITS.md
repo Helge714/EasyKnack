@@ -1,5 +1,7 @@
 # Port units
 
+Full reference: [English](user/en/units.md) · [Deutsch](user/de/units.md).
+
 Right-click a numeric port or its label and choose **Unit**. Connected inputs keep
 this menu available when their slider is hidden. The slider and port menu share
 one setting. Only units supported by that port are offered.

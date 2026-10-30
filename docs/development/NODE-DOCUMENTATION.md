@@ -18,6 +18,11 @@ The approved layout pilot is
 Earlier drafts are comparison material, not templates. The pilot currently has
 only a German page. Bilingual coverage and production integration remain pending.
 
+Shared foundations now live in [English](../user/en/index.md) and
+[German](../user/de/index.md): rates, data types/channels, units and muting.
+Link these from the relevant reference sections instead of repeating their
+explanations. Maintain both language versions when shared behavior changes.
+
 ## Files, identity and languages
 
 - Use `docs/nodes/en/<stable-slug>.md` and `docs/nodes/de/<stable-slug>.md`.

@@ -1,0 +1,60 @@
+# Datentypen
+
+Der Datentyp beschreibt den Inhalt einer Verbindung. Er ist von ihrer
+[Rate](rates.md), [Einheit](units.md) und Farbe zu unterscheiden.
+
+## Signale und Nachrichten
+
+| Datentyp | Inhalt |
+| --- | --- |
+| Wert | Zahlen für Berechnungen und Steuerung, beispielsweise Frequenz oder Mischfaktor |
+| Audio | Numerische Samples für die Klangverarbeitung |
+| Trigger | Einzelne Ereignisse ohne dauerhaft gehaltenen Zahlenwert |
+| MIDI | Nachrichten wie Note On, Note Off, Control Change und Pitch Bend |
+| Vektor | Drei zusammengehörige Komponenten, beispielsweise X, Y und Z |
+
+Audio und Wert verwenden kompatible numerische Signale. Ein Math-Node kann
+deshalb auch Audio verarbeiten. Eine andere Farbe allein bedeutet weder einen
+anderen Zahlenbereich noch eine automatische Umrechnung.
+
+Ein **Gate** ist ein gehaltener Wert, gewöhnlich 0 oder 1. Ein **Trigger** ist
+ein Ereignis. Ein neuer Trigger kann auftreten, während ein Gate bereits 1 ist.
+MIDI muss über passende MIDI-Nodes in numerische Werte oder Trigger umgewandelt
+werden; ein MIDI-Port ist kein Frequenz- oder Gate-Eingang.
+
+## Ressourcen
+
+Ressourcenverbindungen verweisen auf zusammengehörige Daten, statt einen einzelnen
+skalaren Wert zu liefern.
+
+| Ressource | Inhalt | Typische Verwendung |
+| --- | --- | --- |
+| Wavetable | Eine periodische Wellenform mit Abtastwerten | Wellenformeingang eines Oszillators |
+| Buffer | Gespeicherte Audiosamples mit Länge und Schreibposition beziehungsweise Dateiende | Buffer Reader |
+| Spectrum | Komplexe FFT-Bins mit Frequenz-, Fenster- und Zeitbezug | Spektralbearbeitung und IFFT |
+| Analysis | Analyseergebnis, beispielsweise ein Spektrum oder eine Autokorrelation | Viewer und Merkmalsberechnung |
+
+Spectrum kann an geeignete Analysis-Eingänge angeschlossen werden. Ein beliebiges
+Analysis-Ergebnis ist umgekehrt nicht automatisch ein rekonstruierbares Spectrum.
+Eine Ressource wird mit einem passenden Reader oder Verarbeitungs-Node ausgewertet.
+Das Weiterreichen einer Ressource bedeutet nicht, dass ihre gesamte Datenmenge
+an jeder Verbindung kopiert wird.
+
+## Kanäle
+
+Kanäle sind unabhängig vom Datentyp und von der Rate.
+
+| Angabe in der Referenz | Bedeutung |
+| --- | --- |
+| Mono | Ein fester einzelner Signalverlauf |
+| Stereo | Ein festes Paar aus linkem und rechtem Verlauf |
+| Links / Rechts | Eine ausdrücklich zugeordnete Kanalseite |
+| Auto | Die Kanalausprägung ergibt sich aus Eingängen und Node-Verhalten |
+| — | Kanalangabe nicht anwendbar |
+
+Ein Stereo-Signal benötigt nicht grundsätzlich zwei sichtbare Leitungen.
+Kanaltrennung und Zusammenführung erfolgen mit den entsprechenden Channel-Nodes.
+Polyphone Stimmen und Instance-Gruppen sind zusätzliche Verarbeitungsdimensionen;
+sie sind nicht gleichbedeutend mit linkem und rechtem Kanal.
+
+[Grundlagen](index.md) · [English](../en/data-types.md)

@@ -6,6 +6,8 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 
 ## Eingänge
 
+[Datentypen](../../user/de/data-types.md) · [Einheiten](../../user/de/units.md) · [Raten](../../user/de/rates.md)
+
 | Bezeichnung | Datentyp | Reglerbereich | Signalbereich | Standardwert | Einheit | Rate | Sichtbarkeit |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Wellenform (Waveform) | Wavetable-Ressource | Sinus, Dreieck, Sägezahn, Rechteck | — | Sinus | — | Control | Immer |
@@ -17,6 +19,8 @@ Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
 | Zurücksetzen (Reset) | Trigger | — | — | — | — | Trigger | Immer |
 
 ## Ausgänge
+
+[Kanäle und Datentypen](../../user/de/data-types.md)
 
 | Bezeichnung | Datentyp | Wertebereich | Rate | Kanal |
 | --- | --- | --- | --- | --- |
@@ -56,6 +60,8 @@ periodische Wellenform; `wrap(x) = x − floor(x)`. Für eine leere Menge `I` is
 Die übrigen Funktionen entsprechen dem normalen Oszillator.
 
 ## Mute
+
+[Mute-Grundlagen](../../user/de/muting.md)
 
 | Mutable | Eingang | Ausgang |
 | --- | --- | --- |
