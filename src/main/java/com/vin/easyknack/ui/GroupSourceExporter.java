@@ -89,7 +89,7 @@ final class GroupSourceExporter {
             var ports=input?inputs:outputs;var outputBase=GroupUnits.base(registry,descriptor,mapping);var outputUnit=GroupUnits.selected(instance,mapping,outputBase);
             ports.add(new Port(mapping,new PropertyId((input?"input_":"output_")+ports.size()),slider,signal,Map.copyOf(choiceValues),!input&&GroupUnits.numeric(mapping)?new UnitFormats(outputUnit,outputUnit,GroupUnits.allowed(mapping,outputBase)):null));
         }
-        if(outputs.isEmpty()||outputs.size()>8)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Export requires between one and eight output ports."));
+        if(outputs.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("export.outputsRequired"));
         // Sentinel leaves expose boundary endpoints through the existing nested-group flattener.
         var rootNodes=new ArrayList<GLGraphNode>();rootNodes.add(instance.withoutProperty(GLNodeState.HIDDEN).withoutProperty(GLNodeState.MUTED));
         var wires=new ArrayList<GLGraphConnection>();var inputIds=new ArrayList<GLNodeId>();var outputIds=new ArrayList<GLNodeId>();
@@ -482,7 +482,7 @@ final class GroupSourceExporter {
     private static int reference(GLNodeEndpoint endpoint,List<GLGraphNode> nodes,Map<GLNodeId,Integer> indices,List<GLNodeId> external){
         if(endpoint==null)return -1;int index=indices.get(endpoint.nodeId());if(external.contains(endpoint.nodeId()))return index;
         var n=nodes.get(index-external.size());var outputs=NodeRegistry.require(n.typeId()).layout(new NodeState(n.properties())).ports().stream().filter(p->p.direction()==GLPortDirection.OUTPUT).toList();
-        for(int i=0;i<outputs.size();i++)if(outputs.get(i).id().equals(endpoint.portId()))return index+256*i;
+        for(int i=0;i<outputs.size();i++)if(outputs.get(i).id().equals(endpoint.portId()))return Math.addExact(index,Math.multiplyExact(256,i));
         throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unresolved output: ")+endpoint);
     }
 }

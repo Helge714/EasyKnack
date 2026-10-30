@@ -29,7 +29,7 @@ namespace easyknack {
 struct SpectralGraphNode : NodeProcessor {
     struct Step {
         std::unique_ptr<NodeProcessor> processor;
-        std::array<float,8> values{};std::array<float*,8> outputs{};
+        std::vector<float> values;std::vector<float*> outputs;std::size_t valueOffset=0;
         std::vector<const float*> inputs;std::vector<char> rates;std::string type,parameters;
         bool audio=false,condition=false,invariant=false;
         BinAccess* access=nullptr;InstanceContextNode* instance=nullptr;BinUniformNode* uniform=nullptr;
@@ -72,14 +72,14 @@ struct SpectralGraphNode : NodeProcessor {
     SpectrumStream stream;std::vector<std::unique_ptr<SpectrumStream>> extraStreams;
     // Retain the primary result alias for previously exported single-output kernels.
     BinOutputNode* result=nullptr;
-    std::vector<BinOutputNode*> results;std::array<StreamSpectrumFrame*,8> outputFrames{};std::vector<Step> steps;
+    std::vector<BinOutputNode*> results;std::vector<StreamSpectrumFrame*> outputFrames;std::size_t valueSlots=0;std::vector<Step> steps;
     std::size_t spectrumPorts()const noexcept{return std::max(std::size_t{1},results.size());}
-    struct Voice {std::vector<std::array<float,8>> values;std::vector<std::unique_ptr<NodeProcessor>> processors;std::array<float,7> weights{};float gain=0,target=0;bool valid=false;std::uint64_t lastTime=0;};
+    struct Voice {std::vector<float> values;std::vector<std::unique_ptr<NodeProcessor>> processors;std::vector<float> weights;float gain=0,target=0;bool valid=false;std::uint64_t lastTime=0;};
     std::vector<Voice> voices;std::vector<std::size_t> combines;int discard=-1;
     std::vector<std::size_t> activeVoices;
-    std::array<std::array<float,256>,7> normalization{};
+    std::vector<std::array<float,256>> normalization;
     std::array<float,256> activity{};
-    std::vector<std::array<std::array<float,256>,8>> audioBuffers;
+    std::vector<std::vector<std::array<float,256>>> audioBuffers;
     std::size_t activeBins=0;std::uint64_t voiceIdentity=0;float fadeStep=1,weightSmoothing=1;
     std::string programIdentity;
     std::string logicalIdentity="spectral";
@@ -131,7 +131,7 @@ struct SpectralGraphNode : NodeProcessor {
         if(marker=="!62017619f30a4e31"){
             int source;if(!(in>>source>>hex)||source< -1||source>=2048)throw std::runtime_error("Invalid legacy spectral parameters");sources={source};
         }else{in.seekg(start);auto p=parameters::SpectralGraphNodeParameters::read(in);sources=p.sources();hex=p.program_value;}
-        steps.clear();result=nullptr;results.clear();extraStreams.clear();used.fill(false);triggerUsed.fill(false);statefulBins=false;combines.clear();discard=-1;programIdentity=hex;
+        steps.clear();valueSlots=0;result=nullptr;results.clear();extraStreams.clear();used.fill(false);triggerUsed.fill(false);statefulBins=false;combines.clear();discard=-1;programIdentity=hex;
         if(hex.size()>2000000||hex.size()%2)throw std::runtime_error("Invalid bin program");std::string decoded;decoded.reserve(hex.size()/2);
         auto digit=[](char c)->unsigned{if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;throw std::runtime_error("Invalid bin program encoding");};
         for(std::size_t i=0;i<hex.size();i+=2)decoded.push_back(static_cast<char>(digit(hex[i])*16+digit(hex[i+1])));
@@ -151,18 +151,19 @@ struct SpectralGraphNode : NodeProcessor {
             if(type=="binhold"||type=="binmemory")statefulBins=true; if(auto* formula=dynamic_cast<BinFormulaNode*>(step.processor.get()))statefulBins|=formula->hasState()||formula->triggerInputs!=0;
             if(auto* uniform=dynamic_cast<BinUniformNode*>(step.processor.get())){used[uniform->slot]=true;triggerUsed[uniform->slot]=uniform->trigger;}
             if(auto* out=dynamic_cast<BinOutputNode*>(step.processor.get())){if(!result)result=out;results.push_back(out);}
-            step.inputs.resize(step.processor->sources.size());step.rates.assign(step.inputs.size(),'c');for(std::size_t port=0;port<8;port++)step.outputs[port]=&step.values[port];
+            step.inputs.resize(step.processor->sources.size());step.rates.assign(step.inputs.size(),'c');step.valueOffset=valueSlots;valueSlots+=step.processor->outputCount();step.values.resize(step.processor->outputCount());step.outputs.resize(step.values.size());
             for(std::size_t port=0;port<step.inputs.size();port++){int ref=step.processor->sources[port];if(ref<0)continue;
                 auto node=static_cast<std::size_t>(ref%256),output=static_cast<std::size_t>(ref/256);if(node>=i||output>=steps[node].processor->outputCount())throw std::runtime_error("Invalid/cyclic bin input");step.inputs[port]=&steps[node].values[output];step.audio|=steps[node].audio;
                 if(steps[node].type=="instancecombine")throw std::runtime_error("Use shared processing outside the spectral group after Instance Combine");}
             if((type=="bindiscard"||type=="binoutput"||type=="binhold"||type=="binmemory"||type=="formula")&&step.audio)throw std::runtime_error("Frame processors cannot depend on temporal audio; use FFT-frame values");
         }
-        if((results.empty()&&combines.empty())||spectrumPorts()+combines.size()>8||combines.size()>7||program>>marker)throw std::runtime_error("Invalid bin program output");
+        if((results.empty()&&combines.empty())||program>>marker)throw std::runtime_error("Invalid bin program output");
+        outputFrames.assign(spectrumPorts(),nullptr);normalization.resize(combines.size());
         for(std::size_t p=1;p<spectrumPorts();p++)extraStreams.push_back(std::make_unique<SpectrumStream>());
         // A held bin can remain nonzero after its live input becomes empty.
         if(statefulBins)skipEmptyBins=false;
         if(discard>=0)markCondition(std::size_t(discard));
-        for(auto& step:steps)step.outputs.fill(nullptr);
+        for(auto& step:steps)std::fill(step.outputs.begin(),step.outputs.end(),nullptr);
         for(auto& step:steps)for(int ref:step.processor->sources)if(ref>=0)steps[ref%256].outputs[ref/256]=&steps[ref%256].values[ref/256];
         conditionSteps.clear();valueSteps.clear();invariantSteps.clear();
         for(std::size_t i=0;i<steps.size();i++){
@@ -197,9 +198,9 @@ struct SpectralGraphNode : NodeProcessor {
         voices.clear();audioBuffers.clear();
         activeBins=0;voiceIdentity=0;activeVoices.clear();activeVoices.reserve(SpectrumStream::maxSize/2+1);fadeStep=float(1/std::max(1.,.005*rate));weightSmoothing=float(1-std::exp(-1/std::max(1.,.005*rate)));
         if(!combines.empty()){
-            audioBuffers.resize(steps.size());
+            audioBuffers.resize(steps.size());for(std::size_t s=0;s<steps.size();s++)audioBuffers[s].resize(steps[s].values.size());
             voices.resize(SpectrumStream::maxSize/2+1);
-            for(std::size_t k=0;k<voices.size();k++){auto& voice=voices[k];voice.values.resize(steps.size());voice.processors.resize(steps.size());
+            for(std::size_t k=0;k<voices.size();k++){auto& voice=voices[k];voice.values.resize(valueSlots);voice.weights.resize(combines.size());voice.processors.resize(steps.size());
                 for(std::size_t s=0;s<steps.size();s++)if(steps[s].audio){auto p=processor(steps[s].type);std::istringstream in(steps[s].parameters);p->configure(in);p->bindIdentity(logicalIdentity+"/"+std::to_string(s));p->prepare(rate,block);voice.processors[s]=std::move(p);}}
         }
     }
@@ -208,12 +209,12 @@ struct SpectralGraphNode : NodeProcessor {
         if(used!=old.used||triggerUsed!=old.triggerUsed||sources!=old.sources)return;
         history.swap(old.history);historyBegin=old.historyBegin;historyEnd=old.historyEnd;historyIdentity=old.historyIdentity;historyValid=old.historyValid;
         bool layout=voices.size()==old.voices.size()&&steps.size()==old.steps.size();
-        for(std::size_t i=0;layout&&i<steps.size();i++)layout=steps[i].type==old.steps[i].type&&steps[i].audio==old.steps[i].audio;
+        for(std::size_t i=0;layout&&i<steps.size();i++)layout=steps[i].type==old.steps[i].type&&steps[i].audio==old.steps[i].audio&&steps[i].values.size()==old.steps[i].values.size();
         if(layout){
             for(std::size_t s=0;s<steps.size();s++)if(steps[s].type=="binhold"||steps[s].type=="binmemory"||steps[s].type=="formula")steps[s].processor->adoptState(*old.steps[s].processor);
             if(programIdentity==old.programIdentity)voices.swap(old.voices);
             else for(std::size_t k=0;k<voices.size();k++){
-                auto& v=voices[k];auto& previous=old.voices[k];v.values.swap(previous.values);v.weights=previous.weights;v.gain=previous.gain;v.target=previous.target;v.valid=previous.valid;v.lastTime=previous.lastTime;
+                auto& v=voices[k];auto& previous=old.voices[k];v.values.swap(previous.values);v.weights.swap(previous.weights);v.gain=previous.gain;v.target=previous.target;v.valid=previous.valid;v.lastTime=previous.lastTime;
                 for(std::size_t s=0;s<steps.size();s++)if(v.processors[s])v.processors[s]->adoptState(*previous.processors[s]);
             }
             activeVoices.swap(old.activeVoices);activeBins=old.activeBins;voiceIdentity=old.voiceIdentity;
@@ -251,7 +252,7 @@ struct SpectralGraphNode : NodeProcessor {
     virtual void processBins(const SpectrumStream& source,const StreamSpectrumFrame& input,StreamSpectrumFrame& frame,ProcessContext& c,std::size_t offset)noexcept{
         const auto count=source.size/2+1;
         if(frameWorker&&count>=512&&count*(conditionSteps.size()+valueSteps.size())>=parallelWorkThreshold){
-            auto& other=*frameWorker;other.outputFrames=outputFrames;other.windowSum=windowSum;other.discardedBinFrames=0;
+            auto& other=*frameWorker;std::copy(outputFrames.begin(),outputFrames.end(),other.outputFrames.begin());other.windowSum=windowSum;other.discardedBinFrames=0;
             for(std::size_t i=0;i<steps.size();i++)if(steps[i].uniform)other.steps[i].uniform->held=steps[i].uniform->held;
             other.beginFrame(source,input,c.sampleRate);
             struct Job {SpectralGraphNode* node;const SpectrumStream* source;const StreamSpectrumFrame* input;StreamSpectrumFrame* output;ProcessContext context;std::size_t offset,begin,end;};
@@ -272,7 +273,7 @@ struct SpectralGraphNode : NodeProcessor {
             for(auto i:valueSteps)frameStep(steps[i],source,input,k,c.sampleRate);
             writeBin(frame,k);
             if(!voices.empty()){auto& voice=voices[k];advancePhase(voice,source.blockStart+offset,c.sampleRate);
-                for(std::size_t s=0;s<steps.size();s++)if(!steps[s].audio)voice.values[s]=steps[s].values;
+                for(std::size_t s=0;s<steps.size();s++)if(!steps[s].audio)std::copy(steps[s].values.begin(),steps[s].values.end(),voice.values.begin()+steps[s].valueOffset);
                 voice.valid=true;voice.target=1;voice.lastTime=source.blockStart+offset;}
         }
     }
@@ -286,7 +287,7 @@ struct SpectralGraphNode : NodeProcessor {
         for(std::size_t i=0;i<steps.size();i++)if(auto* osc=dynamic_cast<OscillatorNode*>(voice.processors[i].get())){
             int ref=osc->sources.empty()?-1:osc->sources[0];
             if(ref>=0&&steps[ref%256].audio)continue; // Arbitrary temporal modulators retain paused state.
-            double hz=ref<0?osc->frequency:voice.values[ref%256][ref/256];
+            double hz=ref<0?osc->frequency:voice.values[steps[ref%256].valueOffset+ref/256];
             auto kernel=osc->prepareSample(hz,rate);osc->phase=OscillatorNode::wrap(osc->phase/OscillatorNode::tau+kernel.increment*double(time-voice.lastTime))*OscillatorNode::tau;
         }
         voice.lastTime=time;
@@ -301,8 +302,8 @@ struct SpectralGraphNode : NodeProcessor {
             if(voice.target==0)count=std::min(count,std::size_t(std::ceil(voice.gain/fadeStep)));
             if(!count)continue;
             for(std::size_t s=0;s<steps.size();s++)if(steps[s].audio){
-                auto& p=*voice.processors[s];std::array<const float*,8> inputs{};std::array<float*,8> outputs{};std::array<char,8> rates{};rates.fill('c');
-                for(std::size_t port=0;port<p.sources.size();port++){int ref=p.sources[port];if(ref>=0){bool audio=steps[ref%256].audio;inputs[port]=audio?audioBuffers[ref%256][ref/256].data():&voice.values[ref%256][ref/256];rates[port]=audio?'a':'c';}}
+                auto& p=*voice.processors[s];auto& inputs=steps[s].inputs;auto& outputs=steps[s].outputs;auto& rates=steps[s].rates;std::fill(inputs.begin(),inputs.end(),nullptr);std::fill(rates.begin(),rates.end(),'c');
+                for(std::size_t port=0;port<p.sources.size();port++){int ref=p.sources[port];if(ref>=0){bool audio=steps[ref%256].audio;inputs[port]=audio?audioBuffers[ref%256][ref/256].data():&voice.values[steps[ref%256].valueOffset+ref/256];rates[port]=audio?'a':'c';}}
                 for(std::size_t port=0;port<p.outputCount();port++)outputs[port]=audioBuffers[s][port].data();
                 std::array<float,256> ramp{},silence{};
                 auto combine=std::find(combines.begin(),combines.end(),s);
@@ -313,7 +314,7 @@ struct SpectralGraphNode : NodeProcessor {
                     inputs[1]=ramp.data();rates[1]='a';
                 }
                 ProcessContext block{inputs.data(),p.sources.size(),outputs[0],count,c.sampleRate,silence.data(),count};block.outputs=outputs.data();block.outputCount=p.outputCount();block.sourceRates=rates.data();p.process(block);
-                for(std::size_t port=0;port<p.outputCount();port++)voice.values[s][port]=outputs[port][count-1];
+                for(std::size_t port=0;port<p.outputCount();port++)voice.values[steps[s].valueOffset+port]=outputs[port][count-1];
             }
             const float initialGain=voice.gain;
             for(std::size_t i=0;i<count;i++){

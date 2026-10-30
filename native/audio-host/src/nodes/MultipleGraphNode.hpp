@@ -160,7 +160,7 @@ struct MultipleGraphNode : NodeProcessor {
     struct State {
         std::vector<std::unique_ptr<Instance>> instances;
         std::vector<std::array<std::unique_ptr<SpectrumStream>,2>> spectra;
-        std::array<std::array<bool,2>,8> invalidSpectra{};
+        std::vector<std::array<bool,2>> invalidSpectra;
         std::vector<float> gains;
         std::vector<std::vector<float>> left,right;
         std::vector<float> weights;
@@ -288,7 +288,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         auto digit=[](char c)->unsigned{if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;throw std::runtime_error("Invalid Multiple Group encoding");};
         std::string decoded;for(std::size_t i=0;i<p.program_value.size();i+=2)decoded.push_back(char(digit(p.program_value[i])*16+digit(p.program_value[i+1])));
         std::istringstream program(decoded);std::string marker;std::size_t inputCount;
-        if(!(program>>marker>>inputCount>>outputs)||(marker!="MULT1"&&marker!="MULT2"&&marker!="MULT3")||inputCount>9||outputs<1||outputs>8)throw std::runtime_error("Invalid Multiple Group header");
+        if(!(program>>marker>>inputCount>>outputs)||(marker!="MULT1"&&marker!="MULT2"&&marker!="MULT3")||inputCount>9||outputs<1||outputs>maxAddressableOutputs)throw std::runtime_error("Invalid Multiple Group header");
         explicitCombines=marker=="MULT2";
         std::vector<int> inputNodes(inputCount),outputNodes(outputs);
         for(auto& i:inputNodes)if(!(program>>i)||i<0||i>=256)throw std::runtime_error("Invalid Multiple Group input");
@@ -300,7 +300,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
             explicitCombines=explicitMode!=0;
             for(int p=0;p<policyCount;p++){
                 int index;std::string policy;
-                if(!(program>>index>>policy)||index<0||index>=256||policy.size()>8||policy.find_first_not_of("ace?")!=std::string::npos)throw std::runtime_error("Invalid instance rate policy");
+                if(!(program>>index>>policy)||index<0||index>=256||policy.find_first_not_of("ace?")!=std::string::npos)throw std::runtime_error("Invalid instance rate policy");
                 policies.emplace_back(index,std::move(policy));
             }
         }
@@ -364,7 +364,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(!primary)return;
         state->left.assign(outputs,std::vector<float>(frames));state->right.assign(outputs,std::vector<float>(frames));state->weights.resize(frames);state->weightLeft.assign(outputs,std::vector<float>(frames));state->weightRight.assign(outputs,std::vector<float>(frames));
         for(auto& instance:state->instances)instance->prepare(rate,frames);
-        state->fade.resize(frames);state->spectra.resize(outputs);
+        state->fade.resize(frames);state->spectra.resize(outputs);state->invalidSpectra.resize(outputs);
         for(std::size_t p=0;p<outputs;p++)if(outputResourceKind(p)==ResourceKind::spectrum)for(auto& channel:state->spectra[p]){channel=std::make_unique<SpectrumStream>();channel->prepare(frames);}
     }
     void adoptState(NodeProcessor& previous)noexcept override{
@@ -394,7 +394,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
             if(!state->initialized){for(int i=0;i<maximum;i++)state->gains[i]=i<active?1.f:0.f;state->initialized=true;}
             for(std::size_t p=0;p<outputs;p++){std::fill_n(state->left[p].data(),frames,0);std::fill_n(state->right[p].data(),frames,0);std::fill_n(state->weightLeft[p].data(),frames,0);std::fill_n(state->weightRight[p].data(),frames,0);}
             std::fill_n(state->weights.data(),frames,0);
-            state->invalidSpectra={};for(auto& output:state->spectra)for(auto& stream:output)if(stream){stream->count=0;stream->size=0;}
+            std::fill(state->invalidSpectra.begin(),state->invalidSpectra.end(),std::array<bool,2>{});for(auto& output:state->spectra)for(auto& stream:output)if(stream){stream->count=0;stream->size=0;}
             std::array<char,maxNodes> rates{};for(std::size_t p=0;p<std::min(c.inputCount,rates.size());p++)rates[p]=c.sourceRates?c.sourceRates[p]:c.input(p)?'a':'c';
             // Buffers are already in each instance's scheduler cache; no temporary allocation in process().
             for(int i=0;i<maximum;i++){

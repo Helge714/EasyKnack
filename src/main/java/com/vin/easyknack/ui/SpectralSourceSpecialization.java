@@ -68,7 +68,7 @@ final class SpectralSourceSpecialization {
                     if(field.kind()==ParameterContract.Kind.SOURCE)refs.add(Integer.valueOf(value));
                     else if(field.id()!=null)values.put(field.id().value(),value);
                 }
-                for(int ref:refs)if(ref>=0&&(ref%256>=i||ref>=2048))return null;
+                for(int ref:refs)if(ref>=0&&(ref%256>=i))return null;
                 if(type.equals("math")&&Arrays.stream(com.vin.easyknack.model.MathOperation.values()).noneMatch(op->op.id().equals(values.get("operation"))))return null;
                 steps.add(new Step(type,type.equals("formula")?"BinFormulaNode":Path.of(d.processor().header()).getFileName().toString().replace(".hpp",""),refs,values));
             }

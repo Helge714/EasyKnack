@@ -17,7 +17,7 @@ namespace easyknack {
 // Optional export-only block specialization; ordinary graph dispatch stays unchanged.
 template<class T,class=void> struct HasExportProcess:std::false_type{};
 template<class T> struct HasExportProcess<T,std::void_t<decltype(&T::processExport)>>:std::true_type{};
-constexpr int maxNodes = 256;
+constexpr int maxNodes = sourceNodeStride;
 constexpr int blockSize = 256;
 constexpr int sampleRate = 48000;
 struct Node {
@@ -176,6 +176,7 @@ struct AudioGraph {
         }
         preparedSampleRate=rate; preparedBlockFrames=frames;
         for(auto& node:nodes) for(std::size_t v=0;v<node.voiceCount();++v) {
+            node.voice(v).processor->prepareOutputStorage();node.voice(v).rightProcessor->prepareOutputStorage();
             node.voice(v).processor->prepare(rate,frames);
             node.voice(v).rightProcessor->prepare(rate,frames);
         }
@@ -242,6 +243,8 @@ struct AudioGraph {
             std::string marker, rate;
             if (!(in >> marker >> rate >> node.inputRates) || marker != "@" || (rate.empty() || rate.find_first_not_of("ace")!=std::string::npos))
                 throw std::runtime_error("invalid rate metadata");
+            auto outputs=node.processor->outputCount();
+            if(outputs<1||outputs>maxAddressableOutputs)throw std::runtime_error("Output count exceeds source-reference address space");
             node.outputRates=rate.size()==1?std::string(node.processor->outputCount(),rate[0]):rate;
             // Frequency was appended after Factor/Trigger; old exports retain their port indices.
             if(node.processorId=="digitalnoise"&&node.outputRates=="ae"&&node.processor->outputCount()==3)node.outputRates+="a";
@@ -258,9 +261,7 @@ struct AudioGraph {
             if (node.eventRate && !node.processor->supportsEventRate())
                 throw std::runtime_error("processor does not support event rate");
             for (int input : node.processor->sources)
-                if (input < -1 || input >= maxNodes*8 || input >= 0 && (input % maxNodes >= count || input % maxNodes == i && !node.processor->defersInputs())) throw std::runtime_error("invalid input");
-            auto outputs = node.processor->outputCount();
-            if(outputs<1||outputs>8)throw std::runtime_error("invalid output count");
+                if (input < -1 || input >= 0 && (input % maxNodes >= count || input % maxNodes == i && !node.processor->defersInputs())) throw std::runtime_error("invalid input");
             if(!configurationOnly){
             node.denseOutputs.resize(outputs,true);
             for(std::size_t p=0;p<outputs;p++)node.denseOutputs[p]=node.outputRate(p)!='e';

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.vingame.glswing.node.model.*;
 
-/** Protocol 13 (buffered manual-control interpolation, per-output rates and typed resources): source references encode node index + 256 * output index (up to eight outputs). */
+/** Protocol 13: source references encode node index + 256 * output index in a signed int. */
 public final class AudioGraphEncoder {
     private AudioGraphEncoder() { }
 
@@ -24,8 +24,6 @@ public final class AudioGraphEncoder {
             indices.put(node.id(), i);
             ports.put(node.id(), com.vin.easyknack.nodes.NodeRegistry.require(node.typeId())
                     .layout(new com.vin.easyknack.nodes.NodeState(node.properties())).ports());
-            if (ports.get(node.id()).stream().filter(p -> p.direction() == GLPortDirection.OUTPUT).count() > 8)
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximal acht Ausgänge pro Audio-Node"));
         }
         Map<GLNodeEndpoint, Integer> inputs = new HashMap<>();
         Map<GLNodeId,java.util.Set<String>> connectedPorts=new HashMap<>();
@@ -43,7 +41,7 @@ public final class AudioGraphEncoder {
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Incompatible port types: use an explicit Trigger/MIDI converter"));
             var outputs=ports.get(connection.output().nodeId()).stream().filter(p->p.direction()==GLPortDirection.OUTPUT).toList();
             int slot=0;while(!outputs.get(slot).id().equals(connection.output().portId()))slot++;
-            if (inputs.put(connection.input(), source+256*slot) != null)
+            if (inputs.put(connection.input(), Math.addExact(source,Math.multiplyExact(256,slot))) != null)
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Mehrere Quellen an einem Audioeingang"));
         }
         StringBuilder result = new StringBuilder("GRAPH ").append(graph.nodes().size());

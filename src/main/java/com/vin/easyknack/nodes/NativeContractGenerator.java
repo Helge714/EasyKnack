@@ -51,7 +51,7 @@ public final class NativeContractGenerator {
                 if(f.kind()==ParameterContract.Kind.CURVE){out.append("        ").append(field).append(".read(in);\n");continue;}
                 out.append("        if(!(in>>").append(field).append(")) throw std::runtime_error(\"Missing parameter: ").append(f.id().value()).append("\");\n");
                 if(type(node,f).equals("double"))out.append("        if(!std::isfinite(").append(field).append(")) throw std::runtime_error(\"Non-finite parameter\");\n");
-                if(f.kind()==ParameterContract.Kind.SOURCE)out.append("        if(").append(field).append(" < -1 || ").append(field).append(" >= 2048) throw std::runtime_error(\"Invalid source reference\");\n");
+                if(f.kind()==ParameterContract.Kind.SOURCE)out.append("        if(").append(field).append(" < -1) throw std::runtime_error(\"Invalid source reference\");\n");
                 if(f.kind()==ParameterContract.Kind.VALUE||f.kind()==ParameterContract.Kind.INTEGER){
                     var row=node.layout(new NodeState(node.defaults())).rows().stream().filter(r->r.key().equals(f.id())).findFirst().orElse(null);
                     if(row!=null){

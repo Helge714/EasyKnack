@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Allow multiple Bin Outputs in one Spectral Group with a shared bin schedule, independent complex streams and matching worker/Bake/export kernels. Instance Groups can expose Spectrum outputs with aligned complex Sum/Mean reduction per channel. Up to eight output slots remain supported; Bin Discard still affects all outputs. Rebuild the host and plugin SDK together; rebake/re-export to use multiple outputs. Existing single-output programs, document schema and host protocol are unchanged. Covered by the current development version before the first release.
+- Remove the fixed eight-output host/group/export limit. Size output, event-adapter and spectral/instance work buffers during preparation, with packed per-bin voice storage. Keep the existing source-reference encoding and validate actual source-port counts. Cover 24-port audio/control/event/resource routing without callback allocations, and 12-port Spectrum/numeric groups including persistence and Bake/export. Existing graph/voice budgets and integer addressability still apply. Rebuild the host and plugin SDK together; document schema, parameter fingerprints and protocol remain unchanged. Covered by the current development version before its first release.
+
+- Allow multiple Bin Outputs in one Spectral Group with a shared bin schedule, independent complex streams and matching worker/Bake/export kernels. Instance Groups can expose Spectrum outputs with aligned complex Sum/Mean reduction per channel. Output storage follows the group's declared interface; Bin Discard still affects all outputs. Rebuild the host and plugin SDK together; rebake/re-export to use multiple outputs. Existing single-output programs, document schema and host protocol are unchanged. Covered by the current development version before the first release.
 
 - Validate bin-only processors against their required Spectral Group context before sending graphs to the host. Keep ordinary temporal contracts and FFT-frame trigger execution separate in regression tests. Existing DSP behavior, native contracts and protocol versions are unchanged; covered by the current development version.
 

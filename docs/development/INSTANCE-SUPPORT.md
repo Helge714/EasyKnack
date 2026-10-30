@@ -12,11 +12,17 @@ Autocorrelation, spectral/correlation descriptors, level and pitch detection,
 Spectrum Statistics and finite averaging can supply internal control signals.
 
 The public boundary currently accepts numeric, Vector, Spectrum and Wavetable
-inputs and up to eight numeric or Spectrum outputs. Spectrum outputs use typed
+inputs and dynamically sized numeric or Spectrum outputs. Spectrum outputs use typed
 `MultipleSpectrumOutputNode` boundaries and reduce aligned complex frames with
 Sum/Mean independently per stereo channel. Other resources and triggers may be
 routed internally. Instance Merge remains the numeric boundary between
 per-instance processing and shared processing.
+
+Output count is not limited to eight. The unchanged source-reference format uses
+`node + 256 * output`; readers validate the referenced node and its actual output
+count. Prepared runtime, event-adapter, spectral and instance buffers follow the
+declared output counts. Graph-node/voice budgets and integer addressability remain
+separate constraints. Regressions: `DynamicOutputsTest`, `WideGroupOutputsTest`.
 
 ## Deliberate exclusions
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <istream>
@@ -15,6 +16,9 @@
 #include "ControlInterpolation.hpp"
 
 namespace easyknack {
+// Existing wire format: node + sourceNodeStride * output. Bound only by int representation.
+constexpr int sourceNodeStride=256;
+constexpr std::size_t maxAddressableOutputs=(std::size_t(std::numeric_limits<int>::max())+1)/sourceNodeStride;
 /** Borrowed buffers for one block. No allocation, ownership or node-specific parameters. */
 struct ProcessContext {
     struct NumericInput {
@@ -150,12 +154,23 @@ struct NodeProcessor {
     virtual bool writesEventBuffers()const noexcept{return false;}
     virtual bool writesEventBuffer(std::size_t)const noexcept{return writesEventBuffers();}
     virtual bool processesEventBlocks() const noexcept { return evaluatesOnEvents(); }
+    // Called by the scheduler on the control thread, independently of prepare overrides.
+    void prepareOutputStorage(){
+        if(outputCount()>8){eventSampleValues.resize(outputCount());eventSampleOutputs.resize(outputCount());}
+    }
+    std::vector<float> eventSampleValues;
+    std::vector<float*> eventSampleOutputs;
     virtual void processEventBlock(ProcessContext& c) noexcept {
-        if(c.inputCount>256||c.outputCount>8)return;
+        if(c.inputCount>256)return;
         std::array<std::uint32_t,256> cursors{};
         std::array<float,256> held{},sample{};
         std::array<const float*,256> inputs{};
-        std::array<float,8> values{};std::array<float*,8> outputs{};
+        std::array<float,8> smallValues{};std::array<float*,8> smallOutputs{};
+        float* values=smallValues.data();float** outputs=smallOutputs.data();
+        if(c.outputCount>smallValues.size()){
+            if(eventSampleValues.size()<c.outputCount)return; // Must be prepared before realtime execution.
+            values=eventSampleValues.data();outputs=eventSampleOutputs.data();std::fill_n(values,c.outputCount,0);
+        }
         for(std::size_t p=0;p<c.inputCount;p++)held[p]=c.events(p)?c.events(p)->initial:0;
         for(std::size_t p=0;p<c.outputCount;p++)outputs[p]=&values[p];
         bool force=c.eventRefresh;
@@ -164,7 +179,7 @@ struct NodeProcessor {
                 sample[p]=p==triggerPort?trigger:c.events(p)?held[p]:c.valueAt(p,offset);
                 inputs[p]=c.events(p)||c.input(p)?&sample[p]:nullptr;
             }
-            auto event=c;event.inputs=inputs.data();event.output=values.data();event.outputs=outputs.data();event.bufferSize=1;event.legacyEventEvaluation=true;
+            auto event=c;event.inputs=inputs.data();event.output=values;event.outputs=outputs;event.bufferSize=1;event.legacyEventEvaluation=true;
             process(event);if(c.eventEvaluationCount)++*c.eventEvaluationCount;
             for(std::size_t p=0;p<c.outputCount;p++)if(auto* out=c.eventOutput(p))
                 if(force||kind==ValueEventKind::trigger||values[p]!=out->valueAt(offset))out->push(offset,values[p],kind);

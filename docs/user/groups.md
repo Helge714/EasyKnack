@@ -73,9 +73,9 @@ The shortest feedback delay in a loop determines how finely that loop must execu
 more instances and short feedback can be expensive.
 
 A **Spectral Group** derives its instances from FFT bins. Each **Bin Output** produces
-its own spectrum; **Instance Merge** combines generated per-bin audio. Up to eight
-Spectrum/audio output boundaries are supported in total, with at most seven audio
-Merge boundaries. Shared upstream nodes run once per bin, even when several Bin
+its own spectrum; **Instance Merge** combines generated per-bin audio. Spectrum
+and audio output storage follows the group's actual interface; there is no fixed
+eight-output limit. Shared upstream nodes run once per bin, even when several Bin
 Outputs use their results. See [spectrum processing](analysis.md) for the two
 processing time scales.
 
@@ -92,6 +92,9 @@ The streams must use the same FFT size, window, hop, sample rate and frame timin
 incompatible batches produce no frames rather than combining unrelated bins.
 Stereo channels remain separate. Count changes select contributions per frame;
 the audio Merge fade does not apply to Spectrum outputs.
+
+Output buffers are prepared before playback. Existing graph-node, per-bin program
+and instance budgets still apply when building large groups.
 
 ## Formula Groups
 

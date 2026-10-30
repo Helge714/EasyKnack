@@ -63,7 +63,6 @@ final class SpectralGroups {
             var ports=d.portMappings().stream().filter(p->!GroupInputs.editorOnly(p)).toList();
             var inputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&!p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).toList();
             if(ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).count()!=1
-                ||ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).count()>8
                 ||ports.stream().anyMatch(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&!Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId()))
                 ||inputs.size()>SpectralGraphNode.MAX_EXTERNAL||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.TRIGGER.valueTypeId()).contains(p.publicPort().valueTypeId())))
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("spectral.boundaryLimits"));
@@ -122,9 +121,7 @@ final class SpectralGroups {
         for(var n:source.nodes())if(boundaries.contains(n.id()))visit(n.id(),source,new HashSet<>(),done,order);
         if(order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinDiscardNode).count()>1)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Use one Bin Discard; combine conditions with Math or Comparator"));
         var combines=order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode).toList();
-        if(combines.size()>7)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral group supports seven audio Combine outputs"));
         var spectra=order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinOutputNode).toList();
-        if(Math.max(1,spectra.size())+combines.size()>8)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("spectral.outputLimits"));
         var substitutions=new HashMap<GLNodeEndpoint,GLNodeEndpoint>();
         for(var n:order)if(boundaries.contains(n.id())){boolean spectrum=NodeRegistry.require(n.typeId()) instanceof BinOutputNode;substitutions.put(new GLNodeEndpoint(n.id(),spectrum?"spectrum":"out"),new GLNodeEndpoint(instance.id(),spectrum?SpectralGraphNode.spectrumOutput(spectra.indexOf(n)).value():"audio"+combines.indexOf(n)));}
         var shared=new ArrayList<GLGraphNode>();var sharedWires=new ArrayList<GLGraphConnection>();var sharedInputs=new HashMap<String,GLNodeEndpoint>();
@@ -161,7 +158,7 @@ final class SpectralGroups {
                 var endpoint=wires.get(new GLNodeEndpoint(node.id(),port.value()));if(endpoint==null||def instanceof BinContextNode||def instanceof BinReadNode&&port.equals(BinReadNode.SPECTRUM))return -1;
                 var upstream=source.findNode(endpoint.nodeId()).orElseThrow();var layout=NodeRegistry.require(upstream.typeId()).layout(new NodeState(upstream.properties()));
                 var ports=layout.rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).toList();int index=0;while(index<ports.size()&&!ports.get(index).id().equals(endpoint.portId()))index++;
-                if(index==ports.size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing spectral output ")+endpoint.portId()+" on "+upstream.typeId());return indices.get(endpoint.nodeId())+256*index;
+                if(index==ports.size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing spectral output ")+endpoint.portId()+" on "+upstream.typeId());return Math.addExact(indices.get(endpoint.nodeId()),Math.multiplyExact(256,index));
             }));
         }return new Program(SpectralGraphNode.hex(result.toString()),outputNames,combines.size(),Math.max(1,spectra.size()),shared,sharedWires,sharedInputs,CompiledManualTargets.collect(order,flat,n->Integer.toString(indices.get(n.id()))));
     }
