@@ -72,9 +72,26 @@ to combine contributions with Sum, Mean or Weighted Mean before shared processin
 The shortest feedback delay in a loop determines how finely that loop must execute;
 more instances and short feedback can be expensive.
 
-A **Spectral Group** derives its instances from FFT bins. **Bin Output** produces a
-spectrum; **Instance Merge** combines generated per-bin audio. These are distinct
-outputs. See [spectrum processing](analysis.md) for the two processing time scales.
+A **Spectral Group** derives its instances from FFT bins. Each **Bin Output** produces
+its own spectrum; **Instance Merge** combines generated per-bin audio. Up to eight
+Spectrum/audio output boundaries are supported in total, with at most seven audio
+Merge boundaries. Shared upstream nodes run once per bin, even when several Bin
+Outputs use their results. See [spectrum processing](analysis.md) for the two
+processing time scales.
+
+To split a spectrum, add two Bin Outputs and expose both in Group-IO. Multiply
+the original real and imaginary components by a mask for the first output and by
+`1 - mask` for the second. Equivalently, mask the magnitude and retain the original
+phase in Magnitude/phase mode. The two outputs then sum to the original spectrum.
+**Bin Discard** skips the bin for every output; use it only when no output needs
+that bin. Separate output masks do not duplicate the shared calculation.
+
+Instance Groups also accept Spectrum outputs. Their complex coefficients are
+summed, or averaged with the group's Sum/Mean setting, across active instances.
+The streams must use the same FFT size, window, hop, sample rate and frame timing;
+incompatible batches produce no frames rather than combining unrelated bins.
+Stereo channels remain separate. Count changes select contributions per frame;
+the audio Merge fade does not apply to Spectrum outputs.
 
 ## Formula Groups
 

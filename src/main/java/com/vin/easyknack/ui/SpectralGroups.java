@@ -63,18 +63,17 @@ final class SpectralGroups {
             var ports=d.portMappings().stream().filter(p->!GroupInputs.editorOnly(p)).toList();
             var inputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&!p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).toList();
             if(ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).count()!=1
-                ||ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).count()>1
                 ||ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).count()>8
                 ||ports.stream().anyMatch(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&!Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId()))
                 ||inputs.size()>SpectralGraphNode.MAX_EXTERNAL||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.TRIGGER.valueTypeId()).contains(p.publicPort().valueTypeId())))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral group needs one Spectrum input, at most one Spectrum output and seven audio Combine outputs, and up to 16 numeric or trigger frame inputs."));
+                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("spectral.boundaryLimits"));
             var connected=graph.connections().stream().filter(w->w.input().nodeId().equals(node.id())).map(w->w.input().portId()).collect(java.util.stream.Collectors.toSet());
             var state=new NodeState(asset.metadata());
             int flags=(state.text(SKIP_EMPTY,"false").equals("true")?1:0)|(state.text(PARALLEL,"true").equals("true")?0:2);
             var compiled=program(node,original,limits,inputs,connected,flags);
             for(var p:ports)renamed.put(new GLNodeEndpoint(node.id(),p.publicPort().id()),p.publicPort().direction()==GLPortDirection.OUTPUT?compiled.outputs().get(p.publicPort().id()):compiled.inputs().getOrDefault(p.publicPort().id(),new GLNodeEndpoint(node.id(),inputs.contains(p)?SpectralGraphNode.external(inputs.indexOf(p)).value():"spectrum")));
             nodes.addAll(compiled.shared());extraWires.addAll(compiled.wires());
-            var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(compiled.program()));values.put("audioOutputs",GLNodeValue.of(compiled.audioOutputs()));
+            var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(compiled.program()));values.put("audioOutputs",GLNodeValue.of(compiled.audioOutputs()));values.put("spectrumOutputs",GLNodeValue.of(compiled.spectrumOutputs()));
             values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(compiled.manualTargets()));values.put("triggerSlots",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->GroupInputSettings.selectedRate(inputs.get(i))==ProcessingRate.EVENT||inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.TRIGGER.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));
             for(String key:List.of(GLNodeState.MUTED,GLNodeState.HIDDEN))if(node.properties().containsKey(key))values.put(key,node.properties().get(key));
             nodes.add(new GLGraphNode(node.id(),new SpectralGraphNode().registration().id(),values));
@@ -82,7 +81,7 @@ final class SpectralGroups {
         var wires=new ArrayList<>(graph.connections().stream().filter(w->(!renamed.containsKey(w.output())||renamed.get(w.output())!=null)&&(!renamed.containsKey(w.input())||renamed.get(w.input())!=null)).map(w->new GLGraphConnection(w.id(),renamed.getOrDefault(w.output(),w.output()),renamed.getOrDefault(w.input(),w.input()))).toList());wires.addAll(extraWires);
         return new GLCompositeFlattenResult(Optional.of(new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,wires)),flat.origins(),flat.diagnostics());
     }
-    private record Program(String program,Map<String,GLNodeEndpoint> outputs,int audioOutputs,List<GLGraphNode> shared,List<GLGraphConnection> wires,Map<String,GLNodeEndpoint> inputs,Map<String,List<String>> manualTargets){}
+    private record Program(String program,Map<String,GLNodeEndpoint> outputs,int audioOutputs,int spectrumOutputs,List<GLGraphNode> shared,List<GLGraphConnection> wires,Map<String,GLNodeEndpoint> inputs,Map<String,List<String>> manualTargets){}
     private static Program program(GLGraphNode instance,GLCompositeGraphRegistry registry,GLCompositeExpansionLimits limits,List<GLCompositePortMapping> inputs,Set<String> connected,int flags){
         var graph=new GLNodeGraph();graph.edit("Compile bins",e->e.addNode(instance.withoutProperty(GLNodeState.MUTED).withoutProperty(GLNodeState.HIDDEN)));
         // A boundary sentinel exposes the actual group wiring during flattening; it is never a bin instruction.
@@ -112,7 +111,7 @@ final class SpectralGroups {
         }
         if(roots.isEmpty()){
             var out=new BinOutputNode();
-            return new Program(SpectralGraphNode.hex("BIN1 1 binoutput !"+NativeContractGenerator.fingerprint(out)+" "+out.encode(new NodeState(out.defaults()),p->-1)),Map.of(),0,List.of(),List.of(),Map.of(),Map.of());
+            return new Program(SpectralGraphNode.hex("BIN1 1 binoutput !"+NativeContractGenerator.fingerprint(out)+" "+out.encode(new NodeState(out.defaults()),p->-1)),Map.of(),0,1,List.of(),List.of(),Map.of(),Map.of());
         }
         var needed=new HashSet<GLNodeId>();for(var endpoint:roots.values())ancestors(endpoint.nodeId(),source,Set.of(),needed);
         var boundaries=source.nodes().stream().filter(n->needed.contains(n.id())&&(NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode||NodeRegistry.require(n.typeId()) instanceof BinOutputNode)).map(GLGraphNode::id).collect(java.util.stream.Collectors.toSet());
@@ -124,8 +123,10 @@ final class SpectralGroups {
         if(order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinDiscardNode).count()>1)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Use one Bin Discard; combine conditions with Math or Comparator"));
         var combines=order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode).toList();
         if(combines.size()>7)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral group supports seven audio Combine outputs"));
+        var spectra=order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinOutputNode).toList();
+        if(Math.max(1,spectra.size())+combines.size()>8)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("spectral.outputLimits"));
         var substitutions=new HashMap<GLNodeEndpoint,GLNodeEndpoint>();
-        for(var n:order)if(boundaries.contains(n.id())){boolean spectrum=NodeRegistry.require(n.typeId()) instanceof BinOutputNode;substitutions.put(new GLNodeEndpoint(n.id(),spectrum?"spectrum":"out"),new GLNodeEndpoint(instance.id(),spectrum?"out":"audio"+combines.indexOf(n)));}
+        for(var n:order)if(boundaries.contains(n.id())){boolean spectrum=NodeRegistry.require(n.typeId()) instanceof BinOutputNode;substitutions.put(new GLNodeEndpoint(n.id(),spectrum?"spectrum":"out"),new GLNodeEndpoint(instance.id(),spectrum?SpectralGraphNode.spectrumOutput(spectra.indexOf(n)).value():"audio"+combines.indexOf(n)));}
         var shared=new ArrayList<GLGraphNode>();var sharedWires=new ArrayList<GLGraphConnection>();var sharedInputs=new HashMap<String,GLNodeEndpoint>();
         for(var n:source.nodes())if(sharedIds.contains(n.id())){
             var def=NodeRegistry.require(n.typeId());
@@ -162,7 +163,7 @@ final class SpectralGroups {
                 var ports=layout.rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).toList();int index=0;while(index<ports.size()&&!ports.get(index).id().equals(endpoint.portId()))index++;
                 if(index==ports.size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing spectral output ")+endpoint.portId()+" on "+upstream.typeId());return indices.get(endpoint.nodeId())+256*index;
             }));
-        }return new Program(SpectralGraphNode.hex(result.toString()),outputNames,combines.size(),shared,sharedWires,sharedInputs,CompiledManualTargets.collect(order,flat,n->Integer.toString(indices.get(n.id()))));
+        }return new Program(SpectralGraphNode.hex(result.toString()),outputNames,combines.size(),Math.max(1,spectra.size()),shared,sharedWires,sharedInputs,CompiledManualTargets.collect(order,flat,n->Integer.toString(indices.get(n.id()))));
     }
     private static void ancestors(GLNodeId id,GLNodeGraphSnapshot graph,Set<GLNodeId> boundaries,Set<GLNodeId> result){
         if(!result.add(id)||boundaries.contains(id))return;

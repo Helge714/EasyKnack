@@ -36,7 +36,7 @@ final class SpectralSourceSpecialization {
             for(int i=0;i<p.steps().size();i++)if(!invariant[i]&&condition[i])append(s,p.steps().get(i),i);
             s.append("                if(discard>=0&&static_cast<BinDiscardNode&>(*steps[discard].processor).discarded){rejectBin(frame,k);continue;}\n");
             for(int i=0;i<p.steps().size();i++)if(!invariant[i]&&!condition[i])append(s,p.steps().get(i),i);
-            s.append("                frame.bins[k]=result?result->value:std::complex<double>{};\n            }return;\n        }\n");
+            s.append("                writeBin(frame,k);\n            }return;\n        }\n");
         }
         return new Result(type,s.append("        default:SpectralGraphNode::processBinRange(source,input,frame,c,offset,begin,end);\n        }\n    }\n};\n").toString());
     }

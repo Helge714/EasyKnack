@@ -732,8 +732,6 @@ final class WorkspaceController implements AutoCloseable {
         if(isSpectralContext()){
             if(entry.type().id().equals(FormulaGroups.CREATE)||composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(FormulaGroups::isFormula).orElse(false))return true; if(!SpectralGroups.supports(definition))return false;
             // One output is the program's root. Offer its replacement after deletion.
-            if(definition instanceof com.vin.easyknack.nodes.BinOutputNode)
-                return workspace.currentGraph().snapshot().nodes().stream().noneMatch(n->NodeRegistry.find(n.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.BinOutputNode);
             return true;
         }
         return !(definition instanceof com.vin.easyknack.nodes.InstanceCombineNode||definition instanceof com.vin.easyknack.nodes.InstanceContextNode);

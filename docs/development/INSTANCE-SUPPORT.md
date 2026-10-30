@@ -12,9 +12,11 @@ Autocorrelation, spectral/correlation descriptors, level and pitch detection,
 Spectrum Statistics and finite averaging can supply internal control signals.
 
 The public boundary currently accepts numeric, Vector, Spectrum and Wavetable
-inputs and numeric outputs. Other resources and triggers may be routed internally;
-this change does not add new public boundary formats. Instance Merge remains the
-boundary between per-instance processing and shared processing.
+inputs and up to eight numeric or Spectrum outputs. Spectrum outputs use typed
+`MultipleSpectrumOutputNode` boundaries and reduce aligned complex frames with
+Sum/Mean independently per stereo channel. Other resources and triggers may be
+routed internally. Instance Merge remains the numeric boundary between
+per-instance processing and shared processing.
 
 ## Deliberate exclusions
 

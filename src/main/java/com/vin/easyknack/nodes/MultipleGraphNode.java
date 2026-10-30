@@ -7,7 +7,8 @@ public final class MultipleGraphNode extends BasicNode {
     public static PropertyId output(int i){return new PropertyId("output"+i);}
     public boolean isListedInCatalog(){return false;}
     public void define(NodeBuilder n,NodeState s){
-        for(int i=0;i<(int)s.number("outputs",1);i++)n.addOutput(output(i),"Out "+(i+1));
+        var spectrumOutputs=java.util.Set.of(s.text("spectrumOutputs","").split(","));
+        for(int i=0;i<(int)s.number("outputs",1);i++){var row=n.addOutput(output(i),"Out "+(i+1));if(spectrumOutputs.contains(Integer.toString(i)))row.dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);}
         n.addInput(COUNT,"Count",Editor.Slider.button(8,0.0,256.0).integers().discrete()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
         var spectrum=java.util.Set.of(s.text("spectrumInputs","").split(","));
         var waveforms=java.util.Set.of(s.text("waveformInputs","").split(","));

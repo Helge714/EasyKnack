@@ -36,7 +36,7 @@ class SpectralPaletteTest {
             before=c.workspace().currentGraph().snapshot().nodes().size();c.workspace().createNode(oscillator,0,0);c.workspace().createNode(create,0,0);
             assertEquals(++before,c.workspace().currentGraph().snapshot().nodes().size());
             var output=c.workspace().currentGraph().snapshot().nodes().stream().filter(n->NodeRegistry.find(n.typeId()).orElse(null) instanceof BinOutputNode).findFirst().orElseThrow();
-            assertFalse(c.availableNodes().stream().anyMatch(e->e.type().id().equals(output.typeId())));
+            assertTrue(c.availableNodes().stream().anyMatch(e->e.type().id().equals(output.typeId())));
             c.workspace().currentGraph().edit("Remove output",e->e.removeNode(output.id()));
             var replacement=c.availableNodes().stream().filter(e->e.type().id().equals(new BinOutputNode().registration().id())).findFirst().orElseThrow();
             c.workspace().createNode(replacement,600,120);assertEquals(before,c.workspace().currentGraph().snapshot().nodes().size());

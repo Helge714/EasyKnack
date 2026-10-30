@@ -18,7 +18,7 @@ final class MultipleGroups {
         "unitconvert","value","comparator","gain","filter","delay","osc","additive",
         "digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher",
         "samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext",
-        "multiplegraph","multipleinput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate",
+        "multiplegraph","multipleinput","multiplespectrumoutput","multiplespectruminput","vector","vectorcombine","vectorseparate","vectormath","vectorrotate",
         "vectorscale","vectorlength","vectordistance","vectordot","spatialreceiver","multiplevectorinput","multipleoutput","instancecombine",
         "spectrum","fftstream","spectralgraph","ifft"
     );
@@ -58,7 +58,7 @@ final class MultipleGroups {
         var countPort=ports.stream().filter(MultipleGroups::countPort).findFirst().orElse(null);
         var inputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&!countPort(p)).toList();
         var outputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).toList();
-        if(inputs.size()>MultipleGraphNode.MAX_INPUTS||outputs.isEmpty()||outputs.size()>8||ports.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId()).contains(p.publicPort().valueTypeId())&&!(p.publicPort().direction()==GLPortDirection.INPUT&&Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.VECTOR.valueTypeId()).contains(p.publicPort().valueTypeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group supports up to eight numeric, Vector or Spectrum inputs and eight numeric outputs, plus Count. MIDI ports and nonnumeric outputs are not supported."));
+        if(inputs.size()>MultipleGraphNode.MAX_INPUTS||outputs.isEmpty()||outputs.size()>8||ports.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.SPECTRUM.valueTypeId()).contains(p.publicPort().valueTypeId())&&!(p.publicPort().direction()==GLPortDirection.INPUT&&Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.VECTOR.valueTypeId()).contains(p.publicPort().valueTypeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("instance.boundaryLimits"));
         for(var p:ports){String id=p.publicPort().id();renamed.put(new GLNodeEndpoint(instance.id(),id),new GLNodeEndpoint(instance.id(),countPort(p)?"count":p.publicPort().direction()==GLPortDirection.INPUT?MultipleGraphNode.input(inputs.indexOf(p)).value():MultipleGraphNode.output(outputs.indexOf(p)).value()));}
         int maximum=Integer.parseInt(new NodeState(asset.metadata()).text(MAXIMUM,"16"));if(maximum<1||maximum>256)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximum instances must be between 1 and 256"));
         int count=(int)new NodeState(instance.properties()).number(countPort==null?COUNT_PROPERTY:GroupUnits.key(countPort.publicPort().id()),new NodeState(instance.properties()).number(COUNT_PROPERTY,8));
@@ -72,7 +72,7 @@ final class MultipleGroups {
                 e.addNode(new GLGraphNode(id,boundary.registration().id(),Map.of("slot",GLNodeValue.of(i))));
                 if(i>0&&connected.contains(port))e.addConnection(wire(new GLNodeEndpoint(id,"out"),new GLNodeEndpoint(instance.id(),port)));
             }
-            for(var port:outputs){var id=stable(instance.id()+"/"+asset.id()+"/output/"+port.publicPort().id());outputIds.add(id);e.addNode(new GLGraphNode(id,new MultipleOutputNode().registration().id(),Map.of()));e.addConnection(wire(new GLNodeEndpoint(instance.id(),port.publicPort().id()),new GLNodeEndpoint(id,"in")));}
+            for(var port:outputs){var id=stable(instance.id()+"/"+asset.id()+"/output/"+port.publicPort().id());outputIds.add(id);e.addNode(new GLGraphNode(id,(port.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())?new MultipleSpectrumOutputNode():new MultipleOutputNode()).registration().id(),Map.of()));e.addConnection(wire(new GLNodeEndpoint(instance.id(),port.publicPort().id()),new GLNodeEndpoint(id,"in")));}
         });
         var root=new GLNodeGraphAsset("multiple-program",1,GLNodeGraphAssetKind.PROJECT,graph.snapshot(),GLNodeEditorViewState.empty());
         // Expand this instance boundary as an ordinary group, but compile nested
@@ -99,15 +99,16 @@ final class MultipleGroups {
         }
         var needed=new HashSet<GLNodeId>();for(var output:outputIds)ancestors(output,source,Set.of(),needed);
         var combines=source.nodes().stream().filter(n->needed.contains(n.id())&&NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode).toList();
-        if(combines.isEmpty()&&new NodeState(asset.metadata()).number(EXECUTION,1)>=2&&source.connections().stream().anyMatch(w->outputIds.contains(w.input().nodeId())))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Connect an Instance Combine to the group output before shared processing"));
+        var spectralOutputs=source.nodes().stream().filter(n->outputIds.contains(n.id())&&NodeRegistry.require(n.typeId()) instanceof MultipleSpectrumOutputNode).map(GLGraphNode::id).toList();
+        if(combines.isEmpty()&&new NodeState(asset.metadata()).number(EXECUTION,1)>=2&&source.connections().stream().anyMatch(w->outputIds.contains(w.input().nodeId())&&!spectralOutputs.contains(w.input().nodeId())))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Connect an Instance Combine to the group output before shared processing"));
         var extraNodes=new ArrayList<GLGraphNode>();var extraWires=new ArrayList<GLGraphConnection>();
         String marker="MULT1";
         if(!combines.isEmpty()){
-            if(combines.size()>8)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group supports up to eight Instance Combine boundaries"));
+            if(combines.size()+spectralOutputs.size()>8)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("instance.outputLimits"));
             marker="MULT2";
-            var boundaries=combines.stream().map(GLGraphNode::id).collect(java.util.stream.Collectors.toSet());
+            var boundaries=combines.stream().map(GLGraphNode::id).collect(java.util.stream.Collectors.toSet());boundaries.addAll(spectralOutputs);
             var perInstance=new HashSet<GLNodeId>();
-            for(var combine:combines)ancestors(combine.id(),source,Set.of(),perInstance);
+            for(var boundary:boundaries)ancestors(boundary,source,Set.of(),perInstance);
             var shared=new HashSet<GLNodeId>();
             for(var output:outputIds)ancestors(output,source,boundaries,shared);
             shared.removeAll(boundaries);
@@ -142,11 +143,11 @@ final class MultipleGroups {
             for(int i=0;i<outputIds.size();i++){
                 final var id=outputIds.get(i);
                 var upstream=source.connections().stream().filter(w->w.input().nodeId().equals(id)).map(GLGraphConnection::output).findFirst().orElse(null);
-                renamed.put(new GLNodeEndpoint(instance.id(),outputs.get(i).publicPort().id()),substitutions.getOrDefault(upstream,upstream));
+                renamed.put(new GLNodeEndpoint(instance.id(),outputs.get(i).publicPort().id()),spectralOutputs.contains(id)?new GLNodeEndpoint(instance.id(),MultipleGraphNode.output(combines.size()+spectralOutputs.indexOf(id)).value()):substitutions.getOrDefault(upstream,upstream));
             }
             perInstance.addAll(inputIds);
             source=new GLNodeGraphSnapshot(source.graphId(),source.revision(),source.nodes().stream().filter(n->perInstance.contains(n.id())).toList(),source.connections().stream().filter(w->perInstance.contains(w.input().nodeId())&&perInstance.contains(w.output().nodeId())).toList());
-            outputIds.clear();outputIds.addAll(combines.stream().map(GLGraphNode::id).toList());
+            outputIds.clear();outputIds.addAll(combines.stream().map(GLGraphNode::id).toList());outputIds.addAll(spectralOutputs);
         }
         long expandedNodes=source.nodes().stream().mapToLong(n->1+(NodeRegistry.require(n.typeId()) instanceof MultipleGraphNode?(long)new NodeState(n.properties()).number("instanceNodeCost",0):0)).sum()*maximum;
         if(expandedNodes>4096)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group exceeds 4096 node instances; reduce Maximum instances"));
@@ -160,6 +161,7 @@ final class MultipleGroups {
         }
         String program="MULT3 "+inputIds.size()+" "+outputIds.size()+" "+String.join(" ",inputIds.stream().map(id->Integer.toString(ids.indexOf(id))).toList())+" "+String.join(" ",outputIds.stream().map(id->Integer.toString(ids.indexOf(id))).toList())+" "+(marker.equals("MULT2")?1:0)+" "+policies.size()+" "+String.join(" ",policies)+" "+com.vin.easyknack.audio.AudioGraphEncoder.encode(source);
         var values=new HashMap<String,GLNodeValue>();values.put("program",GLNodeValue.of(SpectralGraphNode.hex(program)));values.put("instanceNodeCost",GLNodeValue.of(expandedNodes));values.put("maximum",GLNodeValue.of(maximum));values.put("count",GLNodeValue.of(Math.max(0,Math.min(256,count))));values.put("outputs",GLNodeValue.of(outputIds.size()));values.put("spectrumInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("waveformInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.WAVETABLE.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("vectorInputs",GLNodeValue.of(java.util.stream.IntStream.range(0,inputs.size()).filter(i->inputs.get(i).publicPort().valueTypeId().equals(SignalCategory.VECTOR.valueTypeId())).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));values.put("mode",GLNodeValue.of(new NodeState(asset.metadata()).text(MERGE,"mean")));
+        values.put("spectrumOutputs",GLNodeValue.of(java.util.stream.IntStream.range(0,outputIds.size()).filter(i->spectralOutputs.contains(outputIds.get(i))).mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(","))));
         values.put(CompiledManualTargets.PROPERTY,GLNodeValue.of(CompiledManualTargets.collect(source.nodes(),flat,n->n.id().toString())));
         for(String key:List.of(GLNodeState.MUTED,GLNodeState.HIDDEN))if(instance.properties().containsKey(key))values.put(key,instance.properties().get(key));
         extraNodes.add(0,new GLGraphNode(instance.id(),new MultipleGraphNode().registration().id(),values));

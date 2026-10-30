@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Allow multiple Bin Outputs in one Spectral Group with a shared bin schedule, independent complex streams and matching worker/Bake/export kernels. Instance Groups can expose Spectrum outputs with aligned complex Sum/Mean reduction per channel. Up to eight output slots remain supported; Bin Discard still affects all outputs. Rebuild the host and plugin SDK together; rebake/re-export to use multiple outputs. Existing single-output programs, document schema and host protocol are unchanged. Covered by the current development version before the first release.
+
 - Validate bin-only processors against their required Spectral Group context before sending graphs to the host. Keep ordinary temporal contracts and FFT-frame trigger execution separate in regression tests. Existing DSP behavior, native contracts and protocol versions are unchanged; covered by the current development version.
 
 - Add an editable Test column after the Measurement Recorder index. Store labels per row in the document, preserve them during capture and column reordering, and include a `test` column after `measurement` in CSV exports. Label Undo retains later automatic captures. Existing tables start with blank labels; host protocol and document schema are unchanged. Covered by the current development version.

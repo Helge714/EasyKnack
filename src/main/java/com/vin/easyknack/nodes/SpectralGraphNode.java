@@ -3,10 +3,11 @@ package com.vin.easyknack.nodes;
 public final class SpectralGraphNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("spectrum"),OUT=new PropertyId("out"),PROGRAM=new PropertyId("program");
     public static final int MAX_EXTERNAL=16, PROGRAM_TOKEN=MAX_EXTERNAL+1;
+    public static PropertyId spectrumOutput(int i){return i==0?OUT:new PropertyId("spectrum"+i);}
     public static PropertyId external(int i){return new PropertyId("external"+i);}
     public boolean isListedInCatalog(){return false;}
     public void define(NodeBuilder n,NodeState s){
-        n.addOutput(OUT,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
+        for(int i=0;i<(int)s.number("spectrumOutputs",1);i++)n.addOutput(spectrumOutput(i),"Spectrum "+(i+1)).dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
         for(int i=0;i<(int)s.number("audioOutputs",0);i++)n.addOutput(new PropertyId("audio"+i),"Audio "+(i+1)).signal(SignalCategory.AUDIO).rate(ProcessingRate.AUDIO);
         n.addInput(IN,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
         var triggers=java.util.Set.of(s.text("triggerSlots","").split(","));

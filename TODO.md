@@ -17,6 +17,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   Review old modulation, inherited group editors and generated exports manually.
 - [x] Finish review, validation and focused commits for accumulated Core and
   EasyKnack source changes. Keep machine-specific Eclipse settings local.
+- [x] Share one Spectral Group bin plan across multiple complex Spectrum outputs;
+  support typed Spectrum outputs through Instance Groups, stereo Sum/Mean and
+  Bake/export. Verify complementary reconstruction and mixed audio/resource outputs.
 - [ ] Manual acceptance: nested group Undo/Redo and directly forwarded ports;
   independently copied FFT window editors; repeated inspector selection; duplicate
   ordinary/Multiple Group Bakes; Step Switch mode changes and named inputs.
@@ -66,15 +69,17 @@ The older [event plan](TODO_EVENT.txt) and [routing plan](TODOs_IO-Routing.txt)
 are historical design references, not instructions to reintroduce obsolete public
 rate semantics or to resume kernel-driver installation.
 
-## Latest validation (29 October 2026)
+## Latest validation (30 October 2026)
 
 - Core: full Maven test/install, 132 tests, no failures/errors, one optional skip.
-- EasyKnack: full Maven package, 590 tests, no failures/errors, 154 optional tests
+- EasyKnack: full Maven package, 593 tests, no failures/errors, 155 optional tests
   skipped in the regular profile. Selected native checks were run separately.
 - Additional native checks passed for Step Switch sample/trigger/index behavior,
   all-partial power stretching and legacy cent-contract conversion, generated Instance kernels, spectral hold/memory/formulas,
   filters, Blur synthesis/power, IFFT stability and unit conversions.
 - A real transient plugin build reused its cache; Force rebuild produced a fresh
   host while the earlier binary remained usable. The development host was rebuilt.
+- Multi-output native checks passed for complementary complex spectra, stereo,
+  worker/Bake/export kernels, Instance Sum/Mean and mixed audio/Spectrum outputs.
 - Hardware, clean-machine installation and the manual acceptance list above remain
   separate checks; these results do not imply those tests were performed.

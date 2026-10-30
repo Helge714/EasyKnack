@@ -46,6 +46,7 @@
 #include "MultipleVectorInputNode.hpp"
 #include "MultipleSpectrumInputNode.hpp"
 #include "MultipleOutputNode.hpp"
+#include "MultipleSpectrumOutputNode.hpp"
 #include "InstanceCombineNode.hpp"
 #include "SpectrumNode.hpp"
 #include "FFTStreamNode.hpp"
@@ -158,6 +159,8 @@ struct MultipleGraphNode : NodeProcessor {
     };
     struct State {
         std::vector<std::unique_ptr<Instance>> instances;
+        std::vector<std::array<std::unique_ptr<SpectrumStream>,2>> spectra;
+        std::array<std::array<bool,2>,8> invalidSpectra{};
         std::vector<float> gains;
         std::vector<std::vector<float>> left,right;
         std::vector<float> weights;
@@ -180,6 +183,8 @@ struct MultipleGraphNode : NodeProcessor {
         return state->instances[0]->canShareChannels();
     }
     bool separatesChannels()const noexcept override{return true;}
+    // Resource-only groups still advance their internal audio/frame schedules.
+    char executionRate()const noexcept override{return 'a';}
     void collectMidiDevices(std::vector<std::uint64_t>& devices)const override{
         NodeProcessor::collectMidiDevices(devices);if(state&&!state->instances.empty())state->instances[0]->collectMidiDevices(devices);
     }
@@ -189,6 +194,8 @@ struct MultipleGraphNode : NodeProcessor {
     bool supportsScalarInputs()const noexcept override{return true;}
     bool inputUsesBlockData(std::size_t port)const noexcept override{return port!=0;}
     std::size_t outputCount()const noexcept override{return outputs;}
+    ResourceKind outputResourceKind(std::size_t port)const noexcept override{return state&&!state->instances.empty()?state->instances[0]->outputResourceKind(port):ResourceKind::none;}
+    DspResource* resourceOutput(std::size_t port)noexcept override{return state&&port<state->spectra.size()?state->spectra[port][primary?0:1].get():nullptr;}
     void shareChannelState(NodeProcessor& other)override{state=static_cast<MultipleGraphNode&>(other).state;primary=false;}
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
         if(id=="formula")return std::make_unique<FormulaNode>();
@@ -267,6 +274,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="instancecontext")return std::make_unique<InstanceContextNode>();
         if(id=="multiplespectruminput")return std::make_unique<MultipleSpectrumInputNode>();
         if(id=="multipleinput")return std::make_unique<MultipleInputNode>();
+        if(id=="multiplespectrumoutput")return std::make_unique<MultipleSpectrumOutputNode>();
         if(id=="multipleoutput")return std::make_unique<MultipleOutputNode>();
         throw std::runtime_error("Unsupported Multiple Group node: "+id);
     }
@@ -325,7 +333,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
                 if(auto* context=dynamic_cast<InstanceContextNode*>(node.processor.get())){context->index=i;instance->contexts.push_back(context);}
                 if(auto* context=dynamic_cast<InstanceContextNode*>(node.rightProcessor.get())){context->index=i;instance->contexts.push_back(context);}
             }
-            if(explicitCombines)for(int output:instance->runtime->outputs)if(!dynamic_cast<InstanceCombineNode*>(instance->runtime->graph.nodes[output].processor.get()))throw std::runtime_error("Invalid instance reduction boundary");
+            if(explicitCombines)for(int output:instance->runtime->outputs)if(!dynamic_cast<InstanceCombineNode*>(instance->runtime->graph.nodes[output].processor.get())&&instance->runtime->graph.nodes[output].processor->outputResourceKind(0)!=ResourceKind::spectrum)throw std::runtime_error("Invalid instance reduction boundary");
             instance->planReduction();
             ProcessContext mono{};instance->resolveChannels(mono);
             state->instances.push_back(std::move(instance));
@@ -356,13 +364,27 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(!primary)return;
         state->left.assign(outputs,std::vector<float>(frames));state->right.assign(outputs,std::vector<float>(frames));state->weights.resize(frames);state->weightLeft.assign(outputs,std::vector<float>(frames));state->weightRight.assign(outputs,std::vector<float>(frames));
         for(auto& instance:state->instances)instance->prepare(rate,frames);
-        state->fade.resize(frames);
+        state->fade.resize(frames);state->spectra.resize(outputs);
+        for(std::size_t p=0;p<outputs;p++)if(outputResourceKind(p)==ResourceKind::spectrum)for(auto& channel:state->spectra[p]){channel=std::make_unique<SpectrumStream>();channel->prepare(frames);}
     }
     void adoptState(NodeProcessor& previous)noexcept override{
         auto& old=static_cast<MultipleGraphNode&>(previous);if(!primary||!state||!old.state)return;
         for(std::size_t i=0;i<std::min(state->instances.size(),old.state->instances.size());i++){
             state->instances[i]->adoptState(*old.state->instances[i]);state->gains[i]=old.state->gains[i];
         }state->initialized=old.state->initialized;
+    }
+    // Complex spectra can only be reduced on the same FFT lattice. Mismatched
+    // geometry or timing suppresses this output batch rather than pairing frames.
+    void mergeSpectrum(std::size_t port,unsigned channel,const SpectrumStream* source)noexcept{
+        auto& output=*state->spectra[port][channel];auto& invalid=state->invalidSpectra[port][channel];
+        if(invalid)return;
+        if(!source||!source->size){invalid=true;return;}
+        if(!output.size){output.copy(*source);return;}
+        if(output.size!=source->size||output.windowFrames()!=source->windowFrames()||output.hop!=source->hop||output.window!=source->window||output.dcRemoved!=source->dcRemoved||output.sampleRate!=source->sampleRate||output.blockStart!=source->blockStart||output.count!=source->count){invalid=true;return;}
+        for(std::size_t f=0;f<output.count;f++){
+            if(output.frames[f].start!=source->frames[f].start){invalid=true;return;}
+            for(std::size_t k=0;k<output.size;k++)output.frames[f].bins[k]+=source->frames[f].bins[k];
+        }
     }
     void process(ProcessContext& c)noexcept override{processInstances<Instance>(c);}
     template<class CompiledInstance> void processInstances(ProcessContext& c)noexcept{
@@ -372,6 +394,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
             if(!state->initialized){for(int i=0;i<maximum;i++)state->gains[i]=i<active?1.f:0.f;state->initialized=true;}
             for(std::size_t p=0;p<outputs;p++){std::fill_n(state->left[p].data(),frames,0);std::fill_n(state->right[p].data(),frames,0);std::fill_n(state->weightLeft[p].data(),frames,0);std::fill_n(state->weightRight[p].data(),frames,0);}
             std::fill_n(state->weights.data(),frames,0);
+            state->invalidSpectra={};for(auto& output:state->spectra)for(auto& stream:output)if(stream){stream->count=0;stream->size=0;}
             std::array<char,maxNodes> rates{};for(std::size_t p=0;p<std::min(c.inputCount,rates.size());p++)rates[p]=c.sourceRates?c.sourceRates[p]:c.input(p)?'a':'c';
             // Buffers are already in each instance's scheduler cache; no temporary allocation in process().
             for(int i=0;i<maximum;i++){
@@ -417,6 +440,10 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
                 // Resolve graph/cache metadata once per output, not once per sample.
                 for(std::size_t p=0;p<outputs;p++){
                     auto& node=instance.runtime->graph.nodes[instance.runtime->outputs[p]];auto& lane=node.voice(0);
+                    if(outputResourceKind(p)==ResourceKind::spectrum){
+                        if(target>0)for(unsigned channel=0;channel<2;channel++){auto* source=static_cast<SpectrumStream*>((channel&&node.stereo?lane.rightProcessor:lane.processor)->resourceOutput(0));mergeSpectrum(p,channel,source);}
+                        continue;
+                    }
                     const auto* left=lane.channelCache[0].outputs[0].data();const auto* right=lane.channelCache[node.stereo?1:0].outputs[0].data();
                     const auto stride=node.outputRate(0)=='c'?0u:1u;
                     for(std::size_t sample=0;sample<frames;sample++){
@@ -430,6 +457,10 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
                 }
             }
             for(std::size_t p=0;p<outputs;p++){
+                if(outputResourceKind(p)==ResourceKind::spectrum){
+                    for(unsigned channel=0;channel<2;channel++){auto& stream=*state->spectra[p][channel];if(state->invalidSpectra[p][channel]){stream.count=0;continue;}if(mean&&active>0)for(std::size_t f=0;f<stream.count;f++)for(std::size_t k=0;k<stream.size;k++)stream.frames[f].bins[k]/=double(active);}
+                    continue;
+                }
                 std::string mode=explicitCombines?static_cast<InstanceCombineNode&>(*state->instances[0]->runtime->graph.nodes[state->instances[0]->runtime->outputs[p]].processor).mode:mean?"mean":"sum";
                 if(mode=="mean")for(std::size_t i=0;i<frames;i++){float d=std::max(1.f,state->weights[i]);state->left[p][i]/=d;state->right[p][i]/=d;}
                 else if(mode=="weighted")for(std::size_t i=0;i<frames;i++){
