@@ -143,6 +143,8 @@ struct NodeProcessor {
     virtual void adoptState(NodeProcessor& previous) noexcept { inheritState(previous); }
     virtual void inheritState(const NodeProcessor&) noexcept { }
     virtual void bindIdentity(const std::string&) { }
+    // Control-thread policy for a single UI readout representing replicated DSP state.
+    virtual void setInstanceRepresentative(bool) { }
     virtual bool isObserver() const noexcept { return false; }
     virtual bool observesWithoutInputs() const noexcept { return false; }
     virtual bool isSink() const noexcept { return false; }

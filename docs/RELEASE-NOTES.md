@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Support Step Switch inside Instance Groups, nested instances and Bake/export. Keep selection independent per instance; show and save the first instance's selection, with manual selection shared across replicas. Rebuild the host and plugin SDK together. Parameter fingerprints, document schema and host protocol are unchanged; covered by the current development version before its first release.
+
 - Remove fixed 8-input Instance and 16-frame-input Spectral Group limits. Counted Java/C++ source lists drive actual port layouts, rate plans, frame history, native execution and Bake/export. Keep one source Spectrum per Spectral Group and the existing supported boundary types. Previous fixed group contracts remain readable. Rebuild Java, host and plugin SDK together; parameter fingerprints change for compiled groups, while document schema and host protocol remain unchanged. Covered by the current development version before its first release.
 
 - Remove the fixed eight-output host/group/export limit. Size output, event-adapter and spectral/instance work buffers during preparation, with packed per-bin voice storage. Keep the existing source-reference encoding and validate actual source-port counts. Cover 24-port audio/control/event/resource routing without callback allocations, and 12-port Spectrum/numeric groups including persistence and Bake/export. Existing graph/voice budgets and integer addressability still apply. Rebuild the host and plugin SDK together; document schema, parameter fingerprints and protocol remain unchanged. Covered by the current development version before its first release.

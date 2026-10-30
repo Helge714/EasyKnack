@@ -73,6 +73,7 @@
 #include "TriggerFilterNode.hpp"
 #include "TriggerMergeNode.hpp"
 #include "TriggerTimerNode.hpp"
+#include "StepSwitchNode.hpp"
 #include "HistoryBufferNode.hpp"
 #include "HistoryReaderNode.hpp"
 #include "PositionReaderNode.hpp"
@@ -171,7 +172,12 @@ struct MultipleGraphNode : NodeProcessor {
         bool initialized=false;
     };
     std::shared_ptr<State> state;
+    bool representative=true;
+    void setInstanceRepresentative(bool enabled)override{
+        representative=enabled;if(state)for(std::size_t i=0;i<state->instances.size();i++)state->instances[i]->setInstanceRepresentative(enabled&&i==0);
+    }
     void bindIdentity(const std::string& id)override{
+        setInstanceRepresentative(representative);
         if(state)for(auto& instance:state->instances)instance->bindIdentity(id);
     }
     // Exporters provide a concrete per-instance kernel; live graphs keep the
@@ -200,6 +206,7 @@ struct MultipleGraphNode : NodeProcessor {
     DspResource* resourceOutput(std::size_t port)noexcept override{return state&&port<state->spectra.size()?state->spectra[port][primary?0:1].get():nullptr;}
     void shareChannelState(NodeProcessor& other)override{state=static_cast<MultipleGraphNode&>(other).state;primary=false;}
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
+        if(id=="stepswitch")return std::make_unique<StepSwitchNode>();
         if(id=="formula")return std::make_unique<FormulaNode>();
         if(id=="spectrumblur")return std::make_unique<SpectrumBlurNode>();
         if(id=="spectrumshift")return std::make_unique<SpectrumShiftNode>();

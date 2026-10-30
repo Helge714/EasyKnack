@@ -22,7 +22,7 @@ public final class StepSwitchNode extends BasicNode {
     public static int count(NodeState s){return Math.max(1,Math.min(MAX_STEPS,(int)s.number(STEPS,4)));}
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Value").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
-        n.addOutput(INDEX,"Index").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE).tooltip("Active step index, starting at 0. Follows the output rate.");
+        n.addOutput(INDEX,"Index").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.text("stepswitch.index.help"));
         n.addEditor(STEPS,"Steps",Editor.Slider.button(4,1.,(double)MAX_STEPS).integers().discrete()).editorCopyable(false).keepVisibleOnHide()
             .tooltip("Number of inputs, 1–32. Removing the active step returns to the first input. Undo restores removed connections.");
         n.addEditor(MODE,"Selection",Editor.comboBox(List.of(Mode.values()),Mode.TRIGGER,Mode::id)).inspectorOnly();

@@ -27,3 +27,10 @@ in Index mode; the numbered buttons remain disabled in that mode.
 **Auto** uses audio rate for connected triggers or audio inputs; otherwise it
 uses control rate. Control rate samples the selection at block start. Immediate
 audio switching can click; crossfade between signals if smooth switching is needed.
+
+Inside an Instance Group, each instance keeps its own selected step. Connect
+instance-dependent triggers or indices to switch them independently. The visible
+highlight and saved selection represent the first instance; in nested groups this
+is the first instance at every level. Manual selection applies to all instances.
+The Index output still reports each instance's own selection. This also works
+with Bake and exported groups.

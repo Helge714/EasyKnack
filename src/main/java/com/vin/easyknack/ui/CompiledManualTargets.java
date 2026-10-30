@@ -5,20 +5,31 @@ import com.vin.easyknack.nodes.*;
 import com.vingame.glswing.node.composite.GLCompositeFlattenResult;
 import com.vingame.glswing.node.model.*;
 
-/** Keeps editable inner trigger buttons addressable after execution-domain compilation. */
+/** Keeps inner manual controls and representative readouts addressable after compilation. */
 final class CompiledManualTargets {
     static final String PROPERTY="easyknack.compiledManualTargets";
     static Map<String,List<String>> collect(List<GLGraphNode> nodes,GLCompositeFlattenResult flat,Function<GLGraphNode,String> target){
         var result=new LinkedHashMap<String,List<String>>();
         for(var node:nodes){
             var d=NodeRegistry.require(node.typeId());
-            if(d.layout(new NodeState(node.properties())).rows().stream().noneMatch(r->r.editor() instanceof Editor.Trigger))continue;
-            var origin=flat.origins().get(node.id());String source=(origin==null?node.id():origin.sourceNodeId()).toString();
-            result.computeIfAbsent(source,k->new ArrayList<>()).add(target.apply(node));
-            if(origin!=null)for(int i=origin.instances().size()-1;i>=0;i--){
-                source=origin.instances().get(i).nodeId()+"/"+source;
-                result.computeIfAbsent(source,k->new ArrayList<>()).add(target.apply(node));
+            var paths=new LinkedHashMap<String,List<String>>();
+            read(node).forEach((key,values)->paths.put(key,new ArrayList<>(values)));
+            if(d instanceof StepSwitchNode||d.layout(new NodeState(node.properties())).rows().stream().anyMatch(r->r.editor() instanceof Editor.Trigger)){
+                var origin=flat.origins().get(node.id());String source=(origin==null?node.id():origin.sourceNodeId()).toString();
+                paths.computeIfAbsent(source,k->new ArrayList<>()).add("");
             }
+            paths.forEach((key,values)->{
+                for(var suffix:values){
+                    String source=key;
+                    String destination=target.apply(node)+(suffix.isEmpty()?"":"/"+suffix);
+                    result.computeIfAbsent(source,k->new ArrayList<>()).add(destination);
+                    var origin=flat.origins().get(node.id());
+                    if(origin!=null)for(int i=origin.instances().size()-1;i>=0;i--){
+                        source=origin.instances().get(i).nodeId()+"/"+source;
+                        result.computeIfAbsent(source,k->new ArrayList<>()).add(destination);
+                    }
+                }
+            });
         }
         return result;
     }

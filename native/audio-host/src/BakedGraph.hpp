@@ -58,6 +58,10 @@ struct BakedOutput : NodeProcessor {
 
 /** Shared execution semantics, statically emitted call order. All allocation is in configure(). */
 struct BakedGraphProcessor : NodeProcessor {
+    void setInstanceRepresentative(bool enabled)override{
+        if(!runtime)return;
+        for(auto& node:runtime->graph.nodes){node.processor->setInstanceRepresentative(enabled);if(node.rightProcessor)node.rightProcessor->setInstanceRepresentative(enabled);for(auto& lane:node.additionalVoices){lane.processor->setInstanceRepresentative(enabled);if(lane.rightProcessor)lane.rightProcessor->setInstanceRepresentative(enabled);}}
+    }
     void bindIdentity(const std::string& id)override{
         if(!runtime)return;
         for(std::size_t p=0;p<runtime->inputs.size();p++){

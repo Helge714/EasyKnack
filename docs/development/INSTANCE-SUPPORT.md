@@ -10,6 +10,10 @@ processing, live Buffers and both Buffer Readers. FFT, Spectral Groups, Spectrum
 Blur/Shift/Prune and IFFT can form a complete spectral processing chain per instance.
 Autocorrelation, spectral/correlation descriptors, level and pitch detection,
 Spectrum Statistics and finite averaging can supply internal control signals.
+Step Switch supports independent trigger/index selection per instance, including
+nested groups and Bake/export. Its visible highlight and saved selection represent
+the first instance (the all-zero instance path when nested); manual selection
+addresses all replicas. Only that representative publishes selection telemetry.
 
 The public boundary currently accepts numeric, Vector, Spectrum and Wavetable
 inputs and dynamically sized numeric or Spectrum outputs. Spectrum outputs use typed
@@ -39,8 +43,6 @@ including a high-slot trigger, export, persistence and old-contract loading.
   and voice-domain rules. Feed the supported public inputs from outside instead.
 - Viewers, scopes, pitch monitors and measurement recorders have one visible or
   stored result. They need an instance-selection or aggregation policy first.
-- Step Switch has per-step selection telemetry and likewise needs an explicit
-  instance policy for its highlighted button.
 - Audio File and File Buffer require reviewed sharing of file assets, playback
   state and memory before replication is enabled.
 - Spectrum to Waveform combines capture and document/UI telemetry; each instance

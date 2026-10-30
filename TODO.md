@@ -5,6 +5,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Current stabilization pass
 
+- [x] Support Step Switch in nested Instance Groups and Bake/export, with
+  independent selection state and one representative UI telemetry publisher.
+
 - [x] Preserve direct group forwarding, copied editor identity and custom viewer
   sizes across outer parameter edits, navigation and Undo/Redo (regression tests).
 - [x] Reuse a local Bake for equivalent instances of one group definition, including

@@ -14,7 +14,8 @@ struct StepSwitchNode : NodeProcessor {
     ManualTriggerReceiver next,reset;
     std::array<ManualTriggerReceiver,maximumSteps> selections;
     std::shared_ptr<AnalysisMailbox> mailbox;
-    std::unique_ptr<AnalysisFrame> frame=std::make_unique<AnalysisFrame>();
+    std::unique_ptr<AnalysisFrame> frame;
+    bool reportSelection=true;
     unsigned reportCountdown=0;
     std::size_t outputCount()const noexcept override{return 2;}
     bool supportsControlRate()const noexcept override{return true;}
@@ -24,7 +25,8 @@ struct StepSwitchNode : NodeProcessor {
     char resolveAutoRate(const char* rates,std::size_t count)noexcept override{
         for(std::size_t i=0;i<count&&i<sources.size();i++)if(sources[i]>=0&&((i<2&&!indexed)||rates[i]=='a'))return 'a';return 'c';
     }
-    void bindIdentity(const std::string& id)override{next.bind(id+":next");reset.bind(id+":reset");mailbox=analysisMailbox(id);for(unsigned i=0;i<maximumSteps;i++)selections[i].bind(id+":select-"+std::to_string(i));}
+    void setInstanceRepresentative(bool enabled)override{reportSelection=enabled;if(!enabled){mailbox.reset();frame.reset();}}
+    void bindIdentity(const std::string& id)override{next.bind(id+":next");reset.bind(id+":reset");if(reportSelection){mailbox=analysisMailbox(id);if(!frame)frame=std::make_unique<AnalysisFrame>();}for(unsigned i=0;i<maximumSteps;i++)selections[i].bind(id+":select-"+std::to_string(i));}
     void shareChannelState(NodeProcessor& other)override{auto& p=static_cast<StepSwitchNode&>(other);next=p.next;reset=p.reset;selections=p.selections;}
     void shareVoiceState(NodeProcessor& other)override{shareChannelState(other);}
     void inheritState(const NodeProcessor& other)noexcept override{
