@@ -18,6 +18,14 @@ final class FormulaEditorHelp {
             case "sin","cos","tan"->"Angle in radians. Standard mathematical function; integer arguments compute in double in typed formulas.";
             case "asin","acos"->"Returns radians; input range -1 to 1.";
             case "atan","atan2"->"Returns an angle in radians.";
+            case "sinh"->"Hyperbolic sine; unbounded and can overflow for large inputs.";
+            case "cosh"->"Hyperbolic cosine; result >= 1 for real inputs and can overflow.";
+            case "tanh"->"Hyperbolic tangent: smooth saturation toward -1 and 1. No automatic gain compensation or oversampling.";
+            case "asinh"->"Inverse hyperbolic sine; all real inputs are supported.";
+            case "acosh"->"Inverse hyperbolic cosine; input >= 1. Smaller inputs produce NaN.";
+            case "atanh"->"Inverse hyperbolic tangent; finite for -1 < value < 1, infinite at +/-1, NaN outside.";
+            case "expm1"->"Computes exp(value) - 1 accurately for values near zero.";
+            case "log1p"->"Computes log(1 + value) accurately near zero; finite for value > -1, -infinity at -1, NaN below -1.";
             case "sqrt"->"Square root; negative values produce NaN.";
             case "log","log2","log10"->"Logarithm; positive input required for a finite result.";
             case "rand"->"Uniform reproducible random value per evaluation sample. Optional seed selects the sequence; default seed belongs to this node. Reversed bounds are exchanged.";

@@ -36,6 +36,17 @@ min/max, clamp, mix and sign. `pi` and `tau` are constants. Inputs are read-only
 There are no loops, pointers or arbitrary C++ calls. Persistent variables use explicit state declarations (see below).
 Limits: 16 inputs, 8 outputs; bounded source size, nesting and generated code.
 
+Hyperbolic functions are `sinh(value)`, `cosh(value)` and `tanh(value)`, with
+inverses `asinh(value)`, `acosh(value)` and `atanh(value)`. `tanh` provides smooth
+saturation toward -1 and 1, without automatic level compensation or oversampling.
+`acosh` requires value >= 1; `atanh` is finite only for -1 < value < 1 and returns
+signed infinity at the endpoints. Invalid real domains produce NaN; large
+`sinh`/`cosh` arguments can overflow. `expm1(value)` computes exp(value) - 1 and
+`log1p(value)` computes log(1 + value), retaining accuracy close to zero.
+`log1p` is finite for value > -1, returns -infinity at -1 and NaN below -1.
+Typed integer arguments to these functions are promoted to double; float and
+double arguments retain their respective calculation precision.
+
 ## Execution and editing
 
 Group-General selects Auto, Audio or Control. Auto considers only used inputs;

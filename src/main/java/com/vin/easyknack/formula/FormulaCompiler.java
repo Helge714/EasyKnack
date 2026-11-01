@@ -23,7 +23,9 @@ public final class FormulaCompiler {
     public static final Map<String,Integer> FUNCTIONS=Map.ofEntries(
         Map.entry("abs",1),Map.entry("sqrt",1),Map.entry("sin",1),Map.entry("cos",1),
         Map.entry("tan",1),Map.entry("asin",1),Map.entry("acos",1),Map.entry("atan",1),
-        Map.entry("atan2",2),Map.entry("exp",1),Map.entry("log",1),Map.entry("log2",1),
+        Map.entry("atan2",2),Map.entry("sinh",1),Map.entry("cosh",1),Map.entry("tanh",1),
+        Map.entry("asinh",1),Map.entry("acosh",1),Map.entry("atanh",1),
+        Map.entry("expm1",1),Map.entry("log1p",1),Map.entry("exp",1),Map.entry("log",1),Map.entry("log2",1),
         Map.entry("log10",1),Map.entry("floor",1),Map.entry("ceil",1),Map.entry("round",1),
         Map.entry("pow",2),Map.entry("min",2),Map.entry("max",2),Map.entry("clamp",3),
         Map.entry("sineWave",1),Map.entry("mix",3),Map.entry("sign",1),Map.entry("rand",2));

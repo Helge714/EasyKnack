@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add sinh, cosh, tanh, asinh, acosh, atanh, expm1 and log1p to Formula Groups,
+  including preview/native execution, generated kernels and editor help. Existing
+  formulas retain their behavior; new functions require an updated audio host.
+  Covered by the current first development version; no document or ABI change.
+
 - Prepare documentation and its font atlases during visible startup steps to reduce
   the delay when opening help for the first time. Parsed pages are reused while
   changes to documentation source files remain visible.

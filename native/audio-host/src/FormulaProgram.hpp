@@ -16,7 +16,7 @@ inline std::string formulaUnhex(const std::string& text){
 }
 struct FormulaProgram {
     TypedFormulaProgram typed; bool isTyped=false;
-    enum Op {constant,input,output,copy,jump,jz,jnz,add,sub,mul,div,mod,eq,ne,lt,gt,le,ge,neg,not_,abs_,sqrt_,sin_,cos_,tan_,asin_,acos_,atan_,atan2_,exp_,log_,log2_,log10_,floor_,ceil_,round_,pow_,min_,max_,clamp,mix,sign,sampleRate,blockSize,sampleIndex,samplePosition,rand_,randSeed,bufferSize,bufferRead,bufferInfo,bufferTimeline,inputRate,stateLoad,stateStore,sineWave};
+    enum Op {constant,input,output,copy,jump,jz,jnz,add,sub,mul,div,mod,eq,ne,lt,gt,le,ge,neg,not_,abs_,sqrt_,sin_,cos_,tan_,asin_,acos_,atan_,atan2_,exp_,log_,log2_,log10_,floor_,ceil_,round_,pow_,min_,max_,clamp,mix,sign,sampleRate,blockSize,sampleIndex,samplePosition,rand_,randSeed,bufferSize,bufferRead,bufferInfo,bufferTimeline,inputRate,stateLoad,stateStore,sineWave,sinh_,cosh_,tanh_,asinh_,acosh_,atanh_,expm1_,log1p_};
     struct Instruction {Op op;unsigned target,a,b,c;float value;};
     std::vector<Instruction> code;std::vector<float> registers;
     struct State {std::string name;unsigned type;float initial;};
@@ -28,7 +28,7 @@ struct FormulaProgram {
     }
     void read(const std::string& text,unsigned inputs,unsigned outputs){
         isTyped=text.rfind("FORM3 ",0)==0;if(isTyped){typed.read(text,inputs,outputs);states.clear();code.clear();return;}typed=TypedFormulaProgram{};
-        static const std::vector<std::string> names={"constant","input","output","copy","jump","jz","jnz","add","sub","mul","div","mod","eq","ne","lt","gt","le","ge","neg","not","abs","sqrt","sin","cos","tan","asin","acos","atan","atan2","exp","log","log2","log10","floor","ceil","round","pow","min","max","clamp","mix","sign","sampleRate","blockSize","sampleIndex","samplePosition","rand","randSeed","bufferSize","bufferRead","bufferInfo","bufferTimeline","inputRate","stateLoad","stateStore","sineWave"};
+        static const std::vector<std::string> names={"constant","input","output","copy","jump","jz","jnz","add","sub","mul","div","mod","eq","ne","lt","gt","le","ge","neg","not","abs","sqrt","sin","cos","tan","asin","acos","atan","atan2","exp","log","log2","log10","floor","ceil","round","pow","min","max","clamp","mix","sign","sampleRate","blockSize","sampleIndex","samplePosition","rand","randSeed","bufferSize","bufferRead","bufferInfo","bufferTimeline","inputRate","stateLoad","stateStore","sineWave","sinh","cosh","tanh","asinh","acosh","atanh","expm1","log1p"};
         std::istringstream in(text);std::string version;unsigned size,count;
         if(!(in>>version>>size>>count)||(version!="FORM1"&&version!="FORM2")||size==0||size>20000||count>40000)throw std::invalid_argument("Invalid formula program");
         states.clear();stateValues.fill(0);
@@ -74,6 +74,9 @@ struct FormulaProgram {
                 case copy:r[i.target]=a;break;case add:r[i.target]=a+b;break;case sub:r[i.target]=a-b;break;case mul:r[i.target]=a*b;break;case div:r[i.target]=a/b;break;case mod:r[i.target]=std::fmod(a,b);break;
                 case eq:r[i.target]=a==b;break;case ne:r[i.target]=a!=b;break;case lt:r[i.target]=a<b;break;case gt:r[i.target]=a>b;break;case le:r[i.target]=a<=b;break;case ge:r[i.target]=a>=b;break;case neg:r[i.target]=-a;break;case not_:r[i.target]=!a;break;
                 case abs_:r[i.target]=std::abs(a);break;case sqrt_:r[i.target]=std::sqrt(a);break;case sin_:r[i.target]=std::sin(a);break;case cos_:r[i.target]=std::cos(a);break;case tan_:r[i.target]=std::tan(a);break;case asin_:r[i.target]=std::asin(a);break;case acos_:r[i.target]=std::acos(a);break;case atan_:r[i.target]=std::atan(a);break;case atan2_:r[i.target]=std::atan2(a,b);break;
+                case sinh_:r[i.target]=std::sinh(a);break;case cosh_:r[i.target]=std::cosh(a);break;case tanh_:r[i.target]=std::tanh(a);break;
+                case asinh_:r[i.target]=std::asinh(a);break;case acosh_:r[i.target]=std::acosh(a);break;case atanh_:r[i.target]=std::atanh(a);break;
+                case expm1_:r[i.target]=std::expm1(a);break;case log1p_:r[i.target]=std::log1p(a);break;
                 case exp_:r[i.target]=std::exp(a);break;case log_:r[i.target]=std::log(a);break;case log2_:r[i.target]=std::log2(a);break;case log10_:r[i.target]=std::log10(a);break;case floor_:r[i.target]=std::floor(a);break;case ceil_:r[i.target]=std::ceil(a);break;case round_:r[i.target]=std::round(a);break;case pow_:r[i.target]=std::pow(a,b);break;case min_:r[i.target]=std::min(a,b);break;case max_:r[i.target]=std::max(a,b);break;case clamp:r[i.target]=std::min(std::max(a,b),c);break;case mix:r[i.target]=a+(b-a)*c;break;case sign:r[i.target]=(a>0)-(a<0);break;
             }
         }

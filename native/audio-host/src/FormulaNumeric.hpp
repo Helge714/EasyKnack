@@ -28,7 +28,7 @@ template<class T,class S> inline T formulaCast(S value)noexcept {
         using U=std::make_unsigned_t<T>;U bits=static_cast<U>(value);T out;std::memcpy(&out,&bits,sizeof(T));return out;
     }else return static_cast<T>(value);
 }
-enum class FormulaOp {add,sub,mul,div,mod,neg,abs,sqrt,sin,cos,tan,asin,acos,atan,atan2,exp,log,log2,log10,floor,ceil,round,pow,min,max,clamp,mix,sign,eq,ne,lt,gt,le,ge};
+enum class FormulaOp {add,sub,mul,div,mod,neg,abs,sqrt,sin,cos,tan,asin,acos,atan,atan2,exp,log,log2,log10,floor,ceil,round,pow,min,max,clamp,mix,sign,sinh,cosh,tanh,asinh,acosh,atanh,expm1,log1p,eq,ne,lt,gt,le,ge};
 template<class T> inline T formulaCalc(FormulaOp op,T a,T b=T(0),T c=T(0))noexcept {
     using O=FormulaOp;
     if constexpr(std::is_integral_v<T>){
@@ -54,6 +54,9 @@ template<class T> inline T formulaCalc(FormulaOp op,T a,T b=T(0),T c=T(0))noexce
         case O::min:return std::min(a,b);case O::max:return std::max(a,b);case O::clamp:return std::min(std::max(a,b),c);case O::sign:return T((a>0)-(a<0));
         case O::mix:return a+(b-a)*c;
         case O::sqrt:return T(std::sqrt(a));case O::sin:return T(std::sin(a));case O::cos:return T(std::cos(a));case O::tan:return T(std::tan(a));case O::asin:return T(std::asin(a));case O::acos:return T(std::acos(a));case O::atan:return T(std::atan(a));case O::atan2:return T(std::atan2(a,b));
+        case O::sinh:return T(std::sinh(a));case O::cosh:return T(std::cosh(a));case O::tanh:return T(std::tanh(a));
+        case O::asinh:return T(std::asinh(a));case O::acosh:return T(std::acosh(a));case O::atanh:return T(std::atanh(a));
+        case O::expm1:return T(std::expm1(a));case O::log1p:return T(std::log1p(a));
         case O::exp:return T(std::exp(a));case O::log:return T(std::log(a));case O::log2:return T(std::log2(a));case O::log10:return T(std::log10(a));case O::floor:return T(std::floor(a));case O::ceil:return T(std::ceil(a));case O::round:return T(std::round(a));case O::pow:return T(std::pow(a,b));
         default:return 0;
     }

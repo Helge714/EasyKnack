@@ -50,6 +50,10 @@ class FormulaEditorHelpTest {
         assertTrue(signature("result=sin(signal);").isEmpty());
     }
     @Test void completionDetailsStayOnOneLineWhileDocumentationRemainsAvailable(){
+        var hyperbolic=complete("result=tan",10).stream().filter(c->c.label().equals("tanh")).findFirst().orElseThrow();
+        assertEquals("tanh()",hyperbolic.insertText());
+        assertTrue(hover("result=tanh(signal);",9).contains("saturation"));
+        assertTrue(signature("result=atanh(").get(0).documentation().contains("-1 < value < 1"));
         for(String source:List.of("result=", "buffer."))for(var item:complete(source,source.length())){
             assertFalse(item.detail().contains("\n"),item.label());assertFalse(item.detail().contains("\r"),item.label());
         }

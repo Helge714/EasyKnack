@@ -24,6 +24,11 @@ Computes custom formulas through a configurable group interface.
 
 Group-IO defines port labels, units and stable code identifiers. The initial interface is signal → result. The language supports typed local/state variables, arithmetic, if/else, casts and math functions; Trigger inputs are boolean at their event sample. Audio executes per sample; Control per block, subject to validation against loss of used Audio/Trigger inputs. State is independent per channel/voice/instance. Input-specific read methods distinguish current signal blocks from resource buffers. Live preview applies valid edits before native compilation completes; invalid drafts keep the last accepted program. In Spectral Groups, valid formulas execute per bin/frame; temporal context is not interchangeable with bin context. See [the language reference](../../FORMULA-GROUP.md).
 
+Hyperbolic functions: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.
+`tanh` supplies smooth saturation; gain compensation remains part of the formula.
+`expm1` and `log1p` preserve accuracy near zero. Function help describes domains
+and nonfinite results; no oversampling is applied automatically.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

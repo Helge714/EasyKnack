@@ -24,6 +24,11 @@ Berechnet eigene Formeln mit konfigurierbarer Gruppenschnittstelle.
 
 Group-IO legt Portbeschriftungen, Einheiten und stabile Codebezeichner fest. Die Anfangsschnittstelle ist signal → result. Die Sprache unterstützt typisierte lokale/Zustandsvariablen, Arithmetik, if/else, Casts und Mathematikfunktionen; Triggereingänge sind am Ereignissample boolesch. Audio läuft je Sample, Control je Block mit Prüfung auf den Verlust verwendeter Audio-/Triggereingänge. Zustand ist je Kanal/Stimme/Instanz unabhängig. Eingangsspezifische Lesemethoden unterscheiden aktuelle Signalblöcke von Buffer-Ressourcen. Live-Vorschau übernimmt gültige Änderungen vor Abschluss der nativen Kompilierung; ungültige Entwürfe erhalten das letzte übernommene Programm. In Spectral Groups laufen gültige Formeln je Bin/Frame; Zeit- und Binkontext sind nicht austauschbar. Siehe [Sprachreferenz (englisch)](../../FORMULA-GROUP.md).
 
+Hyperbolische Funktionen: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.
+`tanh` liefert weiche Sättigung; die Pegelkompensation bleibt Teil der Formel.
+`expm1` und `log1p` erhalten die Genauigkeit nahe null. Die Funktionshilfe nennt
+Definitionsbereiche und nichtendliche Ergebnisse; Oversampling erfolgt nicht automatisch.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |

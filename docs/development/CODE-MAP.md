@@ -74,6 +74,7 @@ Paths below are relative to `native/audio-host/src/`.
 | Devices / MIDI | `audio/`, `midi/` | Device transport and MIDI backend implementation. `audio/AudioRenderAhead.hpp` isolates spectral DSP bursts from WASAPI callbacks with a consumption-driven queue. |
 | Spectrum / workers / resources | `Spectrum.hpp`, `SpectrumStream.hpp`, `SpectralWorker.hpp`, `AnalysisResources.hpp`, `WaveformResource.hpp`, `Wavetables.hpp` | FFT frame resources, spectral work, analysis and oscillator waveforms. |
 | Buffers / generated execution / telemetry | `BufferRead.hpp`, `BakedGraph.hpp`, `CompiledInstanceAudio.hpp`, `RenderTelemetry.hpp`, `RenderCadence.hpp` | Buffer access, compiled group execution and workload/deadline measurements. |
+| Formula math execution | `FormulaProgram.hpp`, `TypedFormulaProgram.hpp`, `FormulaNumeric.hpp` | Keep function registry/help in Java, legacy/typed interpreters and generated kernels aligned. `FormulaMathFunctionsTest` covers domains and native/preview parity, including standalone SDK compilation. |
 
 ## Resources, builds and tests
 
