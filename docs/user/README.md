@@ -9,10 +9,13 @@ same menu.
 
 Choose **Help → Node reference** for the reference index in the selected application
 language, or right-click a node and choose **Documentation** for its own page.
-References open in your browser and work offline. Group instances open the matching
+References open in a themed EasyKnack dialog and work offline. Group instances open the matching
 ordinary, Instance, Spectral or Formula Group reference. The Documentation action
 is disabled when no reference is available. Use a reference's language link to
 switch between English and German.
+Follow inline links within the dialog; Back/Forward (Alt+Left/Right) restore the
+previous page and scroll position. Wide tables scroll horizontally. Copy text
+copies the page's text, and Escape closes the dialog.
 
 | Task | Read |
 |---|---|

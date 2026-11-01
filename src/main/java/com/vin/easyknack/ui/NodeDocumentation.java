@@ -1,18 +1,15 @@
 package com.vin.easyknack.ui;
 
-import java.awt.Desktop;
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 import com.vingame.glswing.component.GLContainer;
 import com.vingame.glswing.node.GLNode;
 
-/** Bundled, offline references. Only trusted classpath documents become browser links. */
+/** Bundled offline references with native navigation and a portable HTML export for tooling. */
 final class NodeDocumentation {
     static final String PREFIX="/META-INF/easyknack/docs/";
     private static final Pattern LINK=Pattern.compile("\\[[^]]*]\\(([^)]+)\\)");
@@ -49,10 +46,7 @@ final class NodeDocumentation {
     }
     static void openIndex(GLContainer owner){open(owner,"nodes/"+language(ApplicationSettings.locale())+"/index.md");}
     static void open(GLContainer owner,String page){
-        CompletableFuture.runAsync(()->{
-            try{Desktop.getDesktop().browse(page(page).toUri());}
-            catch(Exception failure){EventQueue.invokeLater(()->HelpMenu.show(owner,"help.nodeDocumentation",failure.getMessage()));}
-        });
+        DocumentationViewer.show(owner,page);
     }
     static String read(String page)throws IOException{
         try(var in=NodeDocumentation.class.getResourceAsStream(PREFIX+page)){
@@ -60,7 +54,7 @@ final class NodeDocumentation {
             return new String(in.readAllBytes(),StandardCharsets.UTF_8).replaceFirst("^\\uFEFF","");
         }
     }
-    private static boolean exists(String page){return NodeDocumentation.class.getResource(PREFIX+page)!=null;}
+    static boolean exists(String page){return NodeDocumentation.class.getResource(PREFIX+page)!=null;}
 
     /** Return a normalized path only within the documented resource tree, never a URI or a host path. */
     static String target(String source,String link){

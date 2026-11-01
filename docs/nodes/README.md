@@ -32,9 +32,10 @@ Follow the [documentation work order](../development/NODE-DOCUMENTATION.md) when
 adding or updating references. Update both languages with relevant node changes.
 Maven bundles the maintained Markdown and catalog. Runtime **Help → Node reference**
 and node-context **Documentation** resolve the application language (English
-fallback), then export a portable HTML link tree through the Java renderer. Work
-runs in the background; content-addressed folders under `.easyknack/help/` avoid
-stale pages after upgrades. Installed help requires no Python, checkout or host.
+fallback), then show a native GLSwing dialog with tables, links and browsing
+history. Each selected page is read and parsed in the background; no browser or
+HTML-file export is needed to read it. Installed help requires no Python,
+checkout or host. The portable HTML exporter remains available to tooling/tests.
 
 `NodeDocumentation` reads adjacent `id`/`slug` pairs; keep these fields together.
 Coverage tests resolve every public built-in identity and both translations; export

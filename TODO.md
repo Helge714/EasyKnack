@@ -48,8 +48,8 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   [NODE-DOCUMENTATION.md](docs/development/NODE-DOCUMENTATION.md), including
   inspector settings, groups and spectral context nodes. Validate catalog,
   paired pages, section structure, index coverage, links and anchors.
-- [x] Bundle built-in references and shared foundations; open localized offline
-  HTML from node/group context menus and Help. Verify portable links, anchors,
+- [x] Bundle built-in references and shared foundations; open localized native
+  help from node/group context menus and Help. Verify portable HTML links, anchors,
   escaping and public-node coverage. Consolidate six replaced legacy references,
   keeping forwarding paths and archived originals; retain workflow guides.
 - [ ] Add plugin documentation discovery/manifest paths and validation. Retain

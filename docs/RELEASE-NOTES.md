@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Open node references and the handbook inside a themed EasyKnack dialog, with
+  native tables, local links, Back/Forward history, restored scroll positions,
+  text copying and Escape to close. Read only the selected page in the background;
+  help no longer launches a browser. Existing HTML export remains available to
+  tooling. Covered by the current development version; document and host contracts
+  are unchanged.
+
 - Bundle bilingual node/group references and shared fundamentals. Open localized
   offline HTML from Help or a node's Documentation action, with English fallback
   and portable links. Prepare pages in the background and invalidate by content.

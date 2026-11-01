@@ -18,7 +18,7 @@ The canonical layout reference is the additive oscillator in
 [German](../nodes/de/additive-oscillator.md). Earlier drafts are comparison
 material, excluded from the public catalog. Both node indices cover every public
 built-in node, the four group types and the user-facing spectral context nodes.
-The application bundles the pages and opens localized offline HTML from the
+The application bundles the pages and opens localized native help from the
 node context menu and Help menu. Plugin documentation integration remains pending.
 
 Shared foundations now live in [English](../user/en/index.md) and
@@ -198,11 +198,13 @@ section or imply that support itself makes an undelayed feedback loop valid.
 
 The node-context action resolves stable built-in/group identities in the current
 language with English fallback. Help exposes the localized index. Maven packages
-Markdown; `NodeDocumentation` exports reachable pages through `DocumentationMarkdown`
-on a worker. Relative HTML links stay within the bundled documentation tree.
-Content-addressed folders avoid stale output. Keep anchor parity between Java and
-Python preview renderers. Java tests check runtime links, translations, escaping
-and public-node coverage.
+Markdown. `DocumentationViewer` loads and parses only the selected page on a worker;
+`DocumentationPage` presents the escaped HTML subset using themed GLSwing text,
+table layout and link hit testing in a native scroll pane. History retains viewport
+positions; links and anchors remain inside the bundle. `NodeDocumentation` retains
+its portable HTML export for tooling. Keep anchor parity across native help, Java
+HTML and Python previews. Tests cover native tables, Unicode, safe links, anchors,
+history, viewport restoration and exported reference coverage.
 
 Older page dispositions are recorded in [the consolidation review](DOCUMENTATION-MIGRATION.md).
 Retain workflow guides until their extra content has a replacement; preserve
