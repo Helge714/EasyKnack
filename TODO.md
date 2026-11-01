@@ -54,6 +54,14 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   keeping forwarding paths and archived originals; retain workflow guides.
 - [ ] Add plugin documentation discovery/manifest paths and validation. Retain
   manual tables; consolidate overlapping spectral workflow guides separately.
+- [ ] Replace the application-specific documentation drawing with a standardized,
+  efficient Markdown viewer in GLSwing Core. Keep document lookup, node identities
+  and language policy in EasyKnack. The Core backlog owns the reusable control.
+- [ ] Add a persisted documentation-language preference independent of the UI:
+  Same as application (default), English or Deutsch. Apply it consistently to node
+  references, the index and help navigation, including reopening the viewer.
+  Allow German documentation with an English interface; use English fallback for
+  missing translations without changing either saved language preference.
 
 - [x] Audit the optional native contract sweep: Frame Trigger requires spectral
   frame context. Validate all temporal contracts separately, reject bin-only nodes

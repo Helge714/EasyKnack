@@ -211,6 +211,15 @@ Retain workflow guides until their extra content has a replacement; preserve
 forwarding pages at old paths.
 
 Remaining work:
+- Replace `DocumentationPage` and its application-specific presentation with the
+  future standardized GLSwing Core Markdown viewer. The generic control owns
+  themed formatting, tables, inline links/anchors, selection/copy and efficient
+  cached layout/rendering. EasyKnack retains reference IDs, resource resolution
+  and navigation/language policy; Core must not depend on EasyKnack or audio.
+- Add an independent, persisted documentation-language setting: Same as
+  application (default), English or Deutsch. It controls reference content,
+  indices and help navigation without switching the application UI. Missing
+  translations fall back to English while retaining the user's preference.
 - Allow plugins to ship references by node ID and language using the same format.
   Missing documentation must not prevent installation; disable the documentation
   action when no page exists. Define manifest paths and safe local resource
