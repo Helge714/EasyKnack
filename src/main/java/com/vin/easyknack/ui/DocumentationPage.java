@@ -72,8 +72,19 @@ final class DocumentationPage extends GLControl {
     List<Run> runs(){return List.copyOf(runs);}
     List<Box> boxes(){return List.copyOf(boxes);}
     private GLFontSpec font(Text text,Span span){
-        var base=getGLTheme().labelStyle().font();float scale=text.heading==1?1.6f:text.heading==2?1.3f:text.heading>0?1.12f:1;
+        return font(getGLTheme().labelStyle().font(),text,span);
+    }
+    private static GLFontSpec font(GLFontSpec base,Text text,Span span){
+        float scale=text.heading==1?1.6f:text.heading==2?1.3f:text.heading>0?1.12f:1;
         return new GLFontSpec(span.code()||text.pre?GLFont.MONOSPACED:base.family(),text.heading>0||text.header||span.bold()?GLFont.BOLD:base.style(),base.size()*scale);
+    }
+    static Set<GLFontSpec> fonts(Document document,GLFontSpec base){
+        var result=new LinkedHashSet<GLFontSpec>();
+        for(var block:document.blocks()){
+            var texts=block instanceof Text t?List.of(t):((Table)block).rows.stream().flatMap(List::stream).toList();
+            for(var text:texts)for(var span:text.spans)result.add(font(base,text,span));
+        }
+        return Set.copyOf(result);
     }
     void reflow(float width){
         clearCursor();

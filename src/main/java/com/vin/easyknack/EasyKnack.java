@@ -40,12 +40,20 @@ public final class EasyKnack {
                             return null;
                         })
                         .background(com.vin.easyknack.ui.AppText.literal("Preparing examples"), task -> {com.vin.easyknack.ui.ExampleLibrary.initialize();return null;})
+                        .background(com.vin.easyknack.ui.AppText.text("startup.documentation"), task -> {
+                            com.vin.easyknack.ui.DocumentationPreparation.prepare(task::detail,task::progress);
+                            return null;
+                        })
                         .awt(com.vin.easyknack.ui.AppText.text("startup.formulaEditor"), task -> {
                             com.vin.easyknack.ui.FormulaEditorPreparation.prepare();
                             return null;
                         })
                         .gl(com.vin.easyknack.ui.AppText.text("startup.formulaFont"), task -> {
                             com.vin.easyknack.ui.FormulaEditorPreparation.prepareFont(task.requireGL());
+                            return null;
+                        })
+                        .gl(com.vin.easyknack.ui.AppText.text("startup.documentationFonts"), task -> {
+                            com.vin.easyknack.ui.DocumentationPreparation.prepareFonts(task.requireGL(),task::progress);
                             return null;
                         }))
                 .surface(context -> {

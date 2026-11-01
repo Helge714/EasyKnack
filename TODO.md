@@ -54,6 +54,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   keeping forwarding paths and archived originals; retain workflow guides.
 - [ ] Add plugin documentation discovery/manifest paths and validation. Retain
   manual tables; consolidate overlapping spectral workflow guides separately.
+- [x] Preload parsed documentation and prepare its theme-dependent font atlases
+  during visible splash steps. Reuse parsed pages while detecting source edits;
+  keep each viewer's layout and navigation state independent.
 - [ ] Replace the application-specific documentation drawing with a standardized,
   efficient Markdown viewer in GLSwing Core. Keep document lookup, node identities
   and language policy in EasyKnack. The Core backlog owns the reusable control.

@@ -206,6 +206,13 @@ its portable HTML export for tooling. Keep anchor parity across native help, Jav
 HTML and Python previews. Tests cover native tables, Unicode, safe links, anchors,
 history, viewport restoration and exported reference coverage.
 
+Startup preloads parsed references in a background splash step and warms their
+actual theme/heading/code fonts in a separate GL splash step, both with progress.
+The viewer reuses cached models but compares current source text on every load,
+so development edits invalidate only the affected page. Layout, cursor state and
+history remain independent for each viewer. Optional preload failure does not
+prevent application startup; on-demand loading still reports unavailable pages.
+
 Older page dispositions are recorded in [the consolidation review](DOCUMENTATION-MIGRATION.md).
 Retain workflow guides until their extra content has a replacement; preserve
 forwarding pages at old paths.

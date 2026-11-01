@@ -63,7 +63,7 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
         if(same){scroll.setScrollOffset(next.x(),next.anchor().isEmpty()?next.y():content.anchor(next.anchor()));buttons();finished.complete(null);return finished;}
         loading=true;status.setText(AppText.text("help.loading"));content.show(new DocumentationPage.Document("",List.of()));scroll.setScrollOffset(0,0);buttons();
         CompletableFuture.supplyAsync(()->{
-            try{return DocumentationPage.parse(NodeDocumentation.read(next.page()),next.page().contains("/de/")?"de":"en");}
+            try{return DocumentationPreparation.document(next.page());}
             catch(IOException failure){throw new java.util.concurrent.CompletionException(failure);}
         }).whenComplete((document,error)->EventQueue.invokeLater(()->{
             if(disposed||request!=revision){finished.complete(null);return;}

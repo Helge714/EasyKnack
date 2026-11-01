@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Prepare documentation and its font atlases during visible startup steps to reduce
+  the delay when opening help for the first time. Parsed pages are reused while
+  changes to documentation source files remain visible.
+
 - Show the Core hand cursor over documentation links and release it when leaving
   a link, changing pages or closing the view. Avoid re-recording the entire page
   for hover changes that do not affect its appearance. Covered by the current
