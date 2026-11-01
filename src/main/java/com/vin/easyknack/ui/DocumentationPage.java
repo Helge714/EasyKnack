@@ -63,7 +63,8 @@ final class DocumentationPage extends GLControl {
     private final Map<String,Float> anchors=new HashMap<>();
     private final Consumer<String> follow;
     private float wrapWidth=900,extent;
-    private String hovered;
+    private com.vingame.glswing.input.GLPointerController pointer=com.vingame.glswing.input.GLPointerController.NONE;
+    private boolean hand;
     DocumentationPage(Consumer<String> follow){this.follow=follow;}
     Document document(){return document;}
     void show(Document value){document=value;reflow(wrapWidth);}
@@ -75,6 +76,7 @@ final class DocumentationPage extends GLControl {
         return new GLFontSpec(span.code()||text.pre?GLFont.MONOSPACED:base.family(),text.heading>0||text.header||span.bold()?GLFont.BOLD:base.style(),base.size()*scale);
     }
     void reflow(float width){
+        clearCursor();
         wrapWidth=Math.max(240,width);runs.clear();boxes.clear();anchors.clear();extent=wrapWidth;
         float y=18;
         for(var block:document.blocks()){
@@ -126,8 +128,18 @@ final class DocumentationPage extends GLControl {
     }
     String linkAt(float x,float y){for(var run:runs)if(run.link()!=null&&x>=run.x()&&x<=run.x()+run.width()&&y>=run.y()&&y<=run.y()+run.height())return run.link();return null;}
     @Override protected void controlMouseClicked(com.vingame.glswing.input.GLMouseEvent e){if(e.getButton()==1){String link=linkAt(e.getLocalX(),e.getLocalY());if(link!=null){follow.accept(link);e.consume();}}}
-    @Override protected void controlMouseMoved(com.vingame.glswing.input.GLMouseEvent e){String link=linkAt(e.getLocalX(),e.getLocalY());if(!Objects.equals(hovered,link)){hovered=link;invalidateRecording();repaintGL();}}
-    @Override protected void controlMouseExited(com.vingame.glswing.input.GLMouseEvent e){hovered=null;invalidateRecording();repaintGL();}
+    private void updateCursor(com.vingame.glswing.input.GLMouseEvent e){
+        var next=e.getPointerController();
+        if(pointer!=next){clearCursor();pointer=next;}
+        boolean linked=linkAt(e.getLocalX(),e.getLocalY())!=null;
+        if(linked&&!hand){pointer.setCursor(this,com.vingame.glswing.input.GLPointerCursor.HAND);hand=true;}
+        else if(!linked&&hand)clearCursor();
+    }
+    private void clearCursor(){if(hand)pointer.clearCursor(this);hand=false;pointer=com.vingame.glswing.input.GLPointerController.NONE;}
+    @Override protected void controlMouseEntered(com.vingame.glswing.input.GLMouseEvent e){updateCursor(e);}
+    @Override protected void controlMouseMoved(com.vingame.glswing.input.GLMouseEvent e){updateCursor(e);}
+    @Override protected void controlMouseExited(com.vingame.glswing.input.GLMouseEvent e){clearCursor();}
+    @Override protected void detached(com.vingame.glswing.component.GLParent parent){clearCursor();super.detached(parent);}
     @Override protected void themeChanged(){super.themeChanged();if(document!=null)reflow(wrapWidth);}
     @Override protected void record(GLContext2D c){
         var theme=getGLTheme();c.fillRect(0,0,getWidth(),getHeight(),theme.textEditorStyle().backgroundColor());

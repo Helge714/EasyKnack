@@ -8,6 +8,25 @@ import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 
 class DocumentationViewerTest {
+    @Test void linksUseCoreHandCursorAndReleaseItOnExitOrPageReplacement()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try{
+            var page=new DocumentationPage(link->{});page.show(DocumentationPage.parse("# Test\n\n[Link](index.md) Plain text\n","en"));
+            class Pointer implements com.vingame.glswing.input.GLPointerController {
+                Object owner;com.vingame.glswing.input.GLPointerCursor cursor;int changes;
+                public boolean isAvailable(){return true;}
+                public void setCursor(Object owner,com.vingame.glswing.input.GLPointerCursor cursor){this.owner=owner;this.cursor=cursor;changes++;}
+                public void clearCursor(Object owner){if(this.owner==owner){this.owner=null;cursor=null;changes++;}}
+            }
+            var pointer=new Pointer();var host=new java.awt.Canvas();
+            var run=page.runs().stream().filter(r->r.link()!=null).findFirst().orElseThrow();
+            var pick=new com.vingame.glswing.input.GLPickResult(1,page,0,0,run.x()+run.width()/2,run.y()+run.height()/2,1,0,0,1,0,0);
+            var event=new com.vingame.glswing.input.GLMouseEvent(new java.awt.event.MouseEvent(host,java.awt.event.MouseEvent.MOUSE_MOVED,0,0,0,0,0,false),pick,0,0,null,pointer);
+            page.mouseEntered(event);assertEquals(com.vingame.glswing.input.GLPointerCursor.HAND,pointer.cursor);
+            int changes=pointer.changes;page.mouseMoved(event);assertEquals(changes,pointer.changes);
+            page.mouseExited(event);assertNull(pointer.cursor);
+            page.mouseMoved(event);page.show(new DocumentationPage.Document("",List.of()));assertNull(pointer.cursor);
+        }catch(Exception failure){throw new AssertionError(failure);}});
+    }
     @Test void nativeModelPreservesTablesEquationsUnicodeAndInlineLinks()throws Exception{
         var document=DocumentationPage.parse(NodeDocumentation.read("nodes/de/additive-oscillator.md"),"de");
         assertTrue(document.title().contains("Additive Oscillator"));

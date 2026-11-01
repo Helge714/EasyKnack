@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Show the Core hand cursor over documentation links and release it when leaving
+  a link, changing pages or closing the view. Avoid re-recording the entire page
+  for hover changes that do not affect its appearance. Covered by the current
+  development version; document and host contracts are unchanged.
+
 - Resolve help from the verified source checkout in incremental development runs
   when copied resources are missing or stale. Keep installed help bundle-only.
   Node reference now opens the active node; a separate Node index entry always
