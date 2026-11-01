@@ -20,7 +20,8 @@ final class AudioNodeFactory implements GLNodeViewFactory {
         context=new NodeViewContext(writer,history); this.observe=observe; this.definitions=definitions;
     }
     @Override public GLNode createNode(GLGraphNode model,GLNodeTypeDescriptor type) {
-        observe.run();return definitions.apply(model.typeId()).createView(context,model);
+        observe.run();var view=definitions.apply(model.typeId()).createView(context,model);
+        NodeDocumentation.attach(view,model.typeId());return view;
     }
     @Override public void transferViewState(GLNode previous,GLNode view,GLGraphNode model,GLNodeTypeDescriptor type){
         for(var control:view.getContents())for(var old:previous.getContents()){

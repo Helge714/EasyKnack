@@ -23,7 +23,7 @@ Filtert Audio mit resonantem Tiefpass, Hochpass oder Bandpass.
 
 ## Verhalten
 
-Kaskadiert Filter zweiter Ordnung zur gewählten Gesamtordnung. Grenzfrequenz und Resonanz werden geglättet; höhere Ordnungen verteilen die Resonanz auf die Stufen. Pegelausgleich folgt dem Verhältnis von Eingangs- und Ausgangs-RMS mit 0,25–4× Verstärkung. Er erzeugt keine Lookahead-Latenz, ist kein Limiter und stellt entfernte Spektralanteile nicht wieder her.
+Kaskadiert Filter zweiter Ordnung zur gewählten Gesamtordnung. Bei Q = 0.707 folgen Tief-/Hochpassstufen einer Butterworth-Anordnung; Q verändert ihre Resonanzen gemeinsam. Grenzfrequenz und Resonanz werden geglättet. Pegelausgleich vergleicht Ein-/Ausgangsleistung über 100 ms und glättet die Verstärkung über 5 ms, kanalweise getrennt und begrenzt auf 0,25–4×. Er erzeugt keine Lookahead-Latenz, ist kein Limiter und stellt entfernte Spektralanteile nicht wieder her. In einer Feedbackschleife verändert der Ausgleich deren Verstärkung.
 
 ## Mute
 

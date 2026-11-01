@@ -17,7 +17,10 @@
   </dependencies>
   <build>
     <resources>
-      <resource><directory>docs/user</directory><targetPath>META-INF/easyknack/manual</targetPath><includes><include>*.md</include></includes></resource>
+      <resource><directory>docs</directory><targetPath>META-INF/easyknack/docs</targetPath>
+        <includes><include>*.md</include><include>user/**/*.md</include><include>nodes/**/*.md</include><include>nodes/catalog.json</include></includes>
+        <excludes><exclude>nodes/**/additive-oscillator-v*.md</exclude></excludes>
+      </resource>
       <resource><directory>${project.basedir}</directory><targetPath>META-INF/easyknack/legal</targetPath><includes><include>LICENSE</include><include>THIRD-PARTY.md</include></includes></resource>
       <resource><directory>src/main/resources</directory></resource>
       <resource><directory>${project.basedir}</directory><targetPath>META-INF</targetPath><includes><include>LICENSE</include><include>THIRD-PARTY.md</include></includes></resource>

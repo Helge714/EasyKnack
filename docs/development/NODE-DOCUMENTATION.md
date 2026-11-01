@@ -18,7 +18,8 @@ The canonical layout reference is the additive oscillator in
 [German](../nodes/de/additive-oscillator.md). Earlier drafts are comparison
 material, excluded from the public catalog. Both node indices cover every public
 built-in node, the four group types and the user-facing spectral context nodes.
-Production help integration remains pending.
+The application bundles the pages and opens localized offline HTML from the
+node context menu and Help menu. Plugin documentation integration remains pending.
 
 Shared foundations now live in [English](../user/en/index.md) and
 [German](../user/de/index.md): rates, data types/channels, units and muting.
@@ -193,14 +194,21 @@ Use a one-column table **Sample-wise feedback / Sampleweises Feedback**, contain
 the actual sample-feedback capability. Do not replace this with a generic Notes
 section or imply that support itself makes an undelayed feedback loop valid.
 
-## Integration work still to implement
+## Application integration and remaining work
 
-- Add a node-context-menu documentation action, resolving the stable node ID and
-  current language. Fall back to English when a translation is missing. Do not
-  display unavailable documentation as if it existed.
-- Render readable HTML with tables, equations, internal navigation, cross-links
-  and scalable text. Package the pages offline; allow the same output to be read
-  in a browser or published as a static site. Keep relative links portable.
+The node-context action resolves stable built-in/group identities in the current
+language with English fallback. Help exposes the localized index. Maven packages
+Markdown; `NodeDocumentation` exports reachable pages through `DocumentationMarkdown`
+on a worker. Relative HTML links stay within the bundled documentation tree.
+Content-addressed folders avoid stale output. Keep anchor parity between Java and
+Python preview renderers. Java tests check runtime links, translations, escaping
+and public-node coverage.
+
+Older page dispositions are recorded in [the consolidation review](DOCUMENTATION-MIGRATION.md).
+Retain workflow guides until their extra content has a replacement; preserve
+forwarding pages at old paths.
+
+Remaining work:
 - Allow plugins to ship references by node ID and language using the same format.
   Missing documentation must not prevent installation; disable the documentation
   action when no page exists. Define manifest paths and safe local resource

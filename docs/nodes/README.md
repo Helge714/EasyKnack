@@ -30,6 +30,14 @@ a registration does not regenerate them or prove their accuracy.
 
 Follow the [documentation work order](../development/NODE-DOCUMENTATION.md) when
 adding or updating references. Update both languages with relevant node changes.
-The HTML preview is not yet packaged context-menu help. Plugin lookup and portable
-offline publication remain separate integration tasks. Earlier additive oscillator
-drafts are comparison material and are not part of the preview catalog.
+Maven bundles the maintained Markdown and catalog. Runtime **Help → Node reference**
+and node-context **Documentation** resolve the application language (English
+fallback), then export a portable HTML link tree through the Java renderer. Work
+runs in the background; content-addressed folders under `.easyknack/help/` avoid
+stale pages after upgrades. Installed help requires no Python, checkout or host.
+
+`NodeDocumentation` reads adjacent `id`/`slug` pairs; keep these fields together.
+Coverage tests resolve every public built-in identity and both translations; export
+tests check all emitted links and section anchors. Plugin documentation discovery
+remains separate work; unknown references produce a disabled action. Archives and
+earlier additive oscillator drafts are excluded from runtime help.

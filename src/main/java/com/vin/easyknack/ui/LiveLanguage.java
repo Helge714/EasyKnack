@@ -8,6 +8,7 @@ final class LiveLanguage {
     static void refresh(GLContainer component){refresh(component,java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));}
     private static void refresh(GLContainer c,java.util.Set<GLContainer> seen){
         if(!seen.add(c))return;
+        if(c instanceof com.vingame.glswing.node.GLNode node)refresh(node.getContextMenu(),seen);
         if(c instanceof NodeTooltipLabel v)v.refreshLanguage();
         else if(c instanceof GLLabel v)v.setText(AppText.translateExisting(v.getText()));
         else if(c instanceof GLButton v)v.setText(AppText.translateExisting(v.getText()));

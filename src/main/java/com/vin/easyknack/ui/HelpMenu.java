@@ -11,9 +11,9 @@ final class HelpMenu {
     static GLPopupMenu create(WorkspaceView owner) {
         var menu = new GLPopupMenu();
         menu.addItem(AppText.text("help.manual"), e -> {
-            try { java.awt.Desktop.getDesktop().browse(HelpDocuments.manual().toUri()); }
-            catch (Exception failure) { show(owner, "help.manual", failure.getMessage()); }
+            NodeDocumentation.open(owner,"user/README.md");
         });
+        menu.addItem(AppText.text("help.nodeReference"),e->NodeDocumentation.openIndex(owner));
         menu.addItem(AppText.text("help.about"), e -> show(owner, "help.about",
                 "EasyKnack\n" + BuildInfo.application().display() + "\n\nGLSwing\n" + BuildInfo.core().display()
                 + "\n\nJava " + System.getProperty("java.runtime.version") + " — " + System.getProperty("java.vendor")
@@ -24,10 +24,10 @@ final class HelpMenu {
         });
         return menu;
     }
-    private static void show(WorkspaceView owner, String title, String text) {
+    static void show(GLContainer owner, String title, String text) {
         show(owner,title,text,java.util.List.of());
     }
-    private static void show(WorkspaceView owner,String title,String text,java.util.List<HelpDocuments.LicenseDocument> documents){
+    private static void show(GLContainer owner,String title,String text,java.util.List<HelpDocuments.LicenseDocument> documents){
         var dialog = new GLDialog[1];
         var panel = new DocumentPanel(text,documents,()->dialog[0].close());
         dialog[0] = new GLDialog(AppText.text(title), panel);

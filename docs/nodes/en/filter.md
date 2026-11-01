@@ -23,7 +23,7 @@ Filters audio with a resonant lowpass, highpass or bandpass.
 
 ## Behavior
 
-Cascades second-order sections to obtain the selected order. Cutoff and resonance are smoothed; resonance is distributed across sections for higher orders. Level compensation follows input/output RMS with gain bounded to 0.25–4×. It adds no lookahead latency, is not a limiter and cannot recover removed spectral content.
+Cascades second-order sections to obtain the selected order. At Q = 0.707, lowpass/highpass sections follow a Butterworth arrangement; changing Q scales their resonances. Cutoff and resonance are smoothed. Level compensation compares input/output power over 100 ms and smooths gain over 5 ms, independently per channel, bounded to 0.25–4×. It adds no lookahead latency, is not a limiter and cannot recover removed spectral content. In a feedback loop, compensation changes the loop gain.
 
 ## Mute
 

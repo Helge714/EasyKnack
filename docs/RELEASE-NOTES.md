@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Bundle bilingual node/group references and shared fundamentals. Open localized
+  offline HTML from Help or a node's Documentation action, with English fallback
+  and portable links. Prepare pages in the background and invalidate by content.
+  Archive six superseded references while preserving forwarding paths and workflow
+  guides. Covered by the current development version before the first release;
+  document and host contracts are unchanged.
+
 - Add Vector, Wavetable, Buffer, Spectrum and Analysis modes to Step Switch, with typed optional resource inputs and block-aligned, zero-copy selection. Keep per-step buttons, names, numeric Index and Instance/Bake/export support. MIDI remains excluded. The Step Switch parameter fingerprint changes; previous numeric source exports remain readable. Rebuild Java, host and plugin SDK together; document schema and host protocol are unchanged. Covered by the current development version before its first release.
 
 - Support Step Switch inside Instance Groups, nested instances and Bake/export. Keep selection independent per instance; show and save the first instance's selection, with manual selection shared across replicas. Rebuild the host and plugin SDK together. Parameter fingerprints, document schema and host protocol are unchanged; covered by the current development version before its first release.

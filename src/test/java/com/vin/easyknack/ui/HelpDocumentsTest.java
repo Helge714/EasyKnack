@@ -24,7 +24,7 @@ class HelpDocumentsTest {
     private static String normalized(String text){return text.replace("\r\n","\n").replace('\r','\n');}
     @Test void handbookAndLicenseAreAvailableWithoutAnInstallation() throws Exception {
         for (String page : HelpDocuments.PAGES)
-            assertTrue(HelpDocuments.resource("easyknack/manual/" + page + ".md").startsWith("#"));
+            assertTrue(NodeDocumentation.read("user/" + page + ".md").startsWith("#"));
         assertTrue(HelpDocuments.resource("LICENSE").contains("GNU GENERAL PUBLIC LICENSE"));
         assertTrue(HelpDocuments.licenses().contains("JogAmp"));
     }
