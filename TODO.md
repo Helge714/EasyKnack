@@ -39,6 +39,15 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Next technical work
 
+- [ ] Add optional Formula Group oversampling (Off/default, 2x, 4x, 8x) as a host
+  execution feature: filtered upsampling, formula execution at the effective
+  sample rate, anti-alias filtering and downsampling. Define sample/time/block
+  context, trigger timing, signal/resource reads, state, stereo/voice handling
+  and feedback restrictions; preserve behavior in preview, native execution and
+  Bake/export. Report/compensate filter latency and verify alias suppression,
+  pass-through gain and timing with repeatable tests. Keep effect-specific
+  output gain/loudness compensation separate from oversampling.
+
 - [x] Keep authored documentation under `docs/`; add a reproducible Python HTML
   preview build in `scripts/build-docs.py` with heading/term links and validation.
   Generated output goes to `target/docs/`. Replace legacy pages individually after
