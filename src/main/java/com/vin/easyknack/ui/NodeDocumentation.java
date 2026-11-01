@@ -16,6 +16,7 @@ final class NodeDocumentation {
     // The maintained catalog's identity/slug fields are deliberately adjacent.
     private static final Pattern ENTRY=Pattern.compile("\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"slug\"\\s*:\\s*\"([a-z0-9-]+)\"");
     private static Map<String,String> slugs;
+    private static final Map<GLNode,String> identities=Collections.synchronizedMap(new WeakHashMap<>());
     private static Path exported;
     private NodeDocumentation(){}
 
@@ -36,6 +37,7 @@ final class NodeDocumentation {
         page="nodes/en/"+slug+".md";return exists(page)?page:null;
     }
     static void attach(GLNode node,String id){
+        identities.put(node,id);
         var menu=node.getContextMenu();menu.addSeparator();
         var item=menu.addItem(AppText.text("help.nodeDocumentation"),event->{
             try{String page=reference(id,ApplicationSettings.locale());if(page!=null)open(node,page);}
@@ -45,16 +47,51 @@ final class NodeDocumentation {
         catch(IOException failure){item.setEnabled(false);}
     }
     static void openIndex(GLContainer owner){open(owner,"nodes/"+language(ApplicationSettings.locale())+"/index.md");}
+    static String activeReference(GLNode active,Locale locale)throws IOException{
+        if(active==null)return "nodes/"+language(locale)+"/index.md";
+        String id=identities.get(active);return id==null?null:reference(id,locale);
+    }
+    static void openActive(GLContainer owner,GLNode active){
+        try{String page=activeReference(active,ApplicationSettings.locale());
+            if(page==null)HelpMenu.show(owner,"help.nodeDocumentation",AppText.text("help.noNodeReference"));
+            else open(owner,page);
+        }catch(IOException failure){HelpMenu.show(owner,"help.nodeDocumentation",failure.getMessage());}
+    }
     static void open(GLContainer owner,String page){
         DocumentationViewer.show(owner,page);
     }
     static String read(String page)throws IOException{
-        try(var in=NodeDocumentation.class.getResourceAsStream(PREFIX+page)){
+        return read(page,developmentDocs(),NodeDocumentation.class::getResourceAsStream);
+    }
+    static String read(String page,Path source,java.util.function.Function<String,java.io.InputStream> bundled)throws IOException{
+        if(!validResource(page))throw new IOException("Invalid help resource: "+page);
+        if(source!=null&&Files.isRegularFile(source.resolve(page)))return text(Files.readString(source.resolve(page),StandardCharsets.UTF_8));
+        try(var in=bundled.apply(PREFIX+page)){
             if(in==null)throw new IOException("Bundled document missing: "+page);
-            return new String(in.readAllBytes(),StandardCharsets.UTF_8).replaceFirst("^\\uFEFF","");
+            return text(new String(in.readAllBytes(),StandardCharsets.UTF_8));
         }
     }
-    static boolean exists(String page){return NodeDocumentation.class.getResource(PREFIX+page)!=null;}
+    private static String text(String text){return text.startsWith("\uFEFF")?text.substring(1):text;}
+    private static boolean validResource(String page){return page!=null&&(page.equals("nodes/catalog.json")||page.equals(target(page,"")));}
+    static boolean exists(String page){
+        if(!validResource(page))return false;
+        Path source=developmentDocs();
+        return source!=null&&Files.isRegularFile(source.resolve(page))||NodeDocumentation.class.getResource(PREFIX+page)!=null;
+    }
+    private static Path developmentDocs(){
+        try{
+            var source=NodeDocumentation.class.getProtectionDomain().getCodeSource();
+            return source==null?null:developmentDocs(Path.of(source.getLocation().toURI()));
+        }catch(java.net.URISyntaxException|IllegalArgumentException failure){return null;}
+    }
+    static Path developmentDocs(Path classes){
+        classes=classes.toAbsolutePath().normalize();
+        if(!Files.isDirectory(classes)||!classes.endsWith(Path.of("target","classes")))return null;
+        Path root=classes.getParent().getParent();
+        return Files.isRegularFile(root.resolve("pom.xml"))
+            &&Files.isRegularFile(root.resolve("src/main/java/com/vin/easyknack/ui/NodeDocumentation.java"))
+            &&Files.isDirectory(root.resolve("docs"))?root.resolve("docs"):null;
+    }
 
     /** Return a normalized path only within the documented resource tree, never a URI or a host path. */
     static String target(String source,String link){

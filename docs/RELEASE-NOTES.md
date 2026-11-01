@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Resolve help from the verified source checkout in incremental development runs
+  when copied resources are missing or stale. Keep installed help bundle-only.
+  Node reference now opens the active node; a separate Node index entry always
+  opens the directory. Document and host contracts are unchanged; covered by the
+  current development version.
+
 - Open node references and the handbook inside a themed EasyKnack dialog, with
   native tables, local links, Back/Forward history, restored scroll positions,
   text copying and Escape to close. Read only the selected page in the background;

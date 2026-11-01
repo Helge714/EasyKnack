@@ -31,11 +31,17 @@ a registration does not regenerate them or prove their accuracy.
 Follow the [documentation work order](../development/NODE-DOCUMENTATION.md) when
 adding or updating references. Update both languages with relevant node changes.
 Maven bundles the maintained Markdown and catalog. Runtime **Help → Node reference**
-and node-context **Documentation** resolve the application language (English
+uses the active node; **Node index** always opens the directory. Node-context
+**Documentation** resolves the clicked node. Both resolve the application language (English
 fallback), then show a native GLSwing dialog with tables, links and browsing
 history. Each selected page is read and parsed in the background; no browser or
 HTML-file export is needed to read it. Installed help requires no Python,
 checkout or host. The portable HTML exporter remains available to tooling/tests.
+
+Incremental development runs also read current files from the verified checkout
+anchored to the application's `target/classes` code location. They do not depend
+on copied Maven resources surviving an IDE clean. Packaged runs use only bundled
+resources; the process working directory is never used to locate documentation.
 
 `NodeDocumentation` reads adjacent `id`/`slug` pairs; keep these fields together.
 Coverage tests resolve every public built-in identity and both translations; export

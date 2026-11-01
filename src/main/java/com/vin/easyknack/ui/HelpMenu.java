@@ -13,7 +13,8 @@ final class HelpMenu {
         menu.addItem(AppText.text("help.manual"), e -> {
             NodeDocumentation.open(owner,"user/README.md");
         });
-        menu.addItem(AppText.text("help.nodeReference"),e->NodeDocumentation.openIndex(owner));
+        menu.addItem(AppText.text("help.nodeReference"),e->NodeDocumentation.openActive(owner,owner.activeNode()));
+        menu.addItem(AppText.text("help.referenceIndex"),e->NodeDocumentation.openIndex(owner));
         menu.addItem(AppText.text("help.about"), e -> show(owner, "help.about",
                 "EasyKnack\n" + BuildInfo.application().display() + "\n\nGLSwing\n" + BuildInfo.core().display()
                 + "\n\nJava " + System.getProperty("java.runtime.version") + " — " + System.getProperty("java.vendor")

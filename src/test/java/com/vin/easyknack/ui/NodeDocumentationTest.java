@@ -11,6 +11,44 @@ import com.vin.easyknack.nodes.NodeRegistry;
 class NodeDocumentationTest {
     @TempDir Path temporary;
 
+    @Test void incrementalBuildReadsVerifiedCheckoutWhenCopiedResourcesAreMissingOrStale()throws Exception{
+        Path project=temporary.resolve("checkout"),classes=project.resolve("target/classes");
+        Files.createDirectories(classes);Files.writeString(project.resolve("pom.xml"),"<project/>");
+        Path owner=project.resolve("src/main/java/com/vin/easyknack/ui/NodeDocumentation.java");
+        Files.createDirectories(owner.getParent());Files.writeString(owner,"class NodeDocumentation {}");
+        Path page=project.resolve("docs/nodes/en/example.md");Files.createDirectories(page.getParent());Files.writeString(page,"# Current reference");
+        Path source=NodeDocumentation.developmentDocs(classes);assertEquals(project.resolve("docs"),source);
+        assertEquals("# Current reference",NodeDocumentation.read("nodes/en/example.md",source,resource->null));
+        assertEquals("# Current reference",NodeDocumentation.read("nodes/en/example.md",source,resource->new java.io.ByteArrayInputStream("# Stale copy".getBytes(java.nio.charset.StandardCharsets.UTF_8))));
+        assertNull(NodeDocumentation.developmentDocs(project));
+        Path jar=project.resolve("easyknack.jar");Files.writeString(jar,"");assertNull(NodeDocumentation.developmentDocs(jar));
+        assertThrows(java.io.IOException.class,()->NodeDocumentation.read("../../secret.md",source,resource->null));
+        assertEquals("# Bundled",NodeDocumentation.read("nodes/en/example.md",null,resource->new java.io.ByteArrayInputStream("# Bundled".getBytes(java.nio.charset.StandardCharsets.UTF_8))));
+    }
+
+    @Test void packagedTranslationsRemainCompleteWithoutCheckoutFallback()throws Exception{
+        for(var entry:NodeDocumentation.catalog().entrySet())for(String language:List.of("en","de"))
+            assertTrue(NodeDocumentation.read("nodes/"+language+"/"+entry.getValue()+".md",null,NodeDocumentation.class::getResourceAsStream).startsWith("#"),entry.getKey());
+    }
+
+    @Test void actualNodeMenusAreEnabledAndActiveReferenceTracksSelectionAndGroups()throws Exception{
+        javax.swing.SwingUtilities.invokeAndWait(()->{try(var controller=new WorkspaceController()){
+            var editor=controller.workspace().editor();
+            for(var view:editor.getNodes()){
+                var item=view.getContextMenu().getItems().stream().filter(i->i.getText().equals(AppText.text("help.nodeDocumentation"))).findFirst().orElseThrow();
+                assertTrue(item.isEnabled(),view.getTitle());editor.setSelectedNode(view);
+                var model=controller.workspace().currentGraph().snapshot().findNode(AudioNodeFactory.idOf(view).orElseThrow()).orElseThrow();
+                assertEquals(NodeDocumentation.reference(model.typeId(),Locale.ENGLISH),NodeDocumentation.activeReference(editor.getActiveNode(),Locale.ENGLISH));
+            }
+            var fixture=GroupChoicesTest.fixture(false);controller.openDocument("Group",fixture.doc());
+            var group=controller.workspace().editor().getNodes().stream().filter(v->v instanceof GroupViewFactory.GroupView).findFirst().orElseThrow();
+            controller.workspace().editor().setSelectedNode(group);
+            assertEquals("nodes/en/node-group.md",NodeDocumentation.activeReference(group,Locale.ENGLISH));
+            assertTrue(group.getContextMenu().getItems().stream().filter(i->i.getText().equals(AppText.text("help.nodeDocumentation"))).findFirst().orElseThrow().isEnabled());
+            assertEquals("nodes/de/index.md",NodeDocumentation.activeReference(null,Locale.GERMAN));
+        }catch(Exception failure){throw new AssertionError(failure);}});
+    }
+
     @Test void publicNodesAndGroupsResolveByIdentityInBothLanguages()throws Exception{
         for(var definition:NodeRegistry.builtinDefinitions())if(definition.isListedInCatalog()){
             for(var locale:List.of(Locale.ENGLISH,Locale.GERMAN)){

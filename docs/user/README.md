@@ -7,8 +7,10 @@ EasyKnack** shows the application and GLSwing build identities; the text is
 selectable for copying into a bug report. License notices are available in the
 same menu.
 
-Choose **Help → Node reference** for the reference index in the selected application
-language, or right-click a node and choose **Documentation** for its own page.
+Choose **Help → Node reference** for the active node's page, or right-click a node
+and choose **Documentation**. With no active node, Node reference opens the index.
+**Help → Node index** always opens the full directory in the selected application
+language.
 References open in a themed EasyKnack dialog and work offline. Group instances open the matching
 ordinary, Instance, Spectral or Formula Group reference. The Documentation action
 is disabled when no reference is available. Use a reference's language link to

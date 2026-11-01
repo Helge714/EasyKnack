@@ -17,7 +17,7 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
     DocumentationPage content=new DocumentationPage(this::follow);
     final GLScrollPane scroll=new GLScrollPane(content);
     final GLButton back=new GLButton(AppText.text("help.back")),forward=new GLButton(AppText.text("help.forward"));
-    final GLButton index=new GLButton(AppText.text("help.nodeReference")),manual=new GLButton(AppText.text("help.manual"));
+    final GLButton index=new GLButton(AppText.text("help.referenceIndex")),manual=new GLButton(AppText.text("help.manual"));
     final GLButton copy=new GLButton(AppText.text("help.copyText")),close=new GLButton(AppText.text("help.close"));
     final GLLabel status=new GLLabel("");
     private final Deque<Position> past=new ArrayDeque<>(),future=new ArrayDeque<>();

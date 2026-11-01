@@ -54,6 +54,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         workspace.setVisible(false);analysisFocus.open(source);resized(getWidth(),getHeight());
     }
     void closeAnalysis(){analysisFocus.clear();workspace.setVisible(true);requestGLFocus(workspace.editor());}
+    com.vingame.glswing.node.GLNode activeNode(){return workspace.editor().getActiveNode();}
     private final GLMenuBar menuBar = new GLMenuBar();
     private final GLLabel heading = new GLLabel(com.vin.easyknack.ui.AppText.literal("EASYKNACK  /  Audio Graph"));
     private final com.vingame.glswing.ui.GLButton audioLoad = new com.vingame.glswing.ui.GLButton("DSP —");
