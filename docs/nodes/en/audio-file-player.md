@@ -30,6 +30,8 @@ Plays an audio file with transport and looping controls.
 
 A background stream supplies decoded audio. Speed changes pitch and duration; 0 stops advancement. Play ≥ 0.5 enables playback. Reset starts at Loop start when looping, otherwise at the file beginning. Seek values are fractions of the whole file; seconds and samples are alternative displays of that position. The unconnected position slider follows playback and can be dragged to seek. Without Loop, playback becomes silent at the end. Buffer underruns counts blocks missing decoded data. For reusable in-memory audio use [File Buffer](file-buffer.md).
 
+MP3 import honors available Xing/LAME encoder-delay and end-padding metadata for gapless playback. Without metadata, quiet samples are preserved rather than guessed away. Older MP3 caches are reimported in the background when their file editor is restored; if the node is inside an unopened group, open it or select the source file again. Imported duration and sample count can therefore decrease.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

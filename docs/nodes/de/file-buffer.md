@@ -27,6 +27,8 @@ Lädt einen gewählten Audiodateiabschnitt als Buffer-Ressource.
 
 Nur der gewählte Abschnitt bleibt als abspielbares Audio erhalten. Anfang/Ende sind begrenzte Schieberegler mit mindestens einem Sample Abstand. Die Wellenformgriffe bearbeiten denselben Abschnitt; optionales Einrasten an Nulldurchgängen erleichtert die Grenzwahl. Dauer und Samples beschreiben den geladenen Abschnitt; Samples zählt Frames je Kanal. Der Buffer ist unveränderlich, sein Ende dient als Schreibkopf. [Speed](buffer-reader-speed.md)- und [Position](buffer-reader-position.md)-Reader können ihn abspielen. Abschnittsänderungen ersetzen den Buffer und setzen Reader zurück.
 
+Beim MP3-Import werden vorhandene Xing/LAME-Angaben zu Encoder-Verzögerung und End-Padding für lückenlose Wiedergabe berücksichtigt. Ohne Metadaten werden leise Samples erhalten statt automatisch entfernt. Alte MP3-Caches werden beim Wiederherstellen ihres Datei-Editors im Hintergrund neu importiert; liegt der Node in einer ungeöffneten Gruppe, diese öffnen oder die Quelldatei erneut auswählen. Dauer und Samplezahl können dadurch kleiner werden.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |

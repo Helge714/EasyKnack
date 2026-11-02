@@ -31,7 +31,7 @@ class AudioFilePlayerTest {
             if(kind.endsWith("mp3"))try(var in=getClass().getResourceAsStream("/audio/tone.mp3.b64")){
                 Files.write(source,Base64.getMimeDecoder().decode(in.readAllBytes()));
             } else Files.write(source,wave(kind.startsWith("stereo")?2:1,kind.startsWith("float")));
-            var asset=AudioFileDecoder.decode(source,temp.resolve("cache"));assertEquals(kind.startsWith("stereo")?2:1,asset.channels());assertEquals(kind.endsWith("mp3")?15047:12000,asset.frames(),2,kind);
+            var asset=AudioFileDecoder.decode(source,temp.resolve("cache"));assertEquals(kind.startsWith("stereo")?2:1,asset.channels());assertEquals(12000,asset.frames(),2,kind);
             var data=ByteBuffer.wrap(Files.readAllBytes(asset.pcm())).order(ByteOrder.LITTLE_ENDIAN);data.position(24);double squares=0;int n=0;
             while(data.remaining()>=4){float value=data.getFloat();assertTrue(Float.isFinite(value));squares+=value*value;n++;}
             assertTrue(Math.sqrt(squares/n)>.045&&Math.sqrt(squares/n)<.11,kind);
@@ -40,6 +40,46 @@ class AudioFilePlayerTest {
             var node=new AudioFileNode();var state=new HashMap<>(node.defaults());state.put("file",com.vingame.glswing.node.model.GLNodeValue.of(asset.reference()));
             assertDoesNotThrow(()->node.encode(new NodeState(state),p->-1));
         }
+    }
+    @Test void oldMp3CachesAreInvalidatedWithoutInvalidatingWaveFiles()throws Exception{
+        var pcm=temp.resolve("old.ekpcm");Files.writeString(pcm,"existing");
+        assertEquals("none",AudioFileDecoder.nativePath(temp.resolve("source.mp3")+"\n"+pcm));
+        assertNotEquals("none",AudioFileDecoder.nativePath(temp.resolve("source.wav")+"\n"+pcm));
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void decodedMp3WrapsSampleForSampleInPlayerAndBufferReader()throws Exception{
+        var source=temp.resolve("loop.mp3");try(var in=getClass().getResourceAsStream("/audio/tone.mp3.b64")){Files.write(source,Base64.getMimeDecoder().decode(in.readAllBytes()));}
+        var asset=AudioFileDecoder.decode(source,temp.resolve("cache"));var node=new AudioFileNode();var values=new HashMap<>(node.defaults());
+        values.put("file",com.vingame.glswing.node.model.GLNodeValue.of(asset.reference()));values.put("play",com.vingame.glswing.node.model.GLNodeValue.of(1.));values.put("loop",com.vingame.glswing.node.model.GLNodeValue.of(true));
+        String config="!"+NativeContractGenerator.fingerprint(node)+" "+node.encode(new NodeState(values),p->-1);
+        Path cpp=temp.resolve("gapless-loop.cpp");Files.writeString(cpp,"""
+            #include "nodes/AudioFileNode.hpp"
+            #include "nodes/FileBufferNode.hpp"
+            #include "nodes/HistoryReaderNode.hpp"
+            #include <cassert>
+            using namespace easyknack;
+            int main(){AudioFileNode player;std::istringstream in("%s");player.configure(in);
+              auto file=FileBufferData::load(player.path);auto& history=file->channels[0];auto count=history.samples.size();assert(count==12000);
+              float audio[256]{},silence[256]{};const float* inputs[4]{};ProcessContext c{inputs,4,audio,256,48000,silence,256};
+              player.position=count-128;player.wasPlaying=true;player.process(c);assert(player.underruns==0);
+              for(int i=0;i<256;i++)assert(std::abs(audio[i]-history.samples[(count-128+i)%%count])<1e-7);
+              HistoryReaderNode reader;reader.initialized=true;reader.historyIdentity=history.identity;reader.cursor=count-128;const DspResource* resources[]{&history};c.resourceInputs=resources;reader.process(c);
+              for(int i=0;i<256;i++)assert(std::abs(audio[i]-history.samples[(count-128+i)%%count])<1e-7);
+            }
+            """.formatted(config));
+        RateConverterTest.compileAndRun(cpp,temp.resolve("gapless-loop.exe"),temp);
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void taggedMp3HasNoEncoderGapAndUntaggedAudioIsNotSilenceTrimmed()throws Exception{
+        byte[] bytes;try(var in=getClass().getResourceAsStream("/audio/tone.mp3.b64")){bytes=Base64.getMimeDecoder().decode(in.readAllBytes());}
+        var source=temp.resolve("tagged.mp3");Files.write(source,bytes);
+        var tagged=AudioFileDecoder.decode(source,temp.resolve("cache"));assertEquals(12000,tagged.frames(),2);
+        var samples=ByteBuffer.wrap(Files.readAllBytes(tagged.pcm())).order(ByteOrder.LITTLE_ENDIAN);samples.position(24);
+        float[] audio=new float[(int)tagged.frames()];for(int i=0;i<audio.length;i++)audio[i]=samples.getFloat();
+        for(int start:new int[]{0,audio.length-240}){double sum=0;for(int i=start;i<start+240;i++)sum+=audio[i]*audio[i];assertTrue(Math.sqrt(sum/240)>.04,"No encoder silence at either edge");}
+        int tag=-1;for(int i=0;i<bytes.length-4;i++)if(bytes[i]=='I'&&bytes[i+1]=='n'&&bytes[i+2]=='f'&&bytes[i+3]=='o'){tag=i;break;}assertTrue(tag>=0);
+        Arrays.fill(bytes,tag,tag+4,(byte)0);var untaggedSource=temp.resolve("untagged.mp3");Files.write(untaggedSource,bytes);
+        var untagged=AudioFileDecoder.decode(untaggedSource,temp.resolve("cache"));assertTrue(untagged.frames()>tagged.frames(),"Without metadata do not guess or trim quiet samples");
     }
     @Test void unsupportedFormatIsRejectedBeforeStartingDecoder()throws Exception{
         var source=temp.resolve("old.flac");Files.writeString(source,"not audio");

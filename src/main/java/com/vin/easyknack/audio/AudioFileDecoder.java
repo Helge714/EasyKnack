@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 /** Control/background-thread media import. The native callback only sees prepared PCM. */
 public final class AudioFileDecoder {
+    private static final String MP3_CACHE_PREFIX="audio-gapless-v1-";
     private AudioFileDecoder(){}
     public record Asset(Path source,Path pcm,int channels,long frames){
         public String reference(){return source.toAbsolutePath()+"\n"+pcm.toAbsolutePath();}
@@ -18,14 +19,18 @@ public final class AudioFileDecoder {
     public static Path cached(String reference){var parts=reference.split("\n",-1);return parts.length==2?Path.of(parts[1]):null;}
     public static String nativePath(String reference){
         if(reference.isBlank())return "none";
-        var path=cached(reference);return path!=null&&Files.isRegularFile(path)?HexFormat.of().formatHex(path.toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)):"none";
+        var path=cached(reference);
+        // Old MP3 caches include encoder delay and padding. Existing file editors
+        // already rebuild unavailable caches asynchronously from their source.
+        if(source(reference).getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".mp3")&&(path==null||!path.getFileName().toString().startsWith(MP3_CACHE_PREFIX)))return "none";
+        return path!=null&&Files.isRegularFile(path)?HexFormat.of().formatHex(path.toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)):"none";
     }
     public static Asset decode(Path source,Path cache)throws IOException,InterruptedException{
         source=source.toAbsolutePath();if(!Files.isRegularFile(source))throw new FileNotFoundException(source.toString());
         String name=source.getFileName().toString().toLowerCase(Locale.ROOT);
         if(!name.endsWith(".wav")&&!name.endsWith(".mp3"))throw new IOException("Only WAV and MP3 files are supported; convert other formats before importing.");
         Files.createDirectories(cache);
-        var log=Files.createTempFile(cache,"decode-",".log");var pcm=Files.createTempFile(cache,"audio-",".ekpcm");
+        var log=Files.createTempFile(cache,"decode-",".log");var pcm=Files.createTempFile(cache,name.endsWith(".mp3")?MP3_CACHE_PREFIX:"audio-",".ekpcm");
         boolean success=false;
         try{
             Path host=AudioHostClient.defaultExecutable();

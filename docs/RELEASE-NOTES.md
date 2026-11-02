@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Honor MP3 gapless metadata during import to remove encoder delay/end padding
+  from File Player and File Buffer loops. WAV import is unchanged; untagged MP3s
+  retain their samples without heuristic silence trimming. Older MP3 caches are
+  refreshed asynchronously when their file editors are restored; open nested
+  groups or reselect the file if needed. Corrected duration/sample counts can
+  differ from old imports. Use pinned MIT-0 dr_mp3 0.7.4 for import only and retain
+  its upstream notices in Windows packages.
+
 - Keep linked output volume keys active when groups contain Hidden or Mute state.
   Discover targets through the same special-group preparation as audio execution,
   independently of muting, and retain link changes made during host communication.

@@ -82,6 +82,11 @@ try {
     $licenseStart = $miniaudio.LastIndexOf('This software is available as a choice of the following licenses.')
     if ($licenseStart -lt 0) { throw 'miniaudio license section not found.' }
     $miniaudio.Substring($licenseStart).Replace('*/','').Trim() | Set-Content -LiteralPath "$inputDir/licenses/miniaudio/LICENSE.txt" -Encoding utf8
+    $mp3Decoder = [IO.File]::ReadAllText("$root/native/audio-host/third_party/dr_mp3.h")
+    $mp3LicenseStart = $mp3Decoder.LastIndexOf('This software is available as a choice of the following licenses.')
+    if ($mp3LicenseStart -lt 0) { throw 'dr_mp3 license section not found.' }
+    New-Item -ItemType Directory -Path "$inputDir/licenses/dr_mp3" | Out-Null
+    $mp3Decoder.Substring($mp3LicenseStart).Replace('*/','').Trim() | Set-Content -LiteralPath "$inputDir/licenses/dr_mp3/LICENSE.txt" -Encoding utf8
     @('format=1', "product.version=$version", "platform=windows-x86_64", 'java=external', 'java.major=25', 'java.arch=x64', 'toolchain=tools/llvm-mingw/bin/clang++.exe', "sources.sha256=$((Get-FileHash -LiteralPath $projectSources -Algorithm SHA256).Hash.ToLowerInvariant())") | Set-Content -LiteralPath "$inputDir/installation.properties" -Encoding ascii
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     foreach ($library in Get-ChildItem -LiteralPath "$inputDir/lib" -Filter '*.jar') {

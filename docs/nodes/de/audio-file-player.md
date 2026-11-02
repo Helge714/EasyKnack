@@ -30,6 +30,8 @@ Spielt eine Audiodatei mit Transport- und Schleifensteuerung ab.
 
 Ein Hintergrundstream liefert decodiertes Audio. Geschwindigkeit verändert Tonhöhe und Dauer; 0 hält die Position. Play ≥ 0.5 aktiviert die Wiedergabe. Reset startet bei aktiver Schleife am Schleifenanfang, sonst am Dateianfang. Abspielpositionen sind Anteile der gesamten Datei; Sekunden und Samples sind alternative Darstellungen. Der unverbundene Positionsregler folgt der Wiedergabe und erlaubt Positionssprünge. Ohne Schleife wird die Wiedergabe am Ende still. Bufferunterläufe zählt Blöcke mit fehlenden decodierten Daten. Für wiederverwendbares Audio im Arbeitsspeicher verwende [File Buffer](file-buffer.md).
 
+Beim MP3-Import werden vorhandene Xing/LAME-Angaben zu Encoder-Verzögerung und End-Padding für lückenlose Wiedergabe berücksichtigt. Ohne Metadaten werden leise Samples erhalten statt automatisch entfernt. Alte MP3-Caches werden beim Wiederherstellen ihres Datei-Editors im Hintergrund neu importiert; liegt der Node in einer ungeöffneten Gruppe, diese öffnen oder die Quelldatei erneut auswählen. Dauer und Samplezahl können dadurch kleiner werden.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |

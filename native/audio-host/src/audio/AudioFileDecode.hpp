@@ -1,5 +1,6 @@
 #pragma once
 #include "miniaudio.h"
+#include "GaplessMp3Decoder.hpp"
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -32,11 +33,14 @@ inline void decodeAudioFile(const std::string& sourceHex, const std::string& out
     for (char& c : extension) if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
     if (extension != ".wav" && extension != ".mp3") throw std::runtime_error("Only WAV and MP3 files are supported");
     auto config = ma_decoder_config_init(ma_format_f32, 0, 48000);
-    config.encodingFormat = extension == ".wav" ? ma_encoding_format_wav : ma_encoding_format_mp3;
+    ma_decoding_backend_vtable* mp3Backends[]{&GaplessMp3Decoder::backend};
+    config.encodingFormat = extension == ".wav" ? ma_encoding_format_wav : ma_encoding_format_unknown;
+    if(extension==".mp3"){config.ppCustomBackendVTables=mp3Backends;config.customBackendCount=1;}
     ma_decoder decoder{};
     if (ma_decoder_init_file_w(source.c_str(), &config, &decoder) != MA_SUCCESS)
         throw std::runtime_error("Cannot decode WAV/MP3 file (invalid, unsupported or unreadable audio)");
     struct Cleanup { ma_decoder* value; ~Cleanup() { ma_decoder_uninit(value); } } cleanup{&decoder};
+    if(extension==".mp3"&&decoder.pBackendVTable!=&GaplessMp3Decoder::backend)throw std::runtime_error("Cannot decode MP3 with the gapless backend");
     ma_uint32 channels = 0;
     if (ma_decoder_get_data_format(&decoder, nullptr, &channels, nullptr, nullptr, 0) != MA_SUCCESS || channels < 1 || channels > 2)
         throw std::runtime_error("Only mono/stereo audio files are supported");
