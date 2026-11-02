@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Keep linked output volume keys active when groups contain Hidden or Mute state.
+  Discover targets through the same special-group preparation as audio execution,
+  independently of muting, and retain link changes made during host communication.
+
 - Bin Width now has one Width input with Octaves, Cent, Semitones and Bins in its
   Unit context menu. Connected pitch values use the shared unit conversion path.
   Bins is an alternative linear radius, not a conversion from octaves. Remove the

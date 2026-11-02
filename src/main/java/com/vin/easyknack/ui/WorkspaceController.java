@@ -615,22 +615,29 @@ final class WorkspaceController implements AutoCloseable {
 
     private com.vingame.glswing.node.composite.GLCompositeFlattenResult flattenedAudioGraph(){return flattenedAudioGraph(false);}
     private com.vingame.glswing.node.composite.GLCompositeFlattenResult flattenedAudioGraph(boolean useBakes) {
+        return flattenedAudioGraph(useBakes,false);
+    }
+    private static GLNodeGraphSnapshot withoutPresentationFlags(GLNodeGraphSnapshot snapshot){
+        return new GLNodeGraphSnapshot(snapshot.graphId(),snapshot.revision(),snapshot.nodes().stream()
+                .map(n->n.withoutProperty(GLNodeState.HIDDEN).withoutProperty(GLNodeState.MUTED)).toList(),snapshot.connections());
+    }
+    private com.vingame.glswing.node.composite.GLCompositeFlattenResult flattenedAudioGraph(boolean useBakes,boolean volumeTargets) {
         var registry = new GLCompositeGraphRegistry();
         for (var source : composites.assets()) {
             var preparedSource=ControlMetadata.prepare(source,(id,key)->midiDrivers!=null&&midiDrivers.isExternal(source.id(),id,key));
             var asset=useBakes?bakes.apply(preparedSource):preparedSource;
-            registry.registerAsset(new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(), executableCompositeMutes(asset.graph()),
+            registry.registerAsset(new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(), volumeTargets?withoutPresentationFlags(asset.graph()):executableCompositeMutes(asset.graph()),
                 asset.viewState(), asset.metadata(), asset.compositeDescriptor()));
         }
         for (var composite : composites.composites())
             if (registry.findComposite(composite.nodeTypeId()).isEmpty()) registry.registerComposite(composite);
         var root = new GLNodeGraphAsset("easyknack.root", 1, GLNodeGraphAssetKind.PROJECT,
-                executableCompositeMutes(graph.snapshot()), GLNodeEditorViewState.empty());
+                volumeTargets?withoutPresentationFlags(graph.snapshot()):executableCompositeMutes(graph.snapshot()), GLNodeEditorViewState.empty());
         root=ControlMetadata.prepare(root,(id,key)->midiDrivers!=null&&midiDrivers.isExternal(MidiDrivers.ROOT,id,key));
         if(useBakes)root=bakes.apply(root);
         var prepared=GroupCompiler.prepare(root,registry);
         var flat=SpectralGroups.flatten(prepared,new GLCompositeExpansionLimits(16, 256, 512, 10000));
-        if(!flat.isValid())return flat;
+        if(!flat.isValid()||volumeTargets)return flat;
         return new com.vingame.glswing.node.composite.GLCompositeFlattenResult(
             java.util.Optional.of(executableGraph(flat.graph().orElseThrow())),flat.origins(),flat.diagnostics());
     }
@@ -705,9 +712,7 @@ final class WorkspaceController implements AutoCloseable {
     }
 
     java.util.Set<String> audioVolumeLinks() {
-        var root=new GLNodeGraphAsset("easyknack.volume.root",1,GLNodeGraphAssetKind.PROJECT,graph.snapshot(),GLNodeEditorViewState.empty());
-        var prepared=GroupCompiler.prepare(root,composites);
-        var flattened=GLCompositeGraphFlattener.flatten(prepared.root(),prepared.registry(),new GLCompositeExpansionLimits(16,256,512,10000));
+        var flattened=flattenedAudioGraph(false,true);
         if(!flattened.isValid()) return java.util.Set.of();
         var result=new java.util.HashSet<String>();
         for(var node:flattened.graph().orElseThrow().nodes()) {

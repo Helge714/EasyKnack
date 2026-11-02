@@ -63,6 +63,11 @@ public final class AudioHostService implements AutoCloseable {
     public void setVolumeLinks(java.util.Set<String> ids) {
         volumeLinks="VOLUME_LINKS"+ids.stream().sorted().map(id->" "+AudioEndpoint.hex(id)).collect(java.util.stream.Collectors.joining());
     }
+    @FunctionalInterface interface CommandSender {void send(String command)throws java.io.IOException;}
+    void sendVolumeLinks(CommandSender sender)throws java.io.IOException{
+        String requested=volumeLinks;
+        if(!requested.equals(sentVolumeLinks)){sender.send(requested);sentVolumeLinks=requested;}
+    }
 
     public AudioHostService() { this(true); }
     AudioHostService(boolean poll) { this(poll, false); }
@@ -146,7 +151,7 @@ public final class AudioHostService implements AutoCloseable {
                 if(!finalAnalysis.isEmpty())SwingUtilities.invokeLater(()->{if(!closed)AudioAnalysis.publish(finalAnalysis);});
             }
 
-            if(!volumeLinks.equals(sentVolumeLinks)) { client.command(volumeLinks); sentVolumeLinks=volumeLinks; }
+            sendVolumeLinks(client::command);
             for(var request:AudioDeviceVolumes.drain().entrySet()) {
                 try { client.command("VOLUME "+AudioEndpoint.hex(request.getKey())+" "+request.getValue()); }
                 catch(java.io.IOException failure) { status(com.vin.easyknack.ui.AppText.literal("Gerätelautstärke: ")+failure.getMessage()); }

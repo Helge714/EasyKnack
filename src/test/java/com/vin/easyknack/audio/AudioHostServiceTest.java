@@ -4,6 +4,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class AudioHostServiceTest {
+    @Test void volumeLinkChangesDuringSendAreNotMistakenForAcknowledgedCommands()throws Exception{
+        try(var service=new AudioHostService(false)){
+            var commands=new java.util.ArrayList<String>();service.setVolumeLinks(java.util.Set.of("out:first"));
+            service.sendVolumeLinks(command->{commands.add(command);service.setVolumeLinks(java.util.Set.of("out:second"));});
+            service.sendVolumeLinks(commands::add);service.sendVolumeLinks(commands::add);
+            assertEquals(java.util.List.of("VOLUME_LINKS "+AudioEndpoint.hex("out:first"),"VOLUME_LINKS "+AudioEndpoint.hex("out:second")),commands);
+            service.setVolumeLinks(java.util.Set.of());service.sendVolumeLinks(commands::add);assertEquals("VOLUME_LINKS",commands.get(2));
+        }
+    }
     @Test void closingClearsLiveAnalysisOnTheUiThread()throws Exception{
         var service=new AudioHostService(false);
         javax.swing.SwingUtilities.invokeAndWait(()->AudioAnalysis.publish(java.util.Map.of("monitor",new AudioAnalysis.Frame(440,1,0,new float[]{440}))));

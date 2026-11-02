@@ -79,6 +79,19 @@ class AudioRoutingTest {
             }
         });
     }
+    @Test void groupMuteAndHiddenFlagsNeverDisableLinkedVolumeTargets()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var controller=new WorkspaceController()){
+            var graph=controller.workspace().currentGraph();
+            var output=graph.snapshot().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof OutputNode).findFirst().orElseThrow();
+            controller.setNodeProperty(output.id(),OutputNode.VOLUME_KEYS,GLNodeValue.of(true));
+            controller.workspace().editor().setSelectedNodes(controller.workspace().editor().getNodes().subList(1,3));controller.actions().extractComposite();
+            var group=graph.snapshot().nodes().stream().filter(n->!(NodeRegistry.find(n.typeId()).orElse(null) instanceof OutputNode)&&NodeRegistry.find(n.typeId()).isEmpty()).findFirst().orElseThrow();
+            for(boolean muted:List.of(false,true)){
+                graph.edit("Group flags",e->{e.setProperty(group.id(),GLNodeState.MUTED,GLNodeValue.of(muted));e.setProperty(group.id(),GLNodeState.HIDDEN,GLNodeValue.of(true));});
+                assertEquals(Set.of("default"),controller.audioVolumeLinks());
+            }
+        }});
+    }
     @Test void mutedInputStaysConnectedAsZeroAndOutputMuteIsLocal() throws Exception {
         SwingUtilities.invokeAndWait(()-> {
             try(var controller=new WorkspaceController()) {
