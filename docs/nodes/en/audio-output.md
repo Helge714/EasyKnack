@@ -24,6 +24,8 @@ Sends audio to an output device.
 
 MIDI voices are summed automatically. Device volume controls the Windows endpoint volume and reflects external changes; it is not an additional signal gain. Linked volume keys change selected endpoints proportionally. Muting this node suppresses its EasyKnack signal without muting the Windows device.
 
+Linked volume keys show a brief desktop overlay, including over other applications. For several linked outputs, the percentage is the highest output volume; their relative levels remain unchanged.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

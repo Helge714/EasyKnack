@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Show brief, themed desktop feedback when linked output volume keys are used,
+  also while EasyKnack is minimized. The overlay does not take keyboard focus,
+  dismisses automatically, and reports the highest linked output level without
+  changing proportional device-volume behavior. No document or protocol change.
+
 - Honor MP3 gapless metadata during import to remove encoder delay/end padding
   from File Player and File Buffer loops. WAV import is unchanged; untagged MP3s
   retain their samples without heuristic silence trimming. Older MP3 caches are

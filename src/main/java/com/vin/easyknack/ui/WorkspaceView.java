@@ -63,6 +63,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     private final AudioDiagnosticsPanel diagnostics=new AudioDiagnosticsPanel(()->controller.resetDiagnostics());
     private final GLNodeWorkspace workspace = controller.workspace();
     private final DocumentActions documents;
+    private final VolumeKeyOverlay volumeOverlay;
     private final GLLabel status = new GLLabel(
             com.vin.easyknack.ui.AppText.literal("Audio gestoppt · Audio → Start · Parameter im Inspector bearbeiten"));
 
@@ -72,6 +73,8 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         status.setSelectable(true);
         setGLHistoryManager(controller.history());
         controller.enableAudio(status::setText, audioLoad::setText);
+        volumeOverlay = new VolumeKeyOverlay(window);
+        controller.setVolumeKeyListener(volumeOverlay::show);
         controller.setDiagnosticsListener(diagnostics::accept);
         audioLoad.setGLStyle(audioLoad.getGLStyle().withBackground(ApplicationTheme.current().theme().menuBarStyle().background()).withBorder(0,new java.awt.Color(0,0,0,0)));
         audioLoad.setToolTipText(com.vin.easyknack.ui.AppText.literal("Open render diagnostics"));
@@ -271,5 +274,5 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     @Override public boolean preservesKeyboardFocusOnPress(){return analysisFocus.isVisible();}
 
     public java.util.concurrent.CompletionStage<Boolean> requestClose() { return documents.requestClose(); }
-    @Override public void close() { if (launchTimer != null) launchTimer.stop(); com.vin.easyknack.audio.FileAudition.stop(); documents.close(); pluginActivity.close(); controller.close(); }
+    @Override public void close() { if (launchTimer != null) launchTimer.stop(); volumeOverlay.close(); com.vin.easyknack.audio.FileAudition.stop(); documents.close(); pluginActivity.close(); controller.close(); }
 }

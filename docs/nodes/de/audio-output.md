@@ -24,6 +24,8 @@ Sendet Audio an ein Ausgabegerät.
 
 MIDI-Stimmen werden automatisch summiert. Gerätelautstärke steuert den Windows-Endpunkt und übernimmt externe Änderungen; sie ist kein zusätzlicher Signal-Gain. Gekoppelte Lautstärketasten verändern die gewählten Endpunkte proportional. Mute unterdrückt das EasyKnack-Signal, ohne das Windows-Gerät stummzuschalten.
 
+Gekoppelte Lautstärketasten zeigen kurz eine Einblendung auf dem Desktop, auch über anderen Programmen. Bei mehreren gekoppelten Ausgängen entspricht die Prozentanzeige dem höchsten Ausgangspegel; die relativen Lautstärkeverhältnisse bleiben erhalten.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
