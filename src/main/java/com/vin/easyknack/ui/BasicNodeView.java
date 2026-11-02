@@ -70,7 +70,7 @@ public class BasicNodeView extends GLNode {
                 setAlwaysVisible(content, row.alwaysVisible());
                 setContentVerticalGrow(content,row.verticalGrow());
                 if (port != null) {
-                    if(row.formats()!=null){content.setName(row.portLabel());port.setContextMenu(PortUnitMenus.create(row.formats().choices(),row.unit(),unit->write(row.unitProperty(),GLNodeValue.of(unit.id()))));}
+                    if(row.formats()!=null){content.setName(row.portLabel());port.setContextMenu(PortUnitMenus.create(row.unitChoices(),row.unit(),unit->write(row.unitProperty(),GLNodeValue.of(unit.id()))));}
                     if(row.editor() instanceof VectorEditor && content instanceof GLSliderGroup group)
                         setContentPortAnchor(content,group.getSliders().get(0));
                     port.setToolTipText(NodeHints.tooltip(row));

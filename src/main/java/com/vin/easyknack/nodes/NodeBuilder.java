@@ -18,6 +18,7 @@ public final class NodeBuilder {
         private Editor editor;
         private UnitFormats formats;
         private UnitFormat unit;
+        private List<UnitFormat> unitChoices;
         private PropertyId unitProperty;
         public UnitFormats formats(){return formats;}
         public UnitFormat unit(){return unit;}
@@ -26,6 +27,9 @@ public final class NodeBuilder {
         public String portLabel(){return formats==null?label:label.replaceFirst("\\s*\\[[^\\]]*\\]$", "")+" ["+unit.suffix()+"]";}
 
         public Row formats(UnitFormats value) { formats=value;return this; }
+        /** Alternative interpretations may span dimensions; conversion stays within formats(). */
+        public Row unitChoices(List<UnitFormat> choices){unitChoices=List.copyOf(choices);return this;}
+        public List<UnitFormat> unitChoices(){return unitChoices==null?formats.choices():unitChoices;}
         private boolean alwaysVisible;
         private boolean editorCopyable=true,driverAssignable=true;
         public Row driverAssignable(boolean value){driverAssignable=value;return this;}
@@ -139,9 +143,10 @@ public final class NodeBuilder {
             var selected=UnitFormat.fromId(state.text(key,formats.stored().id()));
             if(!formats.choices().contains(selected))throw new IllegalArgumentException("Unsupported unit "+selected.id()+" for port "+row.id()+"; expected "+formats.choices());
             row.formats=formats;row.unit=selected;
-            if(slider!=null)row.editor=new UnitSlider(slider,formats,selected);
+            if(!row.unitChoices().containsAll(formats.choices()))throw new IllegalArgumentException("Missing display units in unit menu");
+            if(slider!=null)row.editor=new UnitSlider(slider,formats,selected,row.unitChoices());
             if(rows.stream().noneMatch(r->r.key.equals(key))) {
-                var choice=addEditor(key,row.label+" unit",Editor.comboBox(formats.choices(),formats.initial(),UnitFormat::id)).inspectorOnly();
+                var choice=addEditor(key,row.label+" unit",Editor.comboBox(row.unitChoices(),formats.initial(),UnitFormat::id)).inspectorOnly();
                 choice.menuOnly=true;
             }
         }

@@ -59,3 +59,5 @@ appropriate vector editors and nodes; scalar port conversion is not a substitute
 for a vector transformation.
 
 [Fundamentals](index.md) · [Deutsch](../de/units.md)
+
+**Bins** measures a linear FFT-bin radius. Bin Width also offers octave, cent and semitone radii in its Unit menu. These are alternative interpretations, not universally convertible quantities; the bin spacing and center frequency would be required to relate them.

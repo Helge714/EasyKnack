@@ -4,14 +4,14 @@
 #include <algorithm>
 #include <sstream>
 namespace easyknack {
-enum class UnitFormat { factor,percent,db,cent,semitone,octave,hz,khz,second,ms,turn,degree,radian,q,sample,bpm,metre,kilometre,centimetre,millimetre };
+enum class UnitFormat { factor,percent,db,cent,semitone,octave,hz,khz,second,ms,turn,degree,radian,q,sample,bpm,metre,kilometre,centimetre,millimetre,bin };
 inline UnitFormat readUnit(std::istream& in){
     std::string name;in>>name;
-    const char* names[]={"factor","percent","db","cent","semitone","octave","hz","khz","second","ms","turn","degree","radian","q","sample","bpm","metre","kilometre","centimetre","millimetre"};
-    for(int i=0;i<20;i++)if(name==names[i])return static_cast<UnitFormat>(i);
+    const char* names[]={"factor","percent","db","cent","semitone","octave","hz","khz","second","ms","turn","degree","radian","q","sample","bpm","metre","kilometre","centimetre","millimetre","bin"};
+    for(int i=0;i<21;i++)if(name==names[i])return static_cast<UnitFormat>(i);
     throw std::runtime_error("Unknown unit");
 }
-inline int unitDimension(UnitFormat u){if(u>=UnitFormat::metre)return 5;if(u==UnitFormat::bpm)return 1;if(u==UnitFormat::sample)return 2;int i=static_cast<int>(u);return i<6?0:i<8?1:i<10?2:i<13?3:4;}
+inline int unitDimension(UnitFormat u){if(u==UnitFormat::bin)return 6;if(u>=UnitFormat::metre)return 5;if(u==UnitFormat::bpm)return 1;if(u==UnitFormat::sample)return 2;int i=static_cast<int>(u);return i<6?0:i<8?1:i<10?2:i<13?3:4;}
 inline bool unitsConvertible(UnitFormat from,UnitFormat to) noexcept {
     const int a=unitDimension(from),b=unitDimension(to);
     return a==b||((a==1||a==2)&&(b==1||b==2));

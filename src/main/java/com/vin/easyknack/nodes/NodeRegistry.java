@@ -117,7 +117,7 @@ public final class NodeRegistry {
                         var selected=(UnitSlider)definition.layout(new NodeState(model.properties())).rows().stream().filter(r->r.id().equals(row.id())).findFirst().orElseThrow().editor();
                         var control=selected.create(row.label(),changed);
                         control.update().accept(model.properties().getOrDefault(row.id(),slider.defaultValue()));
-                        slider.bindUnitMenu((com.vingame.glswing.ui.GLSlider)control.component(),unit->{
+                        selected.bindUnitMenu((com.vingame.glswing.ui.GLSlider)control.component(),unit->{
                             for(var parent=control.component().getGLParent();parent!=null;parent=parent instanceof com.vingame.glswing.component.GLContainer container?container.getGLParent():null)
                                 if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(row.unitProperty().value(),GLNodeValue.of(unit.id()));break;}
                         });
@@ -128,6 +128,11 @@ public final class NodeRegistry {
                         return control.component();
                     },(control,model)->{
                         var current=definition.layout(new NodeState(model.properties())).rows().stream().filter(r->r.id().equals(row.id())).findFirst().orElseThrow();
+                        if(current.editor() instanceof UnitSlider next && control instanceof com.vingame.glswing.ui.GLUnitSlider<?> existingSlider && !existingSlider.getUnitFormats().equals(next.formats().core())){
+                            for(var parent=control.getGLParent();parent!=null;parent=parent instanceof com.vingame.glswing.component.GLContainer container?container.getGLParent():null)
+                                if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){java.awt.EventQueue.invokeLater(inspector::refresh);break;}
+                            return;
+                        }
                         EditorPresentation.update(current,control);
                         ((com.vingame.glswing.ui.GLUnitSlider<?>)control).setStoredValue(new NodeState(model.properties()).number(row.key(),slider.spec().value()));
                     }));

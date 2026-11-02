@@ -9,13 +9,10 @@ Verteilt Spektralinhalt über benachbarte Frequenzen.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | Komplexe FFT-Bins | — | — | [Control](../../user/de/rates.md#control) | Immer |
-| Verteilung (Distribution) | [Editor](../../user/de/reference-tables.md) | Bins / Oktaven / Faktor (Legacy) | — | Oktaven | — | — | Immer |
 | Kernel | [Editor](../../user/de/reference-tables.md) | Gauß / Box / Maximum | — | Gauß | — | — | Immer |
 | Synthese (Synthesis) | [Editor](../../user/de/reference-tables.md) | Rauschen / Kontinuierlich / Erhalten | — | Rauschen | — | — | Immer |
 | Leistung normieren (Normalize power) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Immer |
-| Oktaven (Octaves) | [Wert](../../user/de/data-types.md#value) | ≥ 0 oct | ≥ 0 oct | 0 oct | [oct](../../user/de/units.md) | [Control](../../user/de/rates.md#control) | Oktaven |
-| Faktor (Factor) | [Wert](../../user/de/data-types.md#value) | ≥ 1 | ≥ 1 | 1 | — | [Control](../../user/de/rates.md#control) | Faktor (Legacy) |
-| Breite (Bins) (Width (bins)) | [Wert](../../user/de/data-types.md#value) | 0–8192 | 0–8192 | 0 | bins | [Control](../../user/de/rates.md#control) | Bins |
+| Breite (Width) | [Wert](../../user/de/data-types.md#value) | ≥ 0 oct / bins | ≥ 0 oct / bins | 0 oct | [oct / cent / st / bins](../../user/de/units.md) | [Control](../../user/de/rates.md#control) | Immer |
 
 ## Ausgänge
 
@@ -25,7 +22,7 @@ Verteilt Spektralinhalt über benachbarte Frequenzen.
 
 ## Verhalten
 
-Oktaven legt einen logarithmischen Radius fest: Breite b umfasst `f·2^(−b)` bis `f·2^b`; Faktor q umfasst f/q bis f·q. DC bleibt in logarithmischen Modi unverändert. Bins verwendet einen linearen Binradius. Gauß verwendet einen Radius von drei Standardabweichungen; Box gewichtet die Umgebung gleichmäßig; Maximum übernimmt deren größte Magnitude. Rauschen synthetisiert kontinuierliches Rauschen über Frequenzbereiche, Kontinuierlich erzeugt binzentrierte Töne, Erhalten behält die Koeffizientenphase. Breite 0 ist ein exakter Bypass. Bei sehr kleinen Rauschbreiten wird die Phasenabweichung für einen stetigen Übergang begrenzt. Leistung normieren erhält die gesamte Spektralleistung, im Rauschmodus als Erwartungswert statt als Frame-Limiter. Steuerwerte werden je eingehendem Frame ausgewertet.
+Die Einheit wird im Kontextmenü des Sliders oder Ports gewählt. Oktaven, Cent und Halbtöne beschreiben denselben logarithmischen Radius: Eine Breite b in Oktaven umfasst `f·2^(−b)` bis `f·2^b`; 1 oct = 1200 cent = 12 st. Bins wählt einen linearen Binradius. Beim Wechsel zwischen Bins und Tonhöheneinheiten bleibt die gespeicherte Radiuszahl erhalten und ändert ihre Interpretation; eine allgemeine Umrechnung gibt es nicht. DC bleibt bei logarithmischer Breite unverändert. Gaussian verwendet einen Radius von drei Standardabweichungen, Box gewichtet die Nachbarschaft gleichmäßig und Maximum übernimmt die größte Magnitude. Noise erzeugt kontinuierliches Rauschen, Continuous binzentrierte Töne und Preserve erhält die Koeffizientenphase. Breite null ist ein exakter Bypass. Bei sehr kleinen Rauschbreiten ist die Phasenabweichung für einen stetigen Übergang begrenzt. Normalize power erhält die gesamte spektrale Leistung, im Noise-Modus als Erwartungswert statt als Begrenzer pro Frame. Steuerwerte werden pro eingehendem Frame ausgewertet.
 
 ## Mute
 

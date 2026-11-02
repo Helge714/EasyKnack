@@ -62,3 +62,5 @@ Vektorgröße. Verwende dafür die vorgesehenen Vektor-Editoren und -Nodes, nich
 die skalare Portumrechnung als Ersatz für eine Vektortransformation.
 
 [Grundlagen](index.md) · [English](../en/units.md)
+
+**Bins** bezeichnet einen linearen FFT-Binradius. Bin Width bietet im Einheitenmenü außerdem Radien in Oktaven, Cent und Halbtönen. Das sind alternative Interpretationen statt allgemein umrechenbarer Größen; für eine Zuordnung wären Binabstand und Mittenfrequenz erforderlich.

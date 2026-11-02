@@ -10,9 +10,11 @@ public final class EditorPresentation {
     public static void update(NodeBuilder.Row row, GLContainer component) {
         if(component instanceof GLControl control)control.setToolTipText(NodeHints.tooltip(row));
         if(component instanceof GLUnitSlider<?> raw && row.editor() instanceof UnitSlider spec){
+            if(!raw.getUnitFormats().equals(spec.formats().core()))return;
             var slider=(GLUnitSlider<UnitFormat>)raw;slider.setText(row.label());
             slider.setStoredMetadata(spec.spec().value(),spec.spec().min(),spec.spec().max(),spec.spec().step());
             slider.setDisplayUnit(spec.selected());
+            spec.updateUnitMenu(slider);
         }
         if(component instanceof GLSlider slider && row.editor() instanceof Editor.Slider spec) {
             slider.setText(row.label());

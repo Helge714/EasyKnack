@@ -5,6 +5,7 @@ public record UnitFormats(UnitFormat stored,UnitFormat initial,List<UnitFormat> 
     public static final UnitFormats LENGTH=new UnitFormats(UnitFormat.METRE,UnitFormat.METRE,List.of(UnitFormat.METRE,UnitFormat.KILOMETRE,UnitFormat.CENTIMETRE,UnitFormat.MILLIMETRE));
     public static final UnitFormats GAIN_DB=new UnitFormats(UnitFormat.DB,UnitFormat.FACTOR,List.of(UnitFormat.FACTOR,UnitFormat.PERCENT,UnitFormat.DB));
     public static final UnitFormats PITCH_CENT=pitch(UnitFormat.CENT),PITCH_SEMITONE=pitch(UnitFormat.SEMITONE);
+    public static final UnitFormats OCTAVE_WIDTH=new UnitFormats(UnitFormat.OCTAVE,UnitFormat.OCTAVE,List.of(UnitFormat.OCTAVE,UnitFormat.CENT,UnitFormat.SEMITONE));
     public static final UnitFormats FREQUENCY=new UnitFormats(UnitFormat.HZ,UnitFormat.HZ,List.of(UnitFormat.HZ,UnitFormat.KHZ));
     public static final UnitFormats CLOCK=new UnitFormats(UnitFormat.HZ,UnitFormat.HZ,List.of(UnitFormat.HZ,UnitFormat.BPM));
     public static final UnitFormats TIME_MS=new UnitFormats(UnitFormat.MS,UnitFormat.MS,List.of(UnitFormat.MS,UnitFormat.SECOND,UnitFormat.SAMPLE));

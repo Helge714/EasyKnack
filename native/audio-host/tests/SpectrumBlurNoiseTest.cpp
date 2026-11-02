@@ -28,7 +28,7 @@ static void reconstructNoise(int size,int divisor,bool padded,SpectrumWindow win
 static void bandCoverage(int size){
     constexpr int block=256,capture=65536;
     SpectrumNode fft;fft.size=size;fft.hop=size/4;fft.prepare(48000,block);
-    SpectrumBlurNode blur;blur.noiseMode=true;blur.logarithmic=blur.octaveMode=true;blur.octaves=1;blur.kernel="maximum";blur.prepare(48000,block);
+    SpectrumBlurNode blur;blur.noiseMode=true;blur.logarithmic=true;blur.width=1;blur.kernel="maximum";blur.prepare(48000,block);
     IFFTNode inverse;inverse.prepare(48000,block);
     std::array<float,block> in{},out{},silence{};const float* inputs[]{in.data(),nullptr,nullptr,nullptr};
     const DspResource* source[]{&fft.resource};const DspResource* processed[]{&blur.stream};
@@ -62,7 +62,7 @@ static void tinyWidth(const char* kernel,bool padded,int divisor){
     constexpr int block=256,size=1024;
     for(float width:{0.f,.00001f,.0001f,.001f}){
         SpectrumNode fft;fft.size=size;fft.hop=size/divisor;fft.padded=padded;fft.prepare(48000,block);
-        SpectrumBlurNode blur;blur.noiseMode=true;blur.logarithmic=blur.octaveMode=true;blur.octaves=width;blur.kernel=kernel;blur.prepare(48000,block);
+        SpectrumBlurNode blur;blur.noiseMode=true;blur.logarithmic=true;blur.width=width;blur.kernel=kernel;blur.prepare(48000,block);
         IFFTNode inverse;inverse.prepare(48000,block);
         std::array<float,block> in{},out{},silence{};const float* inputs[]{in.data(),nullptr,nullptr,nullptr};
         const DspResource* source[]{&fft.resource};const DspResource* processed[]{&blur.stream};

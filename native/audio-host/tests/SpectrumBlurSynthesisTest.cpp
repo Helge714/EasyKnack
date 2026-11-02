@@ -7,7 +7,7 @@ static void synthesizedBand(int size,int divisor,SpectrumWindow window,bool padd
     constexpr int block=256;
     const int capture=size*16;
     SpectrumNode fft;fft.size=size;fft.hop=size/divisor;fft.window=window;fft.padded=padded;fft.prepare(48000,block);
-    SpectrumBlurNode blur;blur.kernel=kernel;blur.logarithmic=blur.octaveMode=true;blur.octaves=1;blur.prepare(48000,block);
+    SpectrumBlurNode blur;blur.kernel=kernel;blur.logarithmic=true;blur.width=1;blur.prepare(48000,block);
     IFFTNode inverse;inverse.prepare(48000,block);
     std::array<float,block> in{},out{},silence{};
     const float* inputs[]{in.data(),nullptr,nullptr,nullptr};
@@ -34,7 +34,7 @@ static void synthesizedBand(int size,int divisor,SpectrumWindow window,bool padd
 }
 
 static void phaseTimingAndBypass(){
-    SpectrumBlurNode blur;blur.kernel="maximum";blur.logarithmic=blur.octaveMode=true;blur.octaves=1;blur.prepare(48000,256);
+    SpectrumBlurNode blur;blur.kernel="maximum";blur.logarithmic=true;blur.width=1;blur.prepare(48000,256);
     SpectrumStream input;input.prepare(256);input.size=input.windowSize=1024;input.hop=256;input.sampleRate=48000;input.count=1;
     input.frames[0].bins[32]={2,1};SpectrumStream::realSymmetry(input.frames[0],1024);
     const float* inputs[]{nullptr,nullptr,nullptr,nullptr};const DspResource* resources[]{&input};float out=0,silence=0;
@@ -48,7 +48,7 @@ static void phaseTimingAndBypass(){
     blur.preservePhase=true;blur.process(c);
     assert(std::abs(std::arg(blur.stream.frames[0].bins[32])-std::arg(input.frames[0].bins[32]))<1e-12);
     for(bool preserve:{false,true}){
-        blur.preservePhase=preserve;blur.octaves=0;blur.process(c);
+        blur.preservePhase=preserve;blur.width=0;blur.process(c);
         for(int k=0;k<1024;k++)assert(blur.stream.frames[0].bins[k]==input.frames[0].bins[k]);
     }
 }

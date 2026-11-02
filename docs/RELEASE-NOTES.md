@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Bin Width now has one Width input with Octaves, Cent, Semitones and Bins in its
+  Unit context menu. Connected pitch values use the shared unit conversion path.
+  Bins is an alternative linear radius, not a conversion from octaves. Remove the
+  Distribution selector, obsolete Factor mode and legacy host readers. Earlier
+  octave/bin document wiring is migrated; Factor documents need manual rebuilding.
+  Rebuild the host and source plugins for the changed parameter contract. This is
+  a pre-release breaking change covered by the current first development version.
+
 - Add sinh, cosh, tanh, asinh, acosh, atanh, expm1 and log1p to Formula Groups,
   including preview/native execution, generated kernels and editor help. Existing
   formulas retain their behavior; new functions require an updated audio host.
