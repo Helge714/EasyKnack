@@ -102,7 +102,7 @@ Auto uses Audio for random, sample index/position and Buffer reads; explicit Con
 samples them once per block. `sampleRate`, `blockSize` and Buffer size alone remain
 Control in Auto mode.
 
-Add an input of type **Buffer** in Group-IO, name its code identifier `buffer`, and
+Add an input of type **Buffer resource** in Group-IO (formerly **HISTORY**), name its code identifier `buffer`, and
 connect a File Buffer or live Buffer. Buffer outputs and arbitrary audio-input history
 are not supported. Resources are borrowed, not copied or allocated by the Formula.
 

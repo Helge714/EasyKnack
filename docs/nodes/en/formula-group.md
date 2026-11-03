@@ -22,6 +22,8 @@ Computes custom formulas through a configurable group interface.
 
 ## Behavior
 
+For a Buffer input, choose **Buffer resource** as the Group-IO data type. It was previously displayed as **HISTORY**. Buffer resources are supported as inputs only.
+
 Group-IO defines port labels, units and stable code identifiers. The initial interface is signal → result. The language supports typed local/state variables, arithmetic, if/else, casts and math functions; Trigger inputs are boolean at their event sample. Audio executes per sample; Control per block, subject to validation against loss of used Audio/Trigger inputs. State is independent per channel/voice/instance. Input-specific read methods distinguish current signal blocks from resource buffers. Live preview applies valid edits before native compilation completes; invalid drafts keep the last accepted program. In Spectral Groups, valid formulas execute per bin/frame; temporal context is not interchangeable with bin context. See [the language reference](../../FORMULA-GROUP.md).
 
 Hyperbolic functions: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.

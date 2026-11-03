@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Label the existing HISTORY group-port type as Buffer resource (German:
+  Buffer-Ressource), including Formula Group inputs and live language refresh.
+  Existing Buffer connections and saved type IDs are unchanged.
+
 - Keep Custom Groups executable after replacing a choice editor: ignore retired
   generated selection fields during compilation while preserving document/Undo
   values and declared fields. Recover explicit selections when a stable custom

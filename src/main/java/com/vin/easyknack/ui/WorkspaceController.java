@@ -87,7 +87,8 @@ final class WorkspaceController implements AutoCloseable {
         audioUpdateTimer.setRepeats(false);
         var valueTypes = new GLNodeValueTypeRegistry();
         for (var category : com.vin.easyknack.nodes.SignalCategory.values())
-            valueTypes.register(new GLNodeValueTypeDescriptor(category.valueTypeId(), category.name()));
+            valueTypes.register(new GLNodeValueTypeDescriptor(category.valueTypeId(),
+                    category==com.vin.easyknack.nodes.SignalCategory.HISTORY?AppText.text("datatype.buffer"):category.name()));
         var inputEditors=new GLNodeInputEditorRegistry();
         inputEditors.addSupportedValueTypes(GLNodeInputEditorRegistry.SLIDER,java.util.Set.of(
                 com.vin.easyknack.nodes.SignalCategory.AUDIO.valueTypeId(),com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId(),com.vin.easyknack.nodes.SignalCategory.WAVETABLE.valueTypeId()));
@@ -508,6 +509,9 @@ final class WorkspaceController implements AutoCloseable {
         graphDiagnostics.refresh(workspace,graph,composites,types,this::flattenedAudioGraph,isMultipleContext()&&!isSpectralContext(),isSpectralContext(),presented);
     }
     void refreshAppearance(){
+        workspace.interfaceEditor().valueTypes().replace(new GLNodeValueTypeDescriptor(
+                com.vin.easyknack.nodes.SignalCategory.HISTORY.valueTypeId(),AppText.text("datatype.buffer")));
+        workspace.interfaceEditor().refresh();
         var models=new java.util.ArrayList<GLGraphNode>(graph.snapshot().nodes());
         composites.assets().forEach(a->models.addAll(a.graph().nodes()));
         nodes.refreshLanguage(catalog,models);
