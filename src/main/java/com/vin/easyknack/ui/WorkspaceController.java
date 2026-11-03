@@ -623,7 +623,7 @@ final class WorkspaceController implements AutoCloseable {
     }
     private com.vingame.glswing.node.composite.GLCompositeFlattenResult flattenedAudioGraph(boolean useBakes,boolean volumeTargets) {
         var registry = new GLCompositeGraphRegistry();
-        for (var source : composites.assets()) {
+        for (var source : GroupCompiler.reachableAssets(graph.snapshot(),composites)) {
             var preparedSource=ControlMetadata.prepare(source,(id,key)->midiDrivers!=null&&midiDrivers.isExternal(source.id(),id,key));
             var asset=useBakes?bakes.apply(preparedSource):preparedSource;
             registry.registerAsset(new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(), volumeTargets?withoutPresentationFlags(asset.graph()):executableCompositeMutes(asset.graph()),

@@ -41,7 +41,9 @@ public final class AutomaticRates {
         final Set<GLNodeId> visiting = new HashSet<>(), done = new HashSet<>();
         Resolver(GLNodeGraphSnapshot graph) {
             for (var node : graph.nodes()) {
-                for(var key:List.copyOf(node.properties().keySet()))if(key.equals(ProcessingRate.EFFECTIVE)||key.startsWith(ProcessingRate.EFFECTIVE+"."))node=node.withoutProperty(key);
+                var values=new HashMap<>(node.properties());
+                values.keySet().removeIf(key->key.equals(ProcessingRate.EFFECTIVE)||key.startsWith(ProcessingRate.EFFECTIVE+"."));
+                if(!values.equals(node.properties()))node=new GLGraphNode(node.id(),node.typeId(),node.typeVersion(),values);
                 nodes.put(node.id(),node);
             }
             for (var wire : graph.connections()) inputs.computeIfAbsent(wire.input().nodeId(),id->new ArrayList<>()).add(wire);
@@ -59,7 +61,7 @@ public final class AutomaticRates {
                     visit(source.nodeId());
                     incoming.put(new PropertyId(wire.input().portId()),outputs.getOrDefault(source,ProcessingRate.AUDIO));
                 }
-                for(var value:resolveProperties(definition,node.properties(),incoming).entrySet())node=node.withProperty(value.getKey(),value.getValue());
+                node=new GLGraphNode(node.id(),node.typeId(),node.typeVersion(),resolveProperties(definition,node.properties(),incoming));
                 nodes.put(id,node);
             }
             if(definition!=null)for(var row:definition.layout(new NodeState(node.properties())).rows())

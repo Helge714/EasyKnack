@@ -12,15 +12,17 @@ public enum UnitFormat implements com.vingame.glswing.ui.GLUnit {
     BIN("spectrum-bin","Bins","bins"),
     TURN("angle","Turns","turn"), DEGREE("angle","Degrees","°"), RADIAN("angle","Radians","rad"), Q("quality","Quality factor","Q"), METRE("length","Metres","m"), KILOMETRE("length","Kilometres","km"), CENTIMETRE("length","Centimetres","cm"), MILLIMETRE("length","Millimetres","mm");
     private final String dimension,label,suffix;
+    private final String id=name().toLowerCase(java.util.Locale.ROOT);
     UnitFormat(String dimension,String label,String suffix) { this.dimension=dimension;this.label=label;this.suffix=suffix; }
-    public String id() { return name().toLowerCase(java.util.Locale.ROOT); }
+    public String id() { return id; }
     public String suffix() { return suffix; }
     public Object dimension() { return dimension; }
     public String displayName() { return toString(); }
     public double preferredStep() { return switch(this){case FACTOR,OCTAVE,TURN,SECOND,KHZ->.001;case CENT,DEGREE,SAMPLE,BIN->1;default->.01;}; }
     public boolean compatible(UnitFormat other) { return isCompatible(other); }
     public List<UnitFormat> compatible() { return Arrays.stream(values()).filter(this::compatible).toList(); }
-    public static UnitFormat fromId(String id) { return Arrays.stream(values()).filter(u->u.id().equals(id)).findFirst().orElseThrow(); }
+    private static final java.util.Map<String,UnitFormat> BY_ID=Arrays.stream(values()).collect(java.util.stream.Collectors.toUnmodifiableMap(UnitFormat::id,u->u));
+    public static UnitFormat fromId(String id) { var unit=id==null?null:BY_ID.get(id);if(unit==null)throw new java.util.NoSuchElementException();return unit; }
     @Override public String toString() { return NodeText.text("unit."+id(),label); }
     public double toBase(double value) {
         return switch(this) {

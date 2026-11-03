@@ -13,10 +13,20 @@ final class GroupCompiler {
         return prepare(root,original,true);
     }
     static Prepared prepareUngroup(GLNodeGraphAsset root,GLCompositeGraphRegistry original){return prepare(root,original,false);}
+    /** Execution needs only the transitive dependencies of the requested graph. */
+    static List<GLNodeGraphAsset> reachableAssets(GLNodeGraphSnapshot root,GLCompositeGraphRegistry registry){
+        var reachable=new HashSet<String>();var pending=new ArrayDeque<GLNodeGraphSnapshot>();pending.add(root);
+        while(!pending.isEmpty())for(var node:pending.removeFirst().nodes())
+            registry.findComposite(node.typeId()).flatMap(d->registry.findAsset(d.assetId())).ifPresent(asset->{
+                if(reachable.add(asset.id()))pending.addLast(asset.graph());
+            });
+        return registry.assets().stream().filter(a->reachable.contains(a.id())).toList();
+    }
     private static Prepared prepare(GLNodeGraphAsset root,GLCompositeGraphRegistry original,boolean rewriteNested){
         Map<String,List<Adapter>> adapters=new HashMap<>();
         Map<String,GLNodeGraphAsset> expanded=new LinkedHashMap<>();
-        for(var asset:original.assets()){
+        var dependencies=reachableAssets(root.graph(),original);
+        for(var asset:dependencies){
             asset=GLCompositeForwarding.materialize(asset);
             asset=FormulaGroups.materialize(asset);
             asset=GroupInputs.materialize(asset,original);
@@ -36,7 +46,7 @@ final class GroupCompiler {
                 }
                 if(p.publicPort().direction()==GLPortDirection.OUTPUT && p.isBound() && GroupUnits.numeric(p)) {
                     var base=GroupUnits.base(original,d,p);var sourceUnit=GroupUnits.target(original,d,p);
-                    var instances=java.util.stream.Stream.concat(java.util.stream.Stream.of(root),original.assets().stream()).flatMap(a->a.graph().nodes().stream()).filter(n->n.typeId().equals(d.nodeTypeId()));
+                    var instances=java.util.stream.Stream.concat(java.util.stream.Stream.of(root),dependencies.stream()).flatMap(a->a.graph().nodes().stream()).filter(n->n.typeId().equals(d.nodeTypeId()));
                     boolean convert=GroupUnits.initial(p,base)!=sourceUnit || instances.anyMatch(n->GroupUnits.selected(n,p,base)!=sourceUnit);
                     if(!convert){ports.add(p);continue;}
                     String ukey=GroupUnits.unitKey(p.publicPort().id());

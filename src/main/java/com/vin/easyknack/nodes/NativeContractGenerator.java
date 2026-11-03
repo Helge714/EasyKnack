@@ -10,7 +10,7 @@ public final class NativeContractGenerator {
     private NativeContractGenerator() { }
     public static String name(BasicNode node){return node.nativeParameterType();}
     public static String fieldName(ParameterContract.Field f){
-        String name=f.id().value().replaceAll("[^A-Za-z0-9_]","_");
+        String name=f.id().value().replace('.','_').replace('-','_');
         return (Character.isDigit(name.charAt(0))?"p_":"")+name+(f.kind()==ParameterContract.Kind.SOURCE?"_source":f.kind()==ParameterContract.Kind.SOURCE_LIST?"_sources":"_value");
     }
     private static String type(BasicNode node,ParameterContract.Field f){

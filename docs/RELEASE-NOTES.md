@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Reduce UI work when changing external parameters of Instance Groups: prepare
+  only reachable group definitions and batch inferred-rate property updates.
+  Preserve unused groups in the document and retain live DSP state. Covered by
+  the current first development version; no document or host contract change.
+
 - Accept external Buffer inputs in Instance Groups, including both Buffer Readers,
   shared processing after Instance Merge and Bake/export. Instances share the
   input resource and retain independent reader state. Rebuild the audio host for

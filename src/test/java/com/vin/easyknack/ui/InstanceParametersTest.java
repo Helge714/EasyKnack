@@ -30,7 +30,7 @@ class InstanceParametersTest {
   }
   return new MultipleGroupsTest.Fixture(new GLNodeGraphDocument(f.document().root(),assets,List.of()),f.instance());
  }
- static String command(MultipleGroupsTest.Fixture f){var n=MultipleGroupsTest.compiled(f);var d=NodeRegistry.require(n.typeId());return "GRAPH 1 instance multiplegraph !"+NativeContractGenerator.fingerprint(d)+" "+d.encode(new NodeState(n.properties()),p->-1)+" @ a ccccccccc";}
+ static String command(MultipleGroupsTest.Fixture f){var n=MultipleGroupsTest.compiled(f);var d=NodeRegistry.require(n.typeId());return "GRAPH 1 instance multiplegraph !"+NativeContractGenerator.fingerprint(d)+" "+d.encode(new NodeState(n.properties()),p->-1)+" @ a "+"c".repeat(d.processor().inputs(new NodeState(n.properties())).size());}
  @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
  void exportedDefaultsUpdateWithoutReplacingCompiledInstances()throws Exception{
   var f=MultipleGroupsTest.fixture(false,"sum");var export=GroupSourceExporter.create(f.document(),f.instance());var def=export.definition();
