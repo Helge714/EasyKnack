@@ -32,6 +32,8 @@
 #include "PitchHoldNode.hpp"
 #include "InstanceContextNode.hpp"
 #include "MultipleInputNode.hpp"
+#include "MultipleHistoryInputNode.hpp"
+#include "HistoryRelayNode.hpp"
 #include "MultipleWaveformInputNode.hpp"
 #include "WaveformNode.hpp"
 #include "VectorNode.hpp"
@@ -245,6 +247,8 @@ if(id=="vectordot")return std::make_unique<VectorDotNode>();
 if(id=="spatialreceiver")return std::make_unique<SpatialReceiverNode>();
 if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="waveform")return std::make_unique<WaveformNode>();
+        if(id=="multiplehistoryinput")return std::make_unique<MultipleHistoryInputNode>();
+        if(id=="historyrelay")return std::make_unique<HistoryRelayNode>();
         if(id=="multiplewaveforminput")return std::make_unique<MultipleWaveformInputNode>();
         if(id=="multiplegraph")return std::make_unique<MultipleGraphNode>();
         if(id=="spectrum")return std::make_unique<SpectrumNode>();

@@ -1074,6 +1074,14 @@
       "reason": "Internal compiled Formula Group kernel; documented by formula-group."
     },
     {
+      "id": "easyknack.multiple.historyinput",
+      "reason": "Internal Buffer boundary for Instance Groups."
+    },
+    {
+      "id": "easyknack.history.relay",
+      "reason": "Internal Buffer boundary for Instance Groups."
+    },
+    {
       "id": "easyknack.multiple.compiled",
       "reason": "Internal compiled Instance Group; documented by instance-group."
     },

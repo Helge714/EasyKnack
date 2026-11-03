@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Accept external Buffer inputs in Instance Groups, including both Buffer Readers,
+  shared processing after Instance Merge and Bake/export. Instances share the
+  input resource and retain independent reader state. Rebuild the audio host for
+  the new internal boundary processors. Covered by the current first development
+  version; no document-format or protocol version change.
+
 - Show brief, themed desktop feedback when linked output volume keys are used,
   also while EasyKnack is minimized. The overlay does not take keyboard focus,
   dismisses automatically, and reports the highest linked output level without

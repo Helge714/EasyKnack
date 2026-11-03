@@ -32,7 +32,8 @@ class InstanceDspCatalogTest {
    controller.addMultipleGroup(0,0);controller.actions().openSelectedComposite();
    var ids=controller.availableNodes().stream().map(e->e.type().id()).toList();
    assertTrue(ids.contains(new SpectrumBlurNode().registration().id()));assertTrue(ids.contains(FormulaGroups.CREATE));
-   assertTrue(ids.contains(new EnvelopeNode().registration().id()));assertFalse(ids.contains(new ValueViewerNode().registration().id()));
+   assertTrue(ids.contains(new EnvelopeNode().registration().id()));
+   assertTrue(ids.contains(new HistoryReaderNode().registration().id()));assertTrue(ids.contains(new PositionReaderNode().registration().id()));assertFalse(ids.contains(new ValueViewerNode().registration().id()));
   }});
  }
  @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")

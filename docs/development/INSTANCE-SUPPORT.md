@@ -18,7 +18,7 @@ Its Value, Vector, Wavetable, Buffer, Spectrum and Analysis modes also work insi
 instances. Resource selection is block-aligned and forwards the source handle;
 the group's existing public-boundary type restrictions still apply.
 
-The public boundary currently accepts numeric, Vector, Spectrum and Wavetable
+The public boundary currently accepts numeric, Buffer, Vector, Spectrum and Wavetable
 inputs and dynamically sized numeric or Spectrum outputs. Spectrum outputs use typed
 `MultipleSpectrumOutputNode` boundaries and reduce aligned complex frames with
 Sum/Mean independently per stereo channel. Other resources and triggers may be

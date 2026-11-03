@@ -12,11 +12,13 @@ public final class MultipleGraphNode extends BasicNode {
         for(int i=0;i<(int)s.number("outputs",1);i++){var row=n.addOutput(output(i),"Out "+(i+1));if(spectrumOutputs.contains(Integer.toString(i)))row.dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);}
         n.addInput(COUNT,"Count",Editor.Slider.button(8,0.0,256.0).integers().discrete()).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE);
         var spectrum=java.util.Set.of(s.text("spectrumInputs","").split(","));
+        var histories=java.util.Set.of(s.text("historyInputs","").split(","));
         var waveforms=java.util.Set.of(s.text("waveformInputs","").split(","));
         var vectors=java.util.Set.of(s.text("vectorInputs","").split(","));
         for(int i=0;i<inputCount(s);i++){
             var row=n.addInput(input(i),"In "+(i+1));
-            if(waveforms.contains(Integer.toString(i)))row.dataType(PortDataType.WAVEFORM).signal(SignalCategory.WAVETABLE).rate(ProcessingRate.CONTROL);
+            if(histories.contains(Integer.toString(i)))row.dataType(PortDataType.HISTORY).signal(SignalCategory.HISTORY).rate(ProcessingRate.CONTROL);
+            else if(waveforms.contains(Integer.toString(i)))row.dataType(PortDataType.WAVEFORM).signal(SignalCategory.WAVETABLE).rate(ProcessingRate.CONTROL);
             else if(spectrum.contains(Integer.toString(i)))row.dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
             else if(vectors.contains(Integer.toString(i)))row.dataType(PortDataType.VECTOR).signal(SignalCategory.VECTOR).rates(PortRates.AUDIO_CONTROL);
             else row.rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
