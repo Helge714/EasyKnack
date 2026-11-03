@@ -163,7 +163,8 @@ final class GroupCompiler {
             var valid=declared.getOrDefault(node.typeId(),Set.of());
             values.keySet().removeIf(key->{
                 String property=key.startsWith(GLGraphNode.AUTOMATIC_DEFAULT_PREFIX)?key.substring(GLGraphNode.AUTOMATIC_DEFAULT_PREFIX.length()):key.startsWith(GLGraphNode.AUTOMATIC_PREFIX)?key.substring(GLGraphNode.AUTOMATIC_PREFIX.length()):key;
-                return property.matches("easyknack\\.input\\.[0-9a-f]+(?:\\.unit)?")&&!valid.contains(property);
+                return (property.matches("easyknack\\.input\\.[0-9a-f]+(?:\\.unit)?")
+                    ||property.matches("input-choice-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))&&!valid.contains(property);
             });
             return new GLGraphNode(node.id(),node.typeId(),node.typeVersion(),values);
         }).toList();

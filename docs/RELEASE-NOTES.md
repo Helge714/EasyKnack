@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Keep Custom Groups executable after replacing a choice editor: ignore retired
+  generated selection fields during compilation while preserving document/Undo
+  values and declared fields. Recover explicit selections when a stable custom
+  entry UUID identifies one current editor; retain current explicit choices and
+  avoid ambiguous recovery. Covered by the current first development version;
+  no document-format or host contract change.
+
 - Add 64- and 128-sample FFT windows, including legacy FFT Stream, analysis,
   spectral processing and IFFT. Use 16/32-sample minimum synchronous hops for
   these windows while preserving the existing cadence for larger windows.

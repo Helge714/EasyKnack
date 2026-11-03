@@ -75,9 +75,29 @@ final class GroupChoices {
     }
     static GLNodeGraphAsset normalizeSelections(GLNodeGraphAsset asset,GLCompositeGraphRegistry registry){
         var nodes=asset.graph().nodes().stream().map(node->{var d=registry.findComposite(node.typeId()).orElse(null);if(d==null)return node;var source=registry.findAsset(d.assetId()).orElseThrow();
-            for(var c:choices(source,registry)){var v=node.properties().get(c.id());if(v!=null)node=node.withProperty(c.id(),selection(source,c,v));}return node;
+            var choices=choices(source,registry);node=restoreRetiredSelection(node,source,choices);
+            for(var c:choices){var v=node.properties().get(c.id());if(v!=null)node=node.withProperty(c.id(),selection(source,c,v));}return node;
         }).toList();
         return new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(asset.graph().graphId(),asset.graph().revision(),nodes,asset.graph().connections()),asset.viewState(),asset.metadata(),asset.compositeDescriptor());
+    }
+    private static GLGraphNode restoreRetiredSelection(GLGraphNode node,GLNodeGraphAsset source,List<Choice> choices){
+        if(choices.isEmpty()||source.compositeDescriptor()==null)return node;
+        // Custom template entries have stable UUIDs. Recover an orphaned explicit
+        // selection only when its entry identifies exactly one current editor.
+        // Never infer a link from common numeric/native IDs or overwrite a choice.
+        var proposals=new HashMap<String,Set<GLNodeValue>>();
+        for(var entry:node.properties().entrySet()){
+            String key=entry.getKey();
+            if(!key.startsWith("input-choice-")||source.compositeDescriptor().findProperty(key).isPresent()
+                ||GLNodeValue.of(true).equals(node.properties().get(GLGraphNode.AUTOMATIC_PREFIX+key)))continue;
+            if(!(entry.getValue().toJavaValue() instanceof String id)||!id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))continue;
+            var matching=choices.stream().filter(c->c.editor().items().stream().anyMatch(o->o.id().equals(id))).toList();
+            if(matching.size()==1)proposals.computeIfAbsent(matching.get(0).id(),k->new HashSet<>()).add(entry.getValue());
+        }
+        for(var proposal:proposals.entrySet())if(proposal.getValue().size()==1
+            &&(!node.properties().containsKey(proposal.getKey())||GLNodeValue.of(true).equals(node.properties().get(GLGraphNode.AUTOMATIC_PREFIX+proposal.getKey()))))
+            node=node.withExplicitProperty(proposal.getKey(),proposal.getValue().iterator().next());
+        return node;
     }
     static GLNodeGraphAsset remove(GLNodeGraphAsset asset,String id){
         var metadata=new HashMap<>(asset.metadata());metadata.remove(META+id);var d=asset.compositeDescriptor();
