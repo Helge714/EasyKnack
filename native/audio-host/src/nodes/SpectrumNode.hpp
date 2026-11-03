@@ -43,8 +43,8 @@ struct SpectrumNode : NodeProcessor {
             padded=p.padding_value=="double";removeDc=p.remove_dc_value;synchronous=p.synchronous_value;intervalMs=p.interval_ms_value;
         }
         if(!std::isfinite(intervalMs)||intervalMs<0||intervalMs>60000)throw std::runtime_error("Invalid FFT frame interval");
-        if(size<256||size>SpectrumFrame::maxWindowSize||(size&(size-1)))throw std::runtime_error("Invalid FFT size");
-        if(synchronous)hop=std::max(hop,SpectrumStream::minHop);
+        if(size<64||size>SpectrumFrame::maxWindowSize||(size&(size-1)))throw std::runtime_error("Invalid FFT size");
+        if(synchronous)hop=std::max(hop,SpectrumStream::minimumHop(size));
     }
     void prepare(double sampleRate,std::size_t block)override{
         rate=sampleRate;resource.prepare(block);ring.assign(SpectrumFrame::maxWindowSize,0);weights.resize(SpectrumFrame::maxWindowSize);

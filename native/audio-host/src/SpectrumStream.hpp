@@ -11,7 +11,8 @@ struct StreamSpectrumFrame {
     std::vector<std::complex<double>> bins;
 };
 struct SpectrumStream final : AnalysisResource {
-    static constexpr std::size_t maxSize=SpectrumFrame::capacity,minHop=64;
+    static constexpr std::size_t maxSize=SpectrumFrame::capacity,minHop=16,standardMinHop=64;
+    static constexpr std::size_t minimumHop(std::size_t window){return window<256?window/4:standardMinHop;}
     std::size_t size=0,windowSize=0,hop=0,count=0,blockFrames=0;
     bool dcRemoved=false;
     mutable std::unique_ptr<AnalysisResult> analysisCache;
@@ -23,7 +24,11 @@ struct SpectrumStream final : AnalysisResource {
     void prepare(std::size_t maximumBlock){
         analysisCache=std::make_unique<AnalysisResult>();result=nullptr;
         frames.resize((maximumBlock+minHop-1)/minHop+1);
-        for(auto& frame:frames)frame.bins.resize(maxSize);
+        // Only 64/128-sample windows can exceed the established 64-sample cadence.
+        // Reserve full-size bins for the original frame count and small bins for
+        // the extra frames, including 2x zero padding; never allocate in process().
+        const auto fullFrames=(maximumBlock+standardMinHop-1)/standardMinHop+1;
+        for(std::size_t i=0;i<frames.size();i++)frames[i].bins.resize(i<fullFrames?maxSize:256);
         count=0;
     }
     void metadata(const SpectrumStream& other)noexcept{

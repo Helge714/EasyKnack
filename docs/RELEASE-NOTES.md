@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add 64- and 128-sample FFT windows, including legacy FFT Stream, analysis,
+  spectral processing and IFFT. Use 16/32-sample minimum synchronous hops for
+  these windows while preserving the existing cadence for larger windows.
+  Rebuild the host to use the new sizes. Covered by the current first development
+  version; no document-format or parameter-contract change.
+
 - Reduce UI work when changing external parameters of Instance Groups: prepare
   only reachable group definitions and batch inferred-rate property updates.
   Preserve unused groups in the document and retain live DSP state. Covered by

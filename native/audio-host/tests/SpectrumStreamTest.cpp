@@ -25,11 +25,12 @@ static void unifiedIdentity(std::size_t size,std::size_t divisor,std::size_t blo
     IFFTNode ifft;ifft.prepare(48000,block);
     std::vector<float> original(size*5+block),input(block),out(block),unused(block),silence(block);
     unsigned random=17;for(std::size_t i=0;i<original.size();i++){random=1664525*random+1013904223;original[i]=.2f*std::sin(i*.071)+.1f*(float(random>>8)/16777216.f-.5f);}original[0]=1;
-    const float* inputs[]{input.data()};const DspResource* resources[]{&fft.resource};
+    SpectrumStream forwarded;forwarded.prepare(block);
+    const float* inputs[]{input.data()};const DspResource* resources[]{&forwarded};
     ProcessContext c{inputs,1,unused.data(),block,48000,silence.data(),block};
     bool adopted=false;
     for(std::size_t base=0;base<original.size();base+=block){
-        c.bufferSize=c.blockFrames=std::min(block,original.size()-base);std::copy_n(original.data()+base,c.bufferSize,input.data());fft.process(c);
+        c.bufferSize=c.blockFrames=std::min(block,original.size()-base);std::copy_n(original.data()+base,c.bufferSize,input.data());fft.process(c);forwarded.copy(fft.resource);
         auto inverse=c;inverse.output=out.data();inverse.resourceInputs=resources;ifft.process(inverse);
         for(std::size_t i=0;i<c.bufferSize;i++){double expected=base+i>=size?original[base+i-size]:0;if(std::abs(out[i]-expected)>2e-5){std::cerr<<"identity "<<size<<" "<<divisor<<" "<<block<<" at "<<base+i<<": "<<out[i]<<" vs "<<expected<<'\n';std::abort();}}
         if(handover&&!adopted&&base>=2*size){
@@ -51,12 +52,13 @@ static void lateFramesAreNotReplayed(){
 }
 static void largeBackgroundAnalysis(std::size_t size,bool padded){
     auto job=std::make_unique<AnalysisJob>();std::vector<float> samples(size);
+    const auto bin=std::min<std::size_t>(37,size/4);
     constexpr double tau=6.2831853071795864769;
-    for(std::size_t i=0;i<size;i++)samples[i]=static_cast<float>(.7*std::cos(tau*37*i/size));
+    for(std::size_t i=0;i<size;i++)samples[i]=static_cast<float>(.7*std::cos(tau*bin*i/size));
     assert(job->submitSpectrum(samples.data(),0,size,size/4,SpectrumWindow::rectangular,48000,size,17,padded));job->work();
     auto* result=job->acquire();assert(result&&result->spectrum.fftFrames==size*(padded?2:1));
     assert(result->binCount==result->spectrum.fftFrames/2+1);
-    assert(std::abs(result->views[0][37*(padded?2:1)]-.7)<1e-6);
+    assert(std::abs(result->views[0][bin*(padded?2:1)]-.7)<1e-6);
     AnalysisResource resource;resource.result=result;
     AnalysisViewerNode viewer;viewer.mailbox=std::make_shared<AnalysisMailbox>();
     const DspResource* resources[]{&resource};float zero=0;ProcessContext context{nullptr,1,&zero,1,48000,&zero,1};context.resourceInputs=resources;
@@ -67,7 +69,7 @@ static void largeBackgroundAnalysis(std::size_t size,bool padded){
     result=job->acquire();assert(result&&result->correlationCount==size);assert(std::abs(result->views[3][0]-1)<1e-6);
     assert(std::isfinite(result->views[3][size-1]));
     // Reusing the same worker for legacy analysis must restore the fixed lag count.
-    HistoryResource history;history.prepare(48000,1,256);for(float value:samples)history.append(value);
+    HistoryResource history;history.prepare(48000,1,256);for(std::size_t i=0;i<std::max<std::size_t>(size,8192);i++)history.append(samples[i%size]);
     assert(job->submit(history,40,2000));job->work();assert(job->acquire()->correlationCount==8192);
 }
 int main(){
@@ -75,11 +77,17 @@ int main(){
         unifiedIdentity(size,4,256,SpectrumWindow::hann,true,padded);
         largeBackgroundAnalysis(size,padded);
     }
-    for(bool padded:{false,true})for(auto size:{256u,1024u,8192u})for(auto block:{137u,256u})for(auto window:{SpectrumWindow::hann,SpectrumWindow::rectangular})unifiedIdentity(size,4,block,window,true,padded);
+    for(bool padded:{false,true})for(auto size:{64u,128u,256u,1024u,8192u})for(auto block:{137u,256u})for(auto window:{SpectrumWindow::hann,SpectrumWindow::rectangular})unifiedIdentity(size,4,block,window,true,padded);
+    for(auto size:{64u,128u})for(bool padded:{false,true})largeBackgroundAnalysis(size,padded);
+    SpectrumStream capacity;capacity.prepare(256);std::size_t bins=0;
+    for(const auto& frame:capacity.frames)bins+=frame.bins.size();
+    assert(capacity.frames.size()>=256/16);
+    assert(bins<=5*SpectrumStream::maxSize+capacity.frames.size()*256);
     lateFramesAreNotReplayed();
 
-    for(auto size:{256u,1024u,8192u})for(auto divisor:{2u,4u})for(auto block:{64u,137u,256u,1024u})for(auto window:{SpectrumWindow::hann,SpectrumWindow::hamming,SpectrumWindow::blackman,SpectrumWindow::rectangular})identity(size,divisor,block,window,true);
-    const std::size_t size=1024,block=256;FFTStreamNode fft;fft.size=size;fft.hop=256;fft.prepare(48000,block);
+    for(auto size:{64u,128u,256u,1024u,8192u})for(auto divisor:{2u,4u})for(auto block:{64u,137u,256u,1024u})for(auto window:{SpectrumWindow::hann,SpectrumWindow::hamming,SpectrumWindow::blackman,SpectrumWindow::rectangular})identity(size,divisor,block,window,true);
+    for(const std::size_t size:{64u,128u,1024u}){
+    const std::size_t block=256;FFTStreamNode fft;fft.size=size;fft.hop=size/4;fft.prepare(48000,block);
     SpectrumShiftNode shift;shift.shift=3;shift.prepare(48000,block);IFFTNode inverse;inverse.prepare(48000,block);
     std::array<float,block> input{},out{},silence{};const float* inputs[]{input.data(),nullptr};const DspResource* resources[]{&fft.stream,nullptr};
     ProcessContext c{inputs,2,out.data(),block,48000,silence.data(),block};double error=0;int count=0;
@@ -88,6 +96,7 @@ int main(){
         c.resourceInputs=resources;shift.process(c);const DspResource* shifted[]{&shift.stream};c.resourceInputs=shifted;inverse.process(c);c.resourceInputs=nullptr;
         if(base>2048)for(std::size_t i=0;i<block;i++){double expected=std::cos(6.283185307179586*13*(base+i-size)/size);error=std::max(error,std::abs(out[i]-expected));count++;}
     }assert(count&&error<1e-4);
+    }
     StreamSpectrumFrame frame;frame.bins.resize(256);frame.bins[1]={2,4};frame.bins[2]={4,8};assert(readSpectrumBin(frame,256,1.5)==std::complex<double>(3,6));assert(readSpectrumBin(frame,256,-1)==std::complex<double>{});assert(readSpectrumBin(frame,256,-1,2)==frame.bins[128]);
     std::cout<<"Streaming FFT/IFFT reconstruction, timing, handover and bin shift tests passed\n";
 }
