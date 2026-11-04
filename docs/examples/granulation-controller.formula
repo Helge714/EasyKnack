@@ -1,0 +1,78 @@
+state double lastVoices = 0;
+state double lastPeriod = 0;
+state double lastJitter = -1;
+state bool initialized = false;
+state double waiting = 0;
+state double age = 0;
+state double length = 0;
+state double heldOffset = 0;
+
+double size = max(4.0, (double) buffer.size);
+double voices = max(1.0, floor((double) count));
+double rate = clamp(
+    (double) density, 0.001, sampleRate * 0.5
+);
+
+double period = max(2.0, voices * sampleRate / rate);
+
+double maximum = clamp(
+    max((double) grainMin, (double) grainMax) * sampleRate,
+    2.0,
+    min(size - 2.0, period)
+);
+
+double minimum = clamp(
+    min((double) grainMin, (double) grainMax) * sampleRate,
+    2.0,
+    maximum
+);
+
+if (!initialized || voices != lastVoices || period != lastPeriod || clamp((double) jitter, 0.0, 1.0) != lastJitter) {
+    waiting = (double) index * period / voices;
+    age = 0;
+    length = 0;
+    lastVoices = voices;
+    lastPeriod = period;
+    lastJitter = clamp((double) jitter, 0.0, 1.0);
+    initialized = true;
+}
+
+reset = false;
+
+if (waiting <= 0) {
+    length = minimum
+           + (maximum - minimum) * rand(0, 1, seed);
+
+    age = 0;
+
+    double randomDelay = length
+        + (size - 2.0 - length) * rand(0, 1, seed);
+
+    double reference = 0.5 * (maximum + size - 2.0);
+    double amount = clamp((double) strength, 0.0, 1.0);
+
+    heldOffset = (
+        reference + amount * (randomDelay - reference)
+    ) / size;
+
+    double gap = max(0.0, period - length);
+    double irregularity = clamp((double) jitter, 0.0, 1.0);
+
+    waiting = length + gap * (
+        1.0 + irregularity * (2.0 * rand(0, 1, seed) - 1.0)
+    );
+
+    reset = true;
+}
+
+offset = (float) heldOffset;
+
+gain = 0;
+if (age < length) {
+    gain = (float) (
+        0.5 - 0.5 * cos(tau * age / length)
+    );
+}
+
+waiting -= 1;
+age += 1;
