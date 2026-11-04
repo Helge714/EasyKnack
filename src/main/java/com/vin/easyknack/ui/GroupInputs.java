@@ -58,6 +58,7 @@ final class GroupInputs {
     }
     static GLNodeGraphAsset materialize(GLNodeGraphAsset asset){
         if(asset.compositeDescriptor()==null)return asset;
+        asset=descriptor(asset,asset.compositeDescriptor());
         asset=uniqueChoiceProperties(asset);var d=asset.compositeDescriptor();
         if(new NodeState(asset.metadata()).flag("easyknack.inputsUnified",false)){
             var retained=d.portMappings().stream().filter(GroupInputs::choice).map(GroupInputs::property).collect(java.util.stream.Collectors.toSet());
@@ -141,5 +142,10 @@ final class GroupInputs {
         var applied=registry==null?replacement:normalize(replacement,asset,registry);
         var d=asset.compositeDescriptor();return materialize(descriptor(asset,new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),d.portMappings().stream().map(p->p.publicPort().id().equals(port.publicPort().id())?applied:p).toList(),d.properties(),d.propertyMappings().stream().filter(m->!m.publicPropertyId().equals(property(port))).toList())));
     }
-    static GLNodeGraphAsset descriptor(GLNodeGraphAsset a,GLCompositeNodeDescriptor d){return new GLNodeGraphAsset(a.id(),a.version(),a.kind(),a.graph(),a.viewState(),a.metadata(),d);}
+    static GLNodeGraphAsset descriptor(GLNodeGraphAsset a,GLCompositeNodeDescriptor d){
+        if(!MultipleGroups.multiple(a)&&d.portMappings().stream().anyMatch(MultipleGroups::countPort))
+            d=new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),
+                    d.portMappings().stream().map(MultipleGroups::exposedPort).toList(),d.properties(),d.propertyMappings());
+        return new GLNodeGraphAsset(a.id(),a.version(),a.kind(),a.graph(),a.viewState(),a.metadata(),d);
+    }
 }

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Keep ordinary groups visible when they expose a nested Instance Group Count
+  editor. Scope the private Count role to its owning Instance Group and repair
+  existing wrappers on load, preserving their ports, wiring and editor settings.
+  No document format or audio-host protocol change.
+
 - Label the existing HISTORY group-port type as Buffer resource (German:
   Buffer-Ressource), including Formula Group inputs and live language refresh.
   Existing Buffer connections and saved type IDs are unchanged.

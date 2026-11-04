@@ -24,6 +24,14 @@ final class MultipleGroups {
     );
     static final String COUNT_ROLE="easyknack.instance.role";
     static boolean countPort(GLCompositePortMapping port){return GLNodeValue.of("count").equals(port.presentation().editorOptions().get(COUNT_ROLE));}
+    /** A forwarded Count editor is an ordinary parameter of its enclosing group. */
+    static GLCompositePortMapping exposedPort(GLCompositePortMapping port){
+        if(!countPort(port))return port;
+        var options=new HashMap<>(port.presentation().editorOptions());
+        options.remove(COUNT_ROLE);options.remove("applicationManaged");
+        return new GLCompositePortMapping(port.publicPort(),port.internalEndpoint(),
+                new GLCompositePortPresentation(port.presentation().inputEditorId(),port.presentation().socketVisible(),options),port.additionalEndpoints());
+    }
     static GLCompositePortMapping countPort(String id){
         var options=new HashMap<String,GLNodeValue>();options.put("applicationManaged",GLNodeValue.of(true));options.put(COUNT_ROLE,GLNodeValue.of("count"));
         options.put("default",GLNodeValue.of(8.));options.put("minimum",GLNodeValue.of(0.));options.put("maximum",GLNodeValue.of(256.));options.put("numericType",GLNodeValue.of("integer"));options.put("continuous",GLNodeValue.of(false));options.put("presentation",GLNodeValue.of("button"));options.put(GroupInputSettings.RATE,GLNodeValue.of("control"));

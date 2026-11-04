@@ -21,6 +21,8 @@ Führt einen internen Graphen für mehrere unabhängige Instanzen aus.
 
 ## Verhalten
 
+Count kann über einen kopierten Slider-Editor an einer umschließenden normalen Gruppe bereitgestellt werden. Der äußere Port bleibt ein gewöhnlicher, bearbeitbarer Gruppeneingang; die feste Count-Sonderrolle gehört zur Instance Group selbst.
+
 Der Anfangsgraph erzeugt harmonische Oszillatoren und einen [Instance Merge](instance-merge.md); Frequency ist sein anfänglicher öffentlicher Parameter, kein dauerhaft vorgeschriebener Port. Jede Instanz besitzt eigenen DSP-Zustand. [Instance Context](instance-context.md) liefert Index, Count, Position und Seed. Maximum reserviert Zustand/Speicher; Count wählt die aktive Anzahl und ist kein gewöhnlicher Group-IO-Port. Mehrere Merge-Zweige und gemeinsame Verarbeitung danach sind möglich. Verschachtelte Instanz-/Spektralgruppen werden unterstützt. Öffentliche Eingänge erlauben Zahlen, Buffer, Vector, Wavetable und Spectrum; Ausgänge derzeit Zahlen oder Spectrum. MIDI und andere Ressourcengrenzen werden nicht unterstützt. Beide Buffer Reader werden unterstützt. Externe Buffer werden gemeinsam gelesen; jede Instanz behält ihren eigenen Wiedergabezustand. Interne Live-Buffer besitzen pro Instanz eigenen Speicher. Gleiche Generatoren können Arbeit teilen, solange Kontext und Verlauf gleich bleiben.
 
 ## Mute

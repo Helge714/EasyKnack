@@ -93,6 +93,7 @@ final class GroupEditorCopies {
         if(def==null){
             var nested=groups.findComposite(n.typeId()).orElse(null);if(nested==null)return p;
             var child=nested.portMappings().stream().filter(v->v.publicPort().id().equals(endpoint.portId())).findFirst().orElse(null);if(child==null)return p;
+            child=MultipleGroups.exposedPort(child);
             var options=new HashMap<>(child.presentation().editorOptions());options.remove(TARGETS);
             options.put(GroupInputSettings.MODE,GLNodeValue.of(GroupInputSettings.Kind.COPY.name()));options.put("copySource",GLNodeValue.of(endpoint.toString()));
             if(GroupInputs.choice(child))options.put(GroupInputs.CHOICE,GLNodeValue.of(GroupInputs.property(p)));
