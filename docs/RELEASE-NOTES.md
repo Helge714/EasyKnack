@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add Manage groups to document settings: list embedded definitions, direct usage
+  counts and containing instances. Block deletion of referenced or open groups,
+  including references from unused parents. Support Undo/Redo and clear stale
+  forward navigation when deleting a definition. No file is removed from disk.
+  Compatible feature covered by the current first development version; no
+  document-format, plugin ABI or host protocol change.
+
 - Add a sample-accurate normalized Write position output to Recording Buffer.
   Retain the existing Buffer output and reader Distance/Read position semantics.
   Compatible addition covered by the current first development version; no

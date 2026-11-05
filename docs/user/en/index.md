@@ -2,6 +2,7 @@
 
 | Topic | Contents |
 | --- | --- |
+| [Manage groups](groups.md) | Usage counts, embedding locations and undoable removal of unused definitions |
 | [Rates](rates.md) | Audio, Control, Auto and Trigger; sampling and rate conversion |
 | [Data types](data-types.md) | Numbers, triggers, MIDI, vectors and resources; channels |
 | [Units](units.md) | Display, interpretation of connected values and conversion |

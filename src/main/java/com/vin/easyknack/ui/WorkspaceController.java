@@ -391,6 +391,24 @@ final class WorkspaceController implements AutoCloseable {
     boolean preserveUnusedGroups;
     ControlInterpolationSettings controlInterpolation=ControlInterpolationSettings.DEFAULT;
     void controlSettingsChanged(){history.markExternalChange();syncAudio();}
+    List<DocumentGroups.Group> documentGroups(){return DocumentGroups.inspect(captureDocument(),workspace.openAssetIds());}
+    void deleteUnusedGroup(String id){
+        var group=documentGroups().stream().filter(g->g.id().equals(id)).findFirst().orElseThrow(()->new IllegalArgumentException(AppText.text("groups.manager.missing")));
+        if(!group.deletable())throw new IllegalArgumentException(AppText.text(group.open()?"groups.manager.open":"groups.manager.used"));
+        var asset=composites.findAsset(id).orElseThrow();String type=asset.compositeDescriptor().nodeTypeId();
+        var entry=catalog.find(type).orElse(null);var descriptor=types.find(type).orElseThrow();boolean favorite=catalog.isFavorite(type);
+        var bypasses=types.muteBypasses(type);var insertion=types.insertionPorts(type).orElse(null);var exclusion=types.exclusionInput(type).orElse(null);
+        history.perform(AppText.text("groups.manager.delete"),()->{
+            var current=documentGroups().stream().filter(g->g.id().equals(id)).findFirst().orElseThrow();
+            if(!current.deletable())throw new IllegalArgumentException(AppText.text(current.open()?"groups.manager.open":"groups.manager.used"));
+            workspace.excludeEmbeddedAsset(id);catalog.unregister(type);types.unregister(type);composites.unregisterAsset(id);
+            interfaceValidationKeys.remove(id);syncAudio();
+        },()->{
+            composites.registerAsset(asset);types.register(descriptor);types.setMuteBypasses(type,bypasses);types.setInsertionPorts(type,insertion);types.setExclusionInput(type,exclusion);
+            if(entry!=null){catalog.register(entry);if(favorite)catalog.toggleFavorite(type);}
+            workspace.includeEmbeddedAsset(id);syncAudio();
+        });
+    }
 
     com.vingame.glswing.node.document.GLNodeGraphDocument snapshotDocument() {
         return prepareDocumentSnapshot(captureDocument());

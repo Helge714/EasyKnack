@@ -2,6 +2,7 @@
 
 | Thema | Inhalt |
 | --- | --- |
+| [Gruppen verwalten](groups.md) | Verwendungsanzahl, Einbindungsorte und rückgängig machbares Löschen unbenutzter Definitionen |
 | [Raten](rates.md) | Audio, Control, Auto und Trigger; Abtastung und Ratenwechsel |
 | [Datentypen](data-types.md) | Zahlen, Trigger, MIDI, Vektoren und Ressourcen; Kanäle |
 | [Einheiten](units.md) | Darstellung, Interpretation verbundener Werte und Umrechnung |

@@ -8,6 +8,7 @@
 - [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
 - [x] Namensänderungen sollten resetable sein.
 - [x] Tooltips von Controls sollten immer auch den Namen des Controls anzeigen
+- [x] Gruppen sollten in den Dokumenteneinstellungen als Liste mit derzeitiger Verwendungsanzahl auftauchen und löschbar sein (wenn nicht verwendet), vllt über einen Extra-Dialog wie "Gruppen verwalten" und dann vllt zwei Listen nebeneinander, links die Gruppen mit Verwendungsanzahl, rechts wo eine Gruppe überall eingebunden ist. Gruppen sollten sich nicht löschen lassen, wenn sie sichtbar sind oder Teil einer anderen noch nicht gelöschten oder sichtbaren Gruppe sind. Macht das Sinn?
 
 # EasyKnack backlog
 

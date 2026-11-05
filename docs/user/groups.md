@@ -27,6 +27,10 @@ as well, especially when several inputs or outputs could be used as a bypass.
 
 ## Choose editors and units
 
+For usage counts, embedding locations and removal of unused definitions, open
+**Settings → Document settings → Manage groups**. See
+[Manage document groups](en/groups.md) · [Deutsch](de/groups.md).
+
 Use **None** for an input without an editor. Numeric inputs can use sliders,
 comboboxes or checkboxes; a checkbox supplies 0 or 1. Trigger inputs use a button.
 Slider settings include the presentation, limits, default value and compatible units.

@@ -6,7 +6,7 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.component.*;
 import com.vingame.glswing.ui.*;
 
-/** Document-local persistence policy; never removes assets from the live workspace. */
+/** Document-local persistence policy and entry point for explicit group management. */
 final class DocumentSettings {
     static final String PRESERVE="easyknack.document.preserveUnusedGroups";
     static boolean preserve(GLNodeGraphDocument document){return document.root().metadata().getOrDefault(PRESERVE,GLNodeValue.of(false)).equals(GLNodeValue.of(true));}
@@ -39,6 +39,7 @@ final class DocumentSettings {
             boolean adjusting;
             void bounds(boolean fromMin){if(adjusting)return;adjusting=true;try{if(min.getValue()>max.getValue()){if(fromMin)max.setValue(min.getValue());else min.setValue(max.getValue());}}finally{adjusting=false;}}
             final GLButton save=new GLButton(AppText.text("save")),cancel=new GLButton(AppText.text("cancel"));
+            final GLButton groups=new GLButton(AppText.text("groups.manager.title"));
             {buffered.setSelected(controller.controlInterpolation.buffered());smoothing.setSelected(controller.controlInterpolation.smoothing());
                 bufferMs.setUnit("ms");smoothMs.setUnit("ms");bufferMs.setEnabled(buffered.isSelected());smoothMs.setEnabled(smoothing.isSelected());
                 buffered.addActionListener(e->bufferMs.setEnabled(buffered.isSelected()));smoothing.addActionListener(e->smoothMs.setEnabled(smoothing.isSelected()));
@@ -50,10 +51,11 @@ final class DocumentSettings {
                 interpolate.setToolTipText(AppText.text("control.interpolation.hint"));
                 preserve.setSelected(controller.preserveUnusedGroups);addGL(preserve);addGL(hint);addGL(save);addGL(cancel);
                 save.addActionListener(e->{controller.preserveUnusedGroups=preserve.isSelected();controller.controlInterpolation=new ControlInterpolationSettings(interpolate.isSelected(),min.getValue(),max.getValue(),buffered.isSelected(),bufferMs.getValue(),smoothing.isSelected(),smoothMs.getValue());controller.controlSettingsChanged();ref[0].close();});
+                addGL(groups);groups.addActionListener(e->GroupManagerPanel.show(this,controller));
                 cancel.addActionListener(e->ref[0].close());}
             protected void record(com.vingame.glswing.rendering.GLContext2D c){}
-            protected void resized(float w,float h){preserve.setBounds(20,20,w-40,30);hint.setBounds(20,60,w-40,40);interpolate.setBounds(20,108,w-40,30);minLabel.setBounds(20,146,200,28);min.setBounds(230,146,w-250,28);maxLabel.setBounds(20,180,200,28);max.setBounds(230,180,w-250,28);buffered.setBounds(20,220,210,28);bufferMs.setBounds(230,220,w-250,28);smoothing.setBounds(20,254,210,28);smoothMs.setBounds(230,254,w-250,28);cancel.setBounds(w-230,h-45,100,28);save.setBounds(w-120,h-45,100,28);}
+            protected void resized(float w,float h){preserve.setBounds(20,20,w-40,30);hint.setBounds(20,60,w-40,40);interpolate.setBounds(20,108,w-40,30);minLabel.setBounds(20,146,200,28);min.setBounds(230,146,w-250,28);maxLabel.setBounds(20,180,200,28);max.setBounds(230,180,w-250,28);buffered.setBounds(20,220,210,28);bufferMs.setBounds(230,220,w-250,28);smoothing.setBounds(20,254,210,28);smoothMs.setBounds(230,254,w-250,28);groups.setBounds(20,294,230,28);cancel.setBounds(w-230,h-45,100,28);save.setBounds(w-120,h-45,100,28);}
         };
-        ref[0]=new GLDialog(AppText.text("document.settings"),content);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(650,390);ref[0].show(owner);
+        ref[0]=new GLDialog(AppText.text("document.settings"),content);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(650,420);ref[0].show(owner);
     }
 }
