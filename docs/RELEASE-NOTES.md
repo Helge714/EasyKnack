@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Keep Step Switch visible when changing mode inside groups; retain reentrant graph
+  changes and prevent right-click/disabled sliders from blocking Undo.
+- Refresh applied custom combobox templates immediately, including Undo/Redo.
+- Show group icons in the Add menu, support undoable name reset, include control
+  names in tooltips, and reorder Step Switch input rows in the inspector while
+  retaining stable step indices and cables.
+- Compatible UI fixes/features covered by the current first development version;
+  no DSP, document-format, plugin ABI or host protocol change.
+
 - Disable nested group controls while a parent group controls them, and restore
   editing when the coupling is removed. Covered by the current development
   version; no document or host contract change.

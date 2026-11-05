@@ -32,7 +32,7 @@ final class EditorTemplatesPanel extends GLContainer {
     private static String required(String text){if(text.isBlank())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Enter a name/value"));return text.strip();}
     private void row(GLContainer c){rows.add(c);addGL(c);}
     private void button(String text,Runnable action){var b=new GLButton(text);b.addActionListener(e->{try{action.run();status.setText("");}catch(RuntimeException ex){status.setText(ex.getMessage());}});row(b);}
-    private void edit(Runnable action){var before=library.snapshot();action.run();var after=library.snapshot();library.load(before);history.perform("Edit template",()->{library.load(after);refresh();changed.run();},()->{library.load(before);refresh();changed.run();});}
+    private void edit(Runnable action){var before=library.snapshot();action.run();var after=library.snapshot();library.load(before);try(var transaction=history.beginTransaction("Edit template")){history.perform("Edit template",()->{library.load(after);refresh();changed.run();},()->{library.load(before);refresh();changed.run();});}}
     private void put(EditorTemplates.Template t){edit(()->library.put(t));templates.setSelectedItem(library.all().stream().filter(v->v.id().equals(t.id())).findFirst().orElseThrow());}
     private void update(java.util.function.UnaryOperator<EditorTemplates.Template> action){var t=templates.getSelectedItem();if(t!=null)put(action.apply(t));}
     private int index(List<EditorTemplates.Entry> list){return Math.max(0,list.indexOf(entries.getSelectedItem()));}

@@ -23,7 +23,7 @@ public final class InspectorEditor extends GLContainer {
         // Combo boxes and custom visualizations need a name; buttons/sliders/labels label themselves.
         label=(editor.component() instanceof GLComboBox<?> || row.editor() instanceof Editor.Text)?new GLLabel(row.label()):null;
         if(label!=null)addGL(label);addGL(editor.component());setName(row.id());
-        if(editor.component() instanceof GLControl control && row.tooltip()!=null && !row.tooltip().isBlank())control.setToolTipText(row.tooltip());
+        if(editor.component() instanceof GLControl control){control.setName(row.label());control.setToolTipText(NodeHints.tooltip(row));}
         if(editor.component() instanceof WavetableViewerEditor.Plot plot)plot.bind(model.id().toString());
         if(editor.component() instanceof AnalysisEditor.Plot plot)plot.bind(model.id().toString());
         if(editor.component() instanceof com.vin.easyknack.ui.ValueViewerPanel viewer)viewer.bind(model.id().toString());

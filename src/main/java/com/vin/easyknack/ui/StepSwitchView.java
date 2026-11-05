@@ -69,6 +69,7 @@ public final class StepSwitchView extends BasicNodeView {
             nameEditor.addCancelListener(e->finish.run());
             if(nameActions==null)nameActions=new LinkedHashMap<>();nameActions.put(index,begin);
             if(slider instanceof GLSlider value)value.getContextMenu().addItem(AppText.text("stepswitch.rename"),e->begin.run());
+            if(slider instanceof GLSlider value)value.getContextMenu().addItem(AppText.text("name.reset"),e->write(StepSwitchNode.name(index),GLNodeValue.of("")));
             var button=new SelectionButton(Integer.toString(index+1));
             button.setToolTipText(NodeText.text("easyknack.routing.stepswitch.select.tooltip","Select this step."));
             button.addActionListener(e->selectStep(index));

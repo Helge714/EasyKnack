@@ -5,6 +5,11 @@
 generates `META-INF/glswing/build.properties`. Source versions remain in Maven.
 Incremental IDE compilation and `mvn compile` do not allocate package identities.
 
+When Eclipse is compiling the same checkout, use
+`mvn -Deasyknack.buildDirectory=target/validation package` to isolate Maven's
+classes and package output from Eclipse's `target/classes`. The default remains
+`target`; this option does not modify tracked versions or IDE settings.
+
 Properties include the Maven version/artifact, UTC build time, full Git commit,
 dirty status (including untracked, non-ignored files), build kind and identifier.
 Git absence, inaccessible repositories and source archives produce `unknown`

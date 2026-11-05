@@ -40,7 +40,7 @@ final class GroupSettings extends GLContainer {
         this.editor=editor;this.groups=groups;this.catalog=catalog;this.types=types;this.history=history;this.changed=changed;
         editor.setPortPresentationTransform(p->{var a=editor.getAssetId()==null?null:groups.findAsset(editor.getAssetId()).orElse(null);return FormulaGroups.isFormula(a)?FormulaGroups.normalize(p):GroupInputs.normalize(p,a,groups);});
         editor.setApplicationOwnsInputEditors(true);
-        templatesPanel=new EditorTemplatesPanel(templates,history,()->{editor.refresh();changed.run();});
+        templatesPanel=new EditorTemplatesPanel(templates,history,()->{refreshTemplates(templates);editor.refresh();changed.run();});
         inputSettings=new GroupInputSettings(editor,groups,templates,history,changed);addGL(inputSettings);
         general.setPreferredGLSize(280,112+4*54);editor.setGeneralSettings(general);
         general.addGL(kindLabel);general.addGL(kind);general.addGL(categoryLabel);general.addGL(category);category.setItemTextProvider(NodeCategory::path);
@@ -61,6 +61,23 @@ final class GroupSettings extends GLContainer {
         for(int i=0;i<routing.size();i++){int index=i;var box=routing.get(i);general.addGL(routingLabels.get(i));general.addGL(box);box.setItemTextProvider(id->id.isEmpty()?"None":id);box.addActionListener(e->{if(box.getSelectedItem()!=null)setMetadata(ROUTING_KEYS.get(index),box.getSelectedItem());});}
     }
     GLContainer templatesPanel(){return templatesPanel;}
+    private void refreshTemplates(EditorTemplates templates){
+        if(history.isApplying())return;
+        var library=new HashMap<String,EditorTemplates.Template>();templates.all().forEach(t->library.put(t.id(),t));
+        for(var asset:List.copyOf(groups.assets())){
+            var descriptor=asset.compositeDescriptor();if(descriptor==null)continue;
+            var ports=descriptor.portMappings().stream().map(port->{
+                var old=GroupInputs.template(port);var next=old==null?null:library.get(old.id());if(next==null||next.equals(old))return port;
+                String initial=next.entries().stream().anyMatch(e->e.id().equals(old.initial()))?old.initial():next.initial();
+                var options=new HashMap<>(port.presentation().editorOptions());options.put("template",new EditorTemplates.Template(next.id(),next.label(),next.entries(),initial).value());
+                return new GLCompositePortMapping(port.publicPort(),port.internalEndpoint(),new GLCompositePortPresentation(port.presentation().inputEditorId(),port.presentation().socketVisible(),options),port.additionalEndpoints());
+            }).toList();
+            if(ports.equals(descriptor.portMappings()))continue;
+            var updated=GroupInputs.materialize(GroupInputs.descriptor(asset,new GLCompositeNodeDescriptor(descriptor.nodeTypeId(),descriptor.assetId(),descriptor.minimumAssetVersion(),ports,descriptor.properties(),descriptor.propertyMappings())),groups);
+            history.perform("Update applied editor template",()->applyTemplateAsset(updated),()->applyTemplateAsset(asset));
+        }
+    }
+    private void applyTemplateAsset(GLNodeGraphAsset asset){groups.replaceAsset(asset);if(history.isApplying()){editor.refresh();changed.run();}}
     private void setMetadata(String key,String value){
         if(updating||editor.getAssetId()==null)return;
         var before=groups.findAsset(editor.getAssetId()).orElseThrow();

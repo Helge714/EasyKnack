@@ -76,7 +76,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
                     UnitSlider.bindHistory((GLSlider)control,()->history);
                     format.bindUnitMenu((GLSlider)control,u->writer.set(node.id(),new PropertyId(GroupUnits.unitKey(port.id())),GLNodeValue.of(u.id())));
                 }else control=new NodeTooltipLabel(port.id(),output);
-                if(!output)publicControls.put(GroupEditorCopies.groupProperty(p),control);
+                if(!output){control.setName(port.id());publicControls.put(GroupEditorCopies.groupProperty(p),control);}
                 if(GroupUnits.numeric(p) && (output || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER) || p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE))) {
                     var base=GroupUnits.base(groups,descriptor,p);var selected=GroupUnits.selected(node,p,base);
                     String label=port.id()+" ["+selected.suffix()+"]";control.setName(label);

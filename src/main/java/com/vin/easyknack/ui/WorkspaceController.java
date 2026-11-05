@@ -99,6 +99,11 @@ final class WorkspaceController implements AutoCloseable {
         midiDrivers=new MidiDrivers(this);
         measurementRecorders=new MeasurementRecorders(this);stepSwitchStates=new StepSwitchStates(this);
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
+        var groupIcon=com.vingame.glswing.rendering.GLIcon.fromPath(new com.vingame.glswing.rendering.GLPath2D()
+            .moveTo(4,0).lineTo(16,0).lineTo(16,12).lineTo(13,12).lineTo(13,3).lineTo(4,3).closePath()
+            .moveTo(0,4).lineTo(12,4).lineTo(12,16).lineTo(0,16).closePath().moveTo(3,7).lineTo(3,13).lineTo(9,13).lineTo(9,7).closePath());
+        workspace.setNodeCatalogIconProvider(entry->composites.findComposite(entry.type().id()).isPresent()
+            ||java.util.Set.of(MultipleGroups.CREATE_TYPE,SpectralGroups.CREATE_TYPE,FormulaGroups.CREATE).contains(entry.type().id())?groupIcon:null);
         workspace.interfaceEditor().setDefaultValueType(com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
         workspace.setBoundaryPortFactory((port,endpoint)->{
             var asset=composites.findAsset(workspace.currentAssetId()).orElseThrow();
@@ -149,6 +154,7 @@ final class WorkspaceController implements AutoCloseable {
 
     private void compositePresentationChanged(){
         groupBindings.refreshInspector();
+        workspace.refreshNodeViews();
         if(compositeColors!=null)compositeColors.schedule();
         if(workspace.currentGraph()!=null)for(var view:workspace.editor().getNodes())
             if(view instanceof GroupViewFactory.GroupView group)compositeColors.modelId(view).flatMap(workspace.currentGraph().snapshot()::findNode).ifPresent(group::update);

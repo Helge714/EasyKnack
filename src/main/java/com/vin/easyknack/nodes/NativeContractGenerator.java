@@ -82,6 +82,6 @@ public final class NativeContractGenerator {
         var path=Path.of(args.length==0?"target/native/generated/ParameterContracts.hpp":args[0]);Files.createDirectories(path.toAbsolutePath().getParent());
         var source=generate(NodeRegistry.definitionsList());
         if(!Files.exists(path)||!Files.readString(path).equals(source))Files.writeString(path,source,StandardCharsets.UTF_8);
-        com.vin.easyknack.plugins.PluginSdk.packageSdk(Path.of("native/audio-host"),Path.of("target/classes/easyknack/plugin-sdk.zip"));
+        com.vin.easyknack.plugins.PluginSdk.packageSdk(Path.of("native/audio-host"),Path.of(args.length>1?args[1]:"target/classes/easyknack/plugin-sdk.zip"));
     }
 }

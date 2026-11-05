@@ -1,3 +1,14 @@
+# Bugs
+- [x] Wenn man einen Step Switch innerhalb einer Gruppe von Trigger auf Index umstellt, verschwindet er, bis man die Gruppe verlässt und neu öffnet.
+- [x] manchmal funktioniert undo nicht mehr, ohne Fehlermeldung
+- [x] wenn man Einträge in einer custom-Combobox ändert, erscheinen diese Änderungen erst im Node, wenn man die Combobox entfernt und dann wieder hinzufügt
+- [x] Gruppen sollten im Add-Menu ebenfalls ihr Gruppensymbol bekommen
+
+# Nice to have
+- [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
+- [x] Namensänderungen sollten resetable sein.
+- [x] Tooltips von Controls sollten immer auch den Namen des Controls anzeigen
+
 # EasyKnack backlog
 
 Current work only. Historical implementation notes, superseded plans and original

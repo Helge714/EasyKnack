@@ -8,7 +8,8 @@ public final class NodeHints {
     private NodeHints(){}
     public static String tooltip(NodeBuilder.Row row){
         var parts=new ArrayList<String>();
-        parts.add(row.tooltip()==null||row.tooltip().isBlank()?row.label():row.tooltip());
+        parts.add(row.label());
+        if(row.tooltip()!=null&&!row.tooltip().isBlank()&&!row.tooltip().equals(row.label()))parts.add(row.tooltip());
         Editor.Slider slider=row.editor() instanceof Editor.Slider s?s:row.editor() instanceof UnitSlider u?u.spec():null;
         if(slider!=null){
             UnitSlider unit=row.editor() instanceof UnitSlider u?u:null;

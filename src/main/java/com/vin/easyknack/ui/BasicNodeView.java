@@ -268,7 +268,7 @@ public class BasicNodeView extends GLNode {
         BoundSlider(String label, double value) { super(label,value); }
         BoundSlider(String label, double min, double max, double value) { super(label, min, max, value); }
         @Override protected void controlMousePressed(GLMouseEvent event) {
-            if (gesture == null) gesture = history.beginTransaction("Change " + getText());
+            if (isEnabled()&&event.getButton()==java.awt.event.MouseEvent.BUTTON1&&gesture == null) gesture = history.beginTransaction("Change " + getText());
             super.controlMousePressed(event);
         }
         @Override protected void controlMouseReleased(GLMouseEvent event) {

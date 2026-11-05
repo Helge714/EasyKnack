@@ -16,6 +16,7 @@ Wählt einen Eingang per Trigger oder numerischem Index.
 | Gewählter Index (Selected index) | [Wert](../../user/de/data-types.md#value) | 0–31, ganzzahlig | 0–Steps−1, abgerundet | 0 | — | [Auto](../../user/de/rates.md#auto) | Index-Modus |
 | Eingang 1…N (Input 1…N) | [Gewählter Typ](../../user/de/data-types.md) | ±∞ für Wert; kein Ressourceneditor | Gewählter Datentyp | 0 für Wert | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Schrittname 1…N (Step name 1…N) | [Editor](../../user/de/reference-tables.md) | Text | — | Eingang 1…N | — | — | Inspektor |
+| Eingangsreihenfolge (Input order) | [Editor](../../user/de/reference-tables.md) | Nach oben / unten | — | Ursprüngliche Slotreihenfolge | — | — | Inspektor |
 | Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor; Wert/Vector |
 
 ## Ausgänge
@@ -28,6 +29,8 @@ Wählt einen Eingang per Trigger oder numerischem Index.
 ## Verhalten
 
 Next schaltet mit Wrap weiter; Reset wählt 0 und hat Vorrang vor gleichzeitigem Next. Im Indexmodus wird abgerundet und begrenzt; die nummerierten Auswahlbuttons sind deaktiviert. Ressourcen-/Vektormodi ersetzen numerische Schritt-/Ausgangstypen durch den gewählten Typ; Ressourcen besitzen keine Ersatzslider. Die Ressourcenauswahl gilt je Block, spätere Trigger wirken auf den nächsten; Index meldet dann die gewählte Blockressource mit Control. Vektorinhalte können Audio behalten. Spektrenwechsel sind hart und ohne Crossfade. Eingangsnamen und gewählter Schritt werden gespeichert. In Instance Groups zeigt die Hervorhebung die erste verschachtelte Instanz; manuelle Auswahl betrifft alle, verbundene Auswahl bleibt unabhängig. Alle angeschlossenen Quellen werden weiterhin berechnet.
+
+Im Inspektor lassen sich Eingangszeilen nach oben oder unten verschieben. Jeder Eingang behält seinen festen Index, Wert, Namen und seine Verbindungen; Next und Index adressieren weiterhin diese Indizes. Namen zurücksetzen im Node-Kontextmenü stellt den Standardtitel wieder her; Undo stellt den eigenen Titel wieder her.
 
 ## Mute
 

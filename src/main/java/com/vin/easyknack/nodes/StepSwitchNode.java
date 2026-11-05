@@ -29,6 +29,13 @@ public final class StepSwitchNode extends BasicNode {
     public static PropertyId name(int index){return new PropertyId("step-name-"+index);}
     public static String label(NodeState s,int index){return s.text(name(index),"").isBlank()?NodeText.text("easyknack.routing.stepswitch.input","Input")+" "+(index+1):s.text(name(index),"");}
     public static PropertyId input(int index){return new PropertyId("step-"+index);}
+    public static final PropertyId ORDER=new PropertyId("step-order");
+    public static List<Integer> order(NodeState state){
+        var result=new ArrayList<Integer>();var saved=state.values().get(ORDER.value());
+        if(saved instanceof GLNodeValue.ListValue list)for(var item:list.values())if(item.toJavaValue() instanceof Number n&&n.doubleValue()==n.intValue()&&n.intValue()>=0&&n.intValue()<MAX_STEPS&&!result.contains(n.intValue()))result.add(n.intValue());
+        for(int i=0;i<MAX_STEPS;i++)if(!result.contains(i))result.add(i);
+        return result.stream().filter(i->i<count(state)).toList();
+    }
     public static int count(NodeState s){return Math.max(1,Math.min(MAX_STEPS,(int)s.number(STEPS,4)));}
     @Override public void define(NodeBuilder n,NodeState s){
         var type=type(s);boolean numeric=type==Type.VALUE;
@@ -48,12 +55,13 @@ public final class StepSwitchNode extends BasicNode {
             .tooltip("Each trigger advances one step and wraps at the end. Unconnected: click to advance at the next block.");
         if(!indexed(s))n.addInput(RESET,"Reset",new Editor.Trigger()).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT).signal(SignalCategory.TRIGGER)
             .tooltip("Select the first input. Reset wins over Next at the same sample.");
-        for(int i=0;i<count(s);i++){
+        for(int i:order(s)){
             var row=numeric?n.addInput(input(i),label(s,i),Editor.Slider.button(0)):n.addInput(input(i),label(s,i));
             row.editorCopyable(false).dataType(type.dataType).signal(type.signal).optional();
             if(numeric||type==Type.VECTOR)row.rates(PortRates.AUDIO_CONTROL);else row.rate(ProcessingRate.CONTROL);
         }
         for(int i=0;i<count(s);i++)n.addEditor(name(i),NodeText.text("easyknack.routing.stepswitch.stepName","Step name")+" "+(i+1),new Editor.Text("")).inspectorOnly();
+        n.addEditor(ORDER,NodeText.text("stepswitch.order","Input order"),new StepOrderEditor(s)).inspectorOnly().editorCopyable(false);
         if(numeric||type==Type.VECTOR)ProcessingRate.addEditor(n,RATE).tooltip(numeric?"Auto uses AudioRate when a trigger or audio input is connected, otherwise ControlRate. ControlRate samples at block start and defers later triggers to the next block. Audio switching is immediate and can click.":com.vin.easyknack.ui.AppText.text("stepswitch.resource.help"));
     }
     @Override public Map<String,GLNodeValue> defaults(){
@@ -71,6 +79,7 @@ public final class StepSwitchNode extends BasicNode {
     @Override public com.vin.easyknack.ui.BasicNodeView createView(com.vin.easyknack.ui.NodeViewContext context,com.vingame.glswing.node.model.GLGraphNode model){
         return new com.vin.easyknack.ui.StepSwitchView(this,context,model);
     }
+    @Override public void updateEditor(PropertyId key,com.vingame.glswing.component.GLContainer control,NodeState state){if(key.equals(ORDER)&&control instanceof StepOrderEditor.Panel panel)panel.configure(state);}
     @Override public void mute(MuteRouting r,NodeState s){r.connect(input(0),OUT);}
     @Override public void insert(InsertionRouting r,NodeState s){r.connect(input(0),OUT);}
 }

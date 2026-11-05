@@ -10,12 +10,14 @@
     <maven.compiler.release>17</maven.compiler.release><glswing.version>0.2.0-SNAPSHOT</glswing.version>
     <audio.cxx>clang++</audio.cxx>
     <easyknack.test.audio>false</easyknack.test.audio>
+    <easyknack.buildDirectory>${project.basedir}/target</easyknack.buildDirectory>
   </properties>
   <dependencies>
     <dependency><groupId>com.vingame</groupId><artifactId>glswing</artifactId><version>${glswing.version}</version></dependency>
     <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>5.11.4</version><scope>test</scope></dependency>
   </dependencies>
   <build>
+    <directory>${easyknack.buildDirectory}</directory>
     <resources>
       <resource><directory>docs</directory><targetPath>META-INF/easyknack/docs</targetPath>
         <includes><include>*.md</include><include>user/**/*.md</include><include>nodes/**/*.md</include><include>nodes/catalog.json</include></includes>
@@ -62,7 +64,10 @@
           <argument>${project.basedir}/src/processor/java/com/vin/easyknack/processor/NodeProcessor.java</argument>
         </arguments></configuration>
       </execution><execution><id>generate-native-contracts</id><phase>process-classes</phase><goals><goal>java</goal></goals>
-        <configuration><mainClass>com.vin.easyknack.nodes.NativeContractGenerator</mainClass></configuration>
+        <configuration><mainClass>com.vin.easyknack.nodes.NativeContractGenerator</mainClass><arguments>
+          <argument>${project.build.directory}/native/generated/ParameterContracts.hpp</argument>
+          <argument>${project.build.outputDirectory}/easyknack/plugin-sdk.zip</argument>
+        </arguments></configuration>
       </execution><execution><id>package-build-identity</id><phase>prepare-package</phase><goals><goal>exec</goal></goals>
         <configuration><executable>${java.home}/bin/java</executable><arguments>
           <argument>${project.basedir}/scripts/BuildMetadata.java</argument>
