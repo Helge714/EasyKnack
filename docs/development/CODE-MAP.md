@@ -76,6 +76,7 @@ Paths below are relative to `native/audio-host/src/`.
 | Individual DSP nodes | `nodes/` | Native processors; usually start with the Java definition and corresponding Node.hpp. |
 | Devices / MIDI | `audio/`, `midi/` | Device transport and MIDI backend implementation. `audio/AudioRenderAhead.hpp` isolates spectral DSP bursts from WASAPI callbacks with a consumption-driven queue. |
 | Spectrum / workers / resources | `Spectrum.hpp`, `SpectrumStream.hpp`, `SpectralWorker.hpp`, `AnalysisResources.hpp`, `WaveformResource.hpp`, `Wavetables.hpp` | FFT frame resources, spectral work, analysis and oscillator waveforms. |
+| Recording Buffer position | `nodes/HistoryBufferNode.java`, native `nodes/HistoryBufferNode.hpp` | Append-only numeric Write position output; sample-accurate next-write reference matches reader distance. Regression: `BufferWritePositionTest`. |
 | Buffers / generated execution / telemetry | `BufferRead.hpp`, `BakedGraph.hpp`, `CompiledInstanceAudio.hpp`, `RenderTelemetry.hpp`, `RenderCadence.hpp` | Buffer access, compiled group execution and workload/deadline measurements. |
 | Formula math execution | `FormulaProgram.hpp`, `TypedFormulaProgram.hpp`, `FormulaNumeric.hpp` | Keep function registry/help in Java, legacy/typed interpreters and generated kernels aligned. `FormulaMathFunctionsTest` covers domains and native/preview parity, including standalone SDK compilation. |
 

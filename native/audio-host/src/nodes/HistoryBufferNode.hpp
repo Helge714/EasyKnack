@@ -7,8 +7,9 @@ struct HistoryBufferNode : NodeProcessor {
     bool canShareChannels()const noexcept override{return true;}
     bool mergesVoices()const noexcept override{return true;}
     char executionRate()const noexcept override{return 'a';}
-    ResourceKind outputResourceKind(std::size_t)const noexcept override{return ResourceKind::history;}
-    DspResource* resourceOutput(std::size_t)noexcept override{return &history;}
+    std::size_t outputCount()const noexcept override{return 2;}
+    ResourceKind outputResourceKind(std::size_t port)const noexcept override{return port==0?ResourceKind::history:ResourceKind::none;}
+    DspResource* resourceOutput(std::size_t port)noexcept override{return port==0?&history:nullptr;}
     void configure(std::istream& in)override{auto p=parameters::HistoryBufferNodeParameters::read(in);sources=p.sources();seconds=p.seconds_value;}
     void prepare(double rate,std::size_t frames)override{history.prepare(rate,seconds,frames);}
     void adoptState(NodeProcessor& previous)noexcept override{
@@ -22,9 +23,13 @@ struct HistoryBufferNode : NodeProcessor {
         }
     }
     void process(ProcessContext& c)noexcept override{
-        if(history.samples.empty())return;
+        auto* position=c.outputAt(1);
+        if(history.samples.empty()){if(position)std::fill_n(position,c.bufferSize,0.f);return;}
         history.beginBlock(c.bufferSize);
-        for(std::size_t i=0;i<c.bufferSize;i++){float sum=0;for(std::size_t p=0;p<c.inputCount;p++)if(c.input(p))sum+=c.input(p)[i];history.append(sum);}
+        for(std::size_t i=0;i<c.bufferSize;i++){
+            float sum=0;for(std::size_t p=0;p<c.inputCount;p++)if(c.input(p))sum+=c.input(p)[i];history.append(sum);
+            if(position)position[i]=std::min(static_cast<float>(static_cast<double>(history.end%history.samples.size())/history.samples.size()),std::nextafter(1.f,0.f));
+        }
     }
 };
 EASYKNACK_NODE(HistoryBufferNode,"history")

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add a sample-accurate normalized Write position output to Recording Buffer.
+  Retain the existing Buffer output and reader Distance/Read position semantics.
+  Compatible addition covered by the current first development version; no
+  document-format, plugin ABI or host protocol change.
+
 - Keep Step Switch visible when changing mode inside groups; retain reentrant graph
   changes and prevent right-click/disabled sliders from blocking Undo.
 - Refresh applied custom combobox templates immediately, including Undo/Redo.
