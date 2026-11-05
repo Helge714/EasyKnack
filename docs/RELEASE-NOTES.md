@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- When choosing Copy Editor for a new group input, select from free targets
+  instead of automatically trying an already controlled parameter. Keep the
+  current input's own targets selectable. No document or host contract change.
+
 - Revalidate group editor targets, public boundaries, property mappings and signal
   wires after edits, node removal, grouping and ungrouping. Remove stale bindings
   while preserving valid fan-out targets and public controls; deletion/grouping

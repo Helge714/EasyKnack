@@ -100,7 +100,13 @@ final class GroupInputSettings extends GLContainer {
         var copied=GroupEditorCopies.copy(editor.selectedPort(),endpoint,asset(),groups);
         save(copied.presentation().inputEditorId(),copied.presentation().editorOptions(),Kind.COPY);
     }
-    private List<Source> sources(){return asset()==null||editor.selectedPort()==null?List.of():availableSources(asset(),selectedRate(editor.selectedPort()));}
+    private List<Source> sources(){return asset()==null||editor.selectedPort()==null?List.of():availableSources(asset(),selectedRate(editor.selectedPort()),editor.selectedPort().publicPort().id());}
+    static List<Source> availableSources(GLNodeGraphAsset asset,ProcessingRate rate,String selectedPort){
+        var used=asset.compositeDescriptor().portMappings().stream().filter(p->!p.publicPort().id().equals(selectedPort))
+            .flatMap(p->GroupEditorCopies.targets(p).stream()).collect(java.util.stream.Collectors.toSet());
+        return availableSources(asset,rate).stream().map(s->new Source(s.type(),s.property(),s.label(),s.value(),s.endpoints().stream().filter(e->!used.contains(e)).toList()))
+            .filter(s->!s.endpoints().isEmpty()).toList();
+    }
     static List<Source> availableSources(GLNodeGraphAsset asset,ProcessingRate rate){
         return GLNodeEditorSourceCatalog.<Editor>collect(asset.graph(), n->{
             var def=NodeRegistry.find(n.typeId()).orElse(null);if(def==null)return List.of();
