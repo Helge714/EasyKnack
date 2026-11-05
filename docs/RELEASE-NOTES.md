@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Revalidate group editor targets, public boundaries, property mappings and signal
+  wires after edits, node removal, grouping and ungrouping. Remove stale bindings
+  while preserving valid fan-out targets and public controls; deletion/grouping
+  and their repairs undo together. Recheck older documents when loading. Missing
+  plugin definitions remain diagnosable rather than discarding their bindings.
+  Covered by the current first development version; no document or host contract
+  change.
+
 - Keep ordinary groups visible when they expose a nested Instance Group Count
   editor. Scope the private Count role to its owning Instance Group and repair
   existing wrappers on load, preserving their ports, wiring and editor settings.

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.List;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import com.vin.easyknack.nodes.NodeRegistry;
 import com.vin.easyknack.nodes.BasicNode;
 import com.vin.easyknack.nodes.OscillatorNode;
@@ -142,7 +143,7 @@ final class WorkspaceController implements AutoCloseable {
             if(!entry.type().id().equals(SpectralGroups.CREATE_TYPE))return false;
             addSpectralGroup(x,y);return true;
         });
-        workspace.setChangeListener(this::syncAudio);
+        workspace.setChangeListener(this::workspaceChanged);
         history.addListener(rateHistoryListener);
     }
 
@@ -187,9 +188,9 @@ final class WorkspaceController implements AutoCloseable {
         var normalized=nodes.normalize(configured.graph());
         configured=new GLNodeGraphAsset(configured.id(),configured.version(),configured.kind(),normalized,configured.viewState(),configured.metadata(),configured.compositeDescriptor());
         var ungroupDescriptor=configured.compositeDescriptor();
-        workspace.ungroup(prepared.root().graph().findNode(instance.id()).orElseThrow(),configured,
-            (parent,result)->UngroupEditors.remap(parent,result,instance.id(),ungroupDescriptor));
-        syncAudio();
+        var ungroupAsset=configured;
+        editGroup("Ungroup",()->workspace.ungroup(prepared.root().graph().findNode(instance.id()).orElseThrow(),ungroupAsset,
+            (parent,result)->UngroupEditors.remap(parent,result,instance.id(),ungroupDescriptor)));
     }
 
 
@@ -287,36 +288,68 @@ final class WorkspaceController implements AutoCloseable {
         } finally { changingProperties = previous; }
     }
 
-    /** Keep the public interface when internal nodes disappear; only detach missing endpoints. */
+    private boolean reconcilingInterfaces,interfaceReconciliationPending;
+    private final Map<String,Object> interfaceValidationKeys=new HashMap<>();
+    private final Map<GLNodeGraph,Object> connectionValidationKeys=new WeakHashMap<>();
+    private int groupEditDepth;
+    private void workspaceChanged(){
+        if(reconcilingInterfaces)return;
+        if(!closed&&!history.isApplying()&&groupEditDepth==0&&!interfaceReconciliationPending){
+            interfaceReconciliationPending=true;
+            java.awt.EventQueue.invokeLater(()->{
+                interfaceReconciliationPending=false;if(closed||history.isApplying())return;
+                try(var transaction=history.beginTransaction("Update group bindings")){reconcileCompositeInterfaces();}
+                syncAudio();
+            });
+        }
+        syncAudio();
+    }
+    private void editGroup(String name,Runnable action){
+        groupEditDepth++;
+        try(var transaction=history.beginTransaction(name)){action.run();reconcileCompositeInterfaces();}
+        finally{groupEditDepth--;}
+        syncAudio();
+    }
+    private void applyGroupRepair(GLNodeGraphAsset asset){
+        for(var graph:List.copyOf(observed.keySet()))if(graph.snapshot().graphId().equals(asset.graph().graphId()))
+            if(!graph.snapshot().nodes().equals(asset.graph().nodes())||!graph.snapshot().connections().equals(asset.graph().connections()))
+                replaceProperties(graph,"Update group bindings",asset.graph());
+        composites.replaceAsset(asset);types.replace(asset.compositeDescriptor().nodeType());
+    }
+    /** Keep public controls and ports, removing only bindings that no longer work. */
     private void reconcileCompositeInterfaces() {
-        boolean changed;
-        do {
-            changed = false;
-            for (var asset : composites.assets()) {
-                var descriptor = asset.compositeDescriptor();
-                if (descriptor == null) continue;
-                var ports = descriptor.portMappings().stream().flatMap(mapping -> {
-                    var remaining=mapping.internalEndpoints().stream().filter(endpoint ->
-                            GLCompositeForwarding.isInput(endpoint)
-                                ? GLCompositeForwarding.valid(mapping,descriptor.portMappings())
-                                : asset.graph().findNode(endpoint.nodeId()).flatMap(node -> types.find(node.typeId()))
-                                    .flatMap(type -> type.findPort(endpoint.portId())).isPresent()).toList();
-                    return java.util.stream.Stream.of(mapping.withEndpoints(remaining));
-                }).toList();
-                if (ports.equals(descriptor.portMappings())) continue;
-                com.vingame.glswing.node.composite.GLCompositeInterfaceTransactions.replacePorts(
-                        composites, types, asset.id(), ports, history, "Update dynamic composite ports");
-                for (var dependent : observed.keySet()) {
+        if(reconcilingInterfaces||closed||history.isApplying())return;
+        reconcilingInterfaces=true;
+        try{
+            boolean changed;
+            do {
+                changed = false;
+                for (var asset : composites.assets()) {
+                    var descriptor = asset.compositeDescriptor();
+                    if (descriptor == null) continue;
+                    var key=List.of(asset,asset.graph().nodes().stream().map(n->List.of(NodeRegistry.find(n.typeId()),composites.findComposite(n.typeId()))).toList());
+                    if(key.equals(interfaceValidationKeys.get(asset.id())))continue;
+                    var clean=GroupInterfaceValidity.clean(asset,composites);
+                    if(clean.equals(asset)){interfaceValidationKeys.put(asset.id(),key);continue;}
+                    var repaired=GroupInputs.materialize(clean,composites);
+                    history.perform("Update group bindings",()->applyGroupRepair(repaired),()->applyGroupRepair(asset));
+                    changed = true;
+                }
+                for (var dependent : List.copyOf(observed.keySet())) {
                     var before = dependent.snapshot();
-                    var after = nodes.normalize(before);
+                    var key=List.of(before.connections(),before.nodes().stream().map(n->List.of(n.id(),n.typeId(),types.find(n.typeId()).map(t->t.ports()).orElse(List.of()))).toList());
+                    if(!changed&&key.equals(connectionValidationKeys.get(dependent)))continue;
+                    var after = GroupInterfaceValidity.connections(nodes.normalize(before),composites);
+                    connectionValidationKeys.put(dependent,key);
                     if (before.connections().equals(after.connections()) && before.nodes().equals(after.nodes())) continue;
                     replaceProperties(dependent, "Update composite connections", after);
                     history.record("Update composite connections", () -> replaceProperties(dependent, "Restore composite connections", before),
                             () -> replaceProperties(dependent, "Update composite connections", after));
+                    changed=true;
                 }
-                changed = true;
-            }
-        } while (changed);
+            } while (changed);
+            if(workspace.interfaceEditor().getAssetId()!=null)workspace.interfaceEditor().refresh();
+        }finally{reconcilingInterfaces=false;}
     }
 
     private void guardActions() {
@@ -327,7 +360,7 @@ final class WorkspaceController implements AutoCloseable {
         workspace.editor().setEditingActions(new NodeEditingActions(core, () ->
                 workspace.editor().getSelectedNodes().stream().allMatch(view -> AudioNodeFactory.idOf(view)
                         .flatMap(id -> workspace.currentGraph().snapshot().findNode(id))
-                        .flatMap(n -> NodeRegistry.find(n.typeId())).map(n -> n.isMuteable()).orElse(true))));
+                        .flatMap(n -> NodeRegistry.find(n.typeId())).map(n -> n.isMuteable()).orElse(true)),this::editGroup));
     }
 
     private void openExample() {
@@ -415,7 +448,7 @@ final class WorkspaceController implements AutoCloseable {
         bakes.reset();
         workspace.openRoot("", new GLNodeGraph(), GLNodeEditorViewState.empty());
         formulaEditors.values().forEach(FormulaEditorPanel::close);formulaEditors.clear();formulas.reset();
-        observed.forEach(GLNodeGraph::removeListener); observed.clear();
+        observed.forEach(GLNodeGraph::removeListener); observed.clear();interfaceValidationKeys.clear();connectionValidationKeys.clear();
         for (var composite : composites.composites()) { types.unregister(composite.nodeTypeId()); catalog.unregister(composite.nodeTypeId()); }
         for (var asset : composites.assets()) composites.unregisterAsset(asset.id());
         for (var asset : NodeDocuments.assets(document)) {

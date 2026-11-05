@@ -23,6 +23,8 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 Öffne die Gruppe zur Bearbeitung von Graph und Schnittstelle. Jeder öffentliche Port behält seinen gewählten Datentyp und seine Rate; die Tabelle bezeichnet konfigurierbare Ports und keine fest numerische Schnittstelle. Group-General legt Titelgestaltung sowie Mute- und Einfügepaare fest; Group-IO Portreihenfolge, Editoren und Bereiche. Übernommene Editoren erben ihre Darstellung und können kompatible interne Parameter steuern. Einheitenadapter erhalten die internen Einheiten an der Grenze. Bake optimiert die übernommene innere Definition; öffentliche Parameteränderungen bleiben Parameter. [Instance Groups](instance-group.md), [Spectral Groups](spectral-group.md) und [Formula Groups](formula-group.md) besitzen eigene Ausführungsregeln.
 
+Nach Änderungen werden ungültige Verbindungen zu gelöschten Nodes sowie entfernten oder inkompatiblen Ports und Editor-Eigenschaften automatisch entfernt. Gültige übrige Ziele und öffentliche Bedienelemente bleiben erhalten. Beim Löschen oder Gruppieren stellt Undo die ursprünglichen Nodes und Verknüpfungen wieder her.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |

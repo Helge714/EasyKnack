@@ -23,6 +23,8 @@ Exposes a reusable interface to an internal graph.
 
 Open the group to edit its internal graph and public interface. Each public port retains its selected data type and rate; the table above denotes configurable ports, not a fixed numeric-only interface. Group-General sets title appearance and Mute/insertion port pairs; Group-IO sets port order, editors and ranges. Copied editors inherit their source's presentation and can control compatible internal parameters. Unit adapters preserve internal units at the boundary. A Bake optimizes the accepted internal definition; public parameter changes remain parameters. [Instance Groups](instance-group.md), [Spectral Groups](spectral-group.md) and [Formula Groups](formula-group.md) have distinct execution rules.
 
+After changes, invalid connections to deleted nodes or removed/incompatible ports and editor properties are removed automatically. Valid remaining targets and public controls are retained. Undo restores the original nodes and bindings when deleting or grouping nodes.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

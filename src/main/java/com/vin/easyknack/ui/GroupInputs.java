@@ -33,12 +33,13 @@ final class GroupInputs {
     static boolean choice(GLCompositePortMapping port){return template(port)!=null||port.presentation().editorOptions().containsKey(CHOICE);}
     static boolean editorOnly(GLCompositePortMapping port){return (choice(port)||!GroupEditorCopies.targets(port).isEmpty())&&!port.presentation().socketVisible();}
     static GLCompositePortMapping normalize(GLCompositePortMapping port,GLNodeGraphAsset asset,GLCompositeGraphRegistry groups){
-        port=GroupEditorCopies.detachMissingSource(port);
+        port=GroupInterfaceValidity.port(port,asset,groups);
         if(!GroupEditorCopies.targets(port).isEmpty())port=new GLCompositePortMapping(port.publicPort(),null,new GLCompositePortPresentation(port.presentation().inputEditorId(),false,port.presentation().editorOptions()));
         if(template(port)==null)return port;
         var options=new HashMap<>(port.presentation().editorOptions());options.put(CHOICE,GLNodeValue.of(property(port)));
         var targets=new HashMap<String,String>();var values=new HashMap<String,Object>();
-        if(asset!=null)for(var endpoint:port.internalEndpoints()){
+        var endpoints=new LinkedHashSet<>(port.internalEndpoints());endpoints.addAll(GroupEditorCopies.targets(port));
+        if(asset!=null)for(var endpoint:endpoints){
             var model=asset.graph().findNode(endpoint.nodeId()).orElse(null);
             var nested=model==null?null:groups.findComposite(model.typeId()).orElse(null);
             String id=endpoint.portId();
@@ -53,8 +54,9 @@ final class GroupInputs {
         return new GLCompositePortMapping(port.publicPort(),port.internalEndpoint(),new GLCompositePortPresentation(port.presentation().inputEditorId(),port.presentation().socketVisible(),options),port.additionalEndpoints());
     }
     static GLNodeGraphAsset materialize(GLNodeGraphAsset asset,GLCompositeGraphRegistry groups){
-        var d=asset.compositeDescriptor();if(d==null)return asset;
-        return materialize(descriptor(asset,new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),d.portMappings().stream().map(p->normalize(p,asset,groups)).toList(),d.properties(),d.propertyMappings())));
+        var clean=GroupInterfaceValidity.clean(asset,groups);
+        var d=clean.compositeDescriptor();if(d==null)return clean;
+        return materialize(descriptor(clean,new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),d.portMappings().stream().map(p->normalize(p,clean,groups)).toList(),d.properties(),d.propertyMappings())));
     }
     static GLNodeGraphAsset materialize(GLNodeGraphAsset asset){
         if(asset.compositeDescriptor()==null)return asset;

@@ -39,6 +39,9 @@ final class GroupEditorCopies {
     static GLCompositePortMapping detachMissingSource(GLCompositePortMapping p){
         var source=new NodeState(p.presentation().editorOptions()).text("copySource","");
         if(source.isEmpty()||!targets(p).isEmpty()||p.internalEndpoints().stream().anyMatch(e->e.toString().equals(source)))return p;
+        return detachSource(p);
+    }
+    static GLCompositePortMapping detachSource(GLCompositePortMapping p){
         var options=new HashMap<String,GLNodeValue>();
         for(var key:List.of(GroupInputSettings.RATE,FormulaGroups.ID,FormulaGroups.NAME))if(p.presentation().editorOptions().containsKey(key))options.put(key,p.presentation().editorOptions().get(key));
         options.put(GroupInputSettings.MODE,GLNodeValue.of(GroupInputSettings.Kind.NONE.name()));
