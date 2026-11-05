@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Offer public editors of nested groups as Copy Editor sources. Forward numeric,
+  checkbox, vector and choice values through nested group interfaces; retain
+  wireable public inputs and exclude targets already controlled by other inputs.
+  Covered by the current first development version; no document or host contract
+  change.
+
 - When choosing Copy Editor for a new group input, select from free targets
   instead of automatically trying an already controlled parameter. Keep the
   current input's own targets selectable. No document or host contract change.

@@ -59,14 +59,17 @@ final class GroupInputSettings extends GLContainer {
     private static Map<String,GLNodeValue> checkboxOptions(boolean checked){var values=new HashMap<>(defaults());values.put("presentation",GLNodeValue.of("checkbox"));values.put("default",GLNodeValue.of(checked?1.0:0.0));values.put(GroupUnits.BASE,GLNodeValue.of("factor"));values.put(GroupUnits.ALLOWED,GLNodeValue.of(List.of("factor")));return values;}
     private boolean numeric(GLCompositePortMapping p){return List.of(SignalCategory.AUDIO,SignalCategory.VALUE,SignalCategory.WAVETABLE,SignalCategory.TRIGGER).stream().anyMatch(c->c.valueTypeId().equals(p.publicPort().valueTypeId()));}
     private void save(String id,Map<String,GLNodeValue> options,Kind mode){
-        var p=editor.selectedPort();if(p==null)return;var values=new HashMap<>(options);values.put(MODE,GLNodeValue.of(mode.name()));
+        save(editor.selectedPort(),id,options,mode);
+    }
+    private void save(GLCompositePortMapping p,String id,Map<String,GLNodeValue> options,Kind mode){
+        if(p==null)return;var values=new HashMap<>(options);values.put(MODE,GLNodeValue.of(mode.name()));
         for(String key:List.of(FormulaGroups.ID,FormulaGroups.NAME))if(p.presentation().editorOptions().containsKey(key))values.put(key,p.presentation().editorOptions().get(key));
         var requested=rate.getSelectedItem()==null?selectedRate(p):rate.getSelectedItem();values.put(RATE,GLNodeValue.of(requested.id()));
         String type=id.equals(GroupVectorEditors.ID)?SignalCategory.VECTOR.valueTypeId():requested==ProcessingRate.EVENT?SignalCategory.TRIGGER.valueTypeId():p.publicPort().valueTypeId();
         if(requested!=ProcessingRate.EVENT&&type.equals(SignalCategory.TRIGGER.valueTypeId()))type=SignalCategory.VALUE.valueTypeId();
         var publicPort=p.publicPort();var replacement=new GLCompositePortMapping(new GLNodePortDescriptor(publicPort.id(),publicPort.direction(),type,publicPort.timing(),false,publicPort.maximumConnections()),values.containsKey(GroupEditorCopies.TARGETS)?null:p.internalEndpoint(),new GLCompositePortPresentation(id,!values.containsKey(GroupEditorCopies.TARGETS)&&(mode==Kind.NONE||p.presentation().socketVisible()),values),values.containsKey(GroupEditorCopies.TARGETS)?List.of():p.additionalEndpoints());
-        var linked=GroupEditorCopies.targets(replacement);
-        if(asset().compositeDescriptor().portMappings().stream().filter(other->!other.publicPort().id().equals(p.publicPort().id())).flatMap(other->GroupEditorCopies.targets(other).stream()).anyMatch(linked::contains))throw new IllegalArgumentException(AppText.text("group.editor.duplicate"));
+        var linked=controlledTargets(replacement);
+        if(asset().compositeDescriptor().portMappings().stream().filter(other->!other.publicPort().id().equals(p.publicPort().id())).flatMap(other->controlledTargets(other).stream()).anyMatch(linked::contains))throw new IllegalArgumentException(AppText.text("group.editor.duplicate"));
         editor.updateSelectedPort(GroupInputs.normalize(replacement,asset(),groups));
     }
     private void chooseRate(){
@@ -95,21 +98,61 @@ final class GroupInputSettings extends GLContainer {
     }
     private void copySource(){if(source.getSelectedItem()!=null)copy(source.getSelectedItem());}
     private void copy(Source s){
-        var used=asset().compositeDescriptor().portMappings().stream().filter(p->!p.publicPort().id().equals(editor.selectedPort().publicPort().id())).flatMap(p->GroupEditorCopies.targets(p).stream()).collect(java.util.stream.Collectors.toSet());
+        var used=asset().compositeDescriptor().portMappings().stream().filter(p->!p.publicPort().id().equals(editor.selectedPort().publicPort().id())).flatMap(p->controlledTargets(p).stream()).collect(java.util.stream.Collectors.toSet());
         var endpoint=s.endpoints().stream().filter(e->!used.contains(e)).findFirst().orElseThrow(()->new IllegalArgumentException(AppText.text("group.editor.duplicate")));
         var copied=GroupEditorCopies.copy(editor.selectedPort(),endpoint,asset(),groups);
-        save(copied.presentation().inputEditorId(),copied.presentation().editorOptions(),Kind.COPY);
+        save(copied,copied.presentation().inputEditorId(),copied.presentation().editorOptions(),Kind.COPY);
     }
-    private List<Source> sources(){return asset()==null||editor.selectedPort()==null?List.of():availableSources(asset(),selectedRate(editor.selectedPort()),editor.selectedPort().publicPort().id());}
+    private static List<GLNodeEndpoint> controlledTargets(GLCompositePortMapping port){return java.util.stream.Stream.concat(GroupEditorCopies.targets(port).stream(),port.internalEndpoints().stream()).distinct().toList();}
+    private boolean linkableSource(GLGraphNode node,String property){
+        return NodeRegistry.find(node.typeId()).map(d->d.layout(new NodeState(node.properties())).rows().stream().anyMatch(r->r.id().equals(property)&&GroupEditorCopies.linkable(r)))
+            .orElseGet(()->groups.findComposite(node.typeId()).map(d->GroupEditorCopies.groupPort(d,property)).filter(Objects::nonNull).filter(GroupInputs::editorOnly).isPresent());
+    }
+    private String sourceLabel(GLGraphNode node,String property){
+        var definition=NodeRegistry.find(node.typeId()).orElse(null);if(definition!=null)return definition.title()+" / "+property;
+        var descriptor=groups.findComposite(node.typeId()).orElseThrow();var port=GroupEditorCopies.groupPort(descriptor,property);
+        return new NodeState(groups.findAsset(descriptor.assetId()).orElseThrow().metadata()).text("easyknack.title","Group")+" / "+port.publicPort().id();
+    }
+    private List<Source> sources(){return asset()==null||editor.selectedPort()==null?List.of():availableSources(asset(),selectedRate(editor.selectedPort()),editor.selectedPort().publicPort().id(),groups);}
     static List<Source> availableSources(GLNodeGraphAsset asset,ProcessingRate rate,String selectedPort){
+        return availableSources(asset,rate,selectedPort,null);
+    }
+    static List<Source> availableSources(GLNodeGraphAsset asset,ProcessingRate rate,String selectedPort,GLCompositeGraphRegistry groups){
         var used=asset.compositeDescriptor().portMappings().stream().filter(p->!p.publicPort().id().equals(selectedPort))
-            .flatMap(p->GroupEditorCopies.targets(p).stream()).collect(java.util.stream.Collectors.toSet());
-        return availableSources(asset,rate).stream().map(s->new Source(s.type(),s.property(),s.label(),s.value(),s.endpoints().stream().filter(e->!used.contains(e)).toList()))
+            .flatMap(p->controlledTargets(p).stream()).collect(java.util.stream.Collectors.toSet());
+        return availableSources(asset,rate,groups).stream().map(s->new Source(s.type(),s.property(),s.label(),s.value(),s.endpoints().stream().filter(e->!used.contains(e)).toList()))
             .filter(s->!s.endpoints().isEmpty()).toList();
     }
     static List<Source> availableSources(GLNodeGraphAsset asset,ProcessingRate rate){
+        return availableSources(asset,rate,(GLCompositeGraphRegistry)null);
+    }
+    static Editor sourceEditor(GLCompositePortMapping port,GLNodeGraphAsset asset,GLCompositeGraphRegistry groups){
+        if(port.publicPort().direction()!=GLPortDirection.INPUT)return null;
+        var template=GroupInputs.template(port);if(template!=null)return template.editor();
+        if(GroupInputs.choice(port))return GroupChoices.choices(asset,groups).stream().filter(c->c.id().equals(GroupInputs.property(port))).map(c->(Editor)c.editor()).findFirst().orElse(null);
+        if(GroupVectorEditors.isVector(port))return GroupVectorEditors.editor(port);
+        if(port.presentation().inputEditorId().equals(BUTTON))return new Editor.Trigger();
+        if(!port.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER))return null;
+        var state=new NodeState(port.presentation().editorOptions());
+        if(checkbox(port))return new Editor.CheckBox(state.number("default",0)!=0);
+        return Editor.Slider.button(state.number("default",0),state.flag("minimumEnabled",true)?state.number("minimum",0):null,state.flag("maximumEnabled",true)?state.number("maximum",1):null);
+    }
+    private static List<Source> availableSources(GLNodeGraphAsset asset,ProcessingRate rate,GLCompositeGraphRegistry groups){
         return GLNodeEditorSourceCatalog.<Editor>collect(asset.graph(), n->{
-            var def=NodeRegistry.find(n.typeId()).orElse(null);if(def==null)return List.of();
+            var def=NodeRegistry.find(n.typeId()).orElse(null);
+            if(def==null){
+                var descriptor=groups==null?null:groups.findComposite(n.typeId()).orElse(null);if(descriptor==null)return List.of();
+                var child=groups.findAsset(descriptor.assetId()).orElseThrow();
+                var result=new ArrayList<GLNodeEditorSourceCatalog.Candidate<Editor>>();
+                for(var stored:descriptor.portMappings()){
+                    var port=MultipleGroups.exposedPort(stored);var value=sourceEditor(port,child,groups);if(value==null)continue;
+                    var kind=value instanceof Editor.ComboBox<?>?GLNodeEditorCapabilities.Kind.CHOICE:value instanceof Editor.Trigger?GLNodeEditorCapabilities.Kind.TRIGGER:value instanceof Editor.CheckBox?GLNodeEditorCapabilities.Kind.CHECKBOX:value instanceof VectorEditor?GLNodeEditorCapabilities.Kind.CUSTOM:GLNodeEditorCapabilities.Kind.SLIDER;
+                    var property=GroupInputs.editorOnly(port)?GroupEditorCopies.groupProperty(port):port.publicPort().id();
+                    // Public group controls can be copied even when their input socket remains visible.
+                    result.add(new GLNodeEditorSourceCatalog.Candidate<>(property,new NodeState(child.metadata()).text("easyknack.title","Group")+" / "+port.publicPort().id(),value,new GLNodeEditorCapabilities(kind,true,true,value.defaultValue(),Map.of())));
+                }
+                return result;
+            }
             return def.layout(new NodeState(n.properties())).rows().stream().map(row->
                 new GLNodeEditorSourceCatalog.Candidate<Editor>(row.id(),def.title()+" / "+row.label(),row.editor(),GroupEditorCapabilities.of(row))).toList();
         },capability->(rate==ProcessingRate.EVENT)==(capability.kind()==GLNodeEditorCapabilities.Kind.TRIGGER))
@@ -186,8 +229,8 @@ final class GroupInputSettings extends GLContainer {
             if(mode==Kind.COPY&&!targets.isEmpty()){
                 var heading=new GLLabel(AppText.text("group.editor.targets"));unitRows.add(heading);addGL(heading);
                 var first=targets.stream().filter(t->asset().graph().findNode(t.nodeId()).isPresent()).findFirst().orElse(targets.get(0));var original=asset().graph().findNode(first.nodeId()).orElse(null);
-                if(original!=null)for(var n:asset().graph().nodes())if(n.typeId().equals(original.typeId())&&NodeRegistry.require(n.typeId()).layout(new NodeState(n.properties())).rows().stream().anyMatch(r->r.id().equals(first.portId())&&GroupEditorCopies.linkable(r))){
-                    var endpoint=new GLNodeEndpoint(n.id(),first.portId());var box=new GLCheckBox(NodeRegistry.require(n.typeId()).title()+" / "+first.portId()+" · "+n.id().toString().substring(0,8));box.setSelected(targets.contains(endpoint));
+                if(original!=null)for(var n:asset().graph().nodes())if(n.typeId().equals(original.typeId())&&linkableSource(n,first.portId())){
+                    var endpoint=new GLNodeEndpoint(n.id(),first.portId());var box=new GLCheckBox(sourceLabel(n,first.portId())+" · "+n.id().toString().substring(0,8));box.setSelected(targets.contains(endpoint));
                     box.addActionListener(e->edit(()->{var next=new ArrayList<>(targets);if(box.isSelected()){if(!next.contains(endpoint))next.add(endpoint);}else{if(next.size()==1)return;next.remove(endpoint);}var opts=new HashMap<>(editor.selectedPort().presentation().editorOptions());opts.put(GroupEditorCopies.TARGETS,GroupEditorCopies.targetsValue(next));save(p.presentation().inputEditorId(),opts,Kind.COPY);}));unitRows.add(box);addGL(box);
                 }
             }

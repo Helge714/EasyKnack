@@ -42,10 +42,15 @@ final class GroupInterfaceValidity {
     }
     private static boolean editor(GLNodeGraphAsset asset,GLNodeEndpoint endpoint,GLCompositePortMapping mapping,GLCompositeGraphRegistry groups){
         var node=asset.graph().findNode(endpoint.nodeId()).orElse(null);if(node==null)return false;
-        if(NodeRegistry.find(node.typeId()).isEmpty())return groups.findComposite(node.typeId()).isEmpty();
-        var row=row(node,endpoint.portId());if(row==null||!GroupEditorCopies.linkable(row))return false;
+        Editor target;
+        if(NodeRegistry.find(node.typeId()).isEmpty()){
+            var nested=groups.findComposite(node.typeId()).orElse(null);if(nested==null)return true;
+            var child=GroupEditorCopies.groupPort(nested,endpoint.portId());
+            if(child==null||!GroupInputs.editorOnly(child))return false;
+            target=GroupInputSettings.sourceEditor(child,groups.findAsset(nested.assetId()).orElseThrow(),groups);if(target==null)return false;
+        }else{var row=row(node,endpoint.portId());if(row==null||!GroupEditorCopies.linkable(row))return false;target=row.editor();}
         if(GroupInputs.template(mapping)!=null){
-            if(!(row.editor() instanceof Editor.ComboBox<?> combo))return false;
+            if(!(target instanceof Editor.ComboBox<?> combo))return false;
             try{
                 for(var entry:GroupInputs.template(mapping).entries()){
                     if(entry.value().toJavaValue() instanceof Number number){double index=number.doubleValue();if(!Double.isFinite(index)||index!=Math.rint(index)||index<0||index>=combo.items().size())return false;}
@@ -54,10 +59,10 @@ final class GroupInterfaceValidity {
                 return true;
             }catch(IllegalArgumentException incompatible){return false;}
         }
-        if(GroupVectorEditors.isVector(mapping))return row.editor() instanceof VectorEditor;
-        if(GroupInputSettings.checkbox(mapping))return row.editor() instanceof Editor.CheckBox||row.editor() instanceof Editor.Toggle;
-        if(mapping.presentation().inputEditorId().equals(GroupInputSettings.BUTTON))return row.editor() instanceof Editor.Trigger;
-        return row.editor() instanceof Editor.Slider||row.editor() instanceof UnitSlider;
+        if(GroupVectorEditors.isVector(mapping))return target instanceof VectorEditor;
+        if(GroupInputSettings.checkbox(mapping))return target instanceof Editor.CheckBox||target instanceof Editor.Toggle;
+        if(mapping.presentation().inputEditorId().equals(GroupInputSettings.BUTTON))return target instanceof Editor.Trigger;
+        return target instanceof Editor.Slider||target instanceof UnitSlider;
     }
     private static boolean port(GLNodeGraphAsset asset,GLNodeEndpoint endpoint,GLCompositePortMapping mapping,GLCompositeGraphRegistry groups){
         if(GLCompositeForwarding.isInput(endpoint))return GLCompositeForwarding.valid(mapping,asset.compositeDescriptor().portMappings());

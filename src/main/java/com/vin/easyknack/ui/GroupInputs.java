@@ -118,7 +118,7 @@ final class GroupInputs {
     private static Editor.ComboBox<GroupChoices.Option> targetCombo(GLNodeGraphAsset asset,GLNodeEndpoint endpoint,GLCompositeGraphRegistry groups){
         var node=asset.graph().findNode(endpoint.nodeId()).orElse(null);if(node==null)return null;
         var nested=groups.findComposite(node.typeId()).orElse(null);if(nested==null)return GroupChoices.nodeEditor(node,endpoint.portId());
-        var port=nested.portMappings().stream().filter(p->p.publicPort().id().equals(endpoint.portId())).findFirst().orElse(null);
+        var port=GroupEditorCopies.groupPort(nested,endpoint.portId());
         if(port==null||!choice(port))return null;var template=template(port);if(template!=null)return template.editor();
         return GroupChoices.choices(groups.findAsset(nested.assetId()).orElseThrow(),groups).stream().filter(c->c.id().equals(property(port))).map(GroupChoices.Choice::editor).findFirst().orElse(null);
     }

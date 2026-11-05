@@ -15,6 +15,11 @@ final class GroupEditorCopies {
         return ((List<?>)raw.toJavaValue()).stream().map(v->{var m=(Map<?,?>)v;return new GLNodeEndpoint(new GLNodeId(UUID.fromString((String)m.get("node"))),(String)m.get("property"));}).toList();
     }
     static GLNodeValue targetsValue(List<GLNodeEndpoint> targets){return GLNodeValue.of(targets.stream().map(e->Map.of("node",e.nodeId().toString(),"property",e.portId())).toList());}
+    static String groupProperty(GLCompositePortMapping port){return GroupInputs.choice(port)?GroupInputs.property(port):GroupUnits.key(port.publicPort().id());}
+    static GLCompositePortMapping groupPort(GLCompositeNodeDescriptor descriptor,String property){
+        return descriptor.portMappings().stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT
+            &&(p.publicPort().id().equals(property)||groupProperty(p).equals(property))).findFirst().orElse(null);
+    }
     static PropertyId controlledKey(PropertyId property){
         String key=property.value();if(key.startsWith(GLGraphNode.AUTOMATIC_PREFIX))key=key.substring(GLGraphNode.AUTOMATIC_PREFIX.length());
         if(key.endsWith(".unit"))key=key.substring(0,key.length()-5);return new PropertyId(key);
@@ -80,7 +85,8 @@ final class GroupEditorCopies {
             properties.add(new GLCompositePropertyDescriptor(key,vector?"vector":"number",vector?GLCompositeValueKind.LIST:GLCompositeValueKind.DECIMAL,fallback));
             for(var endpoint:targets){
                 var node=asset.graph().findNode(endpoint.nodeId()).orElse(null);if(node==null)continue;
-                var definition=NodeRegistry.find(node.typeId()).orElse(null);if(definition==null)continue;
+                var definition=NodeRegistry.find(node.typeId()).orElse(null);
+                if(definition==null){mappings.add(new GLCompositePropertyMapping(key,node.id(),endpoint.portId()));continue;}
                 var row=definition.layout(new NodeState(node.properties())).rows().stream().filter(r->r.id().equals(endpoint.portId())).findFirst().orElse(null);
                 if(row==null)continue;
                 Map<String,GLNodeValue> values=row.editor() instanceof Editor.CheckBox
@@ -95,11 +101,16 @@ final class GroupEditorCopies {
         var n=asset.graph().findNode(endpoint.nodeId()).orElseThrow();var def=NodeRegistry.find(n.typeId()).orElse(null);
         if(def==null){
             var nested=groups.findComposite(n.typeId()).orElse(null);if(nested==null)return p;
-            var child=nested.portMappings().stream().filter(v->v.publicPort().id().equals(endpoint.portId())).findFirst().orElse(null);if(child==null)return p;
+            var child=groupPort(nested,endpoint.portId());if(child==null)return p;
             child=MultipleGroups.exposedPort(child);
             var options=new HashMap<>(child.presentation().editorOptions());options.remove(TARGETS);
             options.put(GroupInputSettings.MODE,GLNodeValue.of(GroupInputSettings.Kind.COPY.name()));options.put("copySource",GLNodeValue.of(endpoint.toString()));
             if(GroupInputs.choice(child))options.put(GroupInputs.CHOICE,GLNodeValue.of(GroupInputs.property(p)));
+            if(GroupInputs.editorOnly(child)){
+                options.put(TARGETS,targetsValue(List.of(new GLNodeEndpoint(n.id(),groupProperty(child)))));
+                return new GLCompositePortMapping(p.publicPort(),null,new GLCompositePortPresentation(child.presentation().inputEditorId(),false,options));
+            }
+            if(!p.isBound())return new GLCompositePortMapping(p.publicPort(),new GLNodeEndpoint(n.id(),child.publicPort().id()),new GLCompositePortPresentation(child.presentation().inputEditorId(),p.presentation().socketVisible(),options));
             return new GLCompositePortMapping(p.publicPort(),p.internalEndpoint(),new GLCompositePortPresentation(child.presentation().inputEditorId(),p.presentation().socketVisible(),options),p.additionalEndpoints());
         }
         var row=def.layout(new NodeState(n.properties())).rows().stream().filter(r->r.id().equals(endpoint.portId())).findFirst().orElse(null);
