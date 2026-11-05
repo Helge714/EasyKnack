@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Disable nested group controls while a parent group controls them, and restore
+  editing when the coupling is removed. Covered by the current development
+  version; no document or host contract change.
+
 - Offer public editors of nested groups as Copy Editor sources. Forward numeric,
   checkbox, vector and choice values through nested group interfaces; retain
   wireable public inputs and exclude targets already controlled by other inputs.

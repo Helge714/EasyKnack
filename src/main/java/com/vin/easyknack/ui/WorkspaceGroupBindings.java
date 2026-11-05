@@ -31,7 +31,12 @@ final class WorkspaceGroupBindings {
         if(workspace.currentAssetId()==null)return Set.of();
         var asset=groups.findAsset(workspace.currentAssetId()).orElse(null);
         if(asset==null||asset.compositeDescriptor()==null)return Set.of();
-        return asset.compositeDescriptor().portMappings().stream().flatMap(p->GroupEditorCopies.targets(p).stream())
-            .filter(e->e.nodeId().equals(id)).map(e->new PropertyId(e.portId())).collect(Collectors.toSet());
+        var nested=asset.graph().findNode(id).flatMap(n->groups.findComposite(n.typeId())).orElse(null);
+        return asset.compositeDescriptor().portMappings().stream().flatMap(p->java.util.stream.Stream.concat(
+                GroupEditorCopies.targets(p).stream(),nested==null?java.util.stream.Stream.empty():p.internalEndpoints().stream()))
+            .filter(e->e.nodeId().equals(id)).map(e->{
+                var port=nested==null?null:GroupEditorCopies.groupPort(nested,e.portId());
+                return new PropertyId(port==null?e.portId():GroupEditorCopies.groupProperty(port));
+            }).collect(Collectors.toSet());
     }
 }

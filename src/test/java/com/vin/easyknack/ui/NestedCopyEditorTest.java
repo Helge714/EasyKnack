@@ -64,6 +64,28 @@ class NestedCopyEditorTest {
         assertNotNull(GroupSourceExporter.create(document,document.root().graph().nodes().get(0)));
     }
     private static Object field(Object owner,String name)throws ReflectiveOperationException{var field=owner.getClass().getDeclaredField(name);field.setAccessible(true);return field.get(owner);}
+    @Test void coupledGroupEditorsAreDisabledAndUnlockAfterUnlinking()throws Exception{
+        for(boolean visible:new boolean[]{false,true}){
+        var holder=new WorkspaceController[1];
+        SwingUtilities.invokeAndWait(()->{
+            var child=visible?GroupUnitsTest.document(false).embeddedAssets().get("test.asset"):GroupAuthoringTest.asset(new FilterNode(),"order");var groups=new GLCompositeGraphRegistry();groups.registerAsset(child);
+            var parent=outer(child,0,groups,true);var controller=holder[0]=new WorkspaceController();
+            controller.openDocument("Controlled group",document(parent,groups,visible?GLNodeValue.of(880.):GLNodeValue.of("6")));controller.workspace().openComposite(parent.id());
+        });
+        SwingUtilities.invokeAndWait(()->{var controller=holder[0];{
+            var group=(GroupViewFactory.GroupView)GroupUnitsTest.group(controller);
+            var control=(GLControl)group.getContents().stream().filter(v->v instanceof GLComboBox<?>||v instanceof GLSlider).findFirst().orElseThrow();
+            assertFalse(control.isEnabled());
+            var editor=controller.workspace().interfaceEditor();try{((GLList<?>)field(editor,"inputs")).setSelectedIndex(0);}catch(ReflectiveOperationException e){throw new AssertionError(e);}
+            var detached=GroupEditorCopies.detachSource(editor.selectedPort());
+            editor.updateSelectedPort(new GLCompositePortMapping(detached.publicPort(),null,detached.presentation()));
+        }});
+        SwingUtilities.invokeAndWait(()->{try(var controller=holder[0]){
+            var group=GroupUnitsTest.group(controller);
+            assertTrue(((GLControl)group.getContents().stream().filter(v->v instanceof GLComboBox<?>||v instanceof GLSlider).findFirst().orElseThrow()).isEnabled());
+        }});
+        }
+    }
     @Test void copyEditorPickerOffersTheEditorOfTheOnlyNestedGroup()throws Exception{
         SwingUtilities.invokeAndWait(()->{for(boolean visible:new boolean[]{false,true})try(var controller=new WorkspaceController()){
             var child=visible?GroupUnitsTest.document(false).embeddedAssets().get("test.asset"):GroupAuthoringTest.asset(new FilterNode(),"order");var groups=new GLCompositeGraphRegistry();groups.registerAsset(child);

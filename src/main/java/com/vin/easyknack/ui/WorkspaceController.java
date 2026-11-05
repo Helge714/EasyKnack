@@ -581,6 +581,8 @@ final class WorkspaceController implements AutoCloseable {
                     basic.controlledByGroup(coupledProperties(basic.nodeId()));
                     snapshot.findNode(basic.nodeId()).map(n->GroupEditorCopies.previewDefaults(coupledAsset,n)).map(n -> rates.containsKey(n.id())
                             ? n.withProperty(com.vin.easyknack.nodes.ProcessingRate.EFFECTIVE,rates.get(n.id())) : n).map(this::withPortRates).ifPresent(n->{if(connectionsChanged||!n.equals(presented.get(basic))){basic.update(n);presented.put(basic,n);}});
+                }else if(view instanceof GroupViewFactory.GroupView group){
+                    group.controlledByGroup(coupledProperties(group.nodeId()));
                 }
         }
         refreshGraphDiagnostics();
