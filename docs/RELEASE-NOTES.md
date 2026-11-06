@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Allow Hilbert filter length selection directly in the node (61-2049 taps); changing length resets its history and adjusts both output delays. Rebuild Java and the audio host together for the updated Hilbert parameter contract.
+
 - Add a Hilbert quadrature filter with aligned outputs, sample-feedback and Instance Group support, and bilingual documentation.
 
 - Add Manage groups to document settings: list embedded definitions, direct usage

@@ -44,5 +44,15 @@ int main(){
     for(int i=257;i<n;++i)assert(std::abs(quadrature[i])<1e-7);
     HilbertNode silent;inputs[0]=nullptr;silent.process(c);
     for(int i=0;i<n;++i)assert(direct[i]==0&&quadrature[i]==0);
+    inputs[0]=input.data();
+    for(auto length:{61,129,257,513,1025,2049}){
+        HilbertNode node;node.setLength(length);std::fill(input.begin(),input.end(),0);input[0]=1;
+        node.process(c);
+        for(int i=0;i<n;++i)assert(direct[i]==(i==(length-1)/2?1.f:0.f));
+        for(int i=0;i<length;++i)assert(std::abs(quadrature[i]+quadrature[length-1-i])<1e-7);
+        assert(node.parameterStructure()==std::to_string(length));
+        HilbertNode resized;resized.setLength(length==257?513:257);resized.inheritState(node);
+        assert(resized.position==0);for(float x:resized.history)assert(x==0);
+    }
     std::cout<<"Hilbert impulse, phase, SSB rejection, feedback, state and silence tests passed\n";
 }

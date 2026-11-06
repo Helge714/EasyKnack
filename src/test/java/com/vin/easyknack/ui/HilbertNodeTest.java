@@ -12,8 +12,11 @@ class HilbertNodeTest {
         var node=new HilbertNode();var state=new NodeState(node.defaults());
         assertTrue(NodeRegistry.find(node.registration().id()).isPresent());
         var layout=node.layout(state);
-        assertEquals(List.of("direct","quadrature","audio-in"),layout.rows().stream().map(NodeBuilder.Row::id).toList());
-        assertTrue(layout.rows().stream().allMatch(r->r.rate()==ProcessingRate.AUDIO));
+        assertEquals(List.of("direct","quadrature","audio-in","length"),layout.rows().stream().map(NodeBuilder.Row::id).toList());
+        assertTrue(layout.rows().stream().filter(r->r.kind()!=NodeBuilder.RowKind.EDITOR).allMatch(r->r.rate()==ProcessingRate.AUDIO));
+        var length=layout.rows().stream().filter(r->r.id().equals("length")).findFirst().orElseThrow();
+        assertEquals(NodeBuilder.RowKind.EDITOR,length.kind());assertFalse(length.isInspectorOnly());
+        assertEquals("257",state.text(HilbertNode.LENGTH,""));
         assertTrue(node.supportsSampleFeedback());
         var mute=new MuteRouting();node.mute(mute,state);assertEquals(1,mute.bypasses().size());
         var graph=new com.vingame.glswing.node.model.GLNodeGraph();
