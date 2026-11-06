@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a Hilbert quadrature filter with aligned outputs, sample-feedback and Instance Group support, and bilingual documentation.
+
 - Add Manage groups to document settings: list embedded definitions, direct usage
   counts and containing instances. Block deletion of referenced or open groups,
   including references from unused parents. Support Undo/Redo and clear stale

@@ -1034,6 +1034,17 @@
       },
       "source": "VectorSeparateNode.java",
       "kind": "node"
+    },
+    {
+      "id": "easyknack.audio.hilbert",
+      "slug": "hilbert",
+      "category": "effects",
+      "title": {
+        "en": "Hilbert",
+        "de": "Hilbert"
+      },
+      "source": "HilbertNode.java",
+      "kind": "node"
     }
   ],
   "excluded": [

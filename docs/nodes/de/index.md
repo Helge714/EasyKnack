@@ -24,6 +24,8 @@
 
 ## Effekte
 
+- [Hilbert](hilbert.md)
+
 - [Bitcrusher](bitcrusher.md)
 - [Verzögerung](delay.md)
 - [Filter](filter.md)
