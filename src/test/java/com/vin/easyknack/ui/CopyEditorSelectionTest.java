@@ -29,12 +29,38 @@ class CopyEditorSelectionTest {
             @SuppressWarnings("unchecked") var kind=(GLComboBox<GroupInputSettings.Kind>)field(settings,"kind");
             kind.setSelectedItem(GroupInputSettings.Kind.COPY);
             var selected=editor.selectedPort();assertEquals(GroupInputSettings.Kind.COPY,GroupInputSettings.selectedKind(selected));
-            var linked=GroupEditorCopies.targets(selected);assertFalse(linked.isEmpty(),"Copy Editor must choose a free source instead of reporting an occupied one");
+            assertNull(settings.source.getSelectedItem());assertTrue(GroupEditorCopies.targets(selected).isEmpty());
+            settings.source.setSelectedItem(settings.source.getItems().get(0));
+            var linked=GroupEditorCopies.targets(editor.selectedPort());assertFalse(linked.isEmpty(),"The explicitly chosen free source must be linked");
             assertTrue(Collections.disjoint(occupied,linked));
             var snapshot=controller.snapshotDocument().embeddedAssets().get(asset.id());
             var available=GroupInputSettings.availableSources(snapshot,ProcessingRate.AUTO,"New");
             assertTrue(available.stream().flatMap(s->s.endpoints().stream()).anyMatch(linked::contains),"The current input must retain its own sources");
             assertTrue(available.stream().flatMap(s->s.endpoints().stream()).noneMatch(occupied::contains));
+        }catch(ReflectiveOperationException e){throw new AssertionError(e);}});
+    }
+    @Test void hilbertLengthCanBeChosenBeforeANestedInputClaimsThePort()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var controller=new WorkspaceController()){
+            var child=GroupUnitsTest.document(false).embeddedAssets().get("test.asset");
+            var seed=GroupAuthoringTest.asset(new HilbertNode(),"length");
+            var graph=new GLNodeGraph(seed.graph());
+            graph.edit("Nested group",e->e.addNode(new GLGraphNode(GLNodeId.random(),child.compositeDescriptor().nodeTypeId(),Map.of())));
+            var port=new GLCompositePortMapping(GLNodePortDescriptor.input("Length",SignalCategory.VALUE.valueTypeId(),false,1),null);
+            var descriptor=new GLCompositeNodeDescriptor("test.hilbert.copy","test.hilbert.copy.asset",1,List.of(port));
+            var asset=new com.vingame.glswing.node.document.GLNodeGraphAsset(descriptor.assetId(),1,seed.kind(),graph.snapshot(),seed.viewState(),Map.of(),descriptor);
+            var doc=GroupAuthoringTest.document(asset,GLNodeValue.of(0.));
+            controller.openDocument("Hilbert copy",new com.vingame.glswing.node.document.GLNodeGraphDocument(doc.root(),Map.of(asset.id(),asset,child.id(),child),List.of()));
+            controller.workspace().openComposite(asset.id());var editor=controller.workspace().interfaceEditor();
+            ((GLList<?>)field(editor,"inputs")).setSelectedIndex(0);
+            var settings=(GroupInputSettings)field(field(editor,"applicationSettings"),"inputSettings");
+            settings.kind.setSelectedItem(GroupInputSettings.Kind.COPY);
+            assertFalse(editor.selectedPort().isBound());assertTrue(settings.source.isVisible());assertNull(settings.source.getSelectedItem());
+            assertFalse(settings.source.getItems().get(0).type().equals(new HilbertNode().registration().id()));
+            settings.source.setSelectedItem(settings.source.getItems().stream().filter(s->s.type().equals(new HilbertNode().registration().id())&&s.property().equals("length")).findFirst().orElseThrow());
+            var selected=editor.selectedPort();assertFalse(selected.isBound());
+            assertEquals("257",GroupInputs.template(selected).initial());
+            assertEquals("length",GroupEditorCopies.targets(selected).get(0).portId());
+            assertDoesNotThrow(controller::audioGraph);
         }catch(ReflectiveOperationException e){throw new AssertionError(e);}});
     }
     @Test void partlyOccupiedSourcesOfferOnlyTheirFreeTargets(){

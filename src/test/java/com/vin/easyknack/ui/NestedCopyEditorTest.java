@@ -94,6 +94,8 @@ class NestedCopyEditorTest {
             ((GLList<?>)field(editor,"inputs")).setSelectedIndex(0);var settings=field(field(editor,"applicationSettings"),"inputSettings");
             @SuppressWarnings("unchecked") var kind=(GLComboBox<GroupInputSettings.Kind>)field(settings,"kind");kind.setSelectedItem(GroupInputSettings.Kind.COPY);
             var source=(GLComboBox<?>)field(settings,"source");assertFalse(source.getItems().isEmpty());
+            assertNull(source.getSelectedItem());
+            @SuppressWarnings("unchecked") var selection=(GLComboBox<Object>)source;selection.setSelectedItem(selection.getItems().get(0));
             if(visible){assertTrue(editor.selectedPort().isBound());assertTrue(editor.selectedPort().presentation().socketVisible());}
             else assertFalse(GroupEditorCopies.targets(editor.selectedPort()).isEmpty());
             assertEquals("",((GLLabel)field(settings,"status")).getText());
