@@ -1,5 +1,11 @@
 # Adaptive partial peak classifier
 
+**Reproduction status:** this implementation uses our own quantile tables and is
+not the requested reproduction of the paper's deterministic finite-SNR threshold
+construction. Replacing those tables is pending the source clarifications recorded
+in [ZRR07-SOURCE-AUDIT.md](ZRR07-SOURCE-AUDIT.md). Do not describe the current
+implementation as identical to the literature example.
+
 ## Model and controls
 
 Partial Analysis implements the normalized-bandwidth (NBD), normalized-duration
