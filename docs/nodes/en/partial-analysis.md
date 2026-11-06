@@ -9,23 +9,22 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [Spectrum](../../user/en/data-types.md#spectrum) | [Spectrum](../../user/en/data-types.md#spectrum) | — | — | — | — | [Control](../../user/en/rates.md#control) | Always |
-| Threshold | [Editor](../../user/en/reference-tables.md) | −160–0 dB | — | −60 dB | dB | — | Inspector |
-| Maximum partials | [Editor](../../user/en/reference-tables.md) | 1–32768 | — | 64 | — | — | Inspector |
+| Threshold | [Editor](../../user/en/reference-tables.md) | −160–0 dB | — | −60 dB | dB | — | Always |
+| Minimum sinusoidality | [Editor](../../user/en/reference-tables.md) | 0–1 | — | 0.8 | — | — | Always |
+| Minimum track duration | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Always |
+| Maximum partials | [Editor](../../user/en/reference-tables.md) | 1–32768 | — | 64 | — | — | Always |
+| Harmonic only | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
+| Fundamental | [Value](../../user/en/data-types.md#value) | 0–20000 Hz | 0–∞ Hz | 0 Hz | Hz, kHz | [Control](../../user/en/rates.md#control) | Harmonic only |
 | Minimum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20 Hz | Hz | — | Inspector |
 | Maximum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20000 Hz | Hz | — | Inspector |
 | Tracking tolerance | [Editor](../../user/en/reference-tables.md) | 0–2400 cent | — | 100 cent | cent | — | Inspector |
-
-| Minimum sinusoidality | [Editor](../../user/en/reference-tables.md) | 0–1 | — | 0.8 | — | — | Inspector |
 | Peak prominence | [Editor](../../user/en/reference-tables.md) | 0–120 dB | — | 3 dB | dB | — | Inspector |
 | Assessment time | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 30 ms | ms, s, smpl | — | Inspector |
 | Minimum tonality | [Editor](../../user/en/reference-tables.md) | 0–1 | — | 0.7 | — | — | Inspector |
-| Minimum track duration | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspector |
 | Tracking gap | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspector |
-| Harmonic only | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Inspector |
 | Harmonic tolerance | [Editor](../../user/en/reference-tables.md) | 0–200 cent | — | 30 cent | cent | — | Inspector; Harmonic only |
 | Minimum fundamental | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 40 Hz | Hz, kHz | — | Inspector; Harmonic only |
 | Maximum fundamental | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 2000 Hz | Hz, kHz | — | Inspector; Harmonic only |
-| Fundamental | [Value](../../user/en/data-types.md#value) | 0–20000 Hz | 0–∞ Hz | 0 Hz | Hz, kHz | [Control](../../user/en/rates.md#control) | Harmonic only |
 
 ## Outputs
 

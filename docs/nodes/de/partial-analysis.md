@@ -9,23 +9,22 @@ Zerlegt ein Spektrum in verfolgte Teiltöne und ein komplexes Restspektrum.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Spektrum (Spectrum) | [Spectrum](../../user/de/data-types.md#spectrum) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
-| Schwelle (Threshold) | [Editor](../../user/de/reference-tables.md) | −160–0 dB | — | −60 dB | dB | — | Inspektor |
-| Maximale Teiltöne (Maximum partials) | [Editor](../../user/de/reference-tables.md) | 1–32768 | — | 64 | — | — | Inspektor |
+| Schwelle (Threshold) | [Editor](../../user/de/reference-tables.md) | −160–0 dB | — | −60 dB | dB | — | Immer |
+| Minimale Sinusähnlichkeit (Minimum sinusoidality) | [Editor](../../user/de/reference-tables.md) | 0–1 | — | 0.8 | — | — | Immer |
+| Minimale Teiltondauer (Minimum track duration) | [Editor](../../user/de/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Immer |
+| Maximale Teiltöne (Maximum partials) | [Editor](../../user/de/reference-tables.md) | 1–32768 | — | 64 | — | — | Immer |
+| Nur harmonische Teiltöne (Harmonic only) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Immer |
+| Grundfrequenz (Fundamental) | [Value](../../user/de/data-types.md#value) | 0–20000 Hz | 0–∞ Hz | 0 Hz | Hz, kHz | [Control](../../user/de/rates.md#control) | Nur harmonische Teiltöne |
 | Minimale Frequenz (Minimum frequency) | [Editor](../../user/de/reference-tables.md) | 0–∞ Hz | — | 20 Hz | Hz | — | Inspektor |
 | Maximale Frequenz (Maximum frequency) | [Editor](../../user/de/reference-tables.md) | 0–∞ Hz | — | 20000 Hz | Hz | — | Inspektor |
 | Zuordnungstoleranz (Tracking tolerance) | [Editor](../../user/de/reference-tables.md) | 0–2400 cent | — | 100 cent | cent | — | Inspektor |
-
-| Minimale Sinusähnlichkeit (Minimum sinusoidality) | [Editor](../../user/de/reference-tables.md) | 0–1 | — | 0.8 | — | — | Inspektor |
 | Peak-Abhebung (Peak prominence) | [Editor](../../user/de/reference-tables.md) | 0–120 dB | — | 3 dB | dB | — | Inspektor |
 | Bewertungsdauer (Assessment time) | [Editor](../../user/de/reference-tables.md) | 0–2000 ms | — | 30 ms | ms, s, smpl | — | Inspektor |
 | Minimale Tonalität (Minimum tonality) | [Editor](../../user/de/reference-tables.md) | 0–1 | — | 0.7 | — | — | Inspektor |
-| Minimale Teiltondauer (Minimum track duration) | [Editor](../../user/de/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspektor |
 | Tracking-Lücke (Tracking gap) | [Editor](../../user/de/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspektor |
-| Nur harmonische Teiltöne (Harmonic only) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Inspektor |
 | Harmonische Toleranz (Harmonic tolerance) | [Editor](../../user/de/reference-tables.md) | 0–200 cent | — | 30 cent | cent | — | Inspektor; Nur harmonische Teiltöne |
 | Minimale Grundfrequenz (Minimum fundamental) | [Editor](../../user/de/reference-tables.md) | 1–20000 Hz | — | 40 Hz | Hz, kHz | — | Inspektor; Nur harmonische Teiltöne |
 | Maximale Grundfrequenz (Maximum fundamental) | [Editor](../../user/de/reference-tables.md) | 1–20000 Hz | — | 2000 Hz | Hz, kHz | — | Inspektor; Nur harmonische Teiltöne |
-| Grundfrequenz (Fundamental) | [Value](../../user/de/data-types.md#value) | 0–20000 Hz | 0–∞ Hz | 0 Hz | Hz, kHz | [Control](../../user/de/rates.md#control) | Nur harmonische Teiltöne |
 
 ## Ausgänge
 

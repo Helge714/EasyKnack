@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Expose the primary Partial Analysis selection controls directly in the node; keep detailed tracking and harmonic settings in the inspector. DSP behavior and defaults are unchanged.
+
 - Improve Partial Analysis with sinusoidal-lobe fit, local prominence, time-based confidence, predictive tracking, gap tolerance and optional harmonic selection with automatic or supplied fundamental. Add Context Tonality and a separate stochastic Residual Model. Prepared partial capacities now follow configured graph budgets up to 32768 rather than a fixed 256. Existing documents receive the improved classification defaults; embedded legacy parameter commands remain supported. Rebuild Java and the host together.
 
 - Name the creation action New Partial Group. Add Partial Noise with independent per-track/frame variation and a separate Context Seed output; existing ID outputs and connections retain their meaning. Rebuild Java and the host together.
