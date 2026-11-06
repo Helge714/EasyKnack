@@ -60,6 +60,10 @@
 #include "FormulaNode.hpp"
 #include "SpectrumBlurNode.hpp"
 #include "SpectrumShiftNode.hpp"
+#include "PartialAnalysisNode.hpp"
+#include "PartialsSpectrumNode.hpp"
+#include "PartialGraphNode.hpp"
+#include "SpectrumMixNode.hpp"
 #include "SpectrumPruneNode.hpp"
 #include "SpectrumCorrelationNode.hpp"
 #include "SpectrumStatisticsNode.hpp"
@@ -267,6 +271,10 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="value")return std::make_unique<ValueNode>();
         if(id=="comparator")return std::make_unique<ComparatorNode>();
         if(id=="gain")return std::make_unique<GainNode>();
+        if(id=="partialanalysis")return std::make_unique<PartialAnalysisNode>();
+        if(id=="partialsspectrum")return std::make_unique<PartialsSpectrumNode>();
+        if(id=="partialgraph")return std::make_unique<PartialGraphNode>();
+        if(id=="spectrummix")return std::make_unique<SpectrumMixNode>();
         if(id=="hilbert")return std::make_unique<HilbertNode>();
         if(id=="buffercontext")return std::make_unique<BufferContextNode>();
         if(id=="filter")return std::make_unique<FilterNode>();

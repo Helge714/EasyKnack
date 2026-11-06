@@ -19,6 +19,7 @@ public final class AudioGraphEncoder {
         for (int i = 0; i < graph.nodes().size(); i++) {
             var node = graph.nodes().get(i);
             var definition=com.vin.easyknack.nodes.NodeRegistry.require(node.typeId());
+            if(definition.requiresPartialContext())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("partials.contextRequired"));
             if(definition.requiresSpectralContext())
                 throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.format("spectral.contextRequired",definition.title(),node.id()));
             indices.put(node.id(), i);

@@ -11,7 +11,7 @@ final class MultipleGroups {
     static final String MARKER="easyknack.multiple",MAXIMUM="easyknack.multiple.maximum",MERGE="easyknack.multiple.merge",CREATE_TYPE="easyknack.action.multiple",COUNT_PROPERTY="easyknack.instance.count",EXECUTION="easyknack.instance.execution";
     private static final Set<String> SUPPORTED=Set.of(
         "formula","stepswitch",
-        "spectrumblur","spectrumshift","spectrumprune","spectrumcorrelation","spectrumstatistics","spectralfeatures","correlationfeatures","analysisaverage",
+        "partialanalysis","partialsspectrum","partialgraph","spectrummix","spectrumblur","spectrumshift","spectrumprune","spectrumcorrelation","spectrumstatistics","spectralfeatures","correlationfeatures","analysisaverage",
         "valueaverage","levelanalysis","pitchdetection","envelope","triggerinput","triggercounter","triggerdelay","triggerdivider",
         "triggerfilter","triggermerge","triggertimer","history","historyreader","positionreader","spectrumrelay","vectorrelay",
         "historyrelay","multiplehistoryinput","buffercontext","waveformrelay","waveform","multiplewaveforminput","math","maprange","mix","curve","clamp",

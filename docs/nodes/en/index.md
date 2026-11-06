@@ -137,3 +137,10 @@
 - [Instance Group](instance-group.md)
 - [Node Group](node-group.md)
 - [Spectral Group](spectral-group.md)
+
+- [Partial Analysis](partial-analysis.md)
+- [Partials to Spectrum](partials-to-spectrum.md)
+- [Spectrum Mix](spectrum-mix.md)
+- [Partial Context](partial-context.md)
+- [Partial Output](partial-output.md)
+- [Partial Group](partial-group.md)

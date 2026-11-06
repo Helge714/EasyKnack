@@ -1056,6 +1056,72 @@
       },
       "source": "BufferContextNode.java",
       "kind": "node"
+    },
+    {
+      "id": "easyknack.partials.analysis",
+      "slug": "partial-analysis",
+      "category": "spectrum",
+      "title": {
+        "en": "Partial Analysis",
+        "de": "Teiltonanalyse"
+      },
+      "source": "PartialAnalysisNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.partials.spectrum",
+      "slug": "partials-to-spectrum",
+      "category": "spectrum",
+      "title": {
+        "en": "Partials to Spectrum",
+        "de": "Teiltöne zu Spektrum"
+      },
+      "source": "PartialsSpectrumNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.spectral.mix",
+      "slug": "spectrum-mix",
+      "category": "spectrum",
+      "title": {
+        "en": "Spectrum Mix",
+        "de": "Spektrummischung"
+      },
+      "source": "SpectrumMixNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.partials.context",
+      "slug": "partial-context",
+      "category": "spectrum",
+      "title": {
+        "en": "Partial Context",
+        "de": "Teilton-Kontext"
+      },
+      "source": "PartialContextNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "easyknack.partials.output",
+      "slug": "partial-output",
+      "category": "spectrum",
+      "title": {
+        "en": "Partial Output",
+        "de": "Teilton-Ausgang"
+      },
+      "source": "PartialOutputNode.java",
+      "kind": "node"
+    },
+    {
+      "id": "group:partial",
+      "slug": "partial-group",
+      "category": "group",
+      "title": {
+        "en": "Partial Group",
+        "de": "Teilton-Gruppe"
+      },
+      "source": "ui/PartialGroups.java",
+      "kind": "group"
     }
   ],
   "excluded": [
@@ -1158,6 +1224,14 @@
     {
       "id": "easyknack.waveform.relay",
       "reason": "Internal Wavetable boundary adapter."
+    },
+    {
+      "id": "easyknack.partials.compiled",
+      "reason": "Internal Partial Group execution adapter; documented by partial-group."
+    },
+    {
+      "id": "easyknack.partials.uniform",
+      "reason": "Internal Partial Group execution adapter; documented by partial-group."
     }
   ]
 }

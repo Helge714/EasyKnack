@@ -103,7 +103,7 @@ final class WorkspaceController implements AutoCloseable {
             .moveTo(4,0).lineTo(16,0).lineTo(16,12).lineTo(13,12).lineTo(13,3).lineTo(4,3).closePath()
             .moveTo(0,4).lineTo(12,4).lineTo(12,16).lineTo(0,16).closePath().moveTo(3,7).lineTo(3,13).lineTo(9,13).lineTo(9,7).closePath());
         workspace.setNodeCatalogIconProvider(entry->composites.findComposite(entry.type().id()).isPresent()
-            ||java.util.Set.of(MultipleGroups.CREATE_TYPE,SpectralGroups.CREATE_TYPE,FormulaGroups.CREATE).contains(entry.type().id())?groupIcon:null);
+            ||java.util.Set.of(MultipleGroups.CREATE_TYPE,SpectralGroups.CREATE_TYPE,PartialGroups.CREATE,FormulaGroups.CREATE).contains(entry.type().id())?groupIcon:null);
         workspace.interfaceEditor().setDefaultValueType(com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
         workspace.setBoundaryPortFactory((port,endpoint)->{
             var asset=composites.findAsset(workspace.currentAssetId()).orElseThrow();
@@ -136,13 +136,15 @@ final class WorkspaceController implements AutoCloseable {
             @Override public void selectionChanged(com.vingame.glswing.node.GLNodeEditor editor) { guardActions(); prepareBakeInspector(); }
         });
         guardActions();
-        for(var definition:List.of(new com.vin.easyknack.nodes.BinContextNode(),new com.vin.easyknack.nodes.BinOutputNode()))
+        for(var definition:List.of(new com.vin.easyknack.nodes.BinContextNode(),new com.vin.easyknack.nodes.BinOutputNode(),new com.vin.easyknack.nodes.PartialContextNode(),new com.vin.easyknack.nodes.PartialOutputNode()))
             catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(types.find(definition.registration().id()).orElseThrow(),definition.title(),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),definition.defaults(),"bin"));
         catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(SpectralGroups.CREATE_TYPE),com.vin.easyknack.ui.AppText.literal("New Spectral Group"),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),Map.of(),"bins spectrum"));
         catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(MultipleGroups.CREATE_TYPE),com.vin.easyknack.ui.AppText.literal("New Instance Group"),com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"instances additive unison"));
         catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(FormulaGroups.CREATE),AppText.text("formula.new"),com.vin.easyknack.nodes.NodeCategory.MATH.path(),Map.of(),"code formula math"));
+        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(PartialGroups.CREATE),AppText.text("partials.new"),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),Map.of(),"partials tracks"));
         workspace.setNodeCreationFilter(this::nodeAllowedInContext);
         workspace.setNodeCreationHandler((entry,x,y)->{
+            if(entry.type().id().equals(PartialGroups.CREATE)){addPartialGroup(x,y);return true;}
             if(entry.type().id().equals(FormulaGroups.CREATE)){addFormulaGroup(x,y);return true;}
             if(entry.type().id().equals(MultipleGroups.CREATE_TYPE)){addMultipleGroup(x,y);return true;}
             if(!entry.type().id().equals(SpectralGroups.CREATE_TYPE))return false;
@@ -184,7 +186,7 @@ final class WorkspaceController implements AutoCloseable {
         var instance=workspace.currentGraph().snapshot().findNode(ids.iterator().next()).orElseThrow();
         var descriptor=composites.findComposite(instance.typeId()).orElse(null);if(descriptor==null)return;
         var asset=composites.findAsset(descriptor.assetId()).orElseThrow();
-        if(MultipleGroups.multiple(asset)||SpectralGroups.spectral(asset)||FormulaGroups.isFormula(asset))
+        if(MultipleGroups.multiple(asset)||SpectralGroups.spectral(asset)||PartialGroups.partial(asset)||FormulaGroups.isFormula(asset))
             throw new IllegalArgumentException(AppText.text("ungroup.special"));
         if(GLNodeState.isMuted(instance))throw new IllegalArgumentException(AppText.text("ungroup.muted"));
         var root=new GLNodeGraphAsset("ungroup.root",1,GLNodeGraphAssetKind.PROJECT,
@@ -791,12 +793,15 @@ final class WorkspaceController implements AutoCloseable {
     boolean isSpectralContext(){
         return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(SpectralGroups::spectral).orElse(false));
     }
+    boolean isPartialContext(){return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(PartialGroups::partial).orElse(false));}
     boolean isMultipleContext(){return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(MultipleGroups::multiple).orElse(false));}
     private boolean nodeAllowedInContext(com.vingame.glswing.node.model.GLNodeCatalogEntry entry){
         if(workspace.currentAssetId()!=null&&composites.findAsset(workspace.currentAssetId()).map(FormulaGroups::isFormula).orElse(false))return false;
         var definition=NodeRegistry.find(entry.type().id()).orElse(null);
+        if(isPartialContext())return entry.type().id().equals(FormulaGroups.CREATE)||PartialGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(a->!PartialGroups.partial(a)&&!SpectralGroups.spectral(a)&&!MultipleGroups.multiple(a)).orElse(false);
+        if(definition!=null&&definition.requiresPartialContext())return false;
         if(definition!=null&&definition.requiresSpectralContext()&&!isSpectralContext())return false;
-        if(isMultipleContext()&&!isSpectralContext())return entry.type().id().equals(FormulaGroups.CREATE)||entry.type().id().equals(SpectralGroups.CREATE_TYPE)||entry.type().id().equals(MultipleGroups.CREATE_TYPE)||MultipleGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).isPresent();
+        if(isMultipleContext()&&!isSpectralContext())return entry.type().id().equals(FormulaGroups.CREATE)||entry.type().id().equals(SpectralGroups.CREATE_TYPE)||entry.type().id().equals(PartialGroups.CREATE)||entry.type().id().equals(MultipleGroups.CREATE_TYPE)||MultipleGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).isPresent();
         if(isSpectralContext()){
             if(entry.type().id().equals(FormulaGroups.CREATE)||composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(FormulaGroups::isFormula).orElse(false))return true; if(!SpectralGroups.supports(definition))return false;
             // One output is the program's root. Offer its replacement after deletion.
@@ -812,6 +817,13 @@ final class WorkspaceController implements AutoCloseable {
         history.perform(AppText.text("formula.new"),()->target.edit("Formula",e->e.addNode(node)),()->target.edit("Remove formula",e->e.removeNode(node.id())));
         for(var view:workspace.editor().getNodes())if(compositeColors.modelId(view).filter(node.id()::equals).isPresent()){view.setLocation(x,y);workspace.editor().setSelectedNode(view);break;}syncAudio();
     }
+    void addPartialGroup(float x,float y){
+        var asset=PartialGroups.create();var d=asset.compositeDescriptor();composites.registerAsset(asset);types.register(d.nodeType());
+        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(d.nodeType(),AppText.text("partials.group"),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),Map.of(),"partials"));workspace.includeEmbeddedAsset(asset.id());
+        var target=workspace.currentGraph();var node=new GLGraphNode(GLNodeId.random(),d.nodeTypeId(),Map.of());history.perform(AppText.text("partials.new"),()->target.edit("Partial group",e->e.addNode(node)),()->target.edit("Remove partial group",e->e.removeNode(node.id())));
+        for(var view:workspace.editor().getNodes())if(compositeColors.modelId(view).filter(node.id()::equals).isPresent()){view.setLocation(x,y);workspace.editor().setSelectedNode(view);break;}syncAudio();
+    }
+
     void addSpectralGroup(){addSpectralGroup(160,120);}
     private void addSpectralGroup(float x,float y){
         if(isSpectralContext())return;

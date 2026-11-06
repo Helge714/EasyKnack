@@ -32,6 +32,7 @@ scalar value.
 | <a id="wavetable"></a>Wavetable | One periodic waveform represented by samples | Oscillator waveform input |
 | <a id="buffer"></a>Buffer | Stored audio samples with length and write position or file end | Buffer Reader |
 | <a id="spectrum"></a>Spectrum | Complex FFT bins with frequency, window and timing information | Spectral processing and IFFT |
+| <a id="partials"></a>Partials | Tracked sinusoidal components with frequency, amplitude, phase, identity and frame timing | Partial Group and spectral reconstruction |
 | <a id="analysis"></a>Analysis | An analysis result, such as a spectrum or autocorrelation | Viewers and feature extraction |
 
 Spectrum can connect to suitable Analysis inputs. Conversely, an arbitrary

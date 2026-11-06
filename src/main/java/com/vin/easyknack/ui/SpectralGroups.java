@@ -45,7 +45,7 @@ final class SpectralGroups {
     static GLCompositeFlattenResult flatten(GroupCompiler.Prepared prepared,GLCompositeExpansionLimits limits){
         var original=prepared.registry();var registry=new GLCompositeGraphRegistry();var spectralTypes=new HashMap<String,GLNodeGraphAsset>();
         for(var asset:original.assets()){
-            if(asset.compositeDescriptor()!=null&&(spectral(asset)||MultipleGroups.multiple(asset))){
+            if(asset.compositeDescriptor()!=null&&(spectral(asset)||MultipleGroups.multiple(asset)||PartialGroups.partial(asset))){
                 spectralTypes.put(asset.compositeDescriptor().nodeTypeId(),asset);
                 registry.registerAsset(new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),asset.graph(),asset.viewState(),asset.metadata(),null));
             }else registry.registerAsset(asset);
@@ -55,6 +55,12 @@ final class SpectralGroups {
         var graph=flat.graph().orElseThrow();var nodes=new ArrayList<GLGraphNode>();var renamed=new HashMap<GLNodeEndpoint,GLNodeEndpoint>();var extraWires=new ArrayList<GLGraphConnection>();
         for(var node:graph.nodes()){
             var asset=spectralTypes.get(node.typeId());if(asset==null){nodes.add(node);continue;}
+            if(PartialGroups.partial(asset)){
+                var connected=graph.connections().stream().filter(w->w.input().nodeId().equals(node.id())).map(w->w.input().portId()).collect(java.util.stream.Collectors.toSet());
+                var compiled=PartialGroups.compile(node,asset,original,limits,connected);nodes.add(compiled.node());
+                compiled.inputs().forEach((from,to)->renamed.put(new GLNodeEndpoint(node.id(),from),new GLNodeEndpoint(node.id(),to)));
+                renamed.put(new GLNodeEndpoint(node.id(),compiled.output()),new GLNodeEndpoint(node.id(),"out"));continue;
+            }
             if(MultipleGroups.multiple(asset)){
                 var connected=graph.connections().stream().filter(w->w.input().nodeId().equals(node.id())).map(w->w.input().portId()).collect(java.util.stream.Collectors.toSet());
                 var expansion=MultipleGroups.compile(node,asset,original,limits,connected,renamed);nodes.addAll(expansion.nodes());extraWires.addAll(expansion.wires());continue;
@@ -166,7 +172,7 @@ final class SpectralGroups {
         if(!result.add(id)||boundaries.contains(id))return;
         for(var w:graph.connections())if(w.input().nodeId().equals(id)&&!w.input().portId().equals("spectrum"))ancestors(w.output().nodeId(),graph,boundaries,result);
     }
-    private static GLNodeGraphSnapshot resolveMutes(GLNodeGraphSnapshot graph){
+    static GLNodeGraphSnapshot resolveMutes(GLNodeGraphSnapshot graph){
         if(graph.nodes().stream().noneMatch(GLNodeState::isMuted))return graph;
         var contracts=NodeRegistry.executionContracts();var types=contracts.types();
         var definitions=contracts.definitions();

@@ -32,6 +32,7 @@ skalaren Wert zu liefern.
 | <a id="wavetable"></a>Wavetable | Eine periodische Wellenform mit Abtastwerten | Wellenformeingang eines Oszillators |
 | <a id="buffer"></a>Buffer | Gespeicherte Audiosamples mit Länge und Schreibposition beziehungsweise Dateiende | Buffer Reader |
 | <a id="spectrum"></a>Spectrum | Komplexe FFT-Bins mit Frequenz-, Fenster- und Zeitbezug | Spektralbearbeitung und IFFT |
+| <a id="partials"></a>Partials | Verfolgte sinusförmige Komponenten mit Frequenz, Amplitude, Phase, Identität und Frame-Zeit | Teilton-Gruppe und spektrale Rekonstruktion |
 | <a id="analysis"></a>Analysis | Analyseergebnis, beispielsweise ein Spektrum oder eine Autokorrelation | Viewer und Merkmalsberechnung |
 
 Spectrum kann an geeignete Analysis-Eingänge angeschlossen werden. Ein beliebiges

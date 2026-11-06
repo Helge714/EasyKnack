@@ -137,3 +137,10 @@
 - [Instanzgruppe](instance-group.md)
 - [Nodegruppe](node-group.md)
 - [Spektralgruppe](spectral-group.md)
+
+- [Teiltonanalyse](partial-analysis.md)
+- [Teiltöne zu Spektrum](partials-to-spectrum.md)
+- [Spektrummischung](spectrum-mix.md)
+- [Teilton-Kontext](partial-context.md)
+- [Teilton-Ausgang](partial-output.md)
+- [Teilton-Gruppe](partial-group.md)

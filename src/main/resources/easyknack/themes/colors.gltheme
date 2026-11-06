@@ -59,3 +59,7 @@ node.border=#00000000
 @COLOR easyknack.viewer.trace6=#42B9B1
 @COLOR easyknack.viewer.trace7=#B2A957
 @COLOR easyknack.viewer.trace8=#9C8AED
+
+@COLOR easyknack.signal.PARTIALS=#D9A2E8
+@COLOR easyknack.node.PARTIALS.title.light=${easyknack.signal.PARTIALS}
+@COLOR easyknack.node.PARTIALS.title.dark=#765183

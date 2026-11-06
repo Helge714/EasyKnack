@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add tracked Partial Analysis, Partial Group, Partials to Spectrum and complex Spectrum Mix with paired German/English references. Partial programs execute per analysis frame; unchanged partials plus residual reconstruct the source spectrum.
+
 - Add Buffer Context with Size and sample-accurate Write position for recording/file buffers. Remove the writer metadata output; old document connections and exposed group outputs migrate automatically with a load notice. Rebuild Java and the audio host together.
 
 - Keep Copy Editor source selection explicit for unbound group inputs, preventing the first nested group input from hiding alternatives such as Hilbert filter length.

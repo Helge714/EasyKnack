@@ -40,6 +40,8 @@ Spectral history/trigger masks and instance rate buffers are prepared to actual
 sizes. `WideGroupInputsTest` covers 20 numeric, 12 Spectrum and 24 frame inputs,
 including a high-slot trigger, export, persistence and old-contract loading.
 
+Partial Analysis, Partial Group, Partials to Spectrum and Spectrum Mix may form an internal pipeline. Partials resources are internal to that pipeline; the public Instance Group boundary restrictions above still apply. Partial programs evaluate once per frame and retain state by tracked ID.
+
 ## Deliberate exclusions
 
 - Hardware input/output and MIDI device/voice processors need explicit ownership
