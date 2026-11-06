@@ -40,7 +40,7 @@ class PartialsTest {
     }
     @Test void partialNoiseIsContextOnlyAndCompilesWithStableIds(){
         compiled(noiseDocument());assertTrue(new PartialNoiseNode().requiresPartialContext());
-        assertEquals(List.of("frequency","amplitude","phase","id","age","index","time","seed"),new PartialContextNode().layout(new NodeState(Map.of())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(NodeBuilder.Row::id).toList());
+        assertEquals(List.of("frequency","amplitude","phase","id","age","index","time","seed","tonality"),new PartialContextNode().layout(new NodeState(Map.of())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(NodeBuilder.Row::id).toList());
         assertEquals("New Partial Group",AppText.text("partials.new"));
     }
     @Test void partialResourcesCanBeExportedAtGroupBoundaries(){
@@ -56,5 +56,6 @@ class PartialsTest {
         String prefix="!"+NativeContractGenerator.fingerprint(def)+" ";
         Files.writeString(dir.resolve("PartialsTestParameters.hpp"),"#pragma once\nstatic const char* identityParameters=R\"params("+prefix+def.encode(new NodeState(identity.properties()),p->0)+")params\";\nstatic const char* shiftParameters=R\"params("+prefix+def.encode(new NodeState(shift.properties()),p->0)+")params\";\nstatic const char* noiseParameters=R\"params("+prefix+def.encode(new NodeState(noisy.properties()),p->0)+")params\";\n");
         RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialsTest.cpp").toAbsolutePath(),dir.resolve("test.exe"),dir);
+        RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialClassificationTest.cpp").toAbsolutePath(),dir.resolve("classification.exe"),dir);
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <atomic>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -8,6 +9,16 @@
 #include <cassert>
 namespace easyknack {
 enum class ResourceKind { none, history, analysis, spectrum, vector, waveform, partials };
+/** Control-thread preparation budget inherited by nested graph/plugin preparations. */
+struct ResourcePreparation {
+    inline static thread_local std::array<std::size_t,7> capacities{0,0,0,0,0,0,256};
+    static std::size_t capacity(ResourceKind kind)noexcept{return capacities[std::size_t(kind)];}
+};
+struct ResourcePreparationScope {
+    ResourceKind kind;std::size_t previous;
+    ResourcePreparationScope(ResourceKind k,std::size_t count):kind(k),previous(ResourcePreparation::capacity(k)){ResourcePreparation::capacities[std::size_t(k)]=std::max(previous,count);}
+    ~ResourcePreparationScope(){ResourcePreparation::capacities[std::size_t(kind)]=previous;}
+};
 struct DspResource { virtual ~DspResource()=default; virtual ResourceKind kind()const noexcept=0; };
 /** Graph-owned, channel/voice-local ring. Only the scheduled DSP writer mutates it. */
 struct HistoryResource final : DspResource {

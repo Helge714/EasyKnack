@@ -168,7 +168,9 @@ struct AudioGraph {
     bool directChannelOutputs = false;
     double preparedSampleRate = sampleRate;
     std::size_t preparedBlockFrames = blockSize;
+    std::size_t resourceCapacityHint(ResourceKind kind)const noexcept{std::size_t result=0;for(const auto& n:nodes)result=std::max(result,n.processor->resourceCapacityHint(kind));return result;}
     void prepare(double rate, std::size_t frames) {
+        ResourcePreparationScope partialBudget(ResourceKind::partials,resourceCapacityHint(ResourceKind::partials));
         if (!std::isfinite(rate) || rate <= 0 || !frames || frames > blockSize)
             throw std::invalid_argument("Invalid DSP preparation format");
         for(const auto& step:steps)if(step.blockOnly)for(int index:step.nodes){auto& p=*nodes[index].processor;

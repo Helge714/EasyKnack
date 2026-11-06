@@ -106,6 +106,7 @@ struct BakedGraphProcessor : NodeProcessor {
             for(int source:n.processor->sources)if(source>=0&&runtime->graph.nodes[source%maxNodes].stereo)n.stereo=true;
         }
     }
+    std::size_t resourceCapacityHint(ResourceKind kind)const noexcept override{return runtime?runtime->graph.resourceCapacityHint(kind):0;}
     std::size_t voiceIndex=0;
     bool primaryChannel=true;
     bool canShareChannels()const noexcept override{

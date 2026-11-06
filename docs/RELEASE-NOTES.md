@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Improve Partial Analysis with sinusoidal-lobe fit, local prominence, time-based confidence, predictive tracking, gap tolerance and optional harmonic selection with automatic or supplied fundamental. Add Context Tonality and a separate stochastic Residual Model. Prepared partial capacities now follow configured graph budgets up to 32768 rather than a fixed 256. Existing documents receive the improved classification defaults; embedded legacy parameter commands remain supported. Rebuild Java and the host together.
+
 - Name the creation action New Partial Group. Add Partial Noise with independent per-track/frame variation and a separate Context Seed output; existing ID outputs and connections retain their meaning. Rebuild Java and the host together.
 
 - Draw Partials resource references dashed in red. Add complex Spectrum Math and turn Spectrum Mix into a Linear/Equal Power crossfade; earlier weighted sums migrate to Math, and embedded legacy plugin commands retain their meaning. Rebuild Java and the audio host together.

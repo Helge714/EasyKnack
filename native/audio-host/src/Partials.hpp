@@ -6,18 +6,19 @@ struct Partial {
     std::uint64_t id=0;std::size_t slot=0;
     double frequency=0,amplitude=0,phase=0,age=0;
     double originalFrequency=0,originalAmplitude=0,originalPhase=0;
+    double tonality=0;
 };
 struct PartialFrame {std::int64_t start=0;std::size_t count=0;std::vector<Partial> values;};
 /** Borrowed frame batches; stable track IDs, original parameters and exact STFT convention. */
 struct PartialsResource final : DspResource {
-    static constexpr std::size_t capacity=256;
+    std::size_t preparedCapacity=0;
     std::size_t size=0,windowSize=0,hop=0,count=0,blockFrames=0;bool dcRemoved=false;
     std::uint64_t identity=0,blockStart=0;double sampleRate=0;SpectrumWindow window=SpectrumWindow::hann;
     std::vector<PartialFrame> frames;
     ResourceKind kind()const noexcept override{return ResourceKind::partials;}
-    void prepare(std::size_t block){frames.resize((block+SpectrumStream::minHop-1)/SpectrumStream::minHop+1);for(auto& f:frames)f.values.resize(capacity);}
+    void prepare(std::size_t block,std::size_t capacity=ResourcePreparation::capacity(ResourceKind::partials)){preparedCapacity=capacity;frames.resize((block+SpectrumStream::minHop-1)/SpectrumStream::minHop+1);for(auto& f:frames)f.values.resize(capacity);}
     template<class T> void metadata(const T& s)noexcept{size=s.size;windowSize=s.windowSize;hop=s.hop;count=std::min(s.count,frames.size());blockFrames=s.blockFrames;dcRemoved=s.dcRemoved;identity=s.identity;blockStart=s.blockStart;sampleRate=s.sampleRate;window=s.window;RenderCadence::include(hop);}
-    void copy(const PartialsResource& s)noexcept{metadata(s);for(std::size_t i=0;i<count;i++){frames[i].start=s.frames[i].start;frames[i].count=s.frames[i].count;std::copy_n(s.frames[i].values.data(),frames[i].count,frames[i].values.data());}}
+    bool copy(const PartialsResource& s)noexcept{for(std::size_t i=0;i<s.count;i++)if(s.frames[i].count>preparedCapacity){size=count=0;return false;}metadata(s);for(std::size_t i=0;i<count;i++){frames[i].start=s.frames[i].start;frames[i].count=s.frames[i].count;std::copy_n(s.frames[i].values.data(),frames[i].count,frames[i].values.data());}return true;}
     void spectrumMetadata(SpectrumStream& s)const noexcept{s.size=size;s.windowSize=windowSize;s.hop=hop;s.count=count;s.blockFrames=blockFrames;s.dcRemoved=dcRemoved;s.identity=identity;s.blockStart=blockStart;s.sampleRate=sampleRate;s.window=window;}
 };
 // Exact DFT of a periodic analysis window at a fractional bin; no sampled lookup.

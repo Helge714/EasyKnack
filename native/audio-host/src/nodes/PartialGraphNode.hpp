@@ -18,11 +18,11 @@
 namespace easyknack {
 struct PartialContextNode : NodeProcessor {
     const Partial* partial=nullptr;std::size_t index=0;double time=0;
-    std::size_t outputCount()const noexcept override{return 8;}
+    std::size_t outputCount()const noexcept override{return 9;}
     void configure(std::istream& in)override{sources=parameters::PartialContextNodeParameters::read(in).sources();}
     void process(ProcessContext& c)noexcept override{
-        const float values[]={partial?float(partial->frequency):0,partial?float(partial->amplitude):0,partial?float(partial->phase/partialTau):0,partial?float(partial->id):0,partial?float(partial->age):0,float(index),float(time),partial?partialSeed(partial->id):0};
-        for(std::size_t i=0;i<8;i++)if(auto* out=c.outputAt(i))out[0]=values[i];
+        const float values[]={partial?float(partial->frequency):0,partial?float(partial->amplitude):0,partial?float(partial->phase/partialTau):0,partial?float(partial->id):0,partial?float(partial->age):0,float(index),float(time),partial?partialSeed(partial->id):0,partial?float(partial->tonality):0};
+        for(std::size_t i=0;i<9;i++)if(auto* out=c.outputAt(i))out[0]=values[i];
     }
 };
 struct PartialOutputNode : NodeProcessor {
@@ -87,7 +87,7 @@ struct PartialGraphNode : NodeProcessor {
         if(results!=1||program>>marker)throw std::runtime_error("Use exactly one Partial Output");
     }
     void prepare(double rate,std::size_t block)override{
-        stream.prepare(block);voices.resize(PartialsResource::capacity);
+        stream.prepare(block);voices.resize(stream.preparedCapacity);
         for(auto& s:steps)s.initial->prepare(rate,1);
         for(std::size_t slot=0;slot<voices.size();slot++){
             auto& voice=voices[slot];voice.values.resize(slots);voice.steps.resize(steps.size());
@@ -106,7 +106,7 @@ struct PartialGraphNode : NodeProcessor {
     }
     void process(ProcessContext& c)noexcept override{
         const auto* input=static_cast<const PartialsResource*>(c.resource(0));if(!input||!input->size){stream.size=stream.count=0;identity=0;return;}
-        stream.copy(*input);if(identity!=input->identity){for(auto& v:voices)v.id=0;identity=input->identity;}
+        if(!stream.copy(*input))return;if(identity!=input->identity){for(auto& v:voices)v.id=0;identity=input->identity;}
         float silence=0;
         for(std::size_t f=0;f<stream.count;f++){
             auto& frame=stream.frames[f];const auto offset=std::size_t(std::clamp<std::int64_t>(frame.start+std::int64_t(input->windowSize?input->windowSize:input->size)-std::int64_t(input->blockStart)-1,0,std::int64_t(c.bufferSize)-1));

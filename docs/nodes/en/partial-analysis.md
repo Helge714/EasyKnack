@@ -10,10 +10,22 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [Spectrum](../../user/en/data-types.md#spectrum) | [Spectrum](../../user/en/data-types.md#spectrum) | — | — | — | — | [Control](../../user/en/rates.md#control) | Always |
 | Threshold | [Editor](../../user/en/reference-tables.md) | −160–0 dB | — | −60 dB | dB | — | Inspector |
-| Maximum partials | [Editor](../../user/en/reference-tables.md) | 1–256 | — | 64 | — | — | Inspector |
+| Maximum partials | [Editor](../../user/en/reference-tables.md) | 1–32768 | — | 64 | — | — | Inspector |
 | Minimum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20 Hz | Hz | — | Inspector |
 | Maximum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20000 Hz | Hz | — | Inspector |
 | Tracking tolerance | [Editor](../../user/en/reference-tables.md) | 0–2400 cent | — | 100 cent | cent | — | Inspector |
+
+| Minimum sinusoidality | [Editor](../../user/en/reference-tables.md) | 0–1 | — | 0.8 | — | — | Inspector |
+| Peak prominence | [Editor](../../user/en/reference-tables.md) | 0–120 dB | — | 3 dB | dB | — | Inspector |
+| Assessment time | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 30 ms | ms, s, smpl | — | Inspector |
+| Minimum tonality | [Editor](../../user/en/reference-tables.md) | 0–1 | — | 0.7 | — | — | Inspector |
+| Minimum track duration | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspector |
+| Tracking gap | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspector |
+| Harmonic only | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Inspector |
+| Harmonic tolerance | [Editor](../../user/en/reference-tables.md) | 0–200 cent | — | 30 cent | cent | — | Inspector; Harmonic only |
+| Minimum fundamental | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 40 Hz | Hz, kHz | — | Inspector; Harmonic only |
+| Maximum fundamental | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 2000 Hz | Hz, kHz | — | Inspector; Harmonic only |
+| Fundamental | [Value](../../user/en/data-types.md#value) | 0–20000 Hz | 0–∞ Hz | 0 Hz | Hz, kHz | [Control](../../user/en/rates.md#control) | Harmonic only |
 
 ## Outputs
 
@@ -24,7 +36,15 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 
 ## Behavior
 
-Local FFT peaks use logarithmic interpolation. Tracking matches frequency distance in cents; new partials receive new IDs. Age advances by hop duration. The strongest candidates are retained up to the configured limit. Identity is not guaranteed at crossings or after lost peaks. Analysis subtracts reconstructed complex window lobes from the original; weak components and unmodelled tails remain in the residual. Negative-start frames remain entirely in the residual.
+Local FFT peaks are interpolated between bins. Sinusoidality is normalized squared complex agreement with a sinusoidal window lobe; peak prominence compares the peak against the surrounding median outside the main lobe. Only eligible candidates enter tracking. Assignment considers predicted frequency, amplitude change and phase continuity.
+
+Assessment time is the time constant of an exponentially smoothed tonality score, not an additional FFT size or rectangular average. Minimum track duration must elapse before acceptance. Tracking gap tolerates missed observations beyond the next expected frame; no partial is invented during a gap. New or unconfirmed components remain entirely in the residual. Tonality is a model score, not a calibrated noise probability.
+
+Harmonic only restricts selection to integer multiples of the fundamental within the cent tolerance. 0 Hz selects a monophonic spectral estimate from the peaks; positive or connected values supply the fundamental. Automatic estimation is not polyphonic pitch detection and can make octave errors. Disable it for inharmonic sounds.
+
+Maximum partials is prepared tracking capacity, including unconfirmed and briefly missing tracks. Additional candidates remain in the residual when capacity is full. Groups, synthesis, nested instances and exports inherit the largest required preparation budget. No memory is allocated for these resources on the audio thread. Large capacities multiply memory requirements per channel, voice and group processor.
+
+Accepted window lobes are subtracted as complex coefficients. Unmodified partials plus the exact residual still reconstruct the source spectrum. [Residual Model](residual-model.md) is a separate lossy stochastic model; the analysis residual itself is neither denoised nor smoothed. FFT window size and resolution remain significant. Longer assessment and minimum durations delay detection, without retrospectively buffering and reclassifying earlier frames.
 
 ## Mute
 

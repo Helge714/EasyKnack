@@ -19,9 +19,10 @@ Liefert die Werte des aktuellen Teiltons innerhalb einer Teilton-Gruppe.
 | Phase | [Value](../../user/de/data-types.md#value) | ±∞ turn | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | ID | [Value](../../user/de/data-types.md#value) | 1–∞ | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Alter (Age) | [Value](../../user/de/data-types.md#value) | 0–∞ s | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
-| Index | [Value](../../user/de/data-types.md#value) | 0–255 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Index | [Value](../../user/de/data-types.md#value) | 0–32767 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Frame-Zeit (Frame time) | [Value](../../user/de/data-types.md#value) | 0–∞ s | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Seed | [Value](../../user/de/data-types.md#value) | 0–16 777 215 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Tonalität (Tonality) | [Value](../../user/de/data-types.md#value) | 0–1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

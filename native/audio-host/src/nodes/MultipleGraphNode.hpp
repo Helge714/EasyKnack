@@ -61,6 +61,7 @@
 #include "SpectrumBlurNode.hpp"
 #include "SpectrumShiftNode.hpp"
 #include "PartialAnalysisNode.hpp"
+#include "ResidualModelNode.hpp"
 #include "PartialsSpectrumNode.hpp"
 #include "PartialGraphNode.hpp"
 #include "SpectrumMixNode.hpp"
@@ -193,6 +194,7 @@ struct MultipleGraphNode : NodeProcessor {
     // generic implementation. Allocation remains entirely on the control thread.
     virtual std::unique_ptr<Instance> createInstance(){return std::make_unique<Instance>();}
     int maximum=16,count=8;bool mean=false,primary=true,explicitCombines=false;std::size_t outputs=1,framesReserved=0,expandedNodes=0;float fadeStep=1;
+    std::size_t resourceCapacityHint(ResourceKind kind)const noexcept override{return state&&!state->instances.empty()?state->instances[0]->resourceCapacityHint(kind):0;}
     bool canShareChannels()const noexcept override{
         // Connected boundaries remain conservative until their source layout is
         // known. An unconnected group can expose its proven internal layout.
@@ -272,6 +274,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="value")return std::make_unique<ValueNode>();
         if(id=="comparator")return std::make_unique<ComparatorNode>();
         if(id=="gain")return std::make_unique<GainNode>();
+        if(id=="residualmodel")return std::make_unique<ResidualModelNode>();
         if(id=="partialanalysis")return std::make_unique<PartialAnalysisNode>();
         if(id=="partialsspectrum")return std::make_unique<PartialsSpectrumNode>();
         if(id=="partialgraph")return std::make_unique<PartialGraphNode>();

@@ -148,3 +148,5 @@
 - [Spectrum Math](spectrum-math.md)
 
 - [Partial Noise](partial-noise.md)
+
+- [Residual Model](residual-model.md)

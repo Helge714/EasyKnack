@@ -111,6 +111,7 @@ struct NodeProcessor {
     virtual char executionRate() const noexcept { return 0; }
     virtual ResourceKind inputResourceKind(std::size_t)const noexcept{return ResourceKind::none;}
     virtual ResourceKind outputResourceKind(std::size_t)const noexcept{return ResourceKind::none;}
+    virtual std::size_t resourceCapacityHint(ResourceKind)const noexcept{return 0;}
     virtual DspResource* resourceOutput(std::size_t)noexcept{return nullptr;}
     virtual bool supportsLiveParameters() const noexcept { return false; }
     virtual std::string parameterStructure()const{return {};}

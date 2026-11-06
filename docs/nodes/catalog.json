@@ -1144,6 +1144,17 @@
       },
       "source": "PartialNoiseNode.java",
       "kind": "node"
+    },
+    {
+      "id": "easyknack.spectral.residualmodel",
+      "slug": "residual-model",
+      "category": "spectrum",
+      "title": {
+        "en": "Residual Model",
+        "de": "Residualmodell"
+      },
+      "source": "ResidualModelNode.java",
+      "kind": "node"
     }
   ],
   "excluded": [

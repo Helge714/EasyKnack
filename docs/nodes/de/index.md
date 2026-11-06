@@ -148,3 +148,5 @@
 - [Spektrummathematik](spectrum-math.md)
 
 - [Teiltonrauschen](partial-noise.md)
+
+- [Residualmodell](residual-model.md)
