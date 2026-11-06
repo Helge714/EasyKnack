@@ -1,0 +1,4 @@
+# Optional developer comparison only. Never bundle this environment in EasyKnack.
+numpy==1.26.4
+scipy==1.17.1
+sms-tools==1.2

@@ -35,7 +35,7 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 
 ## Behavior
 
-Local FFT peaks are interpolated between bins. Sinusoidality is normalized squared complex agreement with a sinusoidal window lobe; peak prominence compares the peak against the surrounding median outside the main lobe. Only eligible candidates enter tracking. Assignment considers predicted frequency, amplitude change and phase continuity.
+Local FFT peaks are interpolated between bins. Sinusoidality is normalized squared complex agreement with a sinusoidal window lobe; peak prominence compares the peak against the surrounding median outside the main lobe. Candidates are fitted in descending amplitude order. Matching strong components are removed from a temporary spectrum before weaker candidates are evaluated, reducing interference between neighbouring partials. This temporary subtraction does not remove unconfirmed tracks from the residual. Assignment considers predicted frequency, amplitude change and phase continuity at the window centre.
 
 Assessment time is the time constant of an exponentially smoothed tonality score, not an additional FFT size or rectangular average. Minimum track duration must elapse before acceptance. Tracking gap tolerates missed observations beyond the next expected frame; no partial is invented during a gap. New or unconfirmed components remain entirely in the residual. Tonality is a model score, not a calibrated noise probability.
 

@@ -9,8 +9,9 @@ struct PartialAnalysisNode : NodeProcessor {
     double sinusoidality=.8,prominence=3,assessment=30,confidence=.7,duration=20,gap=20;
     double fundamental=0,harmonicTolerance=30,minimumF0=40,maximumF0=2000;bool harmonic=false;std::size_t limit=64;
     struct Track {bool active=false,used=false;std::uint64_t id=0;double frequency=0,velocity=0,phase=0,amplitude=0,quality=0;std::int64_t born=0,seen=0;};
-    struct Peak {double frequency,amplitude,phase,shape;};
+    struct Peak {double frequency,amplitude,phase,shape;int bin;};
     std::vector<Track> tracks;std::vector<Peak> peaks;std::vector<int> assigned,trackOrder,freeSlots;
+    StreamSpectrumFrame classification;
     std::uint64_t identity=0,nextId=1;
     char executionRate()const noexcept override{return 'a';}bool canShareChannels()const noexcept override{return true;}
     bool supportsScalarInputs()const noexcept override{return true;}
@@ -38,7 +39,7 @@ struct PartialAnalysisNode : NodeProcessor {
     }
     void prepare(double,std::size_t block)override{
         partials.prepare(block,limit);residual.prepare(block);tracks.assign(limit,Track{});trackOrder.resize(limit);freeSlots.resize(limit);
-        peaks.resize(SpectrumStream::maxSize/2+1);assigned.resize(peaks.size());
+        peaks.resize(SpectrumStream::maxSize/2+1);assigned.resize(peaks.size());classification.bins.resize(SpectrumStream::maxSize);
     }
     void inheritState(const NodeProcessor& p)noexcept override{const auto& o=static_cast<const PartialAnalysisNode&>(p);std::copy_n(o.tracks.begin(),std::min(tracks.size(),o.tracks.size()),tracks.begin());identity=o.identity;nextId=o.nextId;}
     static double cents(double a,double b)noexcept{return 1200*std::abs(std::log2(a/b));}
@@ -68,25 +69,38 @@ struct PartialAnalysisNode : NodeProcessor {
                 double hz=(k+offset)*rate/input->size;if(hz<minimum||hz>maximum)continue;
                 auto response=partialWindow(partialTau*(double(k)/input->size-hz/rate),length,input->window);if(std::abs(response)<1e-20)continue;
                 auto phasor=source.bins[k]/response;double amplitude=2*std::abs(phasor);if(20*std::log10(std::max(amplitude,1e-30))<threshold)continue;
-                double shape=1;
-                if(sinusoidality>0||confidence>0){
-                    std::complex<double> cross{};double observed=0,ideal=0;
-                    for(int j=std::max(0,k-4*padding);j<=std::min(last,k+4*padding);j++){
-                        double angle=partialTau*j/input->size,omega=partialTau*hz/rate;
-                        auto model=phasor*partialWindow(angle-omega,length,input->window)+std::conj(phasor)*partialWindow(angle+omega,length,input->window);
-                        cross+=std::conj(model)*source.bins[j];observed+=std::norm(source.bins[j]);ideal+=std::norm(model);
-                    }
-                    shape=observed>0&&ideal>0?std::clamp(std::norm(cross)/(observed*ideal),0.,1.):0;
-                }
-                if(shape<sinusoidality)continue;
                 if(prominence>0){
                     std::array<double,64> noise{};std::size_t count=0;
                     for(int j=std::max(1,k-12*padding);j<=std::min(last-1,k+12*padding);j++)if(std::abs(j-k)>3*padding&&count<noise.size())noise[count++]=std::abs(source.bins[j]);
                     if(count){std::nth_element(noise.begin(),noise.begin()+count/2,noise.begin()+count);if(20*std::log10(b/std::max(noise[count/2],1e-30))<prominence)continue;}
                 }
-                peaks[found++]={hz,amplitude,std::arg(phasor),shape};
+                peaks[found++]={hz,amplitude,std::arg(phasor),1,k};
             }
-            std::sort(peaks.begin(),peaks.begin()+found,[](const Peak& a,const Peak& b){return a.amplitude*a.shape>b.amplitude*b.shape;});
+            std::sort(peaks.begin(),peaks.begin()+found,[](const Peak& a,const Peak& b){return a.amplitude>b.amplitude;});
+            if(sinusoidality>0||confidence>0){
+                // Successive lobe subtraction isolates weaker candidates from
+                // already explained strong neighbours. This is a local fit,
+                // not the adaptive statistical classifier of ZRR07.
+                std::copy_n(source.bins.data(),input->size,classification.bins.data());
+                std::size_t accepted=0;
+                for(std::size_t i=0;i<found;i++){
+                    auto peak=peaks[i];int k=peak.bin;double hz=peak.frequency;
+                    auto response=partialWindow(partialTau*(double(k)/input->size-hz/rate),length,input->window);
+                    auto phasor=classification.bins[k]/response;peak.amplitude=2*std::abs(phasor);peak.phase=std::arg(phasor);
+                    if(20*std::log10(std::max(peak.amplitude,1e-30))<threshold)continue;
+                    std::complex<double> cross{};double observed=0,ideal=0;
+                    for(int j=std::max(0,k-4*padding);j<=std::min(last,k+4*padding);j++){
+                        double angle=partialTau*j/input->size,omega=partialTau*hz/rate;
+                        auto model=phasor*partialWindow(angle-omega,length,input->window)+std::conj(phasor)*partialWindow(angle+omega,length,input->window);
+                        cross+=std::conj(model)*classification.bins[j];observed+=std::norm(classification.bins[j]);ideal+=std::norm(model);
+                    }
+                    peak.shape=observed>0&&ideal>0?std::clamp(std::norm(cross)/(observed*ideal),0.,1.):0;
+                    if(peak.shape<sinusoidality)continue;
+                    peaks[accepted++]=peak;
+                    addPartial(classification,input->size,length,rate,input->window,hz,peak.amplitude,peak.phase,-1);
+                }
+                found=accepted;
+            }
             if(harmonic){
                 double f0=c.numericInput(1,float(fundamental))[0];if(!(f0>0&&std::isfinite(f0)))f0=estimateFundamental(found);
                 auto end=std::remove_if(peaks.begin(),peaks.begin()+found,[&](const Peak& p){double h=f0>0?std::round(p.frequency/f0):0;return h<1||cents(p.frequency,h*f0)>harmonicTolerance;});found=std::size_t(end-peaks.begin());
@@ -103,7 +117,8 @@ struct PartialAnalysisNode : NodeProcessor {
                 for(auto j=begin;j!=trackOrder.begin()+active;j++){
                     auto& t=tracks[*j];double predicted=prediction(t,source.start,rate);if(predicted>high)break;if(t.used)continue;
                     double elapsed=double(source.start-t.seen)/rate;
-                    double phaseError=std::abs(std::remainder(peak.phase-t.phase-partialTau*.5*(t.frequency+peak.frequency)*elapsed,partialTau))/3.141592653589793;
+                    double centerPhase=peak.phase+partialTau*peak.frequency*double(length)*.5/rate;
+                    double phaseError=std::abs(std::remainder(centerPhase-t.phase-partialTau*.5*(t.frequency+peak.frequency)*elapsed,partialTau))/3.141592653589793;
                     double cost=cents(peak.frequency,predicted)/std::max(1.,tolerance)+.15*std::min(4.,std::abs(std::log(std::max(peak.amplitude,1e-30)/std::max(t.amplitude,1e-30))))+.2*phaseError;
                     if(cost<best){best=cost;slot=*j;}
                 }
@@ -113,12 +128,16 @@ struct PartialAnalysisNode : NodeProcessor {
             for(std::size_t i=0;i<found;i++){
                 auto& peak=peaks[i];int slot=assigned[i];bool birth=slot<0;if(birth){if(nextFree>=free)continue;slot=freeSlots[nextFree++];tracks[slot]={};tracks[slot].id=nextId++;tracks[slot].born=source.start;}
                 auto& t=tracks[slot];double elapsed=birth?0:double(source.start-t.seen)/rate;
-                double phaseError=birth?0:std::abs(std::remainder(peak.phase-t.phase-partialTau*.5*(t.frequency+peak.frequency)*elapsed,partialTau));
+                // Frequency estimates describe the window centre, not its start.
+                // Compare phases at that same time; retain the original phase in
+                // emitted partials for exact STFT subtraction/reconstruction.
+                double centerPhase=std::remainder(peak.phase+partialTau*peak.frequency*double(length)*.5/rate,partialTau);
+                double phaseError=birth?0:std::abs(std::remainder(centerPhase-t.phase-partialTau*.5*(t.frequency+peak.frequency)*elapsed,partialTau));
                 double target=peak.shape*(.5+.5*std::cos(std::min(phaseError,3.141592653589793)*.5));
                 double alpha=assessment>0?-std::expm1(-elapsed/(assessment*.001)):1;
                 t.quality=birth?peak.shape:t.quality+alpha*(target-t.quality);
                 t.velocity=birth||elapsed<=0?0:.75*t.velocity+.25*(peak.frequency-t.frequency)/elapsed;
-                t.active=t.used=true;t.frequency=peak.frequency;t.phase=peak.phase;t.amplitude=peak.amplitude;t.seen=source.start;
+                t.active=t.used=true;t.frequency=peak.frequency;t.phase=centerPhase;t.amplitude=peak.amplitude;t.seen=source.start;
                 double age=double(source.start-t.born)/rate;
                 if(t.quality<confidence||age+1e-9<duration*.001)continue;
                 auto& p=frame.values[frame.count++];p={t.id,std::size_t(slot),peak.frequency,peak.amplitude,peak.phase,age,peak.frequency,peak.amplitude,peak.phase,t.quality};

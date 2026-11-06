@@ -23,7 +23,53 @@ static void frame(SpectrumStream& input,unsigned tick,bool tonal,bool silent=fal
     spectrumTransform(f.bins.data(),input.size);
 }
 static const Partial* find(const PartialAnalysisNode& a,double hz){auto& f=a.partials.frames[0];for(unsigned i=0;i<f.count;i++)if(std::abs(f.values[i].frequency-hz)<3)return &f.values[i];return nullptr;}
+static void resolvedNeighbours(){
+    // Independent known-signal oracle; the offline SMS comparison is optional.
+    // Previously only the loudest of these eight resolved components survived
+    // at 2048 samples, because neighbours contaminated the wide shape test.
+    // Match the production FFT's twofold zero padding. The existing pipeline
+    // tests separately cover reconstruction with and without padding.
+    for(unsigned length:{2048u,4096u,8192u}){
+        constexpr unsigned padding=2;
+        SpectrumStream input;input.prepare(256);input.size=length*padding;input.windowSize=length;input.hop=length/4;input.sampleRate=48000;input.identity=1;input.window=SpectrumWindow::hann;input.count=1;
+        PartialAnalysisNode node;node.prepare(48000,256);float silence[256]{},output[256]{};const DspResource* resource[]={&input,nullptr};
+        ProcessContext c{};c.resourceInputs=resource;c.inputCount=2;c.bufferSize=256;c.sampleRate=48000;c.silence=silence;c.output=output;
+        double residual=0,power=0;
+        watching=true;
+        for(unsigned t=0;t<24;t++){
+            auto& f=input.frames[0];f.start=t*input.hop;input.blockStart=f.start+length-256;std::fill_n(f.bins.data(),input.size,std::complex<double>{});
+            for(unsigned i=0;i<length;i++){double v=0;for(unsigned h=1;h<=8;h++)v+=.4/h*std::cos(partialTau*110*h*(f.start+i)/48000+.37);f.bins[i]=v*spectrumWindowValue(input.window,i,length);}
+            spectrumTransform(f.bins.data(),input.size);node.process(c);
+            if(t>8){for(unsigned h=1;h<=8;h++){auto p=find(node,110*h);assert(p&&std::abs(p->amplitude-.4/h)<.01);}
+                for(unsigned k=0;k<input.size;k++){power+=std::norm(f.bins[k]);residual+=std::norm(node.residual.frames[0].bins[k]);}}
+        }
+        watching=false;assert(!allocations);assert(residual/power<.002);
+    }
+}
+static void modulatedTracks(){
+    constexpr unsigned length=8192,hop=length/4;
+    SpectrumStream input;input.prepare(256);input.size=2*length;input.windowSize=length;input.hop=hop;input.sampleRate=48000;input.identity=33;input.window=SpectrumWindow::hann;input.count=1;
+    PartialAnalysisNode node;node.prepare(48000,256);float silence[256]{},output[256]{};const DspResource* resource[]={&input,nullptr};
+    ProcessContext c{};c.resourceInputs=resource;c.inputCount=2;c.bufferSize=256;c.sampleRate=48000;c.silence=silence;c.output=output;
+    unsigned hits=0,total=0;watching=true;
+    for(unsigned t=0;t<65;t++){
+        auto& f=input.frames[0];f.start=t*hop;input.blockStart=f.start+length-256;std::fill_n(f.bins.data(),input.size,std::complex<double>{});
+        for(unsigned i=0;i<length;i++){
+            double time=double(f.start+i)/48000,v=0;
+            for(unsigned h=1;h<=4;h++)v+=.4/h*std::cos(partialTau*110*h*time+110*h*.02/5*(1-std::cos(partialTau*5*time))+.37);
+            f.bins[i]=v*spectrumWindowValue(input.window,i,length);
+        }
+        spectrumTransform(f.bins.data(),input.size);node.process(c);
+        if(t>=2&&t<=62)for(unsigned h=1;h<=4;h++){
+            double expected=110*h*(1+.02*std::sin(partialTau*5*(f.start+length/2.)/48000));bool found=false;
+            for(unsigned j=0;j<node.partials.frames[0].count;j++)if(std::abs(node.partials.frames[0].values[j].frequency-expected)<=std::max(2.,expected*.01))found=true;
+            hits+=found;++total;
+        }
+    }
+    watching=false;assert(!allocations);assert(double(hits)/total>.85);
+}
 int main(){
+    resolvedNeighbours();modulatedTracks();
     constexpr unsigned block=256;float output[block]{},silence[block]{};SpectrumStream input;input.prepare(block);input.size=input.windowSize=4096;input.hop=256;input.sampleRate=48000;input.identity=21;input.window=SpectrumWindow::hann;input.blockFrames=block;
     PartialAnalysisNode analysis;analysis.prepare(48000,block);PartialAnalysisNode raw;raw.sinusoidality=raw.prominence=raw.confidence=raw.duration=0;raw.prepare(48000,block);
     const DspResource* resources[]={&input,nullptr};ProcessContext c{};c.resourceInputs=resources;c.inputCount=2;c.bufferSize=block;c.sampleRate=48000;c.silence=silence;c.output=output;

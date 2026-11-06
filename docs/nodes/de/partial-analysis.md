@@ -35,7 +35,7 @@ Zerlegt ein Spektrum in verfolgte Teiltöne und ein komplexes Restspektrum.
 
 ## Verhalten
 
-Lokale FFT-Peaks werden zwischen den Bins interpoliert. Die Sinusähnlichkeit ist die normierte quadratische komplexe Übereinstimmung mit einer sinusförmigen Fensterkeule; Peak-Abhebung vergleicht die Spitze mit dem Median der Umgebung außerhalb der Hauptkeule. Nur geeignete Kandidaten werden verfolgt. Die Zuordnung verwendet vorhergesagte Frequenz, Amplitudenänderung und Phasenkontinuität.
+Lokale FFT-Peaks werden zwischen den Bins interpoliert. Die Sinusähnlichkeit ist die normierte quadratische komplexe Übereinstimmung mit einer sinusförmigen Fensterkeule; Peak-Abhebung vergleicht die Spitze mit dem Median der Umgebung außerhalb der Hauptkeule. Kandidaten werden nach absteigender Amplitude angepasst. Passende starke Komponenten werden vor der Bewertung schwächerer Kandidaten aus einem temporären Spektrum entfernt. Dadurch stören benachbarte Teiltöne die Bewertung weniger. Diese temporäre Subtraktion entfernt keine unbestätigten Spuren aus dem Residual. Die Zuordnung verwendet vorhergesagte Frequenz, Amplitudenänderung und Phasenkontinuität am Fenstermittelpunkt.
 
 Bewertungsdauer ist die Zeitkonstante einer exponentiellen Glättung der Tonalitätsbewertung, keine zusätzliche FFT-Größe oder rechteckige Mittelung. Die minimale Teiltondauer muss vor der ersten Übernahme erreicht sein. Tracking-Lücke erlaubt fehlende Beobachtungen über die nächste erwartete Frame-Position hinaus; während einer Lücke wird kein Teilton erfunden. Neue oder nicht bestätigte Anteile bleiben vollständig im Residual. Tonalität ist ein Modellscore, keine kalibrierte Rauschwahrscheinlichkeit.
 

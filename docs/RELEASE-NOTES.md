@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Improve Partial Analysis for neighbouring resolved tones and changing frequency by fitting strong components first and comparing track phases at the window centre. Existing settings and document/host contracts are unchanged. Add an optional offline SMS reference comparison; tonality remains a model score, not a calibrated noise probability.
+
 - Expose the primary Partial Analysis selection controls directly in the node; keep detailed tracking and harmonic settings in the inspector. DSP behavior and defaults are unchanged.
 
 - Improve Partial Analysis with sinusoidal-lobe fit, local prominence, time-based confidence, predictive tracking, gap tolerance and optional harmonic selection with automatic or supplied fundamental. Add Context Tonality and a separate stochastic Residual Model. Prepared partial capacities now follow configured graph budgets up to 32768 rather than a fixed 256. Existing documents receive the improved classification defaults; embedded legacy parameter commands remain supported. Rebuild Java and the host together.
