@@ -20,6 +20,8 @@ Processes each detected partial once per analysis frame.
 
 Default routing: `Partial Analysis → Partial Group → Partials to Spectrum → Spectrum Math (Add) → IFFT`; connect the analysis residual to the second Math input. Inside, use `Partial Context → Math / Formula Group → Partial Output`. Frequency, amplitude and phase remain independent values. State is isolated by ID and reset for new IDs. Up to 64 numeric processors; ordinary nested groups and numeric Formula Groups are flattened. No audio oscillator bank, buffers or trigger programs. External numeric values are sampled at window end from the current publication block; asynchronous historical modulation values are not buffered.
 
+Use [Partial Noise](partial-noise.md) for independent random modulation per track. It incorporates stable IDs automatically; map its output with `2 * random - 1` for symmetric deviations.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

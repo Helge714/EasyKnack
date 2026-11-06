@@ -146,3 +146,5 @@
 - [Partial Group](partial-group.md)
 
 - [Spectrum Math](spectrum-math.md)
+
+- [Partial Noise](partial-noise.md)

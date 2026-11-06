@@ -146,3 +146,5 @@
 - [Teilton-Gruppe](partial-group.md)
 
 - [Spektrummathematik](spectrum-math.md)
+
+- [Teiltonrauschen](partial-noise.md)

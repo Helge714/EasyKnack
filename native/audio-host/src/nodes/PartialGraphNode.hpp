@@ -13,15 +13,16 @@
 #include "DigitalNoiseNode.hpp"
 #include "NoiseNode.hpp"
 #include "FormulaNode.hpp"
+#include "PartialNoiseNode.hpp"
 #include <sstream>
 namespace easyknack {
 struct PartialContextNode : NodeProcessor {
     const Partial* partial=nullptr;std::size_t index=0;double time=0;
-    std::size_t outputCount()const noexcept override{return 7;}
+    std::size_t outputCount()const noexcept override{return 8;}
     void configure(std::istream& in)override{sources=parameters::PartialContextNodeParameters::read(in).sources();}
     void process(ProcessContext& c)noexcept override{
-        const float values[]={partial?float(partial->frequency):0,partial?float(partial->amplitude):0,partial?float(partial->phase/partialTau):0,partial?float(partial->id):0,partial?float(partial->age):0,float(index),float(time)};
-        for(std::size_t i=0;i<7;i++)if(auto* out=c.outputAt(i))out[0]=values[i];
+        const float values[]={partial?float(partial->frequency):0,partial?float(partial->amplitude):0,partial?float(partial->phase/partialTau):0,partial?float(partial->id):0,partial?float(partial->age):0,float(index),float(time),partial?partialSeed(partial->id):0};
+        for(std::size_t i=0;i<8;i++)if(auto* out=c.outputAt(i))out[0]=values[i];
     }
 };
 struct PartialOutputNode : NodeProcessor {
@@ -44,6 +45,7 @@ struct PartialGraphNode : NodeProcessor {
     std::vector<Step> steps;std::vector<Voice> voices;std::size_t slots=0,result=0;
     std::uint64_t identity=0;std::string shape;
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
+        if(id=="partialnoise")return std::make_unique<PartialNoiseNode>();
         if(id=="partialcontext")return std::make_unique<PartialContextNode>();if(id=="partialoutput")return std::make_unique<PartialOutputNode>();if(id=="partialuniform")return std::make_unique<PartialUniformNode>();
         if(id=="math")return std::make_unique<MathNode>();if(id=="maprange")return std::make_unique<MapRangeNode>();if(id=="clamp")return std::make_unique<ClampNode>();if(id=="comparator")return std::make_unique<ComparatorNode>();
         if(id=="mix")return std::make_unique<MixNode>();if(id=="curve")return std::make_unique<CurveNode>();if(id=="unitconvert")return std::make_unique<UnitConverterNode>();if(id=="value")return std::make_unique<ValueNode>();
@@ -114,6 +116,7 @@ struct PartialGraphNode : NodeProcessor {
                 for(std::size_t s=0;s<steps.size();s++){
                     auto& v=voice.steps[s];
                     if(auto* context=dynamic_cast<PartialContextNode*>(v.processor.get())){context->partial=&partial;context->index=i;context->time=frame.start/input->sampleRate;}
+                    if(auto* noise=dynamic_cast<PartialNoiseNode*>(v.processor.get())){noise->active=true;noise->partialId=partial.id;noise->frameStart=frame.start;}
                     if(auto* uniform=dynamic_cast<PartialUniformNode*>(v.processor.get()))uniform->value=c.numericInput(uniform->slot+1)[offset];
                     ProcessContext scalar{v.inputs.data(),v.inputs.size(),v.outputs[0],1,input->sampleRate/std::max<std::size_t>(1,input->hop),&silence};scalar.outputs=v.outputs.data();scalar.outputCount=v.outputs.size();scalar.sourceRates=v.rates.data();scalar.blockFrames=1;v.processor->process(scalar);
                 }

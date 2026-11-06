@@ -1133,6 +1133,17 @@
       },
       "source": "SpectrumMathNode.java",
       "kind": "node"
+    },
+    {
+      "id": "easyknack.partials.noise",
+      "slug": "partial-noise",
+      "category": "spectrum",
+      "title": {
+        "en": "Partial Noise",
+        "de": "Teiltonrauschen"
+      },
+      "source": "PartialNoiseNode.java",
+      "kind": "node"
     }
   ],
   "excluded": [

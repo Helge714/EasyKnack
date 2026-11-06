@@ -21,10 +21,13 @@ Liefert die Werte des aktuellen Teiltons innerhalb einer Teilton-Gruppe.
 | Alter (Age) | [Value](../../user/de/data-types.md#value) | 0–∞ s | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Index | [Value](../../user/de/data-types.md#value) | 0–255 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Frame-Zeit (Frame time) | [Value](../../user/de/data-types.md#value) | 0–∞ s | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Seed | [Value](../../user/de/data-types.md#value) | 0–16 777 215 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
 Die Werte gelten für den aktuellen Teilton im aktuellen Frame. Phase wird in Umdrehungen angegeben; Index bezeichnet die aktuelle Lautstärkesortierung, ID die verfolgte Identität. Alter und Frame-Zeit sind Sekunden. Zustände der Teilton-Gruppe werden anhand der ID zugeordnet.
+
+ID bleibt die Teiltonkennung. Seed ist ein daraus abgeleiteter, exakt als Float darstellbarer 24-Bit-Wert für die Seed-Eingänge gewöhnlicher Noise-Nodes; er ist keine eindeutige Kennung. Partial Noise verwendet die Teilton-ID direkt und benötigt diese Verbindung nicht.
 
 ## Mute
 

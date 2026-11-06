@@ -52,5 +52,25 @@ int main(){
         if(tick>12)for(unsigned i=0;i<block;i++){double expected=std::cos(partialTau*475*(double(tick*block+i)-1024)/48000);error+=std::pow(a[i]-expected,2);power+=expected*expected;}
     }
     assert(std::sqrt(error/power)<.03);
+    // Counter-based noise follows stable IDs rather than amplitude order or slot order.
+    PartialsResource batch;batch.prepare(block);batch.size=batch.windowSize=1024;batch.hop=256;batch.sampleRate=48000;batch.identity=555;batch.count=1;
+    auto& frame=batch.frames[0];frame.start=1024;frame.count=2;frame.values[0]={10,0,440,1,0,0,440,1,0};frame.values[1]={20,1,660,1,0,0,660,1,0};
+    PartialGraphNode noisy;std::istringstream np(noiseParameters);noisy.configure(np);noisy.prepare(48000,block);
+    const DspResource* rr[]={&batch};ProcessContext nc{};nc.resourceInputs=rr;nc.inputCount=1;nc.bufferSize=block;nc.sampleRate=48000;nc.silence=silence.data();nc.output=a.data();
+    watching=true;noisy.process(nc);double n0=noisy.stream.frames[0].values[0].amplitude,n1=noisy.stream.frames[0].values[1].amplitude;
+    assert(n0>=0&&n0<1&&n1>=0&&n1<1&&n0!=n1);
+    std::swap(frame.values[0],frame.values[1]);noisy.process(nc);assert(noisy.stream.frames[0].values[0].amplitude==n1&&noisy.stream.frames[0].values[1].amplitude==n0);
+    frame.start+=256;noisy.process(nc);assert(noisy.stream.frames[0].values[0].amplitude!=n1);
+    // Both checkboxes can be disabled independently or together.
+    PartialNoiseNode random;random.active=true;random.partialId=10;random.frameStart=1024;random.process(nc);float first=a[0];
+    random.perPartial=false;random.process(nc);first=a[0];random.partialId=20;random.process(nc);assert(a[0]==first);
+    random.perFrame=false;random.process(nc);first=a[0];random.frameStart+=256;random.process(nc);assert(a[0]==first);
+    random.perPartial=true;random.process(nc);first=a[0];random.frameStart+=256;random.process(nc);assert(a[0]==first);
+    random.seed=1;random.process(nc);assert(a[0]!=first);
+    PartialContextNode context;context.partial=&frame.values[0];float contextValues[8]{};float* contextOutputs[8];for(unsigned i=0;i<8;i++)contextOutputs[i]=contextValues+i;
+    auto cc=nc;cc.output=contextValues;cc.outputs=contextOutputs;cc.outputCount=8;cc.bufferSize=1;context.process(cc);
+    assert(contextValues[3]==float(context.partial->id));assert(contextValues[7]==partialSeed(context.partial->id));
+    assert(contextValues[7]>=0&&contextValues[7]<=16777215&&std::floor(contextValues[7])==contextValues[7]);
+    watching=false;assert(allocations==0);
     std::cout<<"Partial reconstruction, tracking, fractional frequency synthesis and frame validation passed\n";
 }

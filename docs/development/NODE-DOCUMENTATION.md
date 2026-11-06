@@ -17,7 +17,7 @@ The canonical layout reference is the additive oscillator in
 [English](../nodes/en/additive-oscillator.md) and
 [German](../nodes/de/additive-oscillator.md). Earlier drafts are comparison
 material, excluded from the public catalog. Both node indices cover every public
-built-in node, the four group types and the user-facing spectral context nodes.
+built-in node, the group types and the user-facing spectral context nodes.
 The application bundles the pages and opens localized native help from the
 node context menu and Help menu. Plugin documentation integration remains pending.
 

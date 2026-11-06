@@ -11,7 +11,7 @@ import com.vingame.glswing.node.model.*;
 final class PartialGroups {
     static final String MARKER="easyknack.partials",CREATE="easyknack.action.partialgroup";
     static boolean partial(GLNodeGraphAsset a){return new NodeState(a.metadata()).flag(MARKER,false);}
-    static boolean supports(BasicNode n){return n!=null&&Set.of("partialcontext","partialoutput","partialuniform","math","maprange","clamp","comparator","mix","curve","unitconvert","value","noise","digitalnoise","formula").contains(n.processor().id());}
+    static boolean supports(BasicNode n){return n!=null&&Set.of("partialnoise","partialcontext","partialoutput","partialuniform","math","maprange","clamp","comparator","mix","curve","unitconvert","value","noise","digitalnoise","formula").contains(n.processor().id());}
     static GLNodeGraphAsset create(){
         String id="partials-"+UUID.randomUUID();var context=new PartialContextNode();var output=new PartialOutputNode();
         var a=new GLGraphNode(GLNodeId.random(),context.registration().id(),context.defaults());var b=new GLGraphNode(GLNodeId.random(),output.registration().id(),output.defaults());

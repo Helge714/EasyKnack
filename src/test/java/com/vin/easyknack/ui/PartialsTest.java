@@ -28,7 +28,20 @@ class PartialsTest {
     static GLGraphNode compiled(GLNodeGraphDocument doc){var r=new GLCompositeGraphRegistry();r.registerDocument(doc);var flat=SpectralGroups.flatten(GroupCompiler.prepare(doc.root(),r),new GLCompositeExpansionLimits(16,256,512,10000));assertTrue(flat.isValid(),flat.diagnostics().toString());assertDoesNotThrow(()->com.vin.easyknack.audio.AudioGraphEncoder.encode(flat.graph().orElseThrow()));return flat.graph().orElseThrow().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof PartialGraphNode).findFirst().orElseThrow();}
     @Test void groupsCompilePersistAndHaveASeparatePalette()throws Exception{
         for(boolean shift:List.of(false,true)){var doc=document(shift);compiled(doc);var codec=new KnackDocumentCodec();var bytes=new java.io.ByteArrayOutputStream();codec.write(doc,bytes);compiled(NodeDocuments.prepare(codec.read(new java.io.ByteArrayInputStream(bytes.toByteArray()),codec.currentSchemaVersion())));}
-        javax.swing.SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){c.addPartialGroup(0,0);c.actions().openSelectedComposite();var ids=c.availableNodes().stream().map(e->e.type().id()).toList();assertTrue(ids.contains(new PartialContextNode().registration().id()));assertTrue(ids.contains(new DigitalNoiseNode().registration().id()));assertFalse(ids.contains(new BinContextNode().registration().id()));assertFalse(ids.contains(new OscillatorNode().registration().id()));}});
+        javax.swing.SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){c.addPartialGroup(0,0);c.actions().openSelectedComposite();var ids=c.availableNodes().stream().map(e->e.type().id()).toList();assertTrue(ids.contains(new PartialContextNode().registration().id()));assertTrue(ids.contains(new DigitalNoiseNode().registration().id()));assertTrue(ids.contains(new PartialNoiseNode().registration().id()));assertFalse(ids.contains(new BinContextNode().registration().id()));assertFalse(ids.contains(new OscillatorNode().registration().id()));}});
+    }
+    static GLNodeGraphDocument noiseDocument(){
+        var doc=document(false);var asset=doc.embeddedAssets().values().iterator().next();var graph=new GLNodeGraph(asset.graph());
+        var out=graph.snapshot().nodes().stream().filter(n->n.typeId().equals(new PartialOutputNode().registration().id())).findFirst().orElseThrow();
+        var noise=add(graph,new PartialNoiseNode());graph.edit("Partial noise",e->{for(var w:graph.snapshot().connections())if(w.input().nodeId().equals(out.id())&&w.input().portId().equals("amplitude"))e.removeConnection(w.id());});
+        connect(graph,noise,"out",out.id(),"amplitude");
+        var changed=new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),graph.snapshot(),asset.viewState(),asset.metadata(),asset.compositeDescriptor());
+        return new GLNodeGraphDocument(doc.root(),Map.of(changed.id(),changed),List.of());
+    }
+    @Test void partialNoiseIsContextOnlyAndCompilesWithStableIds(){
+        compiled(noiseDocument());assertTrue(new PartialNoiseNode().requiresPartialContext());
+        assertEquals(List.of("frequency","amplitude","phase","id","age","index","time","seed"),new PartialContextNode().layout(new NodeState(Map.of())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(NodeBuilder.Row::id).toList());
+        assertEquals("New Partial Group",AppText.text("partials.new"));
     }
     @Test void partialResourcesCanBeExportedAtGroupBoundaries(){
         var doc=document(false);var instance=doc.root().graph().nodes().stream().filter(n->doc.embeddedAssets().values().stream().anyMatch(a->a.compositeDescriptor().nodeTypeId().equals(n.typeId()))).findFirst().orElseThrow();
@@ -39,9 +52,9 @@ class PartialsTest {
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void reconstructionPhaseTrackingAndPreparedStorage()throws Exception{
         var dir=Files.createTempDirectory(Path.of("target"),"partials-native-").toAbsolutePath();var def=new PartialGraphNode();
-        var identity=compiled(document(false));var shift=compiled(document(true));
+        var identity=compiled(document(false));var shift=compiled(document(true));var noisy=compiled(noiseDocument());
         String prefix="!"+NativeContractGenerator.fingerprint(def)+" ";
-        Files.writeString(dir.resolve("PartialsTestParameters.hpp"),"#pragma once\nstatic const char* identityParameters=R\"params("+prefix+def.encode(new NodeState(identity.properties()),p->0)+")params\";\nstatic const char* shiftParameters=R\"params("+prefix+def.encode(new NodeState(shift.properties()),p->0)+")params\";\n");
+        Files.writeString(dir.resolve("PartialsTestParameters.hpp"),"#pragma once\nstatic const char* identityParameters=R\"params("+prefix+def.encode(new NodeState(identity.properties()),p->0)+")params\";\nstatic const char* shiftParameters=R\"params("+prefix+def.encode(new NodeState(shift.properties()),p->0)+")params\";\nstatic const char* noiseParameters=R\"params("+prefix+def.encode(new NodeState(noisy.properties()),p->0)+")params\";\n");
         RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialsTest.cpp").toAbsolutePath(),dir.resolve("test.exe"),dir);
     }
 }

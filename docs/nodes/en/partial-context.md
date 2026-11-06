@@ -21,10 +21,13 @@ Provides the current partial values inside a Partial Group.
 | Age | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 | Index | [Value](../../user/en/data-types.md#value) | 0–255 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 | Frame time | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Seed | [Value](../../user/en/data-types.md#value) | 0–16 777 215 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
 Values describe the current partial in the current frame. Phase uses turns; Index is the current amplitude ordering, ID is the tracked identity. Age and frame time use seconds. Partial Group state follows the ID.
+
+ID remains the track identifier. Seed is a derived 24-bit value exactly representable as float for ordinary Noise seed inputs; it is not a unique identifier. Partial Noise uses the full track ID directly and needs no such connection.
 
 ## Mute
 
