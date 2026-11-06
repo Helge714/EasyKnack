@@ -160,10 +160,13 @@ def main():
                 "native_executable": str(executable),
                 "native_source_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in
                                          (ROOT / "native/audio-host/src/nodes/PartialAnalysisNode.hpp",
-                                          ROOT / "native/audio-host/benchmarks/PartialReference.cpp")}
+                                          ROOT / "native/audio-host/benchmarks/PartialReference.cpp",
+                                          ROOT / "native/audio-host/src/PartialClassifier.hpp",
+                                          ROOT / "native/audio-host/src/PartialClassifierCalibration.hpp")}
                                         if not args.native_executable else None,
                 "native_profile": {"threshold_db": -60, "capacity": 64, "minimum_hz": 20, "maximum_hz": 20000,
-                                   "tracking_tolerance_cents": 100, "minimum_duration_ms": 20},
+                                   "tracking_tolerance_cents": 100, "minimum_duration_ms": 20,
+                                   "classifier": "adaptive NBD/NDD/FCD", "minimum_peak_snr_db": 30},
                 "sms_profile": {"tracking_offset_hz": 20, "tracking_slope": .01, "minimum_duration_ms": 20},
                 "native_executable_sha256": hashlib.sha256(executable.read_bytes()).hexdigest()}
     if args.wav:

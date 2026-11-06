@@ -70,15 +70,20 @@ static void modulatedTracks(){
 }
 int main(){
     resolvedNeighbours();modulatedTracks();
+    { // Embedded pre-classifier and heuristic contracts remain parseable.
+        PartialAnalysisNode old;std::istringstream p("!944a705e1b770686 -1 -60 64 20 20000 100 .8 3 30 .7 20 20 0 -1 0 30 40 2000");old.configure(p);
+        assert(old.classify&&old.peakSnr==30&&old.duration==20&&old.sources.size()==2);
+        PartialAnalysisNode raw;std::istringstream q("!fa4a30260a8836d4 -1 -60 64 20 20000 100");raw.configure(q);assert(!raw.classify&&raw.duration==0);
+    }
     constexpr unsigned block=256;float output[block]{},silence[block]{};SpectrumStream input;input.prepare(block);input.size=input.windowSize=4096;input.hop=256;input.sampleRate=48000;input.identity=21;input.window=SpectrumWindow::hann;input.blockFrames=block;
-    PartialAnalysisNode analysis;analysis.prepare(48000,block);PartialAnalysisNode raw;raw.sinusoidality=raw.prominence=raw.confidence=raw.duration=0;raw.prepare(48000,block);
+    PartialAnalysisNode analysis;analysis.prepare(48000,block);PartialAnalysisNode raw;raw.classify=false;raw.duration=0;raw.prepare(48000,block);
     const DspResource* resources[]={&input,nullptr};ProcessContext c{};c.resourceInputs=resources;c.inputCount=2;c.bufferSize=block;c.sampleRate=48000;c.silence=silence;c.output=output;
     std::uint64_t id=0;double noiseCount=0,rawCount=0;
     watching=true;
     for(unsigned t=0;t<28;t++){
         frame(input,t,true);analysis.process(c);
         for(std::size_t i=1;i<analysis.partials.frames[0].count;i++)assert(analysis.partials.frames[0].values[i-1].amplitude>=analysis.partials.frames[0].values[i].amplitude);
-        if(t>8){assert(find(analysis,375)&&find(analysis,1125)&&find(analysis,1680));assert(find(analysis,375)->tonality>=analysis.confidence);if(id)assert(id==find(analysis,375)->id);id=find(analysis,375)->id;}
+        if(t>8){assert(find(analysis,375)&&find(analysis,1125)&&find(analysis,1680));assert(find(analysis,375)->tonality>=0&&find(analysis,375)->tonality<=1);if(id)assert(id==find(analysis,375)->id);id=find(analysis,375)->id;}
     }
     frame(input,28,true,true);analysis.process(c);assert(!analysis.partials.frames[0].count);
     frame(input,29,true);analysis.process(c);assert(find(analysis,375)&&find(analysis,375)->id==id);
@@ -99,7 +104,7 @@ int main(){
     auto nestedPlan=plan;nestedPlan.replace(0,7,"GRAPH 3");nestedPlan+=" z baked_output 1 8 @ c c";
     nested.configureGraph(nestedPlan,factory,{}, {2},{});assert(nested.resourceCapacityHint(ResourceKind::partials)==400);nested.prepare(48000,block);
     assert(static_cast<PartialGraphNode&>(*nested.runtime->graph.nodes[1].processor).voices.size()>=400);
-    ResourcePreparationScope capacity(ResourceKind::partials,400);PartialAnalysisNode wide;wide.limit=400;wide.threshold=-80;wide.minimum=0;wide.maximum=24000;wide.sinusoidality=wide.prominence=wide.confidence=wide.duration=0;wide.prepare(48000,block);
+    ResourcePreparationScope capacity(ResourceKind::partials,400);PartialAnalysisNode wide;wide.limit=400;wide.threshold=-80;wide.minimum=0;wide.maximum=24000;wide.classify=false;wide.duration=0;wide.prepare(48000,block);
     PartialsSpectrumNode synth;synth.prepare(48000,block);input.identity++;input.count=1;input.frames[0].start=0;input.blockStart=0;input.window=SpectrumWindow::rectangular;
     for(unsigned i=0;i<4096;i++){double v=0;for(unsigned k=1;k<=300;k++)v+=.002*std::cos(partialTau*(2*k)*i/4096.);input.frames[0].bins[i]=v;}spectrumTransform(input.frames[0].bins.data(),4096);
     watching=true;wide.process(c);assert(wide.partials.frames[0].count==300);resources[0]=&wide.partials;group.process(c);assert(group.stream.frames[0].count==300);resources[0]=&group.stream;synth.process(c);

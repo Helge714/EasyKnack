@@ -17,7 +17,7 @@ int main(){
     constexpr std::size_t block=256;std::array<float,block> a{},b{},silence{};
     for(auto window:{SpectrumWindow::rectangular,SpectrumWindow::hann,SpectrumWindow::hamming,SpectrumWindow::blackman})for(unsigned padding:{1,2}){
         SpectrumStream input;input.prepare(block);input.size=1024*padding;input.windowSize=1024;input.hop=block;input.sampleRate=48000;input.identity=42;input.window=window;input.blockFrames=block;
-        PartialAnalysisNode analysis;analysis.threshold=-45;analysis.minimum=100;analysis.maximum=2000;analysis.limit=16;analysis.duration=analysis.sinusoidality=analysis.prominence=analysis.confidence=0;analysis.prepare(48000,block);
+        PartialAnalysisNode analysis;analysis.threshold=-45;analysis.minimum=100;analysis.maximum=2000;analysis.limit=16;analysis.duration=0;analysis.classify=false;analysis.prepare(48000,block);
         PartialGraphNode group;std::istringstream cfg(identityParameters);group.configure(cfg);group.prepare(48000,block);
         PartialsSpectrumNode synthesis;synthesis.prepare(48000,block);SpectrumMathNode mix;mix.prepare(48000,block);
         IFFTNode original,rebuilt;original.prepare(48000,block);rebuilt.prepare(48000,block);
@@ -41,7 +41,7 @@ int main(){
     }
     // A non-bin-aligned shifted sinusoid has a continuous phase across STFT frames.
     SpectrumStream input;input.prepare(block);input.size=input.windowSize=1024;input.hop=block;input.sampleRate=48000;input.identity=99;input.window=SpectrumWindow::hann;input.blockFrames=block;
-    PartialAnalysisNode analysis;analysis.threshold=-30;analysis.minimum=200;analysis.maximum=600;analysis.limit=1;analysis.duration=analysis.sinusoidality=analysis.prominence=analysis.confidence=0;analysis.prepare(48000,block);
+    PartialAnalysisNode analysis;analysis.threshold=-30;analysis.minimum=200;analysis.maximum=600;analysis.limit=1;analysis.duration=0;analysis.classify=false;analysis.prepare(48000,block);
     PartialGraphNode group;std::istringstream cfg(shiftParameters);group.configure(cfg);group.prepare(48000,block);PartialsSpectrumNode synth;synth.prepare(48000,block);IFFTNode inverse;inverse.prepare(48000,block);
     double error=0,power=0;
     for(unsigned tick=0;tick<80;tick++){

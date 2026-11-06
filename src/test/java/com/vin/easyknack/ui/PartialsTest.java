@@ -57,5 +57,6 @@ class PartialsTest {
         Files.writeString(dir.resolve("PartialsTestParameters.hpp"),"#pragma once\nstatic const char* identityParameters=R\"params("+prefix+def.encode(new NodeState(identity.properties()),p->0)+")params\";\nstatic const char* shiftParameters=R\"params("+prefix+def.encode(new NodeState(shift.properties()),p->0)+")params\";\nstatic const char* noiseParameters=R\"params("+prefix+def.encode(new NodeState(noisy.properties()),p->0)+")params\";\n");
         RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialsTest.cpp").toAbsolutePath(),dir.resolve("test.exe"),dir);
         RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialClassificationTest.cpp").toAbsolutePath(),dir.resolve("classification.exe"),dir);
+        RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialClassifierTest.cpp").toAbsolutePath(),dir.resolve("descriptors.exe"),dir);
     }
 }

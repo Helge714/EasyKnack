@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace Partial Analysis heuristic gates with adaptive bandwidth/duration/coherence classification and a 5-60 dB Minimum peak SNR control (default 30 dB). Add an inspector classification switch; Context Tonality becomes Classification margin. Old heuristic settings use the new default and copied bindings to retired controls detach with a log warning; signal connections and raw analysis are retained. Rebuild Java and the host together. The parameter fingerprint changes; document schema and transport versions do not.
+
 - Improve Partial Analysis for neighbouring resolved tones and changing frequency by fitting strong components first and comparing track phases at the window centre. Existing settings and document/host contracts are unchanged. Add an optional offline SMS reference comparison; tonality remains a model score, not a calibrated noise probability.
 
 - Expose the primary Partial Analysis selection controls directly in the node; keep detailed tracking and harmonic settings in the inspector. DSP behavior and defaults are unchanged.

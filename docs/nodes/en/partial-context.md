@@ -22,13 +22,15 @@ Provides the current partial values inside a Partial Group.
 | Index | [Value](../../user/en/data-types.md#value) | 0–32767 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 | Frame time | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 | Seed | [Value](../../user/en/data-types.md#value) | 0–16 777 215 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
-| Tonality | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Classification margin | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
 Values describe the current partial in the current frame. Phase uses turns; Index is the current amplitude ordering, ID is the tracked identity. Age and frame time use seconds. Partial Group state follows the ID.
 
 ID remains the track identifier. Seed is a derived 24-bit value exactly representable as float for ordinary Noise seed inputs; it is not a unique identifier. Partial Noise uses the full track ID directly and needs no such connection.
+
+Classification margin is the smallest normalized distance to a classifier boundary, from 0 at a boundary towards 1 inside the accepted region. It is not a probability. With classification disabled it is 1.
 
 ## Mute
 

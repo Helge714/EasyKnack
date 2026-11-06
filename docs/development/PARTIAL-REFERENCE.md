@@ -69,8 +69,8 @@ windows and modulation that is not locally stationary with long windows.
 
 The adapter runs the actual `PartialAnalysisNode` in two profiles:
 
-- `defaults`: unchanged product defaults, with classification enabled.
-- `sinusoidal`: sinusoidality, tonality threshold and prominence are zero;
+- `defaults`: current product defaults, with classification enabled.
+- `sinusoidal`: classification is disabled;
   minimum track duration remains 20 ms. This isolates tracking from classification.
 
 SMS calls public DFT analysis, peak interpolation, `sineTracking` and
@@ -97,30 +97,13 @@ alone establishes perceptual separation quality.
 
 ## Implementation status
 
-The host currently interpolates peaks, applies prominence screening, fits
-candidates in descending amplitude order and subtracts qualifying window lobes
-from a prepared scratch spectrum before evaluating weaker candidates. Only
-confirmed tracks are subtracted from the actual residual. The broad window-fit
-test is retained: simply restricting it to the peak's minima increased noise
-acceptance dramatically in the comparison and was rejected.
+The host now uses the adaptive NBD/NDD/FCD classifier described in
+[PARTIAL-CLASSIFIER.md](PARTIAL-CLASSIFIER.md), including calibration reproduction,
+parameter meanings, tests, cost and limits. Its `sinusoidal` comparison profile
+sets Classify peaks to false; minimum track duration remains 20 ms.
 
-Tracking compares phases at the window centre, consistent with its frequency
-estimates. Emitted phases retain the original STFT convention. Preparation owns
-the scratch storage; there are no allocations in the process callback. Existing
-parameters, document defaults and host parameter contracts are unchanged.
-
-This is a correction of interference and time-reference errors in our existing
-classifier, **not a reproduction of ZRR07**, nor a claim of calibrated confidence.
-Its complete adaptive classifier remains a distinct next step: derive the three
-descriptors, verify their units/window conventions against synthetic modulated
-peaks, implement and validate SNR-dependent boundaries, then compare recall,
-noise acceptance and runtime against this baseline. Fixed thresholds must not be
-presented as the paper's adaptive method.
-
-Limits remain: unresolved neighbours, transients, strong AM/FM inside a window,
-capacity saturation, and long-window noise tracks. There is no universal window
-size and no guarantee of perfect tonal/noise separation. Real recordings require
-separate listening and evaluation; passing synthetic tests is not such validation.
+The snapshot below records the earlier window-fit classifier and its interference
+fix. Keep it as a labelled baseline, not as the current algorithm description.
 
 ## Measurement snapshot (2026-11-06)
 
