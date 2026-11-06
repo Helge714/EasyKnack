@@ -16,13 +16,12 @@ Records audio into a circular buffer.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
 | Buffer | [Buffer resource](../../user/en/data-types.md#buffer) | Recorded samples | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
-| Write position | [Value](../../user/en/data-types.md#value) | 0 ≤ position < 1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
 Size sets the stored duration at the DSP sample rate. Resizing allocates an empty buffer and resets readers. Readers see a sample-accurate write head, including earlier samples in the current block but never future samples. Read the resource with [Buffer Reader (Speed)](buffer-reader-speed.md) or [Buffer Reader (Position)](buffer-reader-position.md).
 
-Write position is the normalized physical position of the next sample to write. It advances sample by sample, wraps from the buffer end to 0, and matches the write-head reference used by both readers. Resizing restarts it. Reader Distance and Read position retain their existing meanings.
+Use [Buffer Context](buffer-context.md) for Size and sample-accurate Write position.
 
 ## Mute
 

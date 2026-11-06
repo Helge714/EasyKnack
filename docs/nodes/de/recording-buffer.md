@@ -16,13 +16,12 @@ Zeichnet Audio in einem Ringbuffer auf.
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
 | Buffer | [Buffer-Ressource](../../user/de/data-types.md#buffer) | Aufgezeichnete Samples | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Schreibposition (Write position) | [Wert](../../user/de/data-types.md#value) | 0 ≤ Position < 1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
 Größe legt die Speicherdauer bei DSP-Samplerate fest. Größenänderungen erzeugen einen leeren Buffer und setzen Reader zurück. Reader sehen einen samplegenauen Schreibkopf einschließlich früherer Samples desselben Blocks, niemals zukünftiger Samples. Lies die Ressource mit [Buffer Reader (Speed)](buffer-reader-speed.md) oder [Buffer Reader (Position)](buffer-reader-position.md).
 
-Write position ist die normierte physische Position des nächsten zu schreibenden Samples. Sie läuft samplegenau, springt am Bufferende auf 0 und entspricht der Schreibkopfreferenz beider Reader. Eine Größenänderung startet sie neu. Distance und Read position der Reader behalten ihre bisherige Bedeutung.
+[Buffer-Kontext](buffer-context.md) liefert Größe und samplegenaue Schreibposition.
 
 ## Mute
 

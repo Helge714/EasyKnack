@@ -87,6 +87,7 @@
 
 ## Buffers
 
+- [Buffer Context](buffer-context.md)
 - [Buffer Reader (Position)](buffer-reader-position.md)
 - [Buffer Reader (Speed)](buffer-reader-speed.md)
 - [File Buffer](file-buffer.md)

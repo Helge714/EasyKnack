@@ -12,13 +12,20 @@ import com.vingame.glswing.node.model.*;
 final class NodeDocuments implements AutoCloseable {
     private final KnackDocumentCodec codec = new KnackDocumentCodec();
     private final GLDocumentManager manager;
-    NodeDocuments() {
+    private final java.util.function.IntConsumer migrationNotice;
+    NodeDocuments(){this(count->{});}
+    NodeDocuments(java.util.function.IntConsumer migrationNotice) {
+        this.migrationNotice=migrationNotice;
         var codecs = new GLDocumentCodecRegistry(); codecs.register(codec);
         manager = new GLDocumentManager(codecs);
     }
     CompletionStage<GLNodeGraphDocument> read(Path path) {
         return manager.open(path, codec, codec.currentSchemaVersion()).thenApply(document -> {
-            try { return prepare(document.content()); } finally { manager.release(document); }
+            try {
+                int count=BufferContextMigration.count(document.content());var prepared=prepare(document.content());
+                if(count>0){java.util.logging.Logger.getLogger(NodeDocuments.class.getName()).warning("Migrated legacy Write position connections to Buffer Context ("+count+" recording buffers)");migrationNotice.accept(count);}
+                return prepared;
+            } finally { manager.release(document); }
         });
     }
     CompletionStage<Path> write(Path path, GLNodeGraphDocument snapshot) {
@@ -31,6 +38,7 @@ final class NodeDocuments implements AutoCloseable {
         result.addAll(document.embeddedAssets().values()); return result;
     }
     static GLNodeGraphDocument prepare(GLNodeGraphDocument document) {
+        document=BufferContextMigration.migrate(document);
         document=SpectrumBlurMigration.migrate(document);
         document=InstanceGroupMigration.migrate(document);
         document=SpectralInputMigration.migrate(FftMigration.migrate(DelayMigration.migrate(ReaderPositionMigration.migrate(document))));

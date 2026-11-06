@@ -1045,6 +1045,17 @@
       },
       "source": "HilbertNode.java",
       "kind": "node"
+    },
+    {
+      "id": "easyknack.resource.buffercontext",
+      "slug": "buffer-context",
+      "category": "buffer",
+      "title": {
+        "en": "Buffer Context",
+        "de": "Buffer-Kontext"
+      },
+      "source": "BufferContextNode.java",
+      "kind": "node"
     }
   ],
   "excluded": [

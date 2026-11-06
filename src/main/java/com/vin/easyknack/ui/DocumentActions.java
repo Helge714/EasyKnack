@@ -18,7 +18,7 @@ final class DocumentActions implements AutoCloseable {
     private final WorkspaceController controller;
     private final GLParent owner;
     private final JFrame window;
-    private final NodeDocuments files = new NodeDocuments();
+    private final NodeDocuments files = new NodeDocuments(count->EventQueue.invokeLater(this::bufferMigrationWarning));
     private final RememberingFileDialogs dialogs = new RememberingFileDialogs();
     private final Timer titleTimer;
     private final Timer recoveryTimer;
@@ -389,6 +389,19 @@ final class DocumentActions implements AutoCloseable {
     private void error(GLDocumentOperation operation, Path file, Throwable failure) {
         while (failure instanceof CompletionException && failure.getCause() != null) failure = failure.getCause();
         GLDocumentDialogs.showFailure(owner, GLDocumentFailure.of(operation, file, failure));
+    }
+    private void bufferMigrationWarning(){
+        if(closed)return;
+        var ref=new GLDialog[1];
+        var content=new GLContainer(){
+            final GLLabel text=new GLLabel(AppText.text("buffer.context.migration"));
+            final GLLabel detail=new GLLabel(AppText.text("buffer.context.migration.detail"));
+            final GLButton ok=new GLButton("OK");
+            {addGL(text);addGL(detail);addGL(ok);ok.addActionListener(e->ref[0].close());}
+            protected void record(GLContext2D c){}
+            protected void resized(float w,float h){text.setBounds(20,20,w-40,30);detail.setBounds(20,52,w-40,30);ok.setBounds(w-100,h-45,80,28);}
+        };
+        ref[0]=new GLDialog(AppText.text("buffer.context.migration.title"),content);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(880,155);ref[0].show(owner);
     }
     private <T> void onUi(CompletionStage<T> stage, BiConsumer<T, Throwable> action) {
         stage.whenComplete((value, failure) -> EventQueue.invokeLater(() -> { if (!closed) action.accept(value, failure); }));

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Buffer Context with Size and sample-accurate Write position for recording/file buffers. Remove the writer metadata output; old document connections and exposed group outputs migrate automatically with a load notice. Rebuild Java and the audio host together.
+
 - Keep Copy Editor source selection explicit for unbound group inputs, preventing the first nested group input from hiding alternatives such as Hilbert filter length.
 
 - Allow Hilbert filter length selection directly in the node (61-2049 taps); changing length resets its history and adjusts both output delays. Rebuild Java and the audio host together for the updated Hilbert parameter contract.

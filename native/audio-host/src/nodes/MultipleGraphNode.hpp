@@ -12,6 +12,7 @@
 #include "ComparatorNode.hpp"
 #include "GainNode.hpp"
 #include "HilbertNode.hpp"
+#include "BufferContextNode.hpp"
 #include "FilterNode.hpp"
 #include "DelayNode.hpp"
 #include "OscillatorNode.hpp"
@@ -267,6 +268,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="comparator")return std::make_unique<ComparatorNode>();
         if(id=="gain")return std::make_unique<GainNode>();
         if(id=="hilbert")return std::make_unique<HilbertNode>();
+        if(id=="buffercontext")return std::make_unique<BufferContextNode>();
         if(id=="filter")return std::make_unique<FilterNode>();
         if(id=="delay")return std::make_unique<DelayNode>();
         if(id=="osc")return std::make_unique<OscillatorNode>();

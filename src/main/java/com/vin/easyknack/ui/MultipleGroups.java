@@ -14,7 +14,7 @@ final class MultipleGroups {
         "spectrumblur","spectrumshift","spectrumprune","spectrumcorrelation","spectrumstatistics","spectralfeatures","correlationfeatures","analysisaverage",
         "valueaverage","levelanalysis","pitchdetection","envelope","triggerinput","triggercounter","triggerdelay","triggerdivider",
         "triggerfilter","triggermerge","triggertimer","history","historyreader","positionreader","spectrumrelay","vectorrelay",
-        "historyrelay","multiplehistoryinput","waveformrelay","waveform","multiplewaveforminput","math","maprange","mix","curve","clamp",
+        "historyrelay","multiplehistoryinput","buffercontext","waveformrelay","waveform","multiplewaveforminput","math","maprange","mix","curve","clamp",
         "unitconvert","value","comparator","gain","hilbert","filter","delay","osc","additive",
         "digitalnoise","noise","pan","channelseparate","channelcombine","context","slew","bitcrusher",
         "samplehold","edgedetector","clock","rateconvert","triggerpulse","scalequantizer","pitchhold","instancecontext",
