@@ -19,8 +19,8 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Partials | [Partials](../../user/en/data-types.md#partials) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/rates.md#auto) |
-| Residual | [Spectrum](../../user/en/data-types.md#spectrum) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/rates.md#auto) |
+| Partials | [Partials](../../user/en/data-types.md#partials) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
+| Residual | [Spectrum](../../user/en/data-types.md#spectrum) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
@@ -44,6 +44,6 @@ Local FFT peaks use logarithmic interpolation. Tracking matches frequency distan
 | --- |
 | Not supported |
 
-[Partials to Spectrum](partials-to-spectrum.md) · [Spectrum Mix](spectrum-mix.md) · [Partial Context](partial-context.md) · [Partial Output](partial-output.md) · [Partial Group](partial-group.md)
+[Partials to Spectrum](partials-to-spectrum.md) · [Spectrum Math](spectrum-math.md) · [Partial Context](partial-context.md) · [Partial Output](partial-output.md) · [Partial Group](partial-group.md)
 
 [Deutsch](../de/partial-analysis.md)

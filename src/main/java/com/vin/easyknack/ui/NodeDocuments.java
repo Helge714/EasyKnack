@@ -40,6 +40,7 @@ final class NodeDocuments implements AutoCloseable {
     static GLNodeGraphDocument prepare(GLNodeGraphDocument document) {
         document=BufferContextMigration.migrate(document);
         document=SpectrumBlurMigration.migrate(document);
+        document=SpectrumMixMigration.migrate(document);
         document=InstanceGroupMigration.migrate(document);
         document=SpectralInputMigration.migrate(FftMigration.migrate(DelayMigration.migrate(ReaderPositionMigration.migrate(document))));
         if (!document.externalAssets().isEmpty()) throw new IllegalArgumentException(

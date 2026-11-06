@@ -76,7 +76,7 @@ public class BasicNodeView extends GLNode {
                     port.setToolTipText(NodeHints.tooltip(row));
                     port.setColor(ApplicationTheme.current().signal(row.signal()));
                     port.setShape(row.rate().shape());
-                    port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM || row.dataType()==PortDataType.WAVEFORM);
+                    port.setConnectionDashed(row.dataType().isReference());
                     if (row.kind() == NodeBuilder.RowKind.INPUT) {
                         port.setSocketVisible(row.socketVisible());
                         port.setMaximumConnections(1);
@@ -230,7 +230,7 @@ public class BasicNodeView extends GLNode {
                     if (port == null) continue;
                     port.setColor(ApplicationTheme.current().signal(row.signal()));
                     port.setShape(row.rate().shape());
-                    port.setConnectionDashed(row.dataType()==PortDataType.HISTORY || row.dataType()==PortDataType.ANALYSIS || row.dataType()==PortDataType.SPECTRUM || row.dataType()==PortDataType.WAVEFORM);
+                    port.setConnectionDashed(row.dataType().isReference());
 
                     String tip=NodeHints.tooltip(row);
                     if(row.kind()==NodeBuilder.RowKind.INPUT && row.rate()==ProcessingRate.CONTROL && (row.dataType()==PortDataType.SIGNAL)

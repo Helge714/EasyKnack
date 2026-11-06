@@ -20,7 +20,7 @@ class PartialsTest {
             group=new GLNodeGraphAsset(group.id(),group.version(),group.kind(),g.snapshot(),group.viewState(),group.metadata(),group.compositeDescriptor());
         }
         var g=new GLNodeGraph();var osc=add(g,new OscillatorNode());var fft=add(g,new SpectrumNode(),Map.of("synchronous",GLNodeValue.of(true),"size",GLNodeValue.of("1024")));
-        var analysis=add(g,new PartialAnalysisNode());var synthesis=add(g,new PartialsSpectrumNode());var mix=add(g,new SpectrumMixNode());var ifft=add(g,new IFFTNode());var output=add(g,new OutputNode());
+        var analysis=add(g,new PartialAnalysisNode());var synthesis=add(g,new PartialsSpectrumNode());var mix=add(g,new SpectrumMathNode());var ifft=add(g,new IFFTNode());var output=add(g,new OutputNode());
         var instance=GLNodeId.random();var finalGroup=group;g.edit("Partial group",e->e.addNode(new GLGraphNode(instance,finalGroup.compositeDescriptor().nodeTypeId(),Map.of())));
         connect(g,osc,"audio-out",fft,"audio-in");connect(g,fft,"analysis",analysis,"spectrum");connect(g,analysis,"partials",instance,"partials");connect(g,instance,"out",synthesis,"partials");connect(g,analysis,"residual",mix,"b");connect(g,synthesis,"spectrum",mix,"a");connect(g,mix,"spectrum",ifft,"spectrum");connect(g,ifft,"out",output,"audio-in");
         return new GLNodeGraphDocument(new GLNodeGraphAsset("root",1,GLNodeGraphAssetKind.PROJECT,g.snapshot(),GLNodeEditorViewState.empty()),Map.of(group.id(),group),List.of());

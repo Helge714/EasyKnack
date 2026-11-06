@@ -14,13 +14,13 @@ Provides the current partial values inside a Partial Group.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Frequency | [Value](../../user/en/data-types.md#value) | 0–Nyquist Hz | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
-| Amplitude | [Value](../../user/en/data-types.md#value) | 0–∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
-| Phase | [Value](../../user/en/data-types.md#value) | ±∞ turn | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
-| ID | [Value](../../user/en/data-types.md#value) | 1–∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
-| Age | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
-| Index | [Value](../../user/en/data-types.md#value) | 0–255 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
-| Frame time | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/rates.md#auto) |
+| Frequency | [Value](../../user/en/data-types.md#value) | 0–Nyquist Hz | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Amplitude | [Value](../../user/en/data-types.md#value) | 0–∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Phase | [Value](../../user/en/data-types.md#value) | ±∞ turn | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| ID | [Value](../../user/en/data-types.md#value) | 1–∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Age | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Index | [Value](../../user/en/data-types.md#value) | 0–255 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Frame time | [Value](../../user/en/data-types.md#value) | 0–∞ s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

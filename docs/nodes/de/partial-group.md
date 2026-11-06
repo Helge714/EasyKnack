@@ -14,11 +14,11 @@ Bearbeitet jeden erkannten Teilton einmal pro Analyseframe.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/rates.md#auto) |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
-Standardaufbau: `Partial Analysis → Partial Group → Partials to Spectrum → Spectrum Mix → IFFT`; den Rest der Analyse mit dem zweiten Mix-Eingang verbinden. Im Inneren `Partial Context → Math / Formula Group → Partial Output` verwenden. Frequenz, Amplitude und Phase bleiben unabhängige Werte. Zustände sind pro ID getrennt und werden bei einer neuen ID zurückgesetzt. Maximal 64 numerische Prozessoren; gewöhnliche verschachtelte Gruppen und numerische Formula Groups werden aufgelöst. Keine Audio-Oszillatorbank, Buffer oder Triggerprogramme. Externe numerische Werte werden am Fensterende aus dem aktuellen Veröffentlichungsblock abgetastet; asynchrone historische Modulationswerte sind nicht gepuffert.
+Standardaufbau: `Partial Analysis → Partial Group → Partials to Spectrum → Spectrum Math (Add) → IFFT`; den Rest der Analyse mit dem zweiten Math-Eingang verbinden. Im Inneren `Partial Context → Math / Formula Group → Partial Output` verwenden. Frequenz, Amplitude und Phase bleiben unabhängige Werte. Zustände sind pro ID getrennt und werden bei einer neuen ID zurückgesetzt. Maximal 64 numerische Prozessoren; gewöhnliche verschachtelte Gruppen und numerische Formula Groups werden aufgelöst. Keine Audio-Oszillatorbank, Buffer oder Triggerprogramme. Externe numerische Werte werden am Fensterende aus dem aktuellen Veröffentlichungsblock abgetastet; asynchrone historische Modulationswerte sind nicht gepuffert.
 
 ## Mute
 
@@ -38,6 +38,6 @@ Standardaufbau: `Partial Analysis → Partial Group → Partials to Spectrum →
 | --- |
 | Nicht unterstützt |
 
-[Teiltonanalyse](partial-analysis.md) · [Teiltöne zu Spektrum](partials-to-spectrum.md) · [Spektrummischung](spectrum-mix.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md)
+[Teiltonanalyse](partial-analysis.md) · [Teiltöne zu Spektrum](partials-to-spectrum.md) · [Spektrummathematik](spectrum-math.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md)
 
 [English](../en/partial-group.md)

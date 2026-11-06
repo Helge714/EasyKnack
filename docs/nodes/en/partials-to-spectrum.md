@@ -14,7 +14,7 @@ Reconstructs a complex spectrum from partials for IFFT.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| [Spectrum](../../user/en/data-types.md#spectrum) | [Spectrum](../../user/en/data-types.md#spectrum) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/rates.md#auto) |
+| [Spectrum](../../user/en/data-types.md#spectrum) | [Spectrum](../../user/en/data-types.md#spectrum) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
@@ -38,6 +38,6 @@ Reconstructs positive and negative frequency contributions with the analysis win
 | --- |
 | Not supported |
 
-[Partial Analysis](partial-analysis.md) · [Spectrum Mix](spectrum-mix.md) · [Partial Context](partial-context.md) · [Partial Output](partial-output.md) · [Partial Group](partial-group.md)
+[Partial Analysis](partial-analysis.md) · [Spectrum Math](spectrum-math.md) · [Partial Context](partial-context.md) · [Partial Output](partial-output.md) · [Partial Group](partial-group.md)
 
 [Deutsch](../de/partials-to-spectrum.md)

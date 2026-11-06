@@ -64,6 +64,7 @@
 #include "PartialsSpectrumNode.hpp"
 #include "PartialGraphNode.hpp"
 #include "SpectrumMixNode.hpp"
+#include "SpectrumMathNode.hpp"
 #include "SpectrumPruneNode.hpp"
 #include "SpectrumCorrelationNode.hpp"
 #include "SpectrumStatisticsNode.hpp"
@@ -274,6 +275,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
         if(id=="partialanalysis")return std::make_unique<PartialAnalysisNode>();
         if(id=="partialsspectrum")return std::make_unique<PartialsSpectrumNode>();
         if(id=="partialgraph")return std::make_unique<PartialGraphNode>();
+        if(id=="spectrummath")return std::make_unique<SpectrumMathNode>();
         if(id=="spectrummix")return std::make_unique<SpectrumMixNode>();
         if(id=="hilbert")return std::make_unique<HilbertNode>();
         if(id=="buffercontext")return std::make_unique<BufferContextNode>();

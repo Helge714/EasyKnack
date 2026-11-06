@@ -144,3 +144,5 @@
 - [Teilton-Kontext](partial-context.md)
 - [Teilton-Ausgang](partial-output.md)
 - [Teilton-Gruppe](partial-group.md)
+
+- [Spektrummathematik](spectrum-math.md)

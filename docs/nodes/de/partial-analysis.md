@@ -19,8 +19,8 @@ Zerlegt ein Spektrum in verfolgte Teiltöne und ein komplexes Restspektrum.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/rates.md#auto) |
-| Rest (Residual) | Spektrum (Spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/rates.md#auto) |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Rest (Residual) | [Spectrum](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
@@ -44,6 +44,6 @@ Lokale FFT-Maxima werden logarithmisch interpoliert. Die Zuordnung erfolgt nach 
 | --- |
 | Nicht unterstützt |
 
-[Teiltöne zu Spektrum](partials-to-spectrum.md) · [Spektrummischung](spectrum-mix.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md) · [Teilton-Gruppe](partial-group.md)
+[Teiltöne zu Spektrum](partials-to-spectrum.md) · [Spektrummathematik](spectrum-math.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md) · [Teilton-Gruppe](partial-group.md)
 
 [English](../en/partial-analysis.md)

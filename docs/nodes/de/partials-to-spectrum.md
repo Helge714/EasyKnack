@@ -14,7 +14,7 @@ Erzeugt aus Teiltönen ein komplexes Spektrum für IFFT.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/rates.md#auto) |
+| Spektrum (Spectrum) | [Spectrum](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
@@ -38,6 +38,6 @@ Rekonstruiert positive und negative Frequenzanteile mit der Fensterfunktion der 
 | --- |
 | Nicht unterstützt |
 
-[Teiltonanalyse](partial-analysis.md) · [Spektrummischung](spectrum-mix.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md) · [Teilton-Gruppe](partial-group.md)
+[Teiltonanalyse](partial-analysis.md) · [Spektrummathematik](spectrum-math.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md) · [Teilton-Gruppe](partial-group.md)
 
 [English](../en/partials-to-spectrum.md)

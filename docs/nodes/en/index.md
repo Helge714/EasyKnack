@@ -144,3 +144,5 @@
 - [Partial Context](partial-context.md)
 - [Partial Output](partial-output.md)
 - [Partial Group](partial-group.md)
+
+- [Spectrum Math](spectrum-math.md)

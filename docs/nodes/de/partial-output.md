@@ -8,15 +8,15 @@ Legt Frequenz, Amplitude und Phase des bearbeiteten Teiltons fest.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Frequenz (Frequency) | [Value](../../user/de/data-types.md#value) | 0–∞ Hz | ±∞ Hz | 440 Hz | Hz | [Auto](../../user/de/rates.md#auto) | Immer |
-| Amplitude | [Value](../../user/de/data-types.md#value) | 0–∞ | ±∞ | 1 | — | [Auto](../../user/de/rates.md#auto) | Immer |
-| Phase | [Value](../../user/de/data-types.md#value) | ±∞ turn | ±∞ turn | 0 turn | turn, °, rad | [Auto](../../user/de/rates.md#auto) | Immer |
+| Frequenz (Frequency) | [Value](../../user/de/data-types.md#value) | 0–∞ Hz | ±∞ Hz | 440 Hz | Hz | [Auto](../../user/de/data-types.md#channels) | Immer |
+| Amplitude | [Value](../../user/de/data-types.md#value) | 0–∞ | ±∞ | 1 | — | [Auto](../../user/de/data-types.md#channels) | Immer |
+| Phase | [Value](../../user/de/data-types.md#value) | ±∞ turn | ±∞ turn | 0 turn | turn, °, rad | [Auto](../../user/de/data-types.md#channels) | Immer |
 
 ## Ausgänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/rates.md#auto) |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 

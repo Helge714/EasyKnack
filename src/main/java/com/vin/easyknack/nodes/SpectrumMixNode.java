@@ -4,10 +4,11 @@ public final class SpectrumMixNode extends BasicNode {
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(new PropertyId("spectrum"),"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
         for(String id:java.util.List.of("a","b"))n.addInput(new PropertyId(id),id.toUpperCase()).dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL).optional();
-        n.addEditor(new PropertyId("gain-a"),"Gain A",Editor.Slider.button(1,0.,null).formats(UnitFormats.PROPORTION));
-        n.addEditor(new PropertyId("gain-b"),"Gain B",Editor.Slider.button(1,0.,null).formats(UnitFormats.PROPORTION));
+        n.addEditor(new PropertyId("mode"),"Mode",Editor.comboBox(java.util.List.of("Linear","Equal Power"),"Linear",v->v.equals("Equal Power")?"equalpower":"linear"));
+        n.addInput(new PropertyId("factor"),"Factor",Editor.Slider.bar(.5,0,1).formats(UnitFormats.PROPORTION)).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL)
+            .tooltip(com.vin.easyknack.ui.AppText.text("spectrum.mix.factorHelp"));
     }
-    public NativeProcessor processor(){return new NativeProcessor("spectrummix","nodes/SpectrumMixNode.hpp",ParameterContract.builder().source(new PropertyId("a")).source(new PropertyId("b")).value(new PropertyId("gain-a")).value(new PropertyId("gain-b")).build());}
+    public NativeProcessor processor(){return new NativeProcessor("spectrummix","nodes/SpectrumMixNode.hpp",ParameterContract.builder().source(new PropertyId("a")).source(new PropertyId("b")).source(new PropertyId("factor")).value(new PropertyId("factor")).value(new PropertyId("mode")).build());}
     public void mute(MuteRouting r,NodeState s){r.connect(new PropertyId("a"),new PropertyId("spectrum"));}
     public void insert(InsertionRouting r,NodeState s){r.connect(new PropertyId("a"),new PropertyId("spectrum"));}
 }

@@ -1122,6 +1122,17 @@
       },
       "source": "ui/PartialGroups.java",
       "kind": "group"
+    },
+    {
+      "id": "easyknack.spectral.math",
+      "slug": "spectrum-math",
+      "category": "spectrum",
+      "title": {
+        "en": "Spectrum Math",
+        "de": "Spektrummathematik"
+      },
+      "source": "SpectrumMathNode.java",
+      "kind": "node"
     }
   ],
   "excluded": [

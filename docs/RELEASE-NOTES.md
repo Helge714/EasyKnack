@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Draw Partials resource references dashed in red. Add complex Spectrum Math and turn Spectrum Mix into a Linear/Equal Power crossfade; earlier weighted sums migrate to Math, and embedded legacy plugin commands retain their meaning. Rebuild Java and the audio host together.
+
 - Add tracked Partial Analysis, Partial Group, Partials to Spectrum and complex Spectrum Mix with paired German/English references. Partial programs execute per analysis frame; unchanged partials plus residual reconstruct the source spectrum.
 
 - Add Buffer Context with Size and sample-accurate Write position for recording/file buffers. Remove the writer metadata output; old document connections and exposed group outputs migrate automatically with a load notice. Rebuild Java and the audio host together.

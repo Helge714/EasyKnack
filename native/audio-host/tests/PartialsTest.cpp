@@ -1,7 +1,7 @@
 #include "nodes/PartialAnalysisNode.hpp"
 #include "nodes/PartialGraphNode.hpp"
 #include "nodes/PartialsSpectrumNode.hpp"
-#include "nodes/SpectrumMixNode.hpp"
+#include "nodes/SpectrumMathNode.hpp"
 #include "nodes/IFFTNode.hpp"
 #include "PartialsTestParameters.hpp"
 #include <cassert>
@@ -19,7 +19,7 @@ int main(){
         SpectrumStream input;input.prepare(block);input.size=1024*padding;input.windowSize=1024;input.hop=block;input.sampleRate=48000;input.identity=42;input.window=window;input.blockFrames=block;
         PartialAnalysisNode analysis;analysis.threshold=-45;analysis.minimum=100;analysis.maximum=2000;analysis.limit=16;analysis.prepare(48000,block);
         PartialGraphNode group;std::istringstream cfg(identityParameters);group.configure(cfg);group.prepare(48000,block);
-        PartialsSpectrumNode synthesis;synthesis.prepare(48000,block);SpectrumMixNode mix;mix.prepare(48000,block);
+        PartialsSpectrumNode synthesis;synthesis.prepare(48000,block);SpectrumMathNode mix;mix.prepare(48000,block);
         IFFTNode original,rebuilt;original.prepare(48000,block);rebuilt.prepare(48000,block);
         std::uint64_t track=0;double error=0;
         for(unsigned tick=0;tick<24;tick++){
