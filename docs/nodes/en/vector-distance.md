@@ -21,6 +21,8 @@ Calculates Euclidean distance between two vectors.
 
 ## Behavior
 
+Connecting a new wire to occupied A or B moves the previous wire to the other input when it is free and compatible. Otherwise the previous wire is replaced.
+
 `distance = length(A − B)`. Returns one distance per channel, with rate following the inputs. Quantity selects the unit representation, not a different distance metric.
 
 ## Mute

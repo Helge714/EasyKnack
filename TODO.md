@@ -13,12 +13,19 @@
 
 - [x] Inspector: N outside text input and Esc from sidebar controls/text editors work reliably.
 
+- [x] GruppenInputs erscheinen noch nicht alle im Inspektor
+
 # Nice to have
 - [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
 - [x] Namensänderungen sollten resetable sein.
 - [x] Tooltips von Controls sollten immer auch den Namen des Controls anzeigen
 - [x] Gruppen sollten in den Dokumenteneinstellungen als Liste mit derzeitiger Verwendungsanzahl auftauchen und löschbar sein (wenn nicht verwendet), vllt über einen Extra-Dialog wie "Gruppen verwalten" und dann vllt zwei Listen nebeneinander, links die Gruppen mit Verwendungsanzahl, rechts wo eine Gruppe überall eingebunden ist. Gruppen sollten sich nicht löschen lassen, wenn sie sichtbar sind oder Teil einer anderen noch nicht gelöschten oder sichtbaren Gruppe sind. Macht das Sinn?
-- [x] beim Import von Gruppen aus einer Datei sollten wir eine Liste bekommen, sodass wir gleich mehrere Gruppen für den Import auswählen können
+- [x] beim Import von Gruppen aus einer Datei sollten wir eine Liste bekommen, sodass wir gleich mehrere Gruppen für den Import auswählen könne
+
+- [x] Die Cameraposition von Gruppen sollte gespeichert werden, damit man immer da landet, wo man zuletzt war, also jeder Graph bekommt eine eigene Kameraposition (Zoom wird global behandelt)
+- [x] Strg + L sortiert schon gut, sorgt aber manchmal für seltsame Layouts, kannst du Nodes intelligenter anordnen, also zum Beispiel so, dass die Verbindungen möglichst kurz sind?
+- [x] Wir brauchen einen Recorder-Output-Node, der per Start-Trigger eine Aufnahme beginnt und dann beim Stop-Trigger beendet und speichert. Mit der Option des Überschreibens, ansonsten wird ein [_nächster freier Index] angehangen, also zum Beispiel Testaufnahmen_0001.wav (die Anzahl der Ziffern gerne einstellbar, wenn ein Index diese Anzahl überschreitet, darf er das, also wenn wir zwei Ziffern festlegen, gibt es trozdem das Element 100 etc.). Unterstützt werden sollten mindestens WAV, gerne auch MP3 sowie Stereo und Mono (einstellbar)
+- [x] Betsimmte Nodes sollten Verbindungen tauschen, wenn man etwas neu verbindet, z.B. Math-Node (auch Vector Math etc.): wenn A angeschlossen und B frei dann wird beim anschließen einer neuen Verbindung an A, die derzeitige Verbindung auf B geswitcht. Gleiches für die beiden Eingänge der Mix-Nodes. Bitte überlege, bei welchen das sonst noch Sinn machen könnte und wie man das gut im Code umsetzten könnte, vllt mit einer Funktion switchTo(Aktuelle Verbindung, neue Verbindung) mit return des neuen NodePoints (natürlich nur wenn dieser frei ist, das könnte intern danach geprüft werden) oder null, wenn nicht geswitcht werden kann, dann wird die Verbindung wie bisher einfach ersetzt
 
 # EasyKnack backlog
 
@@ -141,6 +148,22 @@ are historical design references, not instructions to reintroduce obsolete publi
 rate semantics or to resume kernel-driver installation.
 
 ## Validation (7 November 2026)
+
+- New group/recorder batch: Core reactor test passes (149 Core, 11 LSP, one SWT;
+  two optional skips), and the committed Core artifact is installed locally.
+  EasyKnack full package passes: 695 tests, no failures/errors, 172 optional skips.
+  Fourteen additional focused tests include native WAV and live-host recording;
+  the final multi-selection/host-service package checks pass as well (10 tests,
+  two optional skips). The development audiohost is rebuilt.
+- Inspector defaults, five group editor types, single-step multi-selection Undo,
+  per-graph camera restoration and occupied-input rerouting are covered. Layout
+  checks retain spacing, independent components, cycles and repeat stability.
+  WAV tests cover sample boundaries, mono/stereo, voice folding, Unicode paths,
+  exclusive numbered files, wider indices, graph handover and transport stop.
+- Bilingual docs: 228 pages, 7689 links/anchors validated. Group inspector rendered
+  offscreen. Hardware audio and clean-machine installation remain manual checks.
+- Newly saved documents use Core schema 10; old documents remain readable.
+  Recording currently supports float32 WAV; MP3 output remains optional later work.
 
 - Core reactor `test`: 146 Core, 11 LSP and one SWT test; no failures/errors,
   two optional skips in total. Core Maven artifact installed locally.

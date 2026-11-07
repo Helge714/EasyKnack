@@ -21,6 +21,8 @@ Wandelt einen Zahlenvergleich in 0 oder 1 um.
 
 ## Verhalten
 
+Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
+
 Gibt bei erfülltem Vergleich 1 aus, sonst 0. Gleichheit vergleicht die Zahlen direkt und ist kein Toleranztest. Der Ausgang ist ein numerisches Gate, kein Trigger. Für Ereignisse dient [Threshold Trigger](threshold-trigger.md).
 
 ## Mute

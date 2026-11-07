@@ -21,6 +21,8 @@
 
 ## Verhalten
 
+Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
+
 Linear berechnet `A * (1 − f) + B * f`. Equal Power verwendet `cos(πf/2)` und `sin(πf/2)` als Gewichte. Faktor 0 liefert A, Faktor 1 liefert B; der Faktor wird auf 0–1 begrenzt und pro FFT-Frame mit dem Control-Wert des aktuellen Blocks angewendet. Equal Power erhält die erwartete Leistung unkorrelierter Signale; gleiche Signale werden in der Mitte um etwa 3 dB verstärkt. Gegenphasige Koeffizienten können sich auslöschen. FFT-Größe, Fenster, Hop, Samplerate und Frame-Positionen müssen übereinstimmen; nicht passende Batches erzeugen ein leeres Spektrum. Ein unverbundener Eingang ist 0. Für Teiltöne plus Rest stattdessen Spectrum Math mit Add verwenden.
 
 ## Mute

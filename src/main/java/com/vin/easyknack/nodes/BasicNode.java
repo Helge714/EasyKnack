@@ -46,6 +46,8 @@ public abstract class BasicNode {
     public void mute(MuteRouting routing, NodeState state) { routing.silence(); }
     /** Opt in with one input/output pair; generators and sinks remain excluded by default. */
     public void insert(InsertionRouting routing, NodeState state) { }
+    /** Optional input for a displaced wire. Core requires it to be free and compatible. */
+    public PropertyId rerouteConnection(PropertyId occupied,NodeState state){return null;}
     /** Preferred source for Ctrl+Delete; null uses the first connected input in definition order. */
     public PropertyId exclusionInput(NodeState state) {
         var routing = new InsertionRouting(); insert(routing,state);

@@ -181,10 +181,13 @@ public final class AudioHostService implements AutoCloseable {
                 SwingUtilities.invokeLater(() -> { if (!closed) AudioEndpoints.publish(endpoints); });
                 nextDiscovery = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
             }
-            if(playing && System.nanoTime()>=nextAnalysis){
-                nextAnalysis=System.nanoTime()+TimeUnit.MILLISECONDS.toNanos(50);
+            if(System.nanoTime()>=nextAnalysis){
+                nextAnalysis=System.nanoTime()+TimeUnit.MILLISECONDS.toNanos(playing?50:250);
                 var analysis=AudioAnalysis.parse(client.command("ANALYSIS"));
-                if(!analysis.isEmpty())SwingUtilities.invokeLater(()->{if(!closed&&state==State.RUNNING)AudioAnalysis.publish(analysis);});
+                if(!analysis.isEmpty())SwingUtilities.invokeLater(()->{if(!closed){
+                    if(state==State.RUNNING)AudioAnalysis.publish(analysis);
+                    else {var recordings=new java.util.HashMap<String,AudioAnalysis.Frame>();analysis.forEach((id,frame)->{if(frame.values().length>0&&frame.values()[0]==-9151)recordings.put(id,frame);});if(!recordings.isEmpty())AudioAnalysis.publish(recordings);}
+                }});
             }
             if (System.nanoTime() < nextMeters) return;
             nextMeters = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(250);

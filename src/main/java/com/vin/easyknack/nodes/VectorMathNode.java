@@ -19,4 +19,7 @@ public final class VectorMathNode extends GenericVectorNode {
     }
     @Override public java.util.Map<String,com.vingame.glswing.node.model.GLNodeValue> defaults(){var values=new java.util.HashMap<>(super.defaults());values.putIfAbsent(FACTOR.value(),com.vingame.glswing.node.model.GLNodeValue.of(1));return values;}
     public NativeProcessor processor(){return new NativeProcessor("vectormath","nodes/VectorMathNode.hpp",VectorSupport.vector(VectorSupport.vector(ParameterContract.builder(),A,0,0,0),B,0,0,0,VectorMathNode::binary).source(FACTOR,s->s.text(OP,"add").equals("scale")).value(FACTOR).value(OP).build());}
+    @Override public PropertyId rerouteConnection(PropertyId occupied,NodeState state){
+        return occupied.equals(A)?B:occupied.equals(B)?A:null;
+    }
 }

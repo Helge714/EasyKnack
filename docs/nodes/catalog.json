@@ -1155,6 +1155,17 @@
       },
       "source": "ResidualModelNode.java",
       "kind": "node"
+    },
+    {
+      "id": "easyknack.audio.recorder",
+      "slug": "audio-recorder",
+      "category": "outputs",
+      "title": {
+        "en": "Audio Recorder",
+        "de": "Audioaufnahme"
+      },
+      "source": "AudioRecorderNode.java",
+      "kind": "node"
     }
   ],
   "excluded": [

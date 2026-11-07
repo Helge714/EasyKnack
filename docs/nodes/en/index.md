@@ -129,6 +129,7 @@
 
 ## Outputs
 
+- [Audio Recorder](audio-recorder.md)
 - [Audio Output](audio-output.md)
 
 ## Groups

@@ -22,6 +22,8 @@
 
 ## Verhalten
 
+Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
+
 Linear: `y = (1−t)A + tB`. Equal Power: `y = cos(πt/2)A + sin(πt/2)B`, mit t auf 0–1 begrenzt. Equal Power erhält die erwartete Leistung unkorrelierter Signale; gleiche Eingänge können in der Mitte etwa 3 dB gewinnen. Linear erhält den Pegel gleicher Eingänge.
 
 ## Mute

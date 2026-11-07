@@ -22,6 +22,8 @@ Crossfades between two numeric signals.
 
 ## Behavior
 
+Connecting a new wire to occupied A or B moves the previous wire to the other input when it is free and compatible. Otherwise the previous wire is replaced.
+
 Linear: `y = (1−t)A + tB`. Equal Power: `y = cos(πt/2)A + sin(πt/2)B`, with t clamped to 0–1. Equal Power preserves expected power for uncorrelated signals; identical inputs can gain about 3 dB at the midpoint. Linear preserves identical-input level.
 
 ## Mute

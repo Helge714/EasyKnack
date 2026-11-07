@@ -34,7 +34,7 @@ final class BufferContextMigration {
             java.util.function.UnaryOperator<GLNodeEndpoint> remap=e->replacements.containsKey(e.nodeId())&&e.portId().equals("write-position")?new GLNodeEndpoint(replacements.get(e.nodeId()),"write-position"):e;
             var wires=new ArrayList<GLGraphConnection>();for(var w:graph.connections())wires.add(new GLGraphConnection(w.id(),remap.apply(w.output()),w.input()));wires.addAll(links);
             var d=asset.compositeDescriptor();if(d!=null)d=new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),d.portMappings().stream().map(p->p.publicPort().direction()==GLPortDirection.OUTPUT?p.withEndpoints(p.internalEndpoints().stream().map(remap).toList()):p).toList(),d.properties(),d.propertyMappings());
-            assets.put(asset.id(),new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,wires),new GLNodeEditorViewState(views,asset.viewState().auxiliaryNodes()),asset.metadata(),d));
+            assets.put(asset.id(),new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,wires),asset.viewState().withNodes(views),asset.metadata(),d));
         }
         return new GLNodeGraphDocument(assets.remove(document.root().id()),assets,document.externalAssets());
     }

@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.HashMap;
 import java.util.WeakHashMap;
+import com.vingame.glswing.node.model.GLNodeValue;
 import com.vin.easyknack.nodes.NodeRegistry;
 import com.vin.easyknack.nodes.BasicNode;
 import com.vin.easyknack.nodes.OscillatorNode;
@@ -208,6 +209,10 @@ final class WorkspaceController implements AutoCloseable {
     }
 
 
+    private void setInspectorNodeProperty(GLNodeId anchor,com.vin.easyknack.nodes.PropertyId property,GLNodeValue value){
+        var selection=selectedNodeIds();var targets=selection.contains(anchor)?java.util.List.copyOf(selection):java.util.List.of(anchor);
+        try(var transaction=history.beginTransaction("Change group input")){for(var id:targets)setNodeProperty(id,property,value);}
+    }
     void setNodeProperty(GLNodeId id, com.vin.easyknack.nodes.PropertyId property, com.vingame.glswing.node.model.GLNodeValue value) {
         String key = property.value();
         if(midiDrivers!=null)midiDrivers.manualEdit(driverCurrentAsset(),id,key);
@@ -440,7 +445,7 @@ final class WorkspaceController implements AutoCloseable {
                             view.getPorts().get(0).getDirection() == com.vingame.glswing.node.GLNodePort.Direction.OUTPUT
                                     ? "composite.boundary.input" : "composite.boundary.output", GLNodeViewState.capture(view));
                 }
-                state = new GLNodeEditorViewState(positions, auxiliary);
+                state = new GLNodeEditorViewState(positions, auxiliary,state.camera());
                 contents = workspace.currentGraph().snapshot();
             }
             contents=new GLNodeGraphSnapshot(contents.graphId(),contents.revision(),contents.nodes().stream().map(n->n.withoutProperty(GroupBakes.PROPERTY)).toList(),contents.connections());
@@ -629,7 +634,7 @@ final class WorkspaceController implements AutoCloseable {
         preparingBakeInspector=true;
         try{
             GroupChoices.registerInspector(nodes.schemas(),composites);
-            GroupCheckboxes.register(nodes.schemas(),composites);
+            GroupInspectorInputs.register(nodes.schemas(),composites,history,this::setInspectorNodeProperty);
             InstanceCountInspector.register(nodes.schemas(),composites);
             bakes.register(nodes.schemas(),composites);
             registerDriverInspector();

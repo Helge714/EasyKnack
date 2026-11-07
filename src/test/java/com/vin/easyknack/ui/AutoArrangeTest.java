@@ -15,7 +15,8 @@ class AutoArrangeTest {
             var after=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
             assertEquals(3,editor.getConnections().size());
             for(int i=0;i<4;i++)for(int j=i+1;j<4;j++){var a=after.get(i);var b=after.get(j);assertFalse(new java.awt.geom.Rectangle2D.Float(a.x(),a.y(),a.width(),a.height()).intersects(b.x(),b.y(),b.width(),b.height()));}
-            assertEquals(editor.getVerticalNodeSpacing(),nodes.get(3).getY()-nodes.get(0).getY()-nodes.get(0).getHeight(),.01);
+            double componentBottom=nodes.subList(0,3).stream().mapToDouble(n->n.getY()+n.getHeight()).max().orElseThrow();
+            assertTrue(nodes.get(3).getY()>=componentBottom+editor.getVerticalNodeSpacing()-.01);
             com.vingame.glswing.node.GLNodeAutoLayout.arrange(editor);
             assertEquals(after,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
         });

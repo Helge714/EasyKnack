@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Show all public group input editors in the inspector, including inherited defaults
+  and copied Slider, Vector, choice, checkbox and trigger controls. Persist a camera
+  center per graph while keeping zoom shared. Improve automatic graph arrangement
+  and preserve an occupied A/B input wire on a free compatible alternate input.
+- Add Audio Recorder under Outputs: sample-aligned Start/Stop, mono/stereo float32
+  WAV, optional overwrite and exclusive next-free numbered filenames. Disk writing
+  runs outside the audio callback; bounded-queue/write errors are reported.
+- Newly saved documents use Core schema 10 for camera centers. Existing schemas
+  remain readable; earlier application versions cannot read new files. Rebuild the
+  Java application and host together for the new recorder. The first development
+  version, plugin ABI and host transport version remain unchanged.
+
 - Keep independent Undo/Redo stacks for the root graph and each group definition,
   retaining group history across reopening and one document-wide save checkpoint.
   Preserve group-boundary insertion through projection and navigation.

@@ -23,4 +23,7 @@ public final class MixNode extends BasicNode {
             ParameterContract.builder().source(A).value(A).source(B).value(B).source(FACTOR).value(FACTOR).value(MODE).build()); }
     @Override public void mute(MuteRouting r,NodeState s) { r.connect(A,OUT); }
     @Override public void insert(InsertionRouting r,NodeState s) { r.connect(A,OUT); }
+    @Override public PropertyId rerouteConnection(PropertyId occupied,NodeState state){
+        return occupied.equals(A)?B:occupied.equals(B)?A:null;
+    }
 }

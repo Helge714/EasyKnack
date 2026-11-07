@@ -129,6 +129,7 @@
 
 ## Ausgänge
 
+- [Audioaufnahme](audio-recorder.md)
 - [Audio-Ausgang](audio-output.md)
 
 ## Gruppen

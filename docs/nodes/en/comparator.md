@@ -21,6 +21,8 @@ Converts a numeric comparison into 0 or 1.
 
 ## Behavior
 
+Connecting a new wire to occupied A or B moves the previous wire to the other input when it is free and compatible. Otherwise the previous wire is replaced.
+
 Outputs 1 when the selected comparison is true, otherwise 0. Equality compares the numeric values directly; it is not a tolerance test. The output is a numeric gate, not a Trigger. Use [Threshold Trigger](threshold-trigger.md) to create events.
 
 ## Mute

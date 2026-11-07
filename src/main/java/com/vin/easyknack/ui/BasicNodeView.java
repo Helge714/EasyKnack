@@ -42,7 +42,12 @@ public class BasicNodeView extends GLNode {
 
         public BasicNodeView(BasicNode definition, NodeViewContext context, GLGraphNode model) {
             super(definition.title());
-            this.definition = definition; this.writer = context.writer(); this.history = context.history();
+            this.definition = definition;
+            setConnectionReplacementRouter((previous,incoming)->{
+                var port=definition.rerouteConnection(new PropertyId(previous.getInput().getId()),new NodeState(lastModel.properties()));
+                return port==null?null:findPort(port.value());
+            });
+            this.writer = context.writer(); this.history = context.history();
             id = model.id();
             category = definition.registration().kind();
             setTitleGradientEnabled(true);
@@ -174,6 +179,7 @@ public class BasicNodeView extends GLNode {
             if(custom.component() instanceof AnalysisEditor.Plot plot)plot.bind(id.toString());
             if(custom.component() instanceof ValueViewerPanel viewer)viewer.bind(id.toString());
             if(custom.component() instanceof PitchReadoutEditor.Readout readout)readout.bind(id.toString());
+            if(custom.component() instanceof RecordingStatusEditor.Status status)status.bind(id.toString());
             if(custom.component() instanceof Editor.TriggerButton button)button.bind(id.toString(),row.id());
             if(custom.component() instanceof GLCurveEditor curve)CurveEditor.bindHistory(curve,()->history);
             updates.add(state -> custom.update().accept(state.values().getOrDefault(row.id(), row.editor().defaultValue())));

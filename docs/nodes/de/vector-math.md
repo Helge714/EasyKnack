@@ -23,6 +23,8 @@ Berechnet Operationen mit vektorwertigem Ergebnis.
 
 ## Verhalten
 
+Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
+
 Add/Subtract/Multiply/Divide/Minimum/Maximum arbeiten komponentenweise. Division durch eine Nullkomponente liefert dort null. Scale multipliziert A mit Factor. Normalize liefert `A/length(A)` oder bei Länge null den Nullvektor. Cross berechnet das rechtshändige Kreuzprodukt. Negate und Absolute wirken je Komponente. Skalare Ergebnisse liefern [Vector Length](vector-length.md), [Vector Distance](vector-distance.md) und [Vector Dot Product](vector-dot-product.md).
 
 ## Mute

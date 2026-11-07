@@ -23,6 +23,8 @@ Performs arithmetic with vector-valued results.
 
 ## Behavior
 
+Connecting a new wire to occupied A or B moves the previous wire to the other input when it is free and compatible. Otherwise the previous wire is replaced.
+
 Add/Subtract/Multiply/Divide/Minimum/Maximum work componentwise. Division by a zero component returns zero there. Scale multiplies A by Factor. Normalize gives `A/length(A)` or the zero vector for zero length. Cross computes the right-handed cross product. Negate and Absolute act per component. Scalar results use [Vector Length](vector-length.md), [Vector Distance](vector-distance.md) or [Vector Dot Product](vector-dot-product.md).
 
 ## Mute

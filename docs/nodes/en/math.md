@@ -22,6 +22,8 @@ Applies a selectable mathematical operation.
 
 ## Behavior
 
+Connecting a new wire to occupied A or B moves the previous wire to the other input when it is free and compatible. Otherwise the previous wire is replaced.
+
 Binary operations evaluate A and B; unary operations hide B. Operand names and automatic defaults follow the operation. Remainder follows the dividend sign; Modulo uses a floor-based remainder. Fract is `x − floor(x)`. Division by a near-zero divisor and invalid domains return safe values; nonfinite results become zero. Optional Clamp limits the final result to ±1. Each connected input keeps its own rate. The same operations are available inside [Spectral Groups](spectral-group.md).
 
 ## Mute

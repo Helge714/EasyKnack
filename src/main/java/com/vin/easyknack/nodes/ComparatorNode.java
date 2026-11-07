@@ -43,4 +43,7 @@ public final class ComparatorNode extends BasicNode {
 	public void insert(InsertionRouting routing, NodeState state) {
 		routing.connect(A, OUT);
 	}
+    @Override public PropertyId rerouteConnection(PropertyId occupied,NodeState state){
+        return occupied.equals(A)?B:occupied.equals(B)?A:null;
+    }
 }

@@ -21,6 +21,8 @@ Berechnet den euklidischen Abstand zweier Vektoren.
 
 ## Verhalten
 
+Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
+
 `distance = length(A − B)`. Liefert einen Abstand pro Kanal mit eingangsabhängiger Rate. Quantity wählt die Einheitendarstellung, keine andere Abstandsmetrik.
 
 ## Mute

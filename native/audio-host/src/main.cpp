@@ -11,6 +11,7 @@
 #include "miniaudio.h"
 #include "audio/AudioFileDecode.hpp"
 #include "AudioGraph.hpp"
+#include "AudioRecording.hpp"
 #include "audio/RoutingAudioBackend.hpp"
 #include "audio/WindowsDeviceVolume.hpp"
 #include "midi/WindowsMidiSource.hpp"
@@ -116,7 +117,7 @@ int main(int argc, char** argv) {
                 }
                 if (line == "QUIT") { sendLine(client.value, "OK"); break; }
                 if (line == "PLAY") { midi->setRunning(true); backend.setRunning(true); engine->playing.store(true); }
-                else if (line == "STOP") { midi->setRunning(false); engine->playing.store(false); backend.setRunning(false); }
+                else if (line == "STOP") { midi->setRunning(false); engine->playing.store(false); backend.setRunning(false); easyknack::AudioRecording::stopAll(); }
                 else if(line=="MIDI_PANIC"){midi->panic();}
                 else if(line.rfind("TRIGGER ",0)==0){
                     std::istringstream input(line.substr(8));std::string id,extra;

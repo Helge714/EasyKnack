@@ -22,6 +22,8 @@ Wendet eine wählbare mathematische Operation an.
 
 ## Verhalten
 
+Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
+
 Binäre Operationen verknüpfen A und B; unäre blenden B aus. Operandennamen und automatische Standardwerte folgen der Operation. Remainder folgt dem Vorzeichen des Dividenden; Modulo verwendet einen floor-basierten Rest. Fract ist `x − floor(x)`. Division durch nahezu null und ungültige Definitionsbereiche liefern abgesicherte Werte; nicht endliche Ergebnisse werden null. Clamp begrenzt das Ergebnis auf ±1. Verbundene Eingänge behalten ihre Rate. Dieselben Operationen sind in [Spectral Groups](spectral-group.md) verfügbar.
 
 ## Mute
