@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add an importable Stochastic Bin Width example using existing spectral nodes:
+  integer Bin Reader sampling with Box/approximate Gaussian kernels, Seed,
+  per-frame variation and static-mapping phase compensation. No existing node
+  behavior or document/host contract changes.
+
 - Preserve A/B wire relocation from composite boundary inputs during projection.
   File-browser tree expansion and main-pane navigation are independent.
 - Import groups with Select all, a separate whole-graph option and retained menu
