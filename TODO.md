@@ -15,7 +15,7 @@
 
 - [x] GruppenInputs erscheinen noch nicht alle im Inspektor
 - [x] Verbindung tauschen klappt noch nicht bei Verbindungen zu Gruppen-Eingängen/Ausgängen
-- [x] Verbessertes Autolayouting ist noch ausbaufähig, Ziel muss sein, das ganze übersichtlich und möglichst kompackt anzuordnen. Mach mir dazu bitte Vorschläge — [Vorschlag](docs/development/AUTO-LAYOUT-PLAN.md); Umsetzung folgt nach Auswahl des Ansatzes.
+- [x] Verbessertes Autolayouting ist noch ausbaufähig, Ziel muss sein, das ganze übersichtlich und möglichst kompackt anzuordnen. Mach mir dazu bitte Vorschläge — [Vorschlag](docs/development/AUTO-LAYOUT-PLAN.md); Vorschlag umgesetzt: Port-Ausrichtung, Feedback-Bereiche, kompakte Spalten und Skyline-Packing.
 - [x] Doppelklick im Filechooser öffnet einen Ordner nur in der Seitenleiste, erst ein erneuter Doppelklick öffnet ihn im Hauptbereich. Die beiden sollten getrennt von einander sein, ein Doppelklick in der Seitenleiste öffnet den Ordner nur dort, ein Einfachklick im Seitenmenu öffnet den Ordner im Hauptbereich. Ein Doppelklick im Hauptbereich öffnet ihn nur dort.
 
 # Nice to have
@@ -157,8 +157,23 @@ rate semantics or to resume kernel-driver installation.
 
 ## Validation (8 November 2026)
 
+- Compact layout pass: Core reactor test passes (162 Core, 11 LSP, one SWT;
+  no failures/errors, two optional skips). Core commit `0e5e011` is installed.
+  EasyKnack full package passes: 703 tests, no failures/errors, 173 optional skips.
+- Twelve Core geometry/performance fixtures cover real anchor offsets, varied
+  widths/heights, crossings, shared branches, overlapping feedback, direct and
+  unconnected boundaries, 600 mixed-size disconnected nodes and a 1000-node chain.
+  Application tests verify group roles, shortcut dispatch, unchanged sizes/graph/
+  camera, persistence and one-step Undo, including repeat Arrange without new Undo.
+- The rendered comparison fixture uses 992377 world-square units versus 1988766
+  before, with Manhattan anchor distance 1081 versus 1671. These are fixture
+  measurements, not a global optimality/performance guarantee. Docs validate:
+  228 pages, 7691 links/anchors. DSP/host protocols and document schema are unchanged.
+
+### Earlier recorder/import pass
+
 - Core reactor test passes: 150 Core, 11 LSP and one SWT test, no failures/errors,
-  two optional skips. Core commit `945b465` is installed locally.
+  two optional skips. That pass used Core commit `945b465`.
 - EasyKnack full package passes: 700 tests, no failures/errors, 172 optional skips.
   Twelve final focused tests also pass with native audio checks enabled, including
   WAV/MP3 mono/stereo, Unicode paths, numbered file preservation, graph handover,
@@ -171,7 +186,7 @@ rate semantics or to resume kernel-driver installation.
   fix. Bilingual docs: 228 pages and 7691 links/anchors validated. MP3 uses the
   installed Windows media encoder and retains codec delay/padding; use WAV for
   sample-accurate recordings. Hardware routing and clean-machine installs remain
-  manual checks. Further compact layout work is a documented proposal only.
+  manual checks. The compact layout proposal is implemented in the following pass.
 
 ## Earlier validation (7 November 2026)
 

@@ -28,4 +28,8 @@ Mit **Gruppen importieren** lassen sich mehrere Definitionen aus einem anderen D
 
 Undo/Redo wirkt auf den gerade geöffneten Graphen. Gruppenverläufe bleiben beim Verlassen und erneuten Öffnen einer Definition erhalten. Speichern gilt für alle Graphen. **N** schaltet den Inspektor außerhalb von Texteingaben um. **Esc** schließt den fokussierten Inspektor; eine aktive Textbearbeitung oder ein Popup behandelt zunächst das erste Esc.
 
+## Aktuellen Graphen anordnen
+
+Mit **Alle Nodes anordnen** im Menü oder **Strg+Umschalt+L** wird der aktuelle Graph angeordnet. Verbundene Ports werden ausgerichtet, unabhängige Zweige kompakt gepackt und Feedback-Bereiche zusammengehalten. Innerhalb einer Gruppe bleibt Input links und Output rechts, auch bei unverbundenen Gruppenports. Theme-Abstände und Node-Größen bleiben erhalten. Ein Undo stellt die vorherige Anordnung wieder her; Kamera und Zoom bleiben unverändert.
+
 [English](../en/groups.md) · [Gruppenreferenz](../../nodes/de/node-group.md)

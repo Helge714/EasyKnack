@@ -5,6 +5,30 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AutoArrangeTest {
+    @Test void realNodeGeometryCameraAndGraphSurviveArrangementAndUndo()throws Exception{
+        var ref=new WorkspaceController[1];
+        SwingUtilities.invokeAndWait(()->{
+            var c=ref[0]=new WorkspaceController();var graph=new com.vingame.glswing.node.model.GLNodeGraph();
+            com.vin.easyknack.nodes.BasicNode[] definitions={new com.vin.easyknack.nodes.OscillatorNode(),new com.vin.easyknack.nodes.FilterNode(),new com.vin.easyknack.nodes.GainNode(),new com.vin.easyknack.nodes.OutputNode(),new com.vin.easyknack.nodes.ValueNode(),new com.vin.easyknack.nodes.ValueNode()};
+            var ids=java.util.stream.IntStream.range(0,definitions.length).mapToObj(i->com.vingame.glswing.node.model.GLNodeId.random()).toList();
+            graph.edit("Fixture",e->{for(int i=0;i<definitions.length;i++)e.addNode(new com.vingame.glswing.node.model.GLGraphNode(ids.get(i),definitions[i].registration().id(),definitions[i].defaults()));
+                for(int i=0;i<3;i++)e.addConnection(new com.vingame.glswing.node.model.GLGraphConnection(com.vingame.glswing.node.model.GLNodeConnectionId.random(),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(i),"audio-out"),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(i+1),"audio-in")));
+                e.addConnection(new com.vingame.glswing.node.model.GLGraphConnection(com.vingame.glswing.node.model.GLNodeConnectionId.random(),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(4),"value-out"),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(1),"cutoff")));
+            });
+            c.openDocument("Real layout",new com.vingame.glswing.node.document.GLNodeGraphDocument(new com.vingame.glswing.node.document.GLNodeGraphAsset("root",1,com.vingame.glswing.node.document.GLNodeGraphAssetKind.PROJECT,graph.snapshot(),com.vingame.glswing.node.binding.GLNodeEditorViewState.empty())));c.workspace().setBounds(0,0,1200,800);
+        });
+        SwingUtilities.invokeAndWait(()->{try(var c=ref[0]){
+            var editor=c.workspace().editor();editor.setZoom(1.25f);editor.setPan(73,-42);int i=0;for(var node:editor.getNodes())node.setLocation(20+i++*17,40+i*23);
+            var before=editor.getNodes().stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();var graph=c.workspace().currentGraph().snapshot();
+            c.workspace().arrangeAll();var after=editor.getNodes().stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();assertNotEquals(before,after);assertEquals(graph,c.workspace().currentGraph().snapshot());
+            for(i=0;i<before.size();i++){assertEquals(before.get(i).width(),after.get(i).width());assertEquals(before.get(i).height(),after.get(i).height());}
+            assertEquals(73,editor.getPanX());assertEquals(-42,editor.getPanY());assertEquals(1.25,editor.getZoom());
+            assertTrue(c.history().undo());assertEquals(before,editor.getNodes().stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());assertTrue(c.history().redo());assertEquals(after,editor.getNodes().stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+            c.workspace().arrangeAll();assertEquals(after,editor.getNodes().stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+            var saved=c.snapshotDocument();try(var reopened=new WorkspaceController()){reopened.openDocument("Restored layout",saved);reopened.workspace().setBounds(0,0,1200,800);assertEquals(saved.root().viewState().nodes(),reopened.snapshotDocument().root().viewState().nodes());}
+            assertTrue(c.history().undo());assertEquals(before,editor.getNodes().stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList(),"Repeated Arrange must not add a second Undo entry");
+        }});
+    }
     @Test void cyclesAndDisconnectedNodesRemainSeparateAndStable()throws Exception{
         SwingUtilities.invokeAndWait(()->{
             var editor=new com.vingame.glswing.node.GLNodeEditor();
@@ -36,6 +60,9 @@ class AutoArrangeTest {
             assertTrue(shortcut.isConsumed());
             var after=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
             assertNotEquals(before,after);assertEquals(graph,c.workspace().currentGraph().snapshot());
+            var input=nodes.stream().filter(n->n.getAutoLayoutRole()==com.vingame.glswing.node.GLNodeAutoLayout.Role.INPUT_BOUNDARY).findFirst().orElseThrow();
+            var output=nodes.stream().filter(n->n.getAutoLayoutRole()==com.vingame.glswing.node.GLNodeAutoLayout.Role.OUTPUT_BOUNDARY).findFirst().orElseThrow();
+            for(var n:nodes)if(n!=input&&n!=output){assertTrue(input.getX()+input.getWidth()+editor.getHorizontalNodeSpacing()<=n.getX()+.01);assertTrue(n.getX()+n.getWidth()+editor.getHorizontalNodeSpacing()<=output.getX()+.01);}
             for(var edge:editor.getConnections())assertTrue(edge.getInput().getNode().getX()>=edge.getOutput().getNode().getX()+edge.getOutput().getNode().getWidth()+editor.getHorizontalNodeSpacing()-.01);
             c.history().undo();assertEquals(before,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
             c.history().redo();assertEquals(after,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());

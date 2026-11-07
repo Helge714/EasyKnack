@@ -1,33 +1,42 @@
-# Compact graph layout proposal
+# Compact graph layout
 
-The next layout revision should optimize readability first, occupied area second,
-and wire length third. Shortening wires alone can obscure the signal flow. This
-is a proposal; it does not change the current Arrange command.
+Core `GLNodeAutoLayout` implements the current Arrange command. It snapshots node
+sizes and actual port anchors, then changes locations only. It has no audio-node
+name/type special cases or external solver dependency.
 
-1. **Stable flow direction.** Place sources on the left and sinks on the right.
-   Identify strongly connected components before ranking nodes. Give feedback
-   components a local layout and a clear return route instead of arbitrarily
-   treating each feedback edge as another forward constraint.
-2. **Port-aware alignment.** Minimize distance between the actual output/input
-   anchors rather than node centers. Preserve declared port order. Align a main
-   signal path; place parameter/modulation sources beside the ports they drive.
-   Treat group Input/Output nodes as boundaries at the outer edges.
-3. **Compact columns.** Allow independent chains to share vertical space where
-   their occupied rectangles do not overlap. Pack disconnected components into
-   shelves near the current aspect ratio rather than one tall vertical stack.
-   Theme horizontal/vertical spacing remains the minimum clearance.
-4. **Local improvement.** Try adjacent row swaps and bounded column compaction.
-   Score crossings, backward-wire intrusions, total anchor distance, bends and
-   occupied area. Accept improvements only; use deterministic tie breaking.
-5. **Predictability.** Repeating Arrange must preserve the result. A topology edit
-   should not randomly reorder unrelated branches. Keep camera and zoom unchanged;
-   retain one Undo operation including boundary-node locations.
+1. **Stable flow direction.** Iterative graph traversals find strongly connected
+   components without recursive call-stack limits. Each feedback region stays a
+   contiguous block; return vertices use a lower lane. The acyclic graph of blocks
+   is ranked left to right. Existing wire curves are retained; no new wire-routing
+   renderer is introduced.
+2. **Port-aware alignment.** Median ordering and weighted isotonic compaction use
+   actual input/output anchors and retain port order. Short source branches move
+   close to their first consumer. Narrow branches do not inherit the maximum width
+   of unrelated columns where safe compaction is possible.
+3. **Boundary roles.** `GLNode` declares Normal, Input boundary or Output boundary
+   roles. Workspace group boundaries set these hints; other nodes use Normal by
+   default. Boundaries remain at the outer edges, including unconnected ones.
+   Boundary-connected branches keep separate lanes so their wires do not pass
+   through unrelated components to their left.
+4. **Compact packing.** A bottom-left skyline fills free vertical space beside
+   taller independent components. Several candidate widths balance occupied area
+   and the viewport aspect ratio. Theme horizontal/vertical spacing remains the
+   minimum clearance between node rectangles.
+5. **Bounded improvement.** Eight ordering sweeps retain the best measured crossing/
+   anchor-distance score. Small components get at most 128 adjacent row-swap trials;
+   large edge sets use a deterministic sample for crossing estimates. Skyline
+   interval maxima use a sliding queue. This is a heuristic, not a globally optimal
+   crossing or area solver.
+6. **Predictability.** Ties use stable editor node order, independent of the current
+   layout. Repeated Arrange is idempotent for unchanged geometry and viewport.
+   `GLNodeWorkspace` retains one Undo operation including boundary locations.
+   Graph properties/wires, node sizes, camera and zoom remain unchanged.
 
-Before replacing the algorithm, keep fixed test graphs for a long chain, many
-short chains, a fan-in mixer, shared modulation, different node heights, nested
-groups and feedback components. Compare crossings, total anchor distance and
-bounding area, and check overlap/spacing plus repeat stability. Offer a balanced
-default first; compact and wide presentation presets can follow if useful.
+Validation lives in Core `GLCompactAutoLayoutTest` (port offsets, mixed sizes,
+crossings, feedback, boundaries, free-space packing, long chains and bounded work)
+and EasyKnack `AutoArrangeTest` (real application views, persistence, shortcut and
+Undo). Sources stay at the left of their consumers; this need not place every
+parameter source in the globally leftmost column.
 
-Implementation ownership: Core `GLNodeAutoLayout`, with fixtures exercising real
-EasyKnack node/port sizes. Avoid special cases for named audio processors.
+Only the balanced default is implemented. Compact/wide presets, pinned nodes and
+dedicated orthogonal feedback routes remain possible future extensions.

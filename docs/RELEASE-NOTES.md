@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Improve Arrange all nodes: align connected ports, keep feedback regions together,
+  compact narrow branches and pack independent components into free space. Group
+  Input/Output remain at the outer edges, including when unconnected. Preserve node
+  sizes, graph data, camera/zoom and a single Undo operation. Covered by the current
+  first-development version; no document-format, plugin ABI or host protocol change.
+
 - Add an importable Stochastic Bin Width example using existing spectral nodes:
   integer Bin Reader sampling with Box/approximate Gaussian kernels, Seed,
   per-frame variation and static-mapping phase compensation. No existing node

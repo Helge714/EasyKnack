@@ -26,4 +26,8 @@ Use **Import groups** to select several definitions from another document. **Sel
 
 Undo/Redo acts on the currently open graph. Group histories are retained when navigating away and reopening a definition. Saving applies to all graphs. Press **N** to toggle the inspector outside text input. **Esc** closes a focused inspector; an active text edit or popup handles the first Esc.
 
+## Arrange the current graph
+
+Use **Arrange all nodes** from the menu or **Ctrl+Shift+L**. Connected ports are aligned, independent branches are packed compactly and feedback regions stay together. Inside a group, Input stays on the left and Output on the right, including unconnected boundaries. Theme spacing and node sizes are retained. Undo restores the previous arrangement in one step; camera and zoom remain unchanged.
+
 [Deutsch](../de/groups.md) · [Groups reference](../../nodes/en/node-group.md)

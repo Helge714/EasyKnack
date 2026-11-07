@@ -23,6 +23,11 @@ The Inspector shows settings for the selected node. **N** toggles it when no tex
 editor is consuming the key. Inputs with connected sources can replace their
 editors with labels. Units and rates are described in the [node reference](nodes.md).
 
+**Ctrl+Shift+L** arranges the current graph using port positions and theme spacing.
+Feedback regions stay together and independent components use free space beside
+taller branches. Inside groups, Input/Output remain at the outer edges. One Undo
+restores the previous arrangement; node sizes, camera and zoom are preserved.
+
 ## Documents and examples
 
 **File → New** creates a small Oscillator-to-Audio-Output graph. Open and Save use
