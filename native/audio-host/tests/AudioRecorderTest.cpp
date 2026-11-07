@@ -1,6 +1,8 @@
 #include "nodes/AudioRecorderNode.hpp"
 #include <cassert>
 #include <fstream>
+#define DR_MP3_IMPLEMENTATION
+#include "../third_party/dr_mp3.h"
 using namespace easyknack;
 static std::vector<float> samples(const std::filesystem::path& path,unsigned channels){
     std::ifstream in(path,std::ios::binary);assert(in);std::array<unsigned char,44> h{};in.read(reinterpret_cast<char*>(h.data()),44);
@@ -10,6 +12,7 @@ static std::vector<float> samples(const std::filesystem::path& path,unsigned cha
 }
 int main(int argc,char** argv){
     assert(argc==2);auto root=std::filesystem::u8path(argv[1]);std::filesystem::create_directories(root);
+    {auto unused=AudioRecording::create((root/"unused.wav").u8string(),false,2,2,48000,8,"unused-recording");unused.reset();auto report=std::make_unique<AnalysisFrame>();assert(!analysisMailbox("unused-recording")->latest(*report));}
     auto base=root/std::filesystem::u8path("Aufnahme_ä.wav");
     auto node=std::make_unique<AudioRecorderNode>();node->path=base.u8string();node->digits=2;node->bindIdentity("wav-test");node->prepare(48000,8);
     float l[]{0,1,2,3,4,5,6,7},r[]{0,-1,-2,-3,-4,-5,-6,-7},out[8]{};
@@ -35,4 +38,20 @@ int main(int argc,char** argv){
     const float* poly[]{l,l,nullptr,nullptr,nullptr,nullptr};c.inputs=poly;c.inputCount=6;c.rightInputs=nullptr;
     start.push(0,1,ValueEventKind::trigger);const ValueEventBuffer* pe[]{nullptr,nullptr,&start,nullptr,&end,nullptr};c.valueEventInputs=pe;node->process(c);node.reset();
     data=samples(root/"voices.wav",2);assert(data.size()==16&&data[2]==2&&data[3]==2);
+    // Native Windows encoding is optional at runtime; on this test machine it must
+    // produce decodable mono/stereo MP3 and preserve an existing numbered take.
+#ifdef _WIN32
+    for(unsigned channels:{1u,2u}){
+        auto target=root/std::filesystem::u8path("MP3_ä_"+std::to_string(channels)+".mp3");
+        auto take=AudioRecording::create(target.u8string(),false,2,channels,48000,256,"");assert(take->push(1));
+        std::array<float,512> wave{};for(int b=0;b<200;b++){
+            for(int i=0;i<256;i++)for(unsigned ch=0;ch<channels;ch++)wave[i*channels+ch]=.5f*std::sin(6.283185307179586*440*(b*256+i)/48000);
+            assert(take->push(2,wave.data(),256*channels));
+        }assert(take->push(3));take.reset();
+        auto path=root/std::filesystem::u8path(target.stem().u8string()+"_01.mp3");drmp3 decoder{};assert(drmp3_init_file_w(&decoder,path.c_str(),nullptr));assert(decoder.channels==channels&&decoder.sampleRate==48000);
+        std::vector<float> decoded(60000*channels);auto frames=drmp3_read_pcm_frames_f32(&decoder,60000,decoded.data());drmp3_uninit(&decoder);if(frames<51200||frames>=55000)std::fprintf(stderr,"MP3 channels=%u decoded=%llu\n",channels,static_cast<unsigned long long>(frames));assert(frames>=51200&&frames<55000);
+        double power=0;for(std::size_t i=0;i<frames*channels;i++){assert(std::isfinite(decoded[i]));power+=decoded[i]*decoded[i];}assert(std::sqrt(power/(frames*channels))>.2);
+        auto bytes=std::filesystem::file_size(path);take=AudioRecording::create(target.u8string(),false,2,channels,48000,256,"");take->push(1);take->push(2,wave.data(),256*channels);take->push(3);take.reset();assert(std::filesystem::file_size(path)==bytes);assert(std::filesystem::exists(root/std::filesystem::u8path(target.stem().u8string()+"_02.mp3")));
+    }
+#endif
 }

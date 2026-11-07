@@ -14,6 +14,9 @@
 - [x] Inspector: N outside text input and Esc from sidebar controls/text editors work reliably.
 
 - [x] GruppenInputs erscheinen noch nicht alle im Inspektor
+- [x] Verbindung tauschen klappt noch nicht bei Verbindungen zu Gruppen-Eingängen/Ausgängen
+- [x] Verbessertes Autolayouting ist noch ausbaufähig, Ziel muss sein, das ganze übersichtlich und möglichst kompackt anzuordnen. Mach mir dazu bitte Vorschläge — [Vorschlag](docs/development/AUTO-LAYOUT-PLAN.md); Umsetzung folgt nach Auswahl des Ansatzes.
+- [x] Doppelklick im Filechooser öffnet einen Ordner nur in der Seitenleiste, erst ein erneuter Doppelklick öffnet ihn im Hauptbereich. Die beiden sollten getrennt von einander sein, ein Doppelklick in der Seitenleiste öffnet den Ordner nur dort, ein Einfachklick im Seitenmenu öffnet den Ordner im Hauptbereich. Ein Doppelklick im Hauptbereich öffnet ihn nur dort.
 
 # Nice to have
 - [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
@@ -26,6 +29,11 @@
 - [x] Strg + L sortiert schon gut, sorgt aber manchmal für seltsame Layouts, kannst du Nodes intelligenter anordnen, also zum Beispiel so, dass die Verbindungen möglichst kurz sind?
 - [x] Wir brauchen einen Recorder-Output-Node, der per Start-Trigger eine Aufnahme beginnt und dann beim Stop-Trigger beendet und speichert. Mit der Option des Überschreibens, ansonsten wird ein [_nächster freier Index] angehangen, also zum Beispiel Testaufnahmen_0001.wav (die Anzahl der Ziffern gerne einstellbar, wenn ein Index diese Anzahl überschreitet, darf er das, also wenn wir zwei Ziffern festlegen, gibt es trozdem das Element 100 etc.). Unterstützt werden sollten mindestens WAV, gerne auch MP3 sowie Stereo und Mono (einstellbar)
 - [x] Betsimmte Nodes sollten Verbindungen tauschen, wenn man etwas neu verbindet, z.B. Math-Node (auch Vector Math etc.): wenn A angeschlossen und B frei dann wird beim anschließen einer neuen Verbindung an A, die derzeitige Verbindung auf B geswitcht. Gleiches für die beiden Eingänge der Mix-Nodes. Bitte überlege, bei welchen das sonst noch Sinn machen könnte und wie man das gut im Code umsetzten könnte, vllt mit einer Funktion switchTo(Aktuelle Verbindung, neue Verbindung) mit return des neuen NodePoints (natürlich nur wenn dieser frei ist, das könnte intern danach geprüft werden) oder null, wenn nicht geswitcht werden kann, dann wird die Verbindung wie bisher einfach ersetzt
+
+- [x] Import von Gruppen sollte eine alle Auswählen-Möglichkeit haben. Den Ganzen Graphen als Gruppe zu importieren sollte besser von den Gruppen getrennt sein. Die NodeGruppen sollten in den gleichen Katheogorien eingordnet werden, wie in ihrer Hauptdatei
+- [x] Index digits sollte eine reine Inspector-Einstellung sein
+- [x] MP3-Unterstützung für den Recorder
+- [x] Recorder braucht einen Savebutton im Inspector zum manuellen Speichern (nur aktiviert, wenn auch etwas aufgenommen wurde) — exportiert die letzte abgeschlossene Aufnahme zusätzlich per „Speichern unter“.
 
 # EasyKnack backlog
 
@@ -135,7 +143,7 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Later product work
 
-- [ ] Audio recording and offline rendering; transport/tempo synchronization.
+- [ ] Offline rendering; transport/tempo synchronization.
 - [ ] Reusable group library, presets, automation and plugin management improvements.
 - [ ] Dynamics, pitch tools, performance diagnostics and latency compensation.
 - [ ] Long-period autocorrelation using a defined low-rate analysis path.
@@ -147,7 +155,25 @@ The older [event plan](TODO_EVENT.txt) and [routing plan](TODOs_IO-Routing.txt)
 are historical design references, not instructions to reintroduce obsolete public
 rate semantics or to resume kernel-driver installation.
 
-## Validation (7 November 2026)
+## Validation (8 November 2026)
+
+- Core reactor test passes: 150 Core, 11 LSP and one SWT test, no failures/errors,
+  two optional skips. Core commit `945b465` is installed locally.
+- EasyKnack full package passes: 700 tests, no failures/errors, 172 optional skips.
+  Twelve final focused tests also pass with native audio checks enabled, including
+  WAV/MP3 mono/stereo, Unicode paths, numbered file preservation, graph handover,
+  unused-session telemetry and live-host recording/finalization.
+- Group-boundary operand relocation survives queued projection and navigation.
+  Import selection separates the root and definitions and preserves menu category.
+  Save-as enablement/export, inspector-only digits and the actual inspector layout
+  are checked; import and recorder inspector were rendered offscreen.
+- The development host is rebuilt; the packaged SDK includes the final telemetry
+  fix. Bilingual docs: 228 pages and 7691 links/anchors validated. MP3 uses the
+  installed Windows media encoder and retains codec delay/padding; use WAV for
+  sample-accurate recordings. Hardware routing and clean-machine installs remain
+  manual checks. Further compact layout work is a documented proposal only.
+
+## Earlier validation (7 November 2026)
 
 - New group/recorder batch: Core reactor test passes (149 Core, 11 LSP, one SWT;
   two optional skips), and the committed Core artifact is installed locally.
@@ -163,7 +189,7 @@ rate semantics or to resume kernel-driver installation.
 - Bilingual docs: 228 pages, 7689 links/anchors validated. Group inspector rendered
   offscreen. Hardware audio and clean-machine installation remain manual checks.
 - Newly saved documents use Core schema 10; old documents remain readable.
-  Recording currently supports float32 WAV; MP3 output remains optional later work.
+  That recorder batch supported float32 WAV; the following pass adds Windows MP3.
 
 - Core reactor `test`: 146 Core, 11 LSP and one SWT test; no failures/errors,
   two optional skips in total. Core Maven artifact installed locally.

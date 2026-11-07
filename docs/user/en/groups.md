@@ -22,7 +22,7 @@ These explicit deletions take effect immediately and can be undone after closing
 the dialog. The separate document option to preserve unused groups controls what
 is retained when saving; it does not bypass these deletion checks.
 
-Use **Import groups** to select several definitions from another document. Shared dependencies are copied once; the imported instances are added together and can be undone together.
+Use **Import groups** to select several definitions from another document. **Select all groups** selects definitions without the separate whole-graph option. Definitions are grouped by their original menu category, which is retained after import. Shared dependencies are copied once; the imported instances are added together and can be undone together.
 
 Undo/Redo acts on the currently open graph. Group histories are retained when navigating away and reopening a definition. Saving applies to all graphs. Press **N** to toggle the inspector outside text input. **Esc** closes a focused inspector; an active text edit or popup handles the first Esc.
 

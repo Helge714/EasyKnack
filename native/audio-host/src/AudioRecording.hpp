@@ -1,5 +1,6 @@
 #pragma once
 #include "Analysis.hpp"
+#include "WindowsMp3Recording.hpp"
 #include <thread>
 #include <chrono>
 #include <filesystem>
@@ -29,6 +30,7 @@ class AudioRecording {
     bool overwrite; unsigned digits,channels,sampleRate;
     std::shared_ptr<AnalysisMailbox> mailbox;
     FILE* file=nullptr;
+    std::unique_ptr<WindowsMp3Recording> mp3;
     std::uint64_t frames=0,nextIndex=1;
     unsigned state=0,error=0;
     std::string actualPath;
@@ -40,16 +42,23 @@ class AudioRecording {
         std::fwrite("WAVEfmt ",1,8,file);word(file,16,4);word(file,3,2);word(file,channels,2);word(file,sampleRate,4);
         word(file,sampleRate*channels*4,4);word(file,channels*4,2);word(file,32,2);std::fwrite("data",1,4,file);word(file,static_cast<std::uint32_t>(frames*channels*4),4);
     }
-    void finish(){if(file){header();if(std::ferror(file)||std::fflush(file))error=3;if(std::fclose(file))error=3;file=nullptr;state=error?3:2;}}
+    bool writing()const noexcept{return file||bool(mp3);}
+    void finish(){if(mp3){if(!mp3->finish())error=3;mp3.reset();state=error?3:2;}if(file){header();if(std::ferror(file)||std::fflush(file))error=3;if(std::fclose(file))error=3;file=nullptr;state=error?3:2;}}
     void begin(){
         finish();frames=0;error=0;state=1;
         try{
             if(target.empty())throw std::runtime_error("No recording path");
             auto base=std::filesystem::u8path(target);
+            auto extension=base.extension().u8string();std::transform(extension.begin(),extension.end(),extension.begin(),[](unsigned char c){return static_cast<char>(std::tolower(c));});bool compressed=extension==".mp3";
             if(!base.parent_path().empty())std::filesystem::create_directories(base.parent_path());
             for(;;){
                 auto path=base;
-                if(!overwrite){auto index=std::to_string(nextIndex++);if(index.size()<digits)index.insert(0,digits-index.size(),'0');path=base.parent_path()/std::filesystem::u8path(base.stem().u8string()+"_"+index+".wav");}
+                if(!overwrite){auto index=std::to_string(nextIndex++);if(index.size()<digits)index.insert(0,digits-index.size(),'0');path=base.parent_path()/std::filesystem::u8path(base.stem().u8string()+"_"+index+(compressed?".mp3":".wav"));}
+                if(compressed){
+                    auto encoder=std::make_unique<WindowsMp3Recording>();
+                    if(encoder->open(path,overwrite,channels,sampleRate)){mp3=std::move(encoder);actualPath=path.u8string();break;}
+                    if(encoder->exists)continue;if(encoder->codecFailure)error=5;throw std::runtime_error("Cannot create MP3");
+                }
                 int fd;
 #ifdef _WIN32
                 fd=_wopen(path.c_str(),_O_WRONLY|_O_CREAT|_O_BINARY|(overwrite?_O_TRUNC:_O_EXCL),_S_IREAD|_S_IWRITE);
@@ -62,14 +71,17 @@ class AudioRecording {
                 if(!overwrite&&fd<0&&errno==EEXIST)continue;
                 throw std::runtime_error("Cannot create WAV");
             }
-        }catch(...){error=1;state=3;failure.store(1,std::memory_order_release);}
+        }catch(...){if(!error)error=1;state=3;failure.store(error,std::memory_order_release);}
     }
-    void report(){
-        if(!mailbox)return;
+    bool report(){
+        // Prepared-but-unused sessions are retired during graph handover. They
+        // must not overwrite the active/completed take's telemetry with Ready.
+        if(!mailbox||state==0)return true;
+        if((mailbox->write.load(std::memory_order_relaxed)+1)%mailbox->frames.size()==mailbox->read.load(std::memory_order_acquire))return false;
         auto frame=std::make_unique<AnalysisFrame>();frame->frequency=static_cast<float>(double(frames)/sampleRate);frame->values[0]=-9151;
         frame->values[1]=static_cast<float>(state);frame->values[2]=static_cast<float>(error);
         auto size=std::min(actualPath.size(),AnalysisFrame::maxValues-4);frame->values[3]=static_cast<float>(size);
-        for(std::size_t i=0;i<size;i++)frame->values[4+i]=static_cast<unsigned char>(actualPath[i]);frame->valueCount=4+size;mailbox->publish(*frame);
+        for(std::size_t i=0;i<size;i++)frame->values[4+i]=static_cast<unsigned char>(actualPath[i]);frame->valueCount=4+size;mailbox->publish(*frame);return true;
     }
     void run()noexcept{
         auto last=std::chrono::steady_clock::now();auto emptySince=last;std::uint64_t stopped=0;bool changed=true;
@@ -78,20 +90,21 @@ class AudioRecording {
             if(r!=w){
                 auto& p=queue[r];
                 if(p.kind==1)begin();
-                else if(p.kind==2&&file){
-                    if(frames*channels*4+p.samples*4>0xffffffffULL-36){error=4;failure.store(4,std::memory_order_release);finish();}
+                else if(p.kind==2&&writing()){
+                    if(mp3){if(mp3->write(p.data.data(),p.samples))frames+=p.samples/channels;else{error=3;failure.store(3,std::memory_order_release);finish();}}
+                    else if(frames*channels*4+p.samples*4>0xffffffffULL-36){error=4;failure.store(4,std::memory_order_release);finish();}
                     else {auto written=std::fwrite(p.data.data(),sizeof(float),p.samples,file);frames+=written/channels;if(written!=p.samples){error=3;failure.store(3,std::memory_order_release);finish();}}
                 }else if(p.kind==3)finish();
                 read.store((r+1)%capacity,std::memory_order_release);emptySince=std::chrono::steady_clock::now();changed=true;
             }else{
-                if(auto failed=failure.load(std::memory_order_acquire);failed&&file){error=failed;finish();changed=true;}
+                if(auto failed=failure.load(std::memory_order_acquire);failed&&writing()){error=failed;finish();changed=true;}
                 auto epoch=stopEpoch.load(std::memory_order_acquire);
                 if(epoch!=stopped&&std::chrono::steady_clock::now()-emptySince>std::chrono::milliseconds(15)){finish();stopped=epoch;changed=true;}
                 if(closing.load(std::memory_order_acquire)){finish();report();break;}
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             if(std::chrono::steady_clock::now()-last>std::chrono::milliseconds(100)){
-                if(changed||file){report();changed=false;}last=std::chrono::steady_clock::now();
+                if(changed||writing())changed=!report();last=std::chrono::steady_clock::now();
             }
         }
     }

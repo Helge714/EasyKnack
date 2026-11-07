@@ -6,9 +6,10 @@ public final class AudioRecorderNode extends BasicNode {
  public void define(NodeBuilder n,NodeState s){
   n.addEditor(FILE,"Recording file",new com.vin.easyknack.ui.RecordingFileEditor()).editorCopyable(false).keepVisibleOnHide();
   n.addEditor(STATUS,"Recording status",new com.vin.easyknack.ui.RecordingStatusEditor()).editorCopyable(false).keepVisibleOnHide();
+  n.addEditor(new PropertyId("save-recording"),"Save recording as",new com.vin.easyknack.ui.RecordingExportEditor()).inspectorOnly().editorCopyable(false);
   n.addEditor(CHANNELS,"Channels",new Editor.ComboBox<String>(java.util.List.of("Mono","Stereo"),"Stereo",v->v));
   n.addEditor(OVERWRITE,"Overwrite",new Editor.CheckBox(false));
-  n.addEditor(DIGITS,"Index digits",Editor.Slider.button(4,1.,12.).integers().discrete()).visible(!s.flag(OVERWRITE,false));
+  n.addEditor(DIGITS,"Index digits",Editor.Slider.button(4,1.,12.).integers().discrete()).inspectorOnly().enabled(!s.flag(OVERWRITE,false));
   n.addInput(AUDIO,"Audio In");
   n.addInput(START,"Start",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT);
   n.addInput(STOP,"Stop",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT);

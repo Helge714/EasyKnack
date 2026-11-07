@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Preserve A/B wire relocation from composite boundary inputs during projection.
+  File-browser tree expansion and main-pane navigation are independent.
+- Import groups with Select all, a separate whole-graph option and retained menu
+  categories. Index digits is now inspector-only. Preserve recorder status across
+  unused prepared sessions. Add completed-take Save as and
+  optional Windows MP3 recording without bundling an encoder. MP3 has codec delay
+  and padding; WAV remains the sample-accurate recording format. No document, host
+  transport or plugin ABI version change; current development versions cover this.
+
 - Show all public group input editors in the inspector, including inherited defaults
   and copied Slider, Vector, choice, checkbox and trigger controls. Persist a camera
   center per graph while keeping zoom shared. Improve automatic graph arrangement

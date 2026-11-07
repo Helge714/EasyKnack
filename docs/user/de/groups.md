@@ -24,7 +24,7 @@ Diese ausdrücklichen Löschungen wirken sofort und lassen sich nach dem Schlie�
 des Dialogs rückgängig machen. Die separate Dokumentenoption zum Erhalten
 unbenutzter Gruppen steuert das Speichern; sie umgeht die Löschprüfung nicht.
 
-Mit **Gruppen importieren** lassen sich mehrere Definitionen aus einem anderen Dokument auswählen. Gemeinsame Abhängigkeiten werden einmal kopiert; die Instanzen werden gemeinsam eingefügt und lassen sich gemeinsam rückgängig machen.
+Mit **Gruppen importieren** lassen sich mehrere Definitionen aus einem anderen Dokument auswählen. **Alle Gruppen auswählen** wählt die Definitionen ohne die getrennte Option für den gesamten Graphen. Die Definitionen sind nach ihrer ursprünglichen Menükategorie geordnet; diese bleibt beim Import erhalten. Gemeinsame Abhängigkeiten werden einmal kopiert; die Instanzen werden gemeinsam eingefügt und lassen sich gemeinsam rückgängig machen.
 
 Undo/Redo wirkt auf den gerade geöffneten Graphen. Gruppenverläufe bleiben beim Verlassen und erneuten Öffnen einer Definition erhalten. Speichern gilt für alle Graphen. **N** schaltet den Inspektor außerhalb von Texteingaben um. **Esc** schließt den fokussierten Inspektor; eine aktive Textbearbeitung oder ein Popup behandelt zunächst das erste Esc.
 

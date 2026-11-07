@@ -177,7 +177,8 @@ final class WorkspaceController implements AutoCloseable {
         for(var asset:imported.assets()){
             composites.registerAsset(asset);types.register(asset.compositeDescriptor().nodeType());workspace.includeEmbeddedAsset(asset.id());
             var title=new com.vin.easyknack.nodes.NodeState(asset.metadata()).text("easyknack.title","Group");
-            catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(asset.compositeDescriptor().nodeType(),title,com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"group"));
+            var category=com.vin.easyknack.nodes.NodeCategory.catalogPath(new com.vin.easyknack.nodes.NodeState(asset.metadata()).text("easyknack.category",com.vin.easyknack.nodes.NodeCategory.ROUTING.path()));
+            catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(asset.compositeDescriptor().nodeType(),title,category,Map.of(),"group"));
         }
         imported.templates().forEach(editorTemplates::put);
         history.perform(AppText.text("group.import.action"),()->target.edit("Import groups",e->added.forEach(e::addNode)),()->target.edit("Remove imported groups",e->added.forEach(n->e.removeNode(n.id()))));

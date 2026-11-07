@@ -2,17 +2,18 @@
 
 ## Übersicht
 
-Nimmt triggergesteuerte Audiodurchläufe als WAV-Dateien auf.
+Nimmt triggergesteuerte Audiodurchläufe als WAV- oder MP3-Dateien auf.
 
 ## Eingänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Aufnahmedatei (Recording file) | [Editor](../../user/de/reference-tables.md) | WAV-Ziel | — | Keines | — | — | Immer |
+| Aufnahmedatei (Recording file) | [Editor](../../user/de/reference-tables.md) | WAV- / MP3-Ziel | — | Keines | — | — | Immer |
 | Aufnahmestatus (Recording status) | [Editor](../../user/de/reference-tables.md) | Bereit / Aufnahme / Gespeichert / Fehler | — | Bereit | s | — | Immer |
 | Kanäle (Channels) | [Editor](../../user/de/reference-tables.md) | Mono / Stereo | — | Stereo | — | — | Immer |
 | Überschreiben (Overwrite) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Immer |
-| Indexstellen (Index digits) | [Editor](../../user/de/reference-tables.md) | 1–12 | — | 4 | — | — | Überschreiben aus |
+| Indexstellen (Index digits) | [Editor](../../user/de/reference-tables.md) | 1–12 | — | 4 | — | — | Inspektor; bei Überschreiben deaktiviert |
+| Aufnahme speichern unter (Save recording as) | [Editor](../../user/de/reference-tables.md) | Speicherdialog | — | Deaktiviert | — | — | Inspektor; abgeschlossene Aufnahme erforderlich |
 | Audioeingang (Audio In) | [Audio](../../user/de/data-types.md#audio) | — | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
 | Start (Start) | [Trigger](../../user/de/data-types.md#trigger) | Button | Trigger | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
 | Stopp (Stop) | [Trigger](../../user/de/data-types.md#trigger) | Button | Trigger | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
@@ -29,7 +30,9 @@ Start nimmt das auslösende Sample bereits auf; Stopp beendet die Aufnahme vor d
 
 WAV speichert 32-Bit-Fließkommawerte mit der Host-Samplerate. Stereo erhält beide Kanäle, Mono mittelt links und rechts. Polyphone Stimmen werden addiert. Ohne Überschreiben erzeugt `Take.wav` die Datei `Take_0001.wav`, danach den nächsten freien Index. Indexstellen legt nur die Mindestbreite fest; größere Indizes bleiben möglich. Überschreiben ersetzt bei jeder neuen Aufnahme die gewählte Datei.
 
-Ein Hintergrundthread schreibt aus einer begrenzten Warteschlange. Ist der Datenträger zu langsam, stoppt die Aufnahme mit Fehler; bereits übernommenes Audio wird als Teilaufnahme abgeschlossen. Der Status zeigt die Dauer und im Tooltip den Dateipfad. Datei-, Pufferüberlauf-, Schreib- und WAV-Größenfehler werden unterschieden. Es gilt die WAV/RIFF-Grenze von ungefähr 4 GiB pro Aufnahme; MP3-Aufnahmen werden nicht unterstützt.
+Ein Hintergrundthread schreibt aus einer begrenzten Warteschlange. Ist der Datenträger zu langsam, stoppt die Aufnahme mit Fehler; bereits übernommenes Audio wird als Teilaufnahme abgeschlossen. Der Status zeigt die Dauer und im Tooltip den Dateipfad. Datei-, Pufferüberlauf-, Schreib- und WAV-Größenfehler werden unterschieden. Es gilt die WAV/RIFF-Grenze von ungefähr 4 GiB pro WAV-Aufnahme; MP3 benötigt einen verfügbaren Windows-Medienencoder. Für MP3 werden Eingangswerte auf ±1 begrenzt; das Format enthält Codec-Verzögerung und Padding. Für samplegenaue Zeitmessungen WAV verwenden. Das Format wird im Dateidialog oder über die Dateiendung gewählt; Standard ist WAV.
+
+Aufnahme speichern unter exportiert eine abgeschlossene Aufnahme im aufgenommenen Format. Das automatische Aufnahmeziel bleibt erhalten. Ohne fertiggestellte Audiodaten ist der Button deaktiviert. Änderungen an Aufnahmeziel, Format oder Kanälen schließen den aktuellen Durchlauf ab.
 
 ## Mute
 
