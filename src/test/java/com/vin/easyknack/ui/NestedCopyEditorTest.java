@@ -22,8 +22,14 @@ class NestedCopyEditorTest {
         var asset=new GLNodeGraphAsset(descriptor.assetId(),1,GLNodeGraphAssetKind.COMPOSITE,graph.snapshot(),GLNodeEditorViewState.empty(),Map.of(),descriptor);
         groups.registerAsset(asset);
         if(copy){
-            var sources=GroupInputSettings.availableSources(asset,ProcessingRate.CONTROL,"Control",groups);assertEquals(1,sources.size());
-            var selected=GroupEditorCopies.copy(control,sources.get(0).endpoint(),asset,groups);ports.set(0,selected);
+            var sources=GroupInputSettings.availableSources(asset,ProcessingRate.CONTROL,"Control",groups);
+            GLCompositePortMapping selected;
+            if(child.compositeDescriptor().portMappings().get(0).presentation().socketVisible()){
+                assertTrue(sources.isEmpty());
+                var endpoint=new GLNodeEndpoint(instance.id(),child.compositeDescriptor().portMappings().get(0).publicPort().id());
+                var connected=control.withEndpoints(List.of(endpoint));selected=GroupEditorCopies.inheritPort(connected,endpoint,asset,groups);
+            }else{assertEquals(1,sources.size());selected=GroupEditorCopies.copy(control,sources.get(0).endpoint(),asset,groups);}
+            ports.set(0,selected);
             asset=GroupInputs.materialize(GroupInputs.descriptor(asset,new GLCompositeNodeDescriptor(descriptor.nodeTypeId(),descriptor.assetId(),1,ports)),groups);
             groups.replaceAsset(asset);
         }
@@ -92,7 +98,7 @@ class NestedCopyEditorTest {
             var asset=outer(child,0,groups,false);controller.openDocument("Nested Copy Editor",document(asset,groups,GLNodeValue.of(0.)));
             controller.workspace().openComposite(asset.id());var editor=controller.workspace().interfaceEditor();
             ((GLList<?>)field(editor,"inputs")).setSelectedIndex(0);var settings=field(field(editor,"applicationSettings"),"inputSettings");
-            @SuppressWarnings("unchecked") var kind=(GLComboBox<GroupInputSettings.Kind>)field(settings,"kind");kind.setSelectedItem(GroupInputSettings.Kind.COPY);
+            @SuppressWarnings("unchecked") var kind=(GLComboBox<GroupInputSettings.Kind>)field(settings,"kind");if(visible){assertFalse(kind.getItems().contains(GroupInputSettings.Kind.COPY));assertFalse(editor.selectedPort().isBound());continue;}kind.setSelectedItem(GroupInputSettings.Kind.COPY);
             var source=(GLComboBox<?>)field(settings,"source");assertFalse(source.getItems().isEmpty());
             assertNull(source.getSelectedItem());
             @SuppressWarnings("unchecked") var selection=(GLComboBox<Object>)source;selection.setSelectedItem(selection.getItems().get(0));

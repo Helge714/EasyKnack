@@ -7,8 +7,20 @@ import com.vingame.glswing.node.composite.*;
 /** Pure import with fresh asset, type, node, connection and template IDs. */
 final class GroupImport {
     record Result(GLNodeGraphAsset selected,List<GLNodeGraphAsset> assets,List<EditorTemplates.Template> templates){}
+    record Batch(List<GLNodeGraphAsset> selected,List<GLNodeGraphAsset> assets,List<EditorTemplates.Template> templates){}
+    static Batch copyMany(GLNodeGraphDocument source,List<String> selectedIds,String rootName){
+        if(selectedIds.isEmpty())throw new IllegalArgumentException("Select at least one group");
+        var assets=new LinkedHashMap<String,GLNodeGraphAsset>();var ids=new HashMap<String,String>();
+        for(String selected:selectedIds){var plan=GLNodeGraphAssetCopy.plan(source,selected,"easyknack.asset.","easyknack.composite.");plan.assets().forEach(a->assets.putIfAbsent(a.id(),a));plan.ids().forEach(ids::putIfAbsent);}
+        var result=copy(source,new GLNodeGraphAssetCopy.Plan(selectedIds.get(0),List.copyOf(assets.values()),ids),rootName);
+        var copied=result.assets().stream().collect(java.util.stream.Collectors.toMap(GLNodeGraphAsset::id,a->a));
+        return new Batch(selectedIds.stream().distinct().map(id->copied.get(ids.get(id))).toList(),result.assets(),result.templates());
+    }
     static Result copy(GLNodeGraphDocument source,String selectedId,String rootName){
         var plan=GLNodeGraphAssetCopy.plan(source,selectedId,"easyknack.asset.","easyknack.composite.");
+        return copy(source,plan,rootName);
+    }
+    private static Result copy(GLNodeGraphDocument source,GLNodeGraphAssetCopy.Plan plan,String rootName){
         var ids=new HashMap<String,String>();
         var templates=new ArrayList<EditorTemplates.Template>();
         var value=source.root().metadata().get(EditorTemplates.KEY);

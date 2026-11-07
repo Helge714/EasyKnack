@@ -38,7 +38,8 @@ class UngroupTest {
             var after=c.snapshotDocument().embeddedAssets().get("test.outer.asset");
             for(var port:after.compositeDescriptor().portMappings())for(var e:port.internalEndpoints())assertTrue(after.graph().findNode(e.nodeId()).isPresent());
             assertTrue(after.graph().nodes().stream().anyMatch(n->n.typeId().equals(new OscillatorNode().registration().id())));
-            c.workspace().navigateBack();assertDoesNotThrow(()->c.audioGraph());c.history().undo();
+            c.workspace().navigateBack();assertDoesNotThrow(()->c.audioGraph());assertFalse(c.history().canUndo());
+            c.workspace().openComposite("test.outer.asset");assertTrue(c.history().undo());
             assertEquals(before.compositeDescriptor(),c.snapshotDocument().embeddedAssets().get("test.outer.asset").compositeDescriptor());
         }});
     }

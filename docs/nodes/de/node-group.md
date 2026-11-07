@@ -27,11 +27,13 @@ Bei einem unverbundenen Gruppeneingang zuerst Editor übernehmen und anschließe
 
 Nach Änderungen werden ungültige Verbindungen zu gelöschten Nodes sowie entfernten oder inkompatiblen Ports und Editor-Eigenschaften automatisch entfernt. Gültige übrige Ziele und öffentliche Bedienelemente bleiben erhalten. Beim Löschen oder Gruppieren stellt Undo die ursprünglichen Nodes und Verknüpfungen wieder her.
 
-Öffentliche Editoren verschachtelter Gruppen stehen ebenfalls als Quellen für Copy Editor zur Verfügung. Ihre Werte werden durch die Gruppenschnittstelle weitergegeben; sichtbare Eingänge bleiben verbindbar.
+Eigenständige Editoren verschachtelter Gruppen stehen als Quellen für Copy Editor zur Verfügung. Eingänge mit sichtbarem Anschluss werden durch Kabel verbunden und fehlen in dieser Liste. Copy Editor erscheint nur bei einem kompatiblen verbundenen Editor oder einer eigenständigen Quelle; die Auswahl legt keine automatische Kabelverbindung an.
 
 Die gesteuerten Gruppeneditoren sind innerhalb der übergeordneten Gruppe ausgegraut. Nach dem Entfernen der Verknüpfung sind sie wieder bedienbar.
 
 Änderungen an wiederverwendbaren Combobox-Einträgen aktualisieren vorhandene Gruppenbedienelemente unmittelbar. Undo und Redo stellen Vorlage und verwendete Editoren gemeinsam wieder her. Gruppen tragen im Add-Menü das Gruppensymbol.
+
+Undo und Redo gelten für den gerade geöffneten Graphen. Jede Gruppendefinition behält beim erneuten Öffnen ihren eigenen Verlauf; Speichern setzt den Speicherstand für das ganze Dokument.
 
 ## Mute
 

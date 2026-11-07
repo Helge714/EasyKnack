@@ -3,12 +3,22 @@
 - [x] manchmal funktioniert undo nicht mehr, ohne Fehlermeldung
 - [x] wenn man Einträge in einer custom-Combobox ändert, erscheinen diese Änderungen erst im Node, wenn man die Combobox entfernt und dann wieder hinzufügt
 - [x] Gruppen sollten im Add-Menu ebenfalls ihr Gruppensymbol bekommen
+- [x] Das Addmenu hält jetzt Platz frei im Hauptmenu für Icons, ob wohl die Einträge gar keine Icons besitzen
+- [x] Die Gruppenicons im Addmenu sind viel Dicker gezeichnet als bei den Gruppen selbst, bitte angleichen.
+- [x] Undo wird gerade über das komplette Dokument aufgezeichnet oder? Sinnvoller wären eigene Manager für das Hauptfenster und für jede Gruppe. Man undot also außerhalb der Gruppe nicht, was in der Gruppe angelegt wurde. Was meinst du?
+- [x] Einfügen von Nodes zwischen Gruppen-Ein-und Ausgängen und Gruppeninternen Nodes funktioniert nicht, Verbindungen veschwinden dann einfach
+- [x] Copy Editor verbindet automatisch den erstbesten Node-Eingang, wenn kein kopierbarer Editor verfügbar ist, das sollte nicht so sein, besser copyEditor ausblenden, wenn es keinen kopierbaren gibt und der Port nicht verbunden ist. Eingänge von Nodes erscheinen außerdem automatisch in der Auswahl, auch wenn sie Ports besitzen, das sollte nicht gehen, diese Verbindungen werden ja physisch hergestellt.
+- [x] Tooltips bleiben manchmal noch stehen, obwohl ihr Host längst nicht mehr sichtbar ist oder die Maus zumindest nicht mehr über ihm hovert
+- [x] die Icons zum Verschieben der Verbindungen im Step-Switch werden nicht gezeichnet. Außerdem sollte das ganze viel näher an den Valueviewer-node angepasst sein, also eine Zeile pro Eingang mit Name, Wert und Buttons für hoch/runter und das ganze als eine Core-ControlGruppe.
+
+- [x] Inspector: N outside text input and Esc from sidebar controls/text editors work reliably.
 
 # Nice to have
 - [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
 - [x] Namensänderungen sollten resetable sein.
 - [x] Tooltips von Controls sollten immer auch den Namen des Controls anzeigen
 - [x] Gruppen sollten in den Dokumenteneinstellungen als Liste mit derzeitiger Verwendungsanzahl auftauchen und löschbar sein (wenn nicht verwendet), vllt über einen Extra-Dialog wie "Gruppen verwalten" und dann vllt zwei Listen nebeneinander, links die Gruppen mit Verwendungsanzahl, rechts wo eine Gruppe überall eingebunden ist. Gruppen sollten sich nicht löschen lassen, wenn sie sichtbar sind oder Teil einer anderen noch nicht gelöschten oder sichtbaren Gruppe sind. Macht das Sinn?
+- [x] beim Import von Gruppen aus einer Datei sollten wir eine Liste bekommen, sodass wir gleich mehrere Gruppen für den Import auswählen können
 
 # EasyKnack backlog
 
@@ -130,7 +140,24 @@ The older [event plan](TODO_EVENT.txt) and [routing plan](TODOs_IO-Routing.txt)
 are historical design references, not instructions to reintroduce obsolete public
 rate semantics or to resume kernel-driver installation.
 
-## Latest validation (30 October 2026)
+## Validation (7 November 2026)
+
+- Core reactor `test`: 146 Core, 11 LSP and one SWT test; no failures/errors,
+  two optional skips in total. Core Maven artifact installed locally.
+- EasyKnack full `package`: 687 tests, no failures/errors, 170 optional/native
+  skips. Six final focused UI tests also pass, including one additional direct
+  Step Switch name/value editing and Undo regression.
+- Group boundary insertion is checked after queued projection, navigation and
+  Undo; graph-local history survives reopening. Inspector N/Esc dispatch is
+  tested through actual control ancestry, with text-entry protection.
+- Bilingual documentation: 226 HTML pages and 7623 local links/anchors checked.
+  Step Switch control groups and geometric reorder icons rendered offscreen.
+- Packaged Core consumer checked directly from a temporary fixture using the
+  current artifact versions and DARK_BLUE theme. The stock invoker fixture still
+  needs its old 0.1.0/DARK references and launcher setup maintained separately.
+- Hardware audio and installer acceptance were not rerun for these UI-only changes.
+
+## Earlier validation (30 October 2026)
 
 - Core: full Maven test/install, 132 tests, no failures/errors, one optional skip.
 - EasyKnack: full Maven package, 598 tests, no failures/errors, 158 optional tests

@@ -34,7 +34,7 @@ class NodeConsistencyTest {
             for(var row:definition.layout(new NodeState(model.properties())).rows()) {
                 assertFalse(row.label().isBlank(),definition.title()+"/"+row.id());
                 assertFalse(NodeHints.tooltip(row).isBlank());
-                if(row.editor()!=null&&!row.isMenuOnly())assertTrue(properties.contains(row.id()),definition.title()+"/"+row.id());
+                if(row.editor()!=null&&!row.isMenuOnly()&&row.isInspectorVisible())assertTrue(properties.contains(row.id()),definition.title()+"/"+row.id());
             }
         }
     }

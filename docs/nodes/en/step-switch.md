@@ -16,7 +16,7 @@ Selects one input by trigger or numeric index.
 | Selected index | [Value](../../user/en/data-types.md#value) | 0–31, integer | 0–Steps−1, rounded down | 0 | — | [Auto](../../user/en/rates.md#auto) | Index mode |
 | Input 1…N | [Selected type](../../user/en/data-types.md) | ±∞ for Value; no resource editor | Selected data type | 0 for Value | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Step name 1…N | [Editor](../../user/en/reference-tables.md) | Text | — | Input 1…N | — | — | Inspector |
-| Input order | [Editor](../../user/en/reference-tables.md) | Move up / down | — | Original slot order | — | — | Inspector |
+| Input order | [Editor](../../user/en/reference-tables.md) | Name, Value, Move up / down | — | Original slot order | — | — | Inspector |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector; Value/Vector |
 
 ## Outputs
@@ -30,7 +30,7 @@ Selects one input by trigger or numeric index.
 
 Next advances with wrap; Reset selects 0 and wins over simultaneous Next. Index mode floors and clamps its input; numbered selection buttons are disabled. Resource/vector modes replace the numeric step/output types with the selected type; resources have no fallback sliders. Resource selection is held per block and later triggers affect the next block; Index then reports the chosen block resource at Control rate. Vector contents can retain Audio rate. Switching spectra is hard, with no crossfade. Input labels can be renamed; names and selected step are saved. Inside Instance Groups the visible selection represents the first nested instance, manual selection affects all, and connected selectors remain independent. All connected sources still compute.
 
-The inspector can move input rows up or down. Each input retains its stable index, value, name and connections; Next and Index continue to address those indices. Use Reset name in the node context menu to restore its default title; Undo restores the custom title.
+The inspector shows one connected control group per input, containing its editable name, numeric fallback value where applicable, and Move up/down buttons. Each input retains its stable index, value, name and connections; Next and Index continue to address those indices. Use Reset name in the node context menu to restore its default title; Undo restores the custom title.
 
 ## Mute
 

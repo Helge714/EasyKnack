@@ -10,7 +10,7 @@ import com.vingame.glswing.ui.GLMenuBar;
 import com.vingame.glswing.ui.GLPopupMenu;
 
 /** All workspace widgets, including the menus, are rendered on the GLCanvas. */
-public final class WorkspaceView extends GLContainer implements AutoCloseable, com.vingame.glswing.input.GLKeyTarget, com.vin.easyknack.nodes.AnalysisEditor.Host {
+public final class WorkspaceView extends GLContainer implements AutoCloseable, com.vingame.glswing.input.GLKeyTarget, com.vingame.glswing.input.GLKeyPressCaptureTarget, com.vin.easyknack.nodes.AnalysisEditor.Host {
     private javax.swing.Timer launchTimer;
     private double displayedCurvature=ApplicationSettings.connectionCurvature();
     private boolean openingExternal;
@@ -227,6 +227,9 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         try{controller.ungroupSelection();}catch(IllegalArgumentException failure){status.setText(failure.getMessage());}
     }
 
+    @Override public boolean capturesKeyPress(com.vingame.glswing.input.GLKeyEvent event){
+        return !analysisFocus.isVisible() && event.getKeyCode()==java.awt.event.KeyEvent.VK_N && event.getModifiersEx()==0;
+    }
     @Override public void keyPressed(com.vingame.glswing.input.GLKeyEvent event) {
         if (!analysisFocus.isVisible() && !event.isConsumed()
                 && getGLInputMap().matches(com.vingame.glswing.input.GLInputActions.NODE_ARRANGE,event)) {

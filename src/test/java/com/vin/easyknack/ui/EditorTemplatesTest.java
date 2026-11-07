@@ -23,7 +23,7 @@ class EditorTemplatesTest {
             assertTrue(settings.model.isVisible());assertFalse(settings.source.isVisible());assertTrue(settings.getPreferredGLSize().height()<sliderHeight);
             settings.rate.setSelectedItem(com.vin.easyknack.nodes.ProcessingRate.CONTROL);assertTrue(c.audioGraph().contains("rateconvert"));
             settings.rate.setSelectedItem(com.vin.easyknack.nodes.ProcessingRate.EVENT);
-            assertEquals(List.of(GroupInputSettings.Kind.NONE,GroupInputSettings.Kind.BUTTON,GroupInputSettings.Kind.COPY),settings.kind.getItems());assertFalse(settings.model.isVisible());assertFalse(settings.source.isVisible());
+            assertEquals(List.of(GroupInputSettings.Kind.NONE,GroupInputSettings.Kind.BUTTON),settings.kind.getItems());assertFalse(settings.model.isVisible());assertFalse(settings.source.isVisible());
             settings.rate.setSelectedItem(com.vin.easyknack.nodes.ProcessingRate.AUTO);assertEquals(GroupInputSettings.Kind.SLIDER,settings.kind.getSelectedItem());
         }});
     }

@@ -27,11 +27,13 @@ Open the group to edit its internal graph and public interface. Each public port
 
 After changes, invalid connections to deleted nodes or removed/incompatible ports and editor properties are removed automatically. Valid remaining targets and public controls are retained. Undo restores the original nodes and bindings when deleting or grouping nodes.
 
-Public editors of nested groups are also available as Copy Editor sources. Their values are forwarded through the group interface; visible inputs remain wireable.
+Standalone editors of nested groups are available as Copy Editor sources. Inputs with visible sockets are connected by cables and are excluded from that list. Copy Editor is offered only when a compatible connected editor or standalone source is available; choosing it never creates an implicit cable.
 
 Controlled group editors are disabled inside the parent group. Removing the coupling enables them again.
 
 Changes to reusable combobox entries update existing group controls immediately. Undo and Redo restore both the template and its applied controls. Groups carry the group marker in the Add menu.
+
+Undo and Redo apply to the currently open graph. Each group definition retains its own history when reopened; saving checkpoints the complete document.
 
 ## Mute
 

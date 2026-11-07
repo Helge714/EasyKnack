@@ -46,7 +46,7 @@ final class GroupInterfaceValidity {
         if(NodeRegistry.find(node.typeId()).isEmpty()){
             var nested=groups.findComposite(node.typeId()).orElse(null);if(nested==null)return true;
             var child=GroupEditorCopies.groupPort(nested,endpoint.portId());
-            if(child==null||!GroupInputs.editorOnly(child))return false;
+            if(child==null||!GroupEditorCopies.standalone(child))return false;
             target=GroupInputSettings.sourceEditor(child,groups.findAsset(nested.assetId()).orElseThrow(),groups);if(target==null)return false;
         }else{var row=row(node,endpoint.portId());if(row==null||!GroupEditorCopies.linkable(row))return false;target=row.editor();}
         if(GroupInputs.template(mapping)!=null){

@@ -55,7 +55,7 @@ class CopyEditorSelectionTest {
             var settings=(GroupInputSettings)field(field(editor,"applicationSettings"),"inputSettings");
             settings.kind.setSelectedItem(GroupInputSettings.Kind.COPY);
             assertFalse(editor.selectedPort().isBound());assertTrue(settings.source.isVisible());assertNull(settings.source.getSelectedItem());
-            assertFalse(settings.source.getItems().get(0).type().equals(new HilbertNode().registration().id()));
+            assertTrue(settings.source.getItems().stream().allMatch(s->s.type().equals(new HilbertNode().registration().id())),"Nested inputs with sockets are connected by wires and are excluded from standalone sources");
             settings.source.setSelectedItem(settings.source.getItems().stream().filter(s->s.type().equals(new HilbertNode().registration().id())&&s.property().equals("length")).findFirst().orElseThrow());
             var selected=editor.selectedPort();assertFalse(selected.isBound());
             assertEquals("257",GroupInputs.template(selected).initial());

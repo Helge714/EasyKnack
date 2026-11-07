@@ -99,9 +99,10 @@ final class WorkspaceController implements AutoCloseable {
         midiDrivers=new MidiDrivers(this);
         measurementRecorders=new MeasurementRecorders(this);stepSwitchStates=new StepSwitchStates(this);
         workspace.setCompositeViewFactory(new GroupViewFactory(composites,catalog,this::setNodeProperty,history,this::observeCurrentGraph));
+        workspace.setGraphHistoryEnabled(true);
         var groupIcon=com.vingame.glswing.rendering.GLIcon.fromPath(new com.vingame.glswing.rendering.GLPath2D()
-            .moveTo(4,0).lineTo(16,0).lineTo(16,12).lineTo(13,12).lineTo(13,3).lineTo(4,3).closePath()
-            .moveTo(0,4).lineTo(12,4).lineTo(12,16).lineTo(0,16).closePath().moveTo(3,7).lineTo(3,13).lineTo(9,13).lineTo(9,7).closePath());
+            .moveTo(4,0).lineTo(16,0).lineTo(16,12).lineTo(4,12).closePath().moveTo(5,1).lineTo(5,11).lineTo(15,11).lineTo(15,1).closePath()
+            .moveTo(0,4).lineTo(12,4).lineTo(12,16).lineTo(0,16).closePath().moveTo(1,5).lineTo(1,15).lineTo(11,15).lineTo(11,5).closePath());
         workspace.setNodeCatalogIconProvider(entry->composites.findComposite(entry.type().id()).isPresent()
             ||java.util.Set.of(MultipleGroups.CREATE_TYPE,SpectralGroups.CREATE_TYPE,PartialGroups.CREATE,FormulaGroups.CREATE).contains(entry.type().id())?groupIcon:null);
         workspace.interfaceEditor().setDefaultValueType(com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
@@ -167,16 +168,21 @@ final class WorkspaceController implements AutoCloseable {
     EditorTemplates editorTemplates(){return editorTemplates;}
     java.util.Set<GLNodeId> selectedNodeIds(){return workspace.editor().getSelectedNodes().stream().flatMap(n->compositeColors.modelId(n).stream()).collect(java.util.stream.Collectors.toSet());}
     void importGroup(GroupImport.Result imported){
+        importGroups(new GroupImport.Batch(List.of(imported.selected()),imported.assets(),imported.templates()));
+    }
+    void importGroups(GroupImport.Batch imported){
         if(isSpectralContext())throw new IllegalArgumentException(AppText.text("group.import.context"));
-        var target=workspace.currentGraph();var node=new GLGraphNode(GLNodeId.random(),imported.selected().compositeDescriptor().nodeTypeId(),Map.of());
+        var target=workspace.currentGraph();var added=imported.selected().stream().map(asset->new GLGraphNode(GLNodeId.random(),asset.compositeDescriptor().nodeTypeId(),Map.of())).toList();
         for(var asset:imported.assets()){
             composites.registerAsset(asset);types.register(asset.compositeDescriptor().nodeType());workspace.includeEmbeddedAsset(asset.id());
             var title=new com.vin.easyknack.nodes.NodeState(asset.metadata()).text("easyknack.title","Group");
             catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(asset.compositeDescriptor().nodeType(),title,com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"group"));
         }
         imported.templates().forEach(editorTemplates::put);
-        history.perform(AppText.text("group.import.action"),()->target.edit("Import group",e->e.addNode(node)),()->target.edit("Remove imported group",e->e.removeNode(node.id())));
-        for(var view:workspace.editor().getNodes())if(compositeColors.modelId(view).filter(node.id()::equals).isPresent()){view.setLocation(160,120);workspace.editor().setSelectedNode(view);break;}
+        history.perform(AppText.text("group.import.action"),()->target.edit("Import groups",e->added.forEach(e::addNode)),()->target.edit("Remove imported groups",e->added.forEach(n->e.removeNode(n.id()))));
+        var views=new java.util.ArrayList<com.vingame.glswing.node.GLNode>();float y=120;
+        for(var node:added)for(var view:workspace.editor().getNodes())if(compositeColors.modelId(view).filter(node.id()::equals).isPresent()){view.setLocation(160,y);y+=view.getHeight()+workspace.editor().getHorizontalNodeSpacing();views.add(view);break;}
+        workspace.editor().setSelectedNodes(views);
         syncAudio();
     }
     GLNodeEditingActions actions() { guardActions(); return workspace.editor().getEditingActions(); }

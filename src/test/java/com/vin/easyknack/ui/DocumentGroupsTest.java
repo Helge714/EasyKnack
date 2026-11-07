@@ -45,7 +45,7 @@ class DocumentGroupsTest {
             controller.workspace().navigateToDepth(0);assertTrue(controller.workspace().canNavigateForward());controller.deleteUnusedGroup("C");
             assertFalse(controller.workspace().canNavigateForward());assertFalse(controller.snapshotDocument().embeddedAssets().containsKey("C"));
             assertTrue(controller.history().undo());assertTrue(controller.workspace().openComposite("C"));
-            assertThrows(IllegalArgumentException.class,()->controller.history().redo());
+            assertFalse(controller.history().redo(),"The group's local history cannot redo a root-level deletion");
             controller.workspace().navigateBack();assertTrue(controller.history().redo());assertFalse(controller.snapshotDocument().embeddedAssets().containsKey("C"));
             var codec=new KnackDocumentCodec();var bytes=new java.io.ByteArrayOutputStream();codec.write(controller.snapshotDocument(),bytes);
             assertFalse(codec.read(new java.io.ByteArrayInputStream(bytes.toByteArray()),codec.currentSchemaVersion()).embeddedAssets().containsKey("C"));

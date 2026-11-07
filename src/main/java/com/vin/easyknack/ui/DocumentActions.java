@@ -290,15 +290,9 @@ final class DocumentActions implements AutoCloseable {
             if(failure!=null||!selection.approved()){busy=false;if(failure!=null)error(GLDocumentOperation.OPEN,null,failure);return;}
             onUi(files.read(selection.selectedPath()),(document,readFailure)->{
                 busy=false;if(readFailure!=null){error(GLDocumentOperation.OPEN,selection.selectedPath(),readFailure);return;}
-                record Choice(String id,String label){public String toString(){return label;}}
-                var choices=new java.util.ArrayList<Choice>();choices.add(new Choice(document.root().id(),AppText.text("group.import.root")));
-                document.embeddedAssets().values().stream().filter(a->a.compositeDescriptor()!=null).sorted(java.util.Comparator.comparing(a->new com.vin.easyknack.nodes.NodeState(a.metadata()).text("easyknack.title",a.id()))).forEach(a->choices.add(new Choice(a.id(),new com.vin.easyknack.nodes.NodeState(a.metadata()).text("easyknack.title",a.id()))));
-                var ref=new GLDialog[1];var panel=new GLContainer(){
-                    final GLComboBox<Choice> choice=new GLComboBox<>(choices);final GLButton add=new GLButton(AppText.text("group.import.action")),cancel=new GLButton(AppText.text("cancel"));final GLLabel message=new GLLabel("");
-                    {addGL(choice);addGL(add);addGL(cancel);addGL(message);cancel.addActionListener(e->ref[0].close());add.addActionListener(e->{try{controller.importGroup(GroupImport.copy(document,choice.getSelectedItem().id(),selection.selectedPath().getFileName().toString().replaceFirst("\\.[^.]+$","")));ref[0].close();}catch(Exception invalid){message.setText(invalid.getMessage());}});}
-                    protected void record(GLContext2D c){}
-                    protected void resized(float w,float h){choice.setBounds(20,20,w-40,32);message.setBounds(20,62,w-40,42);cancel.setBounds(w-235,h-45,100,28);add.setBounds(w-125,h-45,105,28);}
-                };ref[0]=new GLDialog(AppText.text("group.import.title"),panel);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(620,165);ref[0].show(owner);
+                var ref=new GLDialog[1];
+                var panel=new GroupImportPanel(document,ids->controller.importGroups(GroupImport.copyMany(document,ids,selection.selectedPath().getFileName().toString().replaceFirst("\\.[^.]+$",""))),()->ref[0].close());
+                ref[0]=new GLDialog(AppText.text("group.import.title"),panel);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(620,420);ref[0].show(owner);
             });
         });
     }

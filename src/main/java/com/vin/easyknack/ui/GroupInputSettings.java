@@ -88,7 +88,7 @@ final class GroupInputSettings extends GLContainer {
             case CHECKBOX->save(GLNodeInputEditorRegistry.SLIDER,checkboxOptions(false),k);
             case BUTTON->save(BUTTON,Map.of(),k);
             case COMBO->{if(!templates.all().isEmpty())applyModel(templates.all().get(0),k,null);else save("easyknack.choice",Map.of(),k);}
-            case COPY->{var p=editor.selectedPort();if(p.isBound()){var copied=GroupEditorCopies.copy(p,p.internalEndpoint(),asset(),groups);save(copied.presentation().inputEditorId(),copied.presentation().editorOptions(),k);break;}save(p.presentation().inputEditorId(),p.presentation().editorOptions(),k);}
+            case COPY->{var p=editor.selectedPort();if(p.isBound()){var copied=p.internalEndpoints().stream().map(endpoint->GroupEditorCopies.copy(p,endpoint,asset(),groups)).filter(result->result!=p).findFirst().orElse(p);if(copied!=p)save(copied.presentation().inputEditorId(),copied.presentation().editorOptions(),k);break;}if(!sources().isEmpty())save(p.presentation().inputEditorId(),p.presentation().editorOptions(),k);}
         }
     }
     private void applyModel(EditorTemplates.Template t,Kind k,Source copied){
@@ -106,7 +106,7 @@ final class GroupInputSettings extends GLContainer {
     private static List<GLNodeEndpoint> controlledTargets(GLCompositePortMapping port){return java.util.stream.Stream.concat(GroupEditorCopies.targets(port).stream(),port.internalEndpoints().stream()).distinct().toList();}
     private boolean linkableSource(GLGraphNode node,String property){
         return NodeRegistry.find(node.typeId()).map(d->d.layout(new NodeState(node.properties())).rows().stream().anyMatch(r->r.id().equals(property)&&GroupEditorCopies.linkable(r)))
-            .orElseGet(()->groups.findComposite(node.typeId()).map(d->GroupEditorCopies.groupPort(d,property)).filter(Objects::nonNull).filter(GroupInputs::editorOnly).isPresent());
+            .orElseGet(()->groups.findComposite(node.typeId()).map(d->GroupEditorCopies.groupPort(d,property)).filter(Objects::nonNull).filter(GroupEditorCopies::standalone).isPresent());
     }
     private String sourceLabel(GLGraphNode node,String property){
         var definition=NodeRegistry.find(node.typeId()).orElse(null);if(definition!=null)return definition.title()+" / "+property;
@@ -145,10 +145,9 @@ final class GroupInputSettings extends GLContainer {
                 var child=groups.findAsset(descriptor.assetId()).orElseThrow();
                 var result=new ArrayList<GLNodeEditorSourceCatalog.Candidate<Editor>>();
                 for(var stored:descriptor.portMappings()){
-                    var port=MultipleGroups.exposedPort(stored);var value=sourceEditor(port,child,groups);if(value==null)continue;
+                    var port=MultipleGroups.exposedPort(stored);if(!GroupEditorCopies.standalone(port))continue;var value=sourceEditor(port,child,groups);if(value==null)continue;
                     var kind=value instanceof Editor.ComboBox<?>?GLNodeEditorCapabilities.Kind.CHOICE:value instanceof Editor.Trigger?GLNodeEditorCapabilities.Kind.TRIGGER:value instanceof Editor.CheckBox?GLNodeEditorCapabilities.Kind.CHECKBOX:value instanceof VectorEditor?GLNodeEditorCapabilities.Kind.CUSTOM:GLNodeEditorCapabilities.Kind.SLIDER;
-                    var property=GroupInputs.editorOnly(port)?GroupEditorCopies.groupProperty(port):port.publicPort().id();
-                    // Public group controls can be copied even when their input socket remains visible.
+                    var property=GroupEditorCopies.groupProperty(port);
                     result.add(new GLNodeEditorSourceCatalog.Candidate<>(property,new NodeState(child.metadata()).text("easyknack.title","Group")+" / "+port.publicPort().id(),value,new GLNodeEditorCapabilities(kind,true,true,value.defaultValue(),Map.of())));
                 }
                 return result;
@@ -214,6 +213,9 @@ final class GroupInputSettings extends GLContainer {
             rateLabel.setVisible(true);rate.setVisible(true);kindLabel.setVisible(true);kind.setVisible(true);status.setVisible(!status.getText().isEmpty());
             rate.removeAllItems();(numeric(p)?List.of(ProcessingRate.AUTO,ProcessingRate.AUDIO,ProcessingRate.CONTROL,ProcessingRate.EVENT):List.of(selectedRate(p))).forEach(rate::addItem);rate.setSelectedItem(selectedRate(p));rate.setEnabled(numeric(p));
             var choices=numeric(p)?selectedRate(p)==ProcessingRate.EVENT?List.of(Kind.NONE,Kind.BUTTON,Kind.COPY):List.of(Kind.NONE,Kind.SLIDER,Kind.CHECKBOX,Kind.COMBO,Kind.COPY):List.of(Kind.NONE,Kind.COPY);
+            choices=new ArrayList<>(choices);
+            boolean canCopy=p.isBound()?p.internalEndpoints().stream().anyMatch(endpoint->GroupEditorCopies.copy(p,endpoint,asset(),groups)!=p):!sources().isEmpty();
+            if(!canCopy&&selectedKind(p)!=Kind.COPY)choices.remove(Kind.COPY);
             kind.removeAllItems();choices.forEach(kind::addItem);var mode=choices.contains(selectedKind(p))?selectedKind(p):choices.get(0);kind.setSelectedItem(mode);
             if(mode==Kind.COPY){showReadOnlyRate(inheritedRate(p));}
             if(!p.presentation().socketVisible()){showReadOnlyRate(selectedRate(p)==ProcessingRate.EVENT?ProcessingRate.EVENT:ProcessingRate.CONTROL);}

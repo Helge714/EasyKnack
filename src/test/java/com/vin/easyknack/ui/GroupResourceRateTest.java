@@ -17,7 +17,9 @@ class GroupResourceRateTest {
    c.openDocument("Spectrum",GroupAuthoringTest.document(a,com.vingame.glswing.node.model.GLNodeValue.of(0.)));assertTrue(c.workspace().openComposite(a.id()));
    var settings=GroupEditingTest.descendants(c.workspace().interfaceEditor()).filter(GroupInputSettings.class::isInstance).map(GroupInputSettings.class::cast).findFirst().orElseThrow();
    settings.refresh();assertEquals(ProcessingRate.CONTROL,settings.rate.getSelectedItem());assertFalse(settings.rate.isEnabled());
-   settings.kind.setSelectedItem(GroupInputSettings.Kind.NONE);settings.kind.setSelectedItem(GroupInputSettings.Kind.COPY);settings.refresh();assertFalse(settings.rate.isEnabled());
+   settings.kind.setSelectedItem(GroupInputSettings.Kind.NONE);settings.refresh();
+   assertFalse(settings.kind.getItems().contains(GroupInputSettings.Kind.COPY),"A resource port without a copyable editor must not offer Copy Editor");
+   assertEquals(ProcessingRate.CONTROL,settings.rate.getSelectedItem());assertFalse(settings.rate.isEnabled());
   }});
  }
 }

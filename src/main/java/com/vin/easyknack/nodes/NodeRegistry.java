@@ -82,7 +82,7 @@ public final class NodeRegistry {
     }
     private static String signature(NodeBuilder layout, List<GLNodeMuteBypass> mute, GLNodeInsertionPorts insertion, PropertyId exclusion) {
         return layout.ports().toString() + "|" + mute + "|" + insertion + "|" + exclusion + "|" + layout.rows().stream()
-                .map(r -> r.id() + ":" + r.isInspectorOnly()
+                .map(r -> r.id() + ":" + r.isInspectorOnly() + ":" + r.isInspectorVisible()
                         + ":" + (r.editor()==null?"":r.editor().structuralKey())).toList();
     }
     private boolean refreshingLanguage;
@@ -108,7 +108,7 @@ public final class NodeRegistry {
         List<GLNodePropertyDescriptor> properties = new ArrayList<>();
         for (var row : layout.rows()) {
             // Presentation-only visibility changes must not replace the active control.
-            if (row.isMenuOnly()) continue;
+            if (row.isMenuOnly() || !row.isInspectorVisible()) continue;
             if(row.editor() instanceof Editor.ComboBox<?> combo && combo.items().stream().allMatch(item->emptyGroup(combo,item)) && !hasChoiceLabels(combo))properties.add(enumProperty(row,combo));
             else if (row.editor() instanceof Editor.Slider || row.editor() instanceof Editor.CheckBox || row.editor() instanceof Editor.ComboBox<?>)
                 properties.add(InspectorEditor.property(row,definition));

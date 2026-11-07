@@ -26,6 +26,7 @@ final class GroupEditorCopies {
     }
     static boolean supported(Editor e){return e instanceof VectorEditor||e instanceof Editor.Slider||e instanceof UnitSlider||e instanceof Editor.ComboBox<?>||e instanceof Editor.CheckBox||e instanceof Editor.Toggle||e instanceof Editor.Trigger;}
     static boolean linkable(NodeBuilder.Row row){return GroupEditorCapabilities.of(row).linkable();}
+    static boolean standalone(GLCompositePortMapping port){return port.publicPort().direction()==GLPortDirection.INPUT&&!port.presentation().socketVisible()&&!port.presentation().applicationManaged()&&!port.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE);}
     /** Public semantic category and requested rate, not the host's storage type/resolved rate. */
     static GLCompositePortMapping inheritPort(GLCompositePortMapping p,GLNodeEndpoint endpoint,GLNodeGraphAsset asset,GLCompositeGraphRegistry groups){
         var node=asset.graph().findNode(endpoint.nodeId()).orElseThrow();var definition=NodeRegistry.find(node.typeId()).orElse(null);
@@ -98,15 +99,16 @@ final class GroupEditorCopies {
         return new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),asset.graph(),asset.viewState(),metadata,new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),d.portMappings(),properties,mappings));
     }
     static GLCompositePortMapping copy(GLCompositePortMapping p,GLNodeEndpoint endpoint,GLNodeGraphAsset asset,GLCompositeGraphRegistry groups){
-        var n=asset.graph().findNode(endpoint.nodeId()).orElseThrow();var def=NodeRegistry.find(n.typeId()).orElse(null);
+        var n=asset.graph().findNode(endpoint.nodeId()).orElse(null);if(n==null)return p;var def=NodeRegistry.find(n.typeId()).orElse(null);
         if(def==null){
             var nested=groups.findComposite(n.typeId()).orElse(null);if(nested==null)return p;
             var child=groupPort(nested,endpoint.portId());if(child==null)return p;
             child=MultipleGroups.exposedPort(child);
+            if(!p.isBound()&&!standalone(child))return p;
             var options=new HashMap<>(child.presentation().editorOptions());options.remove(TARGETS);
             options.put(GroupInputSettings.MODE,GLNodeValue.of(GroupInputSettings.Kind.COPY.name()));options.put("copySource",GLNodeValue.of(endpoint.toString()));
             if(GroupInputs.choice(child))options.put(GroupInputs.CHOICE,GLNodeValue.of(GroupInputs.property(p)));
-            if(GroupInputs.editorOnly(child)){
+            if(standalone(child)){
                 options.put(TARGETS,targetsValue(List.of(new GLNodeEndpoint(n.id(),groupProperty(child)))));
                 return new GLCompositePortMapping(p.publicPort(),null,new GLCompositePortPresentation(child.presentation().inputEditorId(),false,options));
             }

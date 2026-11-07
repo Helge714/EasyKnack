@@ -57,10 +57,10 @@ public final class StepSwitchNode extends BasicNode {
             .tooltip("Select the first input. Reset wins over Next at the same sample.");
         for(int i:order(s)){
             var row=numeric?n.addInput(input(i),label(s,i),Editor.Slider.button(0)):n.addInput(input(i),label(s,i));
-            row.editorCopyable(false).dataType(type.dataType).signal(type.signal).optional();
+            row.editorCopyable(false).inspectorVisible(false).dataType(type.dataType).signal(type.signal).optional();
             if(numeric||type==Type.VECTOR)row.rates(PortRates.AUDIO_CONTROL);else row.rate(ProcessingRate.CONTROL);
         }
-        for(int i=0;i<count(s);i++)n.addEditor(name(i),NodeText.text("easyknack.routing.stepswitch.stepName","Step name")+" "+(i+1),new Editor.Text("")).inspectorOnly();
+        for(int i=0;i<count(s);i++)n.addEditor(name(i),NodeText.text("easyknack.routing.stepswitch.stepName","Step name")+" "+(i+1),new Editor.Text("")).inspectorOnly().inspectorVisible(false);
         n.addEditor(ORDER,NodeText.text("stepswitch.order","Input order"),new StepOrderEditor(s)).inspectorOnly().editorCopyable(false);
         if(numeric||type==Type.VECTOR)ProcessingRate.addEditor(n,RATE).tooltip(numeric?"Auto uses AudioRate when a trigger or audio input is connected, otherwise ControlRate. ControlRate samples at block start and defers later triggers to the next block. Audio switching is immediate and can click.":com.vin.easyknack.ui.AppText.text("stepswitch.resource.help"));
     }

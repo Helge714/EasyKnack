@@ -44,6 +44,9 @@ public final class NodeBuilder {
         public boolean socketVisible(){return socketVisible;}
         public Row socketVisible(boolean value){requirePort();socketVisible=value;return this;}
         private boolean inspectorOnly;
+        private boolean inspectorVisible=true;
+        public boolean isInspectorVisible(){return inspectorVisible;}
+        public Row inspectorVisible(boolean visible){inspectorVisible=visible;return this;}
         private boolean menuOnly;
         public boolean isMenuOnly() { return menuOnly; }
         private boolean visible = true, enabled = true;

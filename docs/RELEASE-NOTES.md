@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Keep independent Undo/Redo stacks for the root graph and each group definition,
+  retaining group history across reopening and one document-wide save checkpoint.
+  Preserve group-boundary insertion through projection and navigation.
+- Restrict Copy Editor sources to standalone controls or existing input wires;
+  never add implicit connections. Existing document bindings remain readable.
+- Provide compact Step Switch inspector rows with names, numeric values and
+  geometric reorder icons, without duplicate per-step controls.
+- Import multiple group definitions in one operation, sharing copied dependencies.
+  Fix Add-menu icon spacing/weight, stale tooltip ownership and inspector N/Esc
+  handling. No document, plugin ABI or audio-host protocol change; the existing
+  first-development version remains in use.
+
 - Replace the experimental Partial Analysis classifier and harmonic heuristic with original Loris reassigned analysis, bandwidth estimation and tracking. Add Resolution, Frequency drift and Bandwidth model controls; Context Tonality now means the tonal energy fraction. Retired controls/bindings are removed on load, so existing separation results can change. Rebuild Java, the host and plugin/baked caches together. Loris source and notices ship in the SDK; no Python or FFTW runtime is needed.
 
 - Replace Partial Analysis heuristic gates with adaptive bandwidth/duration/coherence classification and a 5-60 dB Minimum peak SNR control (default 30 dB). Add an inspector classification switch; Context Tonality becomes Classification margin. Old heuristic settings use the new default and copied bindings to retired controls detach with a log warning; signal connections and raw analysis are retained. Rebuild Java and the host together. The parameter fingerprint changes; document schema and transport versions do not.
