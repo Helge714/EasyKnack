@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace easyknack;
 int main(int argc,char** argv){
-    if(argc!=6){std::cerr<<"Usage: partial-reference samples.f64 window hop defaults|sinusoidal|snr:5..60 output.csv\n";return 2;}
+    if(argc!=6){std::cerr<<"Usage: partial-reference samples.f64 window hop defaults|sinusoidal output.csv\n";return 2;}
     const auto length=std::stoul(argv[2]),hop=std::stoul(argv[3]);
     if(length<64||2*length>SpectrumStream::maxSize||!hop){std::cerr<<"Invalid frame dimensions\n";return 2;}
     std::ifstream file(argv[1],std::ios::binary|std::ios::ate);if(!file)return 2;
@@ -13,8 +13,7 @@ int main(int argc,char** argv){
     std::vector<double> samples(std::size_t(bytes)/sizeof(double));file.seekg(0);file.read(reinterpret_cast<char*>(samples.data()),bytes);if(!file)return 2;
     SpectrumStream input;input.prepare(256);input.size=2*length;input.windowSize=length;input.hop=hop;input.sampleRate=48000;input.identity=1;input.window=SpectrumWindow::hann;input.count=1;
     PartialAnalysisNode analysis;
-    if(std::string(argv[4])=="sinusoidal")analysis.classify=false;
-    else if(std::string(argv[4]).rfind("snr:",0)==0)analysis.peakSnr=std::stod(argv[4]+4);
+    if(std::string(argv[4])=="sinusoidal")analysis.settings.bandwidth=0;
     else if(std::string(argv[4])!="defaults")return 2;
     analysis.prepare(48000,256);float silence[256]{},output[256]{};const DspResource* resources[]={&input,nullptr};
     ProcessContext c{};c.resourceInputs=resources;c.inputCount=2;c.bufferSize=256;c.sampleRate=48000;c.silence=silence;c.output=output;

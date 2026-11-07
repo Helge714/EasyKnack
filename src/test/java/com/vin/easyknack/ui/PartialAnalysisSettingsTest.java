@@ -9,30 +9,33 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 class PartialAnalysisSettingsTest {
-    @Test void adaptiveControlsReplaceHeuristicThresholds(){
+    @Test void originalLorisControlsReplaceExperimentalClassifier(){
         var definition=new PartialAnalysisNode();var layout=definition.layout(new NodeState(definition.defaults()));
-        var snr=layout.rows().stream().filter(r->r.id().equals("peak-snr")).findFirst().orElseThrow();
-        var unit=(UnitSlider)snr.editor();var slider=unit.spec();assertEquals(5.,slider.min());assertEquals(60.,slider.max());
-        assertEquals(30.,((Number)slider.defaultValue().toJavaValue()).doubleValue());assertTrue(snr.isVisible());
+        var resolution=layout.rows().stream().filter(r->r.id().equals("resolution")).findFirst().orElseThrow();
+        var slider=((UnitSlider)resolution.editor()).spec();assertEquals(0.,slider.min());
+        assertEquals(0.,((Number)slider.defaultValue().toJavaValue()).doubleValue());assertTrue(resolution.isVisible());
         assertFalse(layout.rows().stream().anyMatch(r->PartialAnalysisMigration.RETIRED.contains(r.id())));
-        var disabled=definition.layout(new NodeState(Map.of("classify",GLNodeValue.of(false))));
-        assertFalse(disabled.rows().stream().filter(r->r.id().equals("peak-snr")).findFirst().orElseThrow().isVisible());
-        String encoded=definition.encode(new NodeState(definition.defaults()),p->-1);assertFalse(encoded.isBlank());
+        var none=definition.layout(new NodeState(Map.of("bandwidth",GLNodeValue.of("none"))));
+        assertFalse(none.rows().stream().filter(r->r.id().equals("convergence")).findFirst().orElseThrow().isVisible());
+        assertFalse(none.rows().stream().filter(r->r.id().equals("region")).findFirst().orElseThrow().isVisible());
+        String encoded=definition.encode(new NodeState(definition.defaults()),p->-1);assertTrue(encoded.contains("convergence"));
     }
     @Test void oldDocumentsRetireScoresAndPreserveRawAnalysis(){
         for(boolean raw:List.of(false,true)){
             var doc=PartialsTest.document(false);var root=doc.root();var graph=root.graph();
             var nodes=graph.nodes().stream().map(n->{
                 if(!n.typeId().startsWith(new PartialAnalysisNode().registration().id()))return n;
-                return n.withoutProperty("classify").withoutProperty("peak-snr")
+                return n.withoutProperty("classify").withoutProperty("peak-snr").withoutProperty("bandwidth")
                     .withProperty("sinusoidality",GLNodeValue.of(raw?0.:.8))
                     .withProperty("confidence",GLNodeValue.of(raw?0.:.7))
-                    .withProperty("assessment",GLNodeValue.of(30.)).withProperty("prominence",GLNodeValue.of(3.));
+                    .withProperty("assessment",GLNodeValue.of(30.)).withProperty("prominence",GLNodeValue.of(3.))
+                    .withProperty("maximum",GLNodeValue.of(24000.));
             }).toList();
             root=new GLNodeGraphAsset(root.id(),root.version(),root.kind(),new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,graph.connections()),root.viewState(),root.metadata(),root.compositeDescriptor());
             var migrated=NodeDocuments.prepare(new GLNodeGraphDocument(root,doc.embeddedAssets(),doc.externalAssets()));
             var analysis=migrated.root().graph().nodes().stream().filter(n->n.typeId().startsWith(new PartialAnalysisNode().registration().id())).findFirst().orElseThrow();
-            assertEquals(GLNodeValue.of(!raw),analysis.properties().get("classify"));assertEquals(GLNodeValue.of(30.),analysis.properties().get("peak-snr"));
+            assertEquals(GLNodeValue.of(raw?"none":"convergence"),analysis.properties().get("bandwidth"));
+            assertEquals(GLNodeValue.of(24000.),analysis.properties().get("maximum"));
             assertTrue(PartialAnalysisMigration.RETIRED.stream().noneMatch(analysis.properties()::containsKey));
             assertEquals(graph.connections(),migrated.root().graph().connections());
             assertEquals(migrated,PartialAnalysisMigration.migrate(migrated));
@@ -40,7 +43,7 @@ class PartialAnalysisSettingsTest {
         }
     }
     @Test void copiedRetiredEditorsDetachWithoutInvalidatingTheGroup(){
-        var asset=GroupAuthoringTest.asset(new PartialAnalysisNode(),"peak-snr");var d=asset.compositeDescriptor();
+        var asset=GroupAuthoringTest.asset(new PartialAnalysisNode(),"resolution");var d=asset.compositeDescriptor();
         var port=d.portMappings().get(0);var options=new HashMap<>(port.presentation().editorOptions());
         var oldTargets=GroupEditorCopies.targets(port).stream().map(e->new GLNodeEndpoint(e.nodeId(),"sinusoidality")).toList();
         options.put(GroupEditorCopies.TARGETS,GroupEditorCopies.targetsValue(oldTargets));
@@ -48,7 +51,7 @@ class PartialAnalysisSettingsTest {
         port=new GLCompositePortMapping(port.publicPort(),null,new GLCompositePortPresentation(port.presentation().inputEditorId(),false,options));
         var nodes=asset.graph().nodes().stream().map(n->n.withProperty("sinusoidality",GLNodeValue.of(.8)).withProperty("confidence",GLNodeValue.of(.7))).toList();
         var graph=new GLNodeGraphSnapshot(asset.graph().graphId(),asset.graph().revision(),nodes,asset.graph().connections());
-        var mappings=d.propertyMappings().stream().map(m->m.internalPropertyId().equals("peak-snr")?new GLCompositePropertyMapping(m.publicPropertyId(),m.internalNodeId(),"sinusoidality"):m).toList();
+        var mappings=d.propertyMappings().stream().map(m->m.internalPropertyId().equals("resolution")?new GLCompositePropertyMapping(m.publicPropertyId(),m.internalNodeId(),"sinusoidality"):m).toList();
         d=new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),List.of(port),d.properties(),mappings);
         asset=new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),graph,asset.viewState(),asset.metadata(),d);
         var doc=NodeDocuments.prepare(GroupAuthoringTest.document(asset,GLNodeValue.of(.8)));

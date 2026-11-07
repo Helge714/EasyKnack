@@ -55,7 +55,7 @@ class RateConverterTest {
     }
     static String payload(BasicNode d,String rate,int source){var values=new HashMap<>(d.defaults());values.put("rate",GLNodeValue.of(rate));return "!"+NativeContractGenerator.fingerprint(d)+" "+d.encode(new NodeState(values),p->source);}
     static void compileAndRun(Path source,Path executable,Path includes)throws Exception{
-        run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O2","-static","-I",includes.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),source.toString(),"-o",executable.toString()));
+        run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O2","-static","-I",includes.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),source.toString(),Path.of("native/audio-host/src/nodes/LorisLibrary.cpp").toAbsolutePath().toString(),"-o",executable.toString()));
         run(List.of(executable.toString()));
     }
     static void run(List<String> command)throws Exception{

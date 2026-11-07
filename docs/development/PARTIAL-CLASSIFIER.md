@@ -1,5 +1,9 @@
 # Adaptive partial peak classifier
 
+> Historical research. The experimental classifier is no longer used or shipped.
+> Current integration: [Loris](LORIS.md).
+
+
 **Reproduction status:** this implementation uses our own quantile tables and is
 not the requested reproduction of the paper's deterministic finite-SNR threshold
 construction. Replacing those tables is pending the source clarifications recorded

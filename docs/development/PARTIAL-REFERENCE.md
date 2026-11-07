@@ -4,7 +4,7 @@
 
 Compare EasyKnack's causal general sinusoidal analysis with an independently
 installed, executable reference before adjusting its classifier. Neither analysis
-requires a common fundamental. The optional harmonic restriction is disabled.
+requires a common fundamental. No common fundamental is required.
 
 This is a developer experiment, not an additional runtime dependency. SMS Tools
 and its sources are not copied into EasyKnack, the SDK or an installer.
@@ -70,7 +70,7 @@ windows and modulation that is not locally stationary with long windows.
 The adapter runs the actual `PartialAnalysisNode` in two profiles:
 
 - `defaults`: current product defaults, with classification enabled.
-- `sinusoidal`: classification is disabled;
+- `sinusoidal`: Loris bandwidth association is disabled;
   minimum track duration remains 20 ms. This isolates tracking from classification.
 
 SMS calls public DFT analysis, peak interpolation, `sineTracking` and
@@ -79,7 +79,7 @@ all defaults, padding and synthesis conventions of the high-level SPR function
 are identical. Both use a 20-20000 Hz band and capacity 64. SMS's positive complex
 exponential has half the real cosine amplitude: its peak threshold is -66.0206 dB
 for the host's -60 dB amplitude threshold. SMS frequency assignment uses its
-20 Hz + 1% gate; EasyKnack retains its predictive 100-cent gate.
+20 Hz + 1% gate; Loris uses an absolute-Hz drift gate (half its resolution in the default profile).
 
 The reference retrospectively removes short complete track fragments. The host
 waits causally before confirming a track and never rewrites earlier frames. Ignore
@@ -97,13 +97,15 @@ alone establishes perceptual separation quality.
 
 ## Implementation status
 
-The host now uses the adaptive NBD/NDD/FCD classifier described in
-[PARTIAL-CLASSIFIER.md](PARTIAL-CLASSIFIER.md), including calibration reproduction,
-parameter meanings, tests, cost and limits. Its `sinusoidal` comparison profile
-sets Classify peaks to false; minimum track duration remains 20 ms.
+The host now runs the original [Loris stages](LORIS.md). The `defaults` profile
+uses convergence bandwidth, tolerance 0.1, automatic resolution `2*rate/window`,
+64 tracks and a causal 20 ms duration filter. `sinusoidal` disables bandwidth
+association, not Loris peak selection or tracking. Hop and the available sample
+window come from the supplied STFT, not the standalone offline Analyzer defaults.
+SMS remains an independent comparison with different window/tracking policies.
+The native LorisAnalysisTest additionally compares against unmodified Loris itself.
 
-The snapshot below records the earlier window-fit classifier and its interference
-fix. Keep it as a labelled baseline, not as the current algorithm description.
+The following snapshots describe retired implementations and are historical only.
 
 ## Measurement snapshot (2026-11-06)
 

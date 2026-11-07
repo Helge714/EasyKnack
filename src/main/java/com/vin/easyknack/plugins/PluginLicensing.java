@@ -24,7 +24,9 @@ public final class PluginLicensing {
                     is not automatically exempt from the licenses of copied SDK code.
 
                     The SDK retains ASIO's LICENSE.txt and COPYING (GPLv3 option) and
-                    miniaudio's license in its header (MIT-0 option). GLSwing is a separate
+                    miniaudio's license in its header (MIT-0 option), and Loris' COPYING
+                    (GPL-2.0-or-later, used under GPLv3), provenance and bundled Ooura FFT
+                    permission notice. Loris is linked into plugin audio hosts too. GLSwing is a separate
                     Apache-2.0 dependency and is not included in this source archive.
                     EasyKnack project: https://github.com/Helge97/EasyKnack
                     """);

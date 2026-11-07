@@ -22,3 +22,11 @@ continues using the miniaudio version above.
 - Copyright David Reid; EasyKnack selects the MIT-0 option. Embedded minimp3
   code carries the CC0/public-domain dedication retained at the end of the header.
   The full upstream license section is also bundled with Windows packages.
+
+# Loris
+
+Partial analysis uses a pinned subset of the original C++ Loris library.
+See [provenance, local access patches and license](loris/PROVENANCE.md).
+COPYING (GPL-2.0-or-later, GPLv3 option), AUTHORS and the bundled Ooura FFT
+permission statement are included in SDKs and Windows packages. File hashes are
+recorded in loris/SHA256SUMS.json; no FFTW or Python dependency is introduced.

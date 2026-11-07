@@ -78,6 +78,8 @@ try {
     Copy-Item -LiteralPath "$root/src/main/resources/easyknack/notices" -Destination "$inputDir/licenses/upstream" -Recurse
     New-Item -ItemType Directory -Path "$inputDir/licenses/asio", "$inputDir/licenses/miniaudio" | Out-Null
     Copy-Item -LiteralPath "$root/native/audio-host/third_party/asio/LICENSE.txt", "$root/native/audio-host/third_party/asio/COPYING" -Destination "$inputDir/licenses/asio"
+    New-Item -ItemType Directory -Path "$inputDir/licenses/loris" | Out-Null
+    Copy-Item -LiteralPath "$root/native/audio-host/third_party/loris/COPYING", "$root/native/audio-host/third_party/loris/AUTHORS", "$root/native/audio-host/third_party/loris/PROVENANCE.md", "$root/native/audio-host/third_party/loris/OOURA-LICENSE.txt" -Destination "$inputDir/licenses/loris"
     $miniaudio = [IO.File]::ReadAllText("$root/native/audio-host/third_party/miniaudio.h")
     $licenseStart = $miniaudio.LastIndexOf('This software is available as a choice of the following licenses.')
     if ($licenseStart -lt 0) { throw 'miniaudio license section not found.' }

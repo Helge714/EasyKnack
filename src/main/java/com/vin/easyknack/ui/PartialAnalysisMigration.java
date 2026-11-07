@@ -7,9 +7,9 @@ import com.vingame.glswing.node.composite.*;
 import com.vingame.glswing.node.document.*;
 import com.vingame.glswing.node.model.*;
 
-/** Retire heuristic controls without inventing a conversion to physical peak SNR. */
+/** Retire the experimental classifier without pretending its scores are Loris parameters. */
 final class PartialAnalysisMigration {
-    static final Set<String> RETIRED=Set.of("sinusoidality","prominence","assessment","confidence");
+    static final Set<String> RETIRED=Set.of("sinusoidality","prominence","assessment","confidence","classify","peak-snr","tolerance","gap","harmonic","fundamental","harmonic-tolerance","minimum-f0","maximum-f0");
     private static boolean analysis(GLGraphNode node){
         String id=new PartialAnalysisNode().registration().id();
         return node!=null&&(node.typeId().equals(id)||node.typeId().startsWith(id+".variant."));
@@ -24,13 +24,12 @@ final class PartialAnalysisMigration {
             for(var node:graph.nodes()){
                 if(analysis(node)&&RETIRED.stream().anyMatch(node.properties()::containsKey)){
                     var values=new HashMap<>(node.properties());
-                    if(!values.containsKey("classify")){
-                        boolean raw=values.containsKey("sinusoidality")&&values.containsKey("confidence")
+                    if(!values.containsKey("bandwidth")){
+                        boolean raw=GLNodeValue.of(false).equals(values.get("classify"))||values.containsKey("sinusoidality")&&values.containsKey("confidence")
                             &&((Number)values.get("sinusoidality").toJavaValue()).doubleValue()==0
                             &&((Number)values.get("confidence").toJavaValue()).doubleValue()==0;
-                        values.put("classify",GLNodeValue.of(!raw));
+                        values.put("bandwidth",GLNodeValue.of(raw?"none":"convergence"));
                     }
-                    values.putIfAbsent("peak-snr",GLNodeValue.of(30.));
                     values.keySet().removeIf(k->RETIRED.stream().anyMatch(r->k.equals(r)||k.startsWith(r+".")));
                     node=new GLGraphNode(node.id(),node.typeId(),node.typeVersion(),values);changed++;
                 }
@@ -58,9 +57,11 @@ final class PartialAnalysisMigration {
                 if(!mappings.equals(d.propertyMappings()))changed++;
                 d=new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),ports,d.properties(),mappings);
             }
-            assets.put(asset.id(),new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,graph.connections()),asset.viewState(),asset.metadata(),d));
+            var connections=graph.connections().stream().filter(c->!retired(asset,c.input())&&!retired(asset,c.output())).toList();
+            if(connections.size()!=graph.connections().size())changed++;
+            assets.put(asset.id(),new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),new GLNodeGraphSnapshot(graph.graphId(),graph.revision(),nodes,connections),asset.viewState(),asset.metadata(),d));
         }
-        if(changed>0)Logger.getLogger(PartialAnalysisMigration.class.getName()).warning("Partial Analysis now uses adaptive spectral descriptors. Retired heuristic controls use the new 30 dB peak-SNR default; their copied editor bindings were detached. Other settings and signal connections are retained.");
+        if(changed>0)Logger.getLogger(PartialAnalysisMigration.class.getName()).warning("Partial Analysis now uses Loris. Experimental classifier/harmonic controls and their copied bindings or connections were removed; frequency range, amplitude floor, capacity and duration are retained. Existing analyses can sound different.");
         return new GLNodeGraphDocument(assets.remove(document.root().id()),assets,document.externalAssets());
     }
 }

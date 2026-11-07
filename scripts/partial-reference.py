@@ -146,7 +146,8 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     executable = args.native_executable.resolve() if args.native_executable else out / "partial-reference.exe"
     command = [str(args.cxx.resolve()), "-std=c++17", "-O2", "-static", "-I", str(ROOT / "native/audio-host/src"),
-               "-I", str(ROOT / "target/native/generated"), str(ROOT / "native/audio-host/benchmarks/PartialReference.cpp"), "-o", str(executable)]
+               "-I", str(ROOT / "target/native/generated"), str(ROOT / "native/audio-host/benchmarks/PartialReference.cpp"),
+               str(ROOT / "native/audio-host/src/nodes/LorisLibrary.cpp"), "-o", str(executable)]
     if not args.native_executable:
         subprocess.run(command, check=True)
     git = subprocess.run(["git", "describe", "--always", "--dirty"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip()
@@ -161,12 +162,12 @@ def main():
                 "native_source_sha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in
                                          (ROOT / "native/audio-host/src/nodes/PartialAnalysisNode.hpp",
                                           ROOT / "native/audio-host/benchmarks/PartialReference.cpp",
-                                          ROOT / "native/audio-host/src/PartialClassifier.hpp",
-                                          ROOT / "native/audio-host/src/PartialClassifierCalibration.hpp")}
+                                          ROOT / "native/audio-host/src/LorisStreamImplementation.hpp",
+                                          ROOT / "native/audio-host/third_party/loris/SHA256SUMS.json")}
                                         if not args.native_executable else None,
                 "native_profile": {"threshold_db": -60, "capacity": 64, "minimum_hz": 20, "maximum_hz": 20000,
-                                   "tracking_tolerance_cents": 100, "minimum_duration_ms": 20,
-                                   "classifier": "adaptive NBD/NDD/FCD", "minimum_peak_snr_db": 30},
+                                   "minimum_duration_ms": 20, "analyzer": "Loris eccd42ac847b08769643b0d0c36442ef0fd27f38",
+                                   "resolution_hz": "2*sample_rate/window_length", "bandwidth": "convergence", "convergence": .1},
                 "sms_profile": {"tracking_offset_hz": 20, "tracking_slope": .01, "minimum_duration_ms": 20},
                 "native_executable_sha256": hashlib.sha256(executable.read_bytes()).hexdigest()}
     if args.wav:

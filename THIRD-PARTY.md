@@ -15,6 +15,7 @@ that all corresponding-source obligations have already been fulfilled.
 | GLSwing | Apache-2.0; retain its license and applicable notices from the external artifact. |
 | Steinberg ASIO SDK | The vendored SDK offers GPLv3 or a separate proprietary agreement. EasyKnack uses the GPLv3 option. Preserve the SDK notices and COPYING. |
 | miniaudio 0.11.21 | MIT-0 option, copyright David Reid; license text is in the vendored header and packaged notices. |
+| Loris (Kelly Fitz and Lippold Haken) | GPL-2.0-or-later, used under GPLv3. Pinned upstream sources implement partial analysis; COPYING, AUTHORS, provenance and the bundled Ooura FFT permission notice are retained in the SDK and Windows package. No FFTW dependency. |
 | dr_mp3 0.7.4 | MIT-0 option, copyright David Reid; includes minimp3 under CC0. Exact revision and checksum are in the native third-party README; complete upstream license statements are retained and packaged. |
 | JogAmp JOGL / GlueGen and transitive JARs | Preserve the notices/licenses from each exact artifact; review bundled native components too. |
 | External JDK | New packages do not distribute Java. Users install a Windows x64 JDK 25 separately under its provider terms; the launcher can assist via winget. |

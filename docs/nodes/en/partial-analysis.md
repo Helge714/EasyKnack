@@ -9,20 +9,16 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [Spectrum](../../user/en/data-types.md#spectrum) | [Spectrum](../../user/en/data-types.md#spectrum) | — | — | — | — | [Control](../../user/en/rates.md#control) | Always |
+| Resolution | [Editor](../../user/en/reference-tables.md) | 0–20000 Hz | — | 0 Hz | Hz, kHz | — | Always |
 | Threshold | [Editor](../../user/en/reference-tables.md) | −160–0 dB | — | −60 dB | dB | — | Always |
-| Minimum peak SNR | [Editor](../../user/en/reference-tables.md) | 5–60 dB | — | 30 dB | dB | — | Classify peaks |
 | Minimum track duration | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Always |
 | Maximum partials | [Editor](../../user/en/reference-tables.md) | 1–32768 | — | 64 | — | — | Always |
-| Harmonic only | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
-| Classify peaks | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Inspector |
-| Fundamental | [Value](../../user/en/data-types.md#value) | 0–20000 Hz | 0–∞ Hz | 0 Hz | Hz, kHz | [Control](../../user/en/rates.md#control) | Harmonic only |
-| Minimum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20 Hz | Hz | — | Inspector |
-| Maximum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20000 Hz | Hz | — | Inspector |
-| Tracking tolerance | [Editor](../../user/en/reference-tables.md) | 0–2400 cent | — | 100 cent | cent | — | Inspector |
-| Tracking gap | [Editor](../../user/en/reference-tables.md) | 0–2000 ms | — | 20 ms | ms, s, smpl | — | Inspector |
-| Harmonic tolerance | [Editor](../../user/en/reference-tables.md) | 0–200 cent | — | 30 cent | cent | — | Inspector; Harmonic only |
-| Minimum fundamental | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 40 Hz | Hz, kHz | — | Inspector; Harmonic only |
-| Maximum fundamental | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 2000 Hz | Hz, kHz | — | Inspector; Harmonic only |
+| Minimum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20 Hz | Hz, kHz | — | Inspector |
+| Maximum frequency | [Editor](../../user/en/reference-tables.md) | 0–∞ Hz | — | 20000 Hz | Hz, kHz | — | Inspector |
+| Frequency drift | [Editor](../../user/en/reference-tables.md) | 0–20000 Hz | — | 0 Hz | Hz, kHz | — | Inspector |
+| Bandwidth model | [Editor](../../user/en/reference-tables.md) | None / Residue / Convergence | — | Convergence | — | — | Inspector |
+| Convergence tolerance | [Editor](../../user/en/reference-tables.md) | 0.001–1 | — | 0.1 | — | — | Inspector; Convergence |
+| Bandwidth region | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 2000 Hz | Hz, kHz | — | Inspector; Residue |
 
 ## Outputs
 
@@ -31,19 +27,24 @@ Separates a spectrum into tracked partials and a complex residual spectrum.
 | Partials | [Partials](../../user/en/data-types.md#partials) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 | Residual | [Spectrum](../../user/en/data-types.md#spectrum) | — | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
+
 ## Behavior
 
-Local FFT peaks are interpolated between bins. With Classify peaks enabled, normalized bandwidth, normalized duration and reassigned-frequency coherence classify candidates against window-dependent bounds. Minimum peak SNR selects the assumed peak-to-noise contrast of the model: higher values tighten the decision region and reject more candidates. It is not a measured output SNR. With classification disabled, peaks are selected by the amplitude threshold and tracking alone.
+Uses Loris' Kaiser-window reassigned spectrum, peak selection, frequency-resolution thinning and partial tracking. The input FFT determines the available window duration and frame cadence. Resolution is the minimum peak separation in Hz; 0 selects `2 × sampleRate / windowSamples`. Frequency drift is the permitted change between consecutive track points; 0 selects half the resolution. Components do not have to share a fundamental.
 
-Minimum track duration must elapse before acceptance. Tracking gap tolerates missed observations beyond the next expected frame; no partial is invented during a gap. New or unconfirmed components remain in the residual. Assignment uses predicted frequency, amplitude change and phase continuity at the window centre. Accepted candidates are fitted in descending amplitude order to reduce interference from stronger neighbours.
+Bandwidth model determines how Loris estimates the noisy fraction of a partial:
 
-The classifier supports Hann, Hamming and Blackman windows. Rectangular frames are reanalysed internally with Hann for classification; the original spectrum and residual convention are retained. Short windows cannot resolve close components, while long windows can turn modulation into separate sidebands. No setting guarantees a perfect tonal/noise separation.
+- **None:** bandwidth is zero; the entire detected amplitude is tonal.
+- **Residue:** associates rejected spectral energy within Bandwidth region.
+- **Convergence:** uses Loris' mixed phase-derivative indicator; Convergence tolerance sets its saturation point.
 
-Harmonic only restricts selection to integer multiples of the fundamental within the cent tolerance. 0 Hz selects a monophonic spectral estimate from the peaks; positive or connected values supply the fundamental. Automatic estimation is not polyphonic pitch detection and can make octave errors. Disable it for inharmonic sounds.
+The emitted sinusoidal amplitude is `LorisAmplitude × sqrt(1 − bandwidth)`. [Partial Context](partial-context.md) exposes `1 − bandwidth` as Tonality. Energy not represented by these sinusoids remains in the exact residual. This is a sinusoidal/noisy model, not an instrument, percussion or semantic classifier.
 
-Maximum partials is prepared tracking capacity, including unconfirmed and briefly missing tracks. Additional candidates remain in the residual when capacity is full. Groups, synthesis, nested instances and exports inherit the largest required preparation budget. No memory is allocated for these resources on the audio thread. Large capacities multiply memory requirements per channel, voice and group processor.
+Minimum track duration is causal: a track is emitted only after the elapsed time, without rewriting earlier frames. Maximum partials limits simultaneous tracks; stronger accepted peaks take precedence. Tracks end when no peak can be linked in the next frame. Resolution, duration and other analysis changes restart tracking. IDs stay unique within the running analyzer.
 
-Accepted window lobes are subtracted as complex coefficients. Unmodified partials plus the exact residual still reconstruct the source spectrum. [Residual Model](residual-model.md) is a separate lossy stochastic model; the analysis residual itself is neither denoised nor smoothed. FFT window size and resolution remain significant. Longer minimum durations delay detection, without retrospectively buffering and reclassifying earlier frames.
+The original allocating Loris stages run on a prepared helper thread. Rendering waits for each frame, so their computation still counts against the real-time deadline. No offline whole-file pass, retrospective phase correction or additional frame queue is used. Long FFT windows and large capacities cost more time and memory.
+
+Unmodified [Partials to Spectrum](partials-to-spectrum.md) output plus Residual reconstructs the original complex spectrum, including estimation errors. [Residual Model](residual-model.md) is a separate lossy stochastic model. Short windows cannot resolve close components, and no setting guarantees perfect tonal/noise separation.
 
 ## Mute
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace the experimental Partial Analysis classifier and harmonic heuristic with original Loris reassigned analysis, bandwidth estimation and tracking. Add Resolution, Frequency drift and Bandwidth model controls; Context Tonality now means the tonal energy fraction. Retired controls/bindings are removed on load, so existing separation results can change. Rebuild Java, the host and plugin/baked caches together. Loris source and notices ship in the SDK; no Python or FFTW runtime is needed.
+
 - Replace Partial Analysis heuristic gates with adaptive bandwidth/duration/coherence classification and a 5-60 dB Minimum peak SNR control (default 30 dB). Add an inspector classification switch; Context Tonality becomes Classification margin. Old heuristic settings use the new default and copied bindings to retired controls detach with a log warning; signal connections and raw analysis are retained. Rebuild Java and the host together. The parameter fingerprint changes; document schema and transport versions do not.
 
 - Improve Partial Analysis for neighbouring resolved tones and changing frequency by fitting strong components first and comparing track phases at the window centre. Existing settings and document/host contracts are unchanged. Add an optional offline SMS reference comparison; tonality remains a model score, not a calibrated noise probability.

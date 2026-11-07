@@ -1,5 +1,9 @@
 # ZRR07 reproduction: source questions
 
+> Historical research. The experimental classifier is no longer used or shipped.
+> Current integration: [Loris](LORIS.md).
+
+
 The requested replacement is the deterministic threshold construction in sections
 5.1/5.2 of [Zivanovic, Roebel and Rodet, DAFx 2007](https://www.dafx.de/paper-archive/2007/Papers/p047.pdf),
 not the finite-distribution quantiles currently embedded in EasyKnack. Those

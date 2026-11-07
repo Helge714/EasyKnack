@@ -25,6 +25,7 @@
       </resource>
       <resource><directory>${project.basedir}</directory><targetPath>META-INF/easyknack/legal</targetPath><includes><include>LICENSE</include><include>THIRD-PARTY.md</include></includes></resource>
       <resource><directory>src/main/resources</directory></resource>
+      <resource><directory>native/audio-host/third_party/loris</directory><targetPath>META-INF/easyknack/legal/loris</targetPath><includes><include>COPYING</include><include>AUTHORS</include><include>PROVENANCE.md</include><include>OOURA-LICENSE.txt</include></includes></resource>
       <resource><directory>${project.basedir}</directory><targetPath>META-INF</targetPath><includes><include>LICENSE</include><include>THIRD-PARTY.md</include></includes></resource>
     </resources>
     <plugins>

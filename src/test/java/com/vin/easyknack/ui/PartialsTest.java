@@ -52,11 +52,12 @@ class PartialsTest {
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void reconstructionPhaseTrackingAndPreparedStorage()throws Exception{
         var dir=Files.createTempDirectory(Path.of("target"),"partials-native-").toAbsolutePath();var def=new PartialGraphNode();
+        var analysis=new PartialAnalysisNode();var values=new HashMap<>(analysis.defaults());values.put("maximum-partials",GLNodeValue.of(400.));values.put("threshold",GLNodeValue.of(-80.));
+        String wide="!"+NativeContractGenerator.fingerprint(analysis)+" "+analysis.encode(new NodeState(values),p->-1);
         var identity=compiled(document(false));var shift=compiled(document(true));var noisy=compiled(noiseDocument());
         String prefix="!"+NativeContractGenerator.fingerprint(def)+" ";
-        Files.writeString(dir.resolve("PartialsTestParameters.hpp"),"#pragma once\nstatic const char* identityParameters=R\"params("+prefix+def.encode(new NodeState(identity.properties()),p->0)+")params\";\nstatic const char* shiftParameters=R\"params("+prefix+def.encode(new NodeState(shift.properties()),p->0)+")params\";\nstatic const char* noiseParameters=R\"params("+prefix+def.encode(new NodeState(noisy.properties()),p->0)+")params\";\n");
+        Files.writeString(dir.resolve("PartialsTestParameters.hpp"),"#pragma once\nstatic const char* wideAnalysisParameters=R\"params("+wide+")params\";\nstatic const char* identityParameters=R\"params("+prefix+def.encode(new NodeState(identity.properties()),p->0)+")params\";\nstatic const char* shiftParameters=R\"params("+prefix+def.encode(new NodeState(shift.properties()),p->0)+")params\";\nstatic const char* noiseParameters=R\"params("+prefix+def.encode(new NodeState(noisy.properties()),p->0)+")params\";\n");
         RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialsTest.cpp").toAbsolutePath(),dir.resolve("test.exe"),dir);
-        RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialClassificationTest.cpp").toAbsolutePath(),dir.resolve("classification.exe"),dir);
-        RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/PartialClassifierTest.cpp").toAbsolutePath(),dir.resolve("descriptors.exe"),dir);
+        RateConverterTest.compileAndRun(Path.of("native/audio-host/tests/LorisAnalysisTest.cpp").toAbsolutePath(),dir.resolve("classification.exe"),dir);
     }
 }
