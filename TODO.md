@@ -108,9 +108,11 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 - [x] Preload parsed documentation and prepare its theme-dependent font atlases
   during visible splash steps. Reuse parsed pages while detecting source edits;
   keep each viewer's layout and navigation state independent.
-- [ ] Replace the application-specific documentation drawing with a standardized,
-  efficient Markdown viewer in GLSwing Core. Keep document lookup, node identities
-  and language policy in EasyKnack. The Core backlog owns the reusable control.
+- [x] Replace the application-specific documentation drawing with a shared
+  Markdown model/view in GLSwing Core. Document lookup, node identities and
+  language policy remain in EasyKnack.
+- [ ] Harden the shared Markdown viewer with read-only text selection, bounded
+  shared caching and theme-driven metrics; track generic control work in Core.
 - [ ] Add a persisted documentation-language preference independent of the UI:
   Same as application (default), English or Deutsch. Apply it consistently to node
   references, the index and help navigation, including reopening the viewer.

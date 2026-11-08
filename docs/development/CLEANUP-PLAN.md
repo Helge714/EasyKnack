@@ -61,7 +61,7 @@ API changes remain explicitly open rather than being guessed.
 - Formatting rules are explicit (`.editorconfig`, `.clang-format`). Focused new
   native helpers were formatted; vendored code and historical generated snapshots
   were not reformatted. Workflow tests now have functional names. One legacy pair of Windows-1252 quotes in the release notes was normalized to UTF-8.
-- Fresh application package build: 705 tests, zero failures/errors, 174 optional
+- Final application package build: 709 tests, zero failures/errors, 174 optional
   skips. Targeted native execution, source-export/plugin integration, documentation
   validation, source-package safety and Java prerequisite checks also run separately.
 - Aggregate native tests were updated where old fixtures treated numeric audio
@@ -95,3 +95,29 @@ API changes remain explicitly open rather than being guessed.
 No product release, Git-history rewrite or remote push is part of this cleanup.
 Product development versions remain unchanged; document schema, plugin ABI and
 host protocol are unchanged. SDK content changes correctly invalidate build caches.
+
+
+## Final packaging verification
+
+- Installer built from commit `3c2c1a3` under
+  `dist/20261108-234907-880`, including matching project/source-material archives.
+  The installer build ran 709 tests with zero failures/errors (174 optional skips).
+- Packaging staging was automatically removed after success; build logs were
+  retained in the destination's `build-logs` directory.
+- Packaged window launch, responsiveness and normal application close passed.
+  The probe waits for the displayed workspace, excluding transparent/offscreen
+  preparation frames. An initial theme/layout checkpoint regression was fixed:
+  startup view initialization no longer marks a new document modified, while real
+  edits and recovery documents remain dirty (three focused regression tests).
+- The final packaged functional smoke test passed with isolated test data:
+  group export, real Java/C++ plugin compilation, audio-host parameter contracts
+  and a restart loading the plugin cache. MP3 decoding is included in the probe.
+- Packaging copies and checksum inventories now use one .NET directory traversal
+  rather than one PowerShell pipeline per file. Source-package checks cover exact
+  bytes/hashes, Unicode names, empty directories and unsafe destination rejection.
+- Existing public-release checks remain open: clean-machine Java installation,
+  upgrade/uninstall and publication. The source review reports no missing sources;
+  the newly rebuilt first-party Core JAR has a new hash requiring the normal
+  release review. No new third-party library was introduced by this cleanup.
+- Final source-only polish aligns PowerShell line endings with Git attributes
+  and removes two extra EOF blank lines; executable behavior is unchanged.

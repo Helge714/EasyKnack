@@ -36,12 +36,21 @@ using System.Runtime.InteropServices;
 public static class EasyKnackWindowProbe {
     [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
     [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr window, out Rect rect);
+    [DllImport("user32.dll")] static extern int GetSystemMetrics(int index);
+    [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")] static extern bool GetLayeredWindowAttributes(IntPtr window, out uint colorKey, out byte alpha, out uint flags);
     [DllImport("user32.dll", SetLastError=true)] static extern IntPtr SendMessageTimeout(IntPtr window, uint message, UIntPtr wParam, IntPtr lParam, uint flags, uint timeout, out UIntPtr result);
     public static bool IsResponsive(IntPtr window) {
         UIntPtr result; return SendMessageTimeout(window, 0, UIntPtr.Zero, IntPtr.Zero, 2, 1000, out result) != IntPtr.Zero;
     }
     public static bool IsWorkspace(IntPtr window) {
-        Rect r; return GetWindowRect(window, out r) && r.Right-r.Left >= 900 && r.Bottom-r.Top >= 600;
+        if (!IsWindowVisible(window)) return false;
+        uint key, flags; byte alpha;
+        if (GetLayeredWindowAttributes(window, out key, out alpha, out flags) && (flags & 2) != 0 && alpha == 0) return false;
+        Rect r;
+        if (!GetWindowRect(window, out r) || r.Right-r.Left < 900 || r.Bottom-r.Top < 600) return false;
+        int left=GetSystemMetrics(76), top=GetSystemMetrics(77);
+        return r.Right>left && r.Bottom>top && r.Left<left+GetSystemMetrics(78) && r.Top<top+GetSystemMetrics(79);
     }
 }
 '@
