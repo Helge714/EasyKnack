@@ -156,7 +156,7 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 - [ ] VST3 hosting/plugin integration, then JACK if needed. Own virtual-driver
   development remains deferred; do not require Secure Boot/test-signing changes.
 
-The older [event plan](TODO_EVENT.txt) and [routing plan](TODOs_IO-Routing.txt)
+The older [event plan](docs/development/history/TODO_EVENT.txt) and [routing plan](docs/development/history/TODOs_IO-Routing.txt)
 are historical design references, not instructions to reintroduce obsolete public
 rate semantics or to resume kernel-driver installation.
 

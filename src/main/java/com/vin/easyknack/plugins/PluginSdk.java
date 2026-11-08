@@ -19,10 +19,10 @@ public final class PluginSdk {
                 if (source != null) return archive(source);
             }
         } catch (java.net.URISyntaxException e) {
-            throw new IOException(com.vin.easyknack.ui.AppText.literal("Invalid plugin SDK class location"), e);
+            throw new IOException(com.vin.easyknack.i18n.AppText.literal("Invalid plugin SDK class location"), e);
         }
         try (var in = PluginSdk.class.getResourceAsStream(RESOURCE)) {
-            if (in == null) throw new IOException(com.vin.easyknack.ui.AppText.literal("Plugin SDK missing from this installation; rebuild with Maven package or reinstall EasyKnack"));
+            if (in == null) throw new IOException(com.vin.easyknack.i18n.AppText.literal("Plugin SDK missing from this installation; rebuild with Maven package or reinstall EasyKnack"));
             return in.readAllBytes();
         }
     }
@@ -52,7 +52,7 @@ public final class PluginSdk {
             }
             for (var path : paths.filter(Files::isRegularFile).sorted().toList()) {
                 String name = source.relativize(path).toString().replace('\\', '/');
-                if (!(name.startsWith("src/") || name.startsWith("third_party/"))) continue;
+                if (!(name.equals("build.properties") || name.startsWith("src/") || name.startsWith("third_party/"))) continue;
                 var entry = new ZipEntry(name); entry.setTime(0); zip.putNextEntry(entry);
                 Files.copy(path, zip); zip.closeEntry();
             }
@@ -69,16 +69,16 @@ public final class PluginSdk {
                 String name = entry.getName();
                 if (++entries > 4096 || name.contains("\\") || name.contains(":") || name.startsWith("/")
                         || Arrays.stream(name.split("/")).anyMatch(p -> p.equals("..") || p.endsWith(".") || p.endsWith(" ")))
-                    throw new IOException(com.vin.easyknack.ui.AppText.literal("Invalid archive path: ") + name);
+                    throw new IOException(com.vin.easyknack.i18n.AppText.literal("Invalid archive path: ") + name);
                 var target = destination.resolve(name).normalize();
                 if (!target.startsWith(destination) || !names.add(target.toString().toLowerCase(Locale.ROOT)))
-                    throw new IOException(com.vin.easyknack.ui.AppText.literal("Duplicate or invalid archive entry: ") + name);
+                    throw new IOException(com.vin.easyknack.i18n.AppText.literal("Duplicate or invalid archive entry: ") + name);
                 if (entry.isDirectory()) { Files.createDirectories(target); continue; }
                 Files.createDirectories(target.getParent());
                 try (var out = Files.newOutputStream(target, StandardOpenOption.CREATE_NEW)) {
                     byte[] buffer = new byte[16384]; int n;
                     while ((n = zip.read(buffer)) != -1) {
-                        total += n; if (total > 64L * 1024 * 1024) throw new IOException(com.vin.easyknack.ui.AppText.literal("Plugin archive exceeds 64 MiB"));
+                        total += n; if (total > 64L * 1024 * 1024) throw new IOException(com.vin.easyknack.i18n.AppText.literal("Plugin archive exceeds 64 MiB"));
                         out.write(buffer, 0, n);
                     }
                 }

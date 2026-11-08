@@ -13,15 +13,15 @@ public final class AudioGraphEncoder {
     public static String encode(GLNodeGraphSnapshot graph) {
         graph = com.vin.easyknack.nodes.PortUnitConversions.materialize(com.vin.easyknack.nodes.AutomaticRates.resolve(graph));
         SampleFeedback.validate(graph);
-        if (graph.nodes().size() > 256) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximal 256 Audio-Nodes"));
+        if (graph.nodes().size() > 256) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Maximal 256 Audio-Nodes"));
         Map<GLNodeId, Integer> indices = new HashMap<>();
         Map<GLNodeId, java.util.List<GLNodePortDescriptor>> ports = new HashMap<>();
         for (int i = 0; i < graph.nodes().size(); i++) {
             var node = graph.nodes().get(i);
             var definition=com.vin.easyknack.nodes.NodeRegistry.require(node.typeId());
-            if(definition.requiresPartialContext())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("partials.contextRequired"));
+            if(definition.requiresPartialContext())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.text("partials.contextRequired"));
             if(definition.requiresSpectralContext())
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.format("spectral.contextRequired",definition.title(),node.id()));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.format("spectral.contextRequired",definition.title(),node.id()));
             indices.put(node.id(), i);
             ports.put(node.id(), com.vin.easyknack.nodes.NodeRegistry.require(node.typeId())
                     .layout(new com.vin.easyknack.nodes.NodeState(node.properties())).ports());
@@ -33,17 +33,17 @@ public final class AudioGraphEncoder {
             Integer source = indices.get(connection.output().nodeId());
             if (source == null || !validPort(ports, connection.output(), GLPortDirection.OUTPUT)
                     || !validPort(ports, connection.input(), GLPortDirection.INPUT))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Ungültige Audioverbindung"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Ungültige Audioverbindung"));
             var fromPort=ports.get(connection.output().nodeId()).stream().filter(p->p.id().equals(connection.output().portId())).findFirst().orElseThrow();
             var toPort=ports.get(connection.input().nodeId()).stream().filter(p->p.id().equals(connection.input().portId())).findFirst().orElseThrow();
             var numeric=java.util.Set.of(com.vin.easyknack.nodes.PortDataType.SIGNAL.id(),com.vin.easyknack.nodes.SignalCategory.VALUE.valueTypeId());
             if(!fromPort.valueTypeId().equals(toPort.valueTypeId())&&!(numeric.contains(fromPort.valueTypeId())&&numeric.contains(toPort.valueTypeId()))
                     &&!(fromPort.valueTypeId().equals(com.vin.easyknack.nodes.PortDataType.SPECTRUM.id())&&toPort.valueTypeId().equals(com.vin.easyknack.nodes.PortDataType.ANALYSIS.id())))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Incompatible port types: use an explicit Trigger/MIDI converter"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Incompatible port types: use an explicit Trigger/MIDI converter"));
             var outputs=ports.get(connection.output().nodeId()).stream().filter(p->p.direction()==GLPortDirection.OUTPUT).toList();
             int slot=0;while(!outputs.get(slot).id().equals(connection.output().portId()))slot++;
             if (inputs.put(connection.input(), Math.addExact(source,Math.multiplyExact(256,slot))) != null)
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Mehrere Quellen an einem Audioeingang"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Mehrere Quellen an einem Audioeingang"));
         }
         StringBuilder result = new StringBuilder("GRAPH ").append(graph.nodes().size());
         for (var node : graph.nodes()) {
@@ -57,14 +57,14 @@ public final class AudioGraphEncoder {
                     .filter(row -> row.kind() == com.vin.easyknack.nodes.NodeBuilder.RowKind.INPUT && row.key().equals(key))
                     .map(row -> row.rate().code()).findFirst().orElse('c'));
             for (var row : layout.rows()) if (row.kind() == com.vin.easyknack.nodes.NodeBuilder.RowKind.INPUT
-                    && !definition.processor().inputs(new com.vin.easyknack.nodes.NodeState(node.properties())).contains(row.key())) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing native input binding: ") + row.id());
+                    && !definition.processor().inputs(new com.vin.easyknack.nodes.NodeState(node.properties())).contains(row.key())) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Missing native input binding: ") + row.id());
             result.append(' ').append(node.id()).append(' ').append(definition.processor().id()).append(' ')
                     .append("!").append(com.vin.easyknack.nodes.NativeContractGenerator.fingerprint(definition)).append(' ')
                     .append(definition.encode(new com.vin.easyknack.nodes.NodeState(node.properties()),
                             port -> {
                                 var endpoint = new GLNodeEndpoint(node.id(), port.value());
                                 if (!validPort(ports, endpoint, GLPortDirection.INPUT))
-                                    throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Undeclared input: ") + node.typeId() + "/" + port.value());
+                                    throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Undeclared input: ") + node.typeId() + "/" + port.value());
                                 return inputs.getOrDefault(endpoint, -1);
                             })).append(" @ ").append(outputRateMetadata(layout)).append(' ').append(inputRates.isEmpty() ? "-" : inputRates).append(com.vin.easyknack.ui.ControlMetadata.encode(node,definition,layout,connectedPorts.getOrDefault(node.id(),java.util.Set.of())));
         }

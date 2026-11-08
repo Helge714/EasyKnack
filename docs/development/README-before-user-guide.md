@@ -46,7 +46,7 @@ und für Eclipse in `EasyKnack.launch` hinterlegt. In Eclipse diese Startkonfigu
 
 ## Bedienung
 
-Neue Gruppen-Editoren, FFT/IFFT und Bin-Verarbeitung: [Anleitung](../GROUPS-SPECTRAL.md).
+Neue Gruppen-Editoren, FFT/IFFT und Bin-Verarbeitung: [Anleitung](features/GROUPS-SPECTRAL.md).
 
 - **Nodes → Node hinzufügen …** öffnet die durchsuchbare Workspace-Palette mit
   Oszillator, Verstärkung, Math, Audioausgang und erstellten Composites.
@@ -512,7 +512,7 @@ bleibt erhalten. Routingtools separat installieren und dort Send/Return bzw.
 virtuelle Kabel konfigurieren. EasyKnack installiert oder bündelt keine fremden
 Treiber und ändert keine Boot-Einstellungen. VST3/JACK folgen später.
 
-Anleitung, Grenzen und Tests: [Externe Audioverbindungen](../external-audio-routing.md).
+Anleitung, Grenzen und Tests: [Externe Audioverbindungen](features/external-audio-routing.md).
 Der native ASIO-Build verwendet SDK-Header unter deren GPLv3-Option; Lizenz- und
 Quellhinweise: [ASIO-Provenienz](../../native/audio-host/third_party/asio/PROVENANCE.md).
 Java und Host verwenden jetzt Protokoll 9; bitte beide zusammen bauen.
@@ -1162,9 +1162,9 @@ Optimierungen hängen von den enthaltenen Nodes und deren Verschaltung ab.
 
 ## DSP-Referenzprojekte und Baselines
 
-Unter [examples/reference-v1](../../examples/reference-v1/README.md) liegen acht `.knack`-
+Unter [examples/reference-v1](../../src/test/resources/reference-projects/README.md) liegen acht `.knack`-
 Referenzdokumente für Math, Synth/Polyphonie, Stereo, Raten, Analyse und Geräte-Routing.
 Die opt-in Tests vergleichen Original, exportiertes Plugin und Export ohne Fusion
 mit festen MIDI-Sequenzen und prüfen die isolierte Plugininstallation. Ein separater
 Routingrunner misst VB-Cable und einen echten Ausgang über längere Zeit, ohne die
-Windows-Gerätepegel zu verändern. Wiederholung und Befunde: [DSP-BASELINE.md](../DSP-BASELINE.md).
+Windows-Gerätepegel zu verändern. Wiederholung und Befunde: [DSP-BASELINE.md](DSP-BASELINE.md).

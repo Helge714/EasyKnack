@@ -72,15 +72,25 @@ int main() {
     auto valueGraph = AudioGraph::parse("GRAPH 2 value value -1234567.5 @ c - out out 0 0 @ a a");
     valueGraph.process(additiveBuffer.data(), blockSize);
     for (float value : additiveBuffer) require(value == -1234567.5f);
-    auto simpleCustomWave = AudioGraph::parse("GRAPH 3 table value .25 @ c - osc osc -1 440 wave square 0 @ a aa out out 1 0 @ a a");
+    auto testWave=std::make_shared<WaveformResource>();
+    std::array<float,WaveformResource::size> testSamples{};testSamples.fill(.25f);testWave->fromSamples(testSamples);
+    struct TestTable:WaveformNode {
+        explicit TestTable(std::shared_ptr<const WaveformResource> value){wave=std::move(value);}
+        void configure(std::istream&)override{}
+    };
+    auto parseWave=[&](const std::string& message){return AudioGraph::compile(message,
+        [&](const std::string& type)->std::unique_ptr<NodeProcessor>{if(type=="testwave")return std::make_unique<TestTable>(testWave);return createNodeProcessor(type);});};
+    auto simpleCustomWave = parseWave("GRAPH 3 table testwave @ c - osc osc -1 440 wave square 0 @ a aa out out 1 0 @ a a");
     simpleCustomWave.process(additiveBuffer.data(), blockSize);
     for (float value : additiveBuffer) require(value == .25f);
-    // Control-rate table selection keeps the complete table, not a held first sample.
+    for(std::size_t i=0;i<testSamples.size();i++)testSamples[i]=std::sin(i*6.283185307179586/testSamples.size());
+    testWave->fromSamples(testSamples);
+    // Control-rate resource selection keeps the complete table, not a held first sample.
     for (bool additiveTarget : {false, true}) {
-        std::string prefix = "GRAPH 3 table osc -1 440 @ a a target ";
+        std::string prefix = "GRAPH 3 table testwave @ c - target ";
         std::string processor = additiveTarget ? "additive 0 sine 1 1 0 -1 440 -1 0 @ a " : "osc -1 440 wave sine 0 @ a ";
-        auto audioTable = AudioGraph::parse(prefix + processor + (additiveTarget ? "aaa" : "aa") + " out out 1 0 @ a a");
-        auto controlTable = AudioGraph::parse(prefix + processor + (additiveTarget ? "caa" : "ac") + " out out 1 0 @ a a");
+        auto audioTable = parseWave(prefix + processor + (additiveTarget ? "aaa" : "aa") + " out out 1 0 @ a a");
+        auto controlTable = parseWave(prefix + processor + (additiveTarget ? "caa" : "ac") + " out out 1 0 @ a a");
         audioTable.process(additiveReference.data(), blockSize); controlTable.process(additiveBuffer.data(), blockSize);
         require(additiveBuffer == additiveReference);
         require(std::any_of(additiveBuffer.begin(), additiveBuffer.end(), [](float value) { return std::abs(value) > .1f; }));
@@ -91,8 +101,8 @@ int main() {
         simple.process(additiveBuffer.data(), blockSize); reference.process(additiveReference.data(), blockSize);
         for (std::size_t i = 0; i < blockSize; ++i) require(std::abs(additiveBuffer[i] - additiveReference[i]) < .000003f);
     }
-    auto controlled = AudioGraph::parse("GRAPH 5 count value 2 @ c - slope value 1 @ c - spread value -25 @ c - osc additive -1 sine 2 1 -25 -1 440 -1 0 inputs 0 1 2 @ a aaacaa out out 3 0 @ a a");
-    auto controlledReference = additive("sine 2 1 -25 -1 440 -1 0");
+    auto controlled = AudioGraph::parse("GRAPH 5 count value 2 @ c - slope value 1 @ c - spread value 1 @ c - osc additive -1 sine 2 1 0 -1 440 -1 0 inputs 0 1 2 @ a aaacaa out out 3 0 @ a a");
+    auto controlledReference = additive("sine 2 1 0 -1 440 -1 0");
     controlled.process(additiveBuffer.data(), blockSize); controlledReference.process(additiveReference.data(), blockSize);
     require(additiveBuffer == additiveReference);
     auto beforeEdit = AudioGraph::parse("GRAPH 2 m math -1 1 -1 1 multiply 0 @ a aa out out 0 0 @ a a");
@@ -115,7 +125,8 @@ int main() {
         double factor = std::exp2(cents / 1200.0);
         require(spreadNode.ratios[0] == 1);
         for (unsigned h = 1; h < AdditiveOscillatorNode::maximumPartials; ++h)
-            require(std::abs(spreadNode.ratios[h] / (h + 1) - factor) < 1e-12);
+            // Legacy cents migrate to the current power-law exponent.
+            require(std::abs(spreadNode.ratios[h] - std::pow(double(h + 1),double(spreadNode.spread))) < 1e-12);
         ProcessContext context{nullptr, 0, additiveBuffer.data(), blockSize, sampleRate, nullptr};
         spreadNode.process(context);
         for (unsigned i = 0; i < blockSize; ++i) {

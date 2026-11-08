@@ -10,7 +10,7 @@ public final class TriggerMergeNode extends BasicNode {
     public boolean supportsTriggerFeedback(){return true;}
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Trigger").rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggermerge.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggermerge.tooltip"));
         n.addEditor(COUNT,"Inputs",Editor.Slider.button(2,2.,(double)MAX_INPUTS).integers().discrete()).keepVisibleOnHide();
         for(int i=0;i<count(s);i++)n.addInput(input(i),NodeText.text("triggermerge.input","Input")+" "+(i+1),new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
     }

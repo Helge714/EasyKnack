@@ -15,7 +15,7 @@ You do not need a development environment to use them.
 3. Choose **Audio → Start** to hear the connected Oscillator.
 4. Change Frequency, then choose **File → Save** to keep the document.
 
-See the [Windows quick start](docs/WINDOWS-QUICK-START.md) for installation and
+See the [Windows quick start](docs/user/WINDOWS-QUICK-START.md) for installation and
 first-use troubleshooting, or open the [user guide](docs/user/README.md).
 
 ## User documentation

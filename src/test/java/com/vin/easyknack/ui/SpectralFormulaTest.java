@@ -14,7 +14,7 @@ class SpectralFormulaTest {
     @Test void documentedGaussianCompiles()throws Exception{
         var ports=new ArrayList<com.vin.easyknack.formula.FormulaCompiler.Port>();
         for(String name:List.of("frequency","magnitude","center","factor","result"))ports.add(new com.vin.easyknack.formula.FormulaCompiler.Port(name,name,com.vin.easyknack.formula.FormulaCompiler.Type.NUMBER,name.equals("result")));
-        String code=Files.readString(Path.of("docs/SPECTRAL-FORMULA.md")).split("```cpp\\R")[1].split("```")[0];
+        String code=Files.readString(Path.of("docs/development/features/SPECTRAL-FORMULA.md")).split("```cpp\\R")[1].split("```")[0];
         assertNotNull(com.vin.easyknack.formula.FormulaCompiler.compile(code,ports,3));
     }
     static SpectralUniformTest.Fixture fixture(String code){

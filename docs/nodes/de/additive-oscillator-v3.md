@@ -69,6 +69,6 @@ Die übrigen Funktionen entsprechen dem normalen Oszillator.
 
 ## Delayable
 
-| [Sampleweises Feedback](../../SAMPLE-FEEDBACK.md) |
+| [Sampleweises Feedback](../../development/features/SAMPLE-FEEDBACK.md) |
 | --- |
 | Unterstützt |

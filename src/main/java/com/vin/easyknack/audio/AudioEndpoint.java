@@ -10,15 +10,15 @@ public record AudioEndpoint(String id, String name, Type type, boolean input, bo
     public static final AudioEndpoint SYSTEM = new AudioEndpoint("system", "System Audio", Type.SYSTEM_MIX, true, false, false);
     public AudioEndpoint {
         if (id == null || id.isBlank() || id.length() > 4096 || name == null || name.length() > 4096 || type == null)
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid audio endpoint"));
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid audio endpoint"));
         boolean source = isInput(type);
-        if (source != input) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Endpoint direction/type mismatch"));
+        if (source != input) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Endpoint direction/type mismatch"));
     }
     /** Store type, stable ID, and fallback name; never persist availability or PID. */
     public String reference() { return type.name() + ":" + hex(id) + ":" + hex(name); }
     public static AudioEndpoint reference(String text) {
         String[] fields = text.split(":", -1);
-        if (fields.length != 3) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid endpoint reference"));
+        if (fields.length != 3) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid endpoint reference"));
         var type = Type.valueOf(fields[0]);
         boolean input = isInput(type);
         return new AudioEndpoint(unhex(fields[1]), unhex(fields[2]), type, input, false, false);

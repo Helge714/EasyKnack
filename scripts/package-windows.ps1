@@ -24,7 +24,7 @@ foreach ($file in @($java, $cxx, "$JdkHome/bin/javac.exe")) {
 $version = [string]$pom.project.version
 $installerVersion = $version -replace '-.*$', ''
 $build = Get-Date -Format 'yyyyMMdd-HHmmss'
-if (!$Destination) { $Destination = "$root/target/distribution/$build" }
+if (!$Destination) { $Destination = "$root/dist/$build" }
 $Destination = [IO.Path]::GetFullPath($Destination)
 if (Test-Path -LiteralPath "$Destination/EasyKnack") { throw 'Destination already contains EasyKnack; choose a fresh destination.' }
 $work = Join-Path $root "target/package-work/$([guid]::NewGuid().ToString('N'))"
@@ -46,10 +46,7 @@ try {
     Write-Host 'Building the matching native audio host (this can take several minutes)...'
     $native = Join-Path $inputDir 'native'
     New-Item -ItemType Directory -Force -Path $native | Out-Null
-    & "$PSScriptRoot/generate-native-nodes.ps1" -OutputDirectory "$root/target/native/generated"
-    $sources = @(Get-ChildItem -LiteralPath "$root/native/audio-host/src/nodes" -Filter '*.cpp' -File -Recurse | Sort-Object FullName | ForEach-Object FullName)
-    & $cxx -std=c++17 -O2 -static -I "$root/native/audio-host/third_party" -I "$root/native/audio-host/src" -I "$root/target/native/generated" "$root/native/audio-host/src/main.cpp" @sources -o "$native/easyknack-audio-host.exe" -lws2_32 -lole32 -luuid -lwinmm -ladvapi32 -luser32 *> "$work/native.log"
-    if ($LASTEXITCODE -ne 0) { throw "Native build failed: $work/native.log" }
+    & "$PSScriptRoot/build-audio-host.ps1" -Cxx $cxx -OutputDirectory $native -SkipTests *> "$work/native.log"
     $jar = "easy-knack-$version.jar"
     Copy-Item -LiteralPath "$root/target/$jar" -Destination $inputDir
     New-Item -ItemType Directory -Path "$inputDir/lib", "$inputDir/tools", "$inputDir/licenses" | Out-Null
@@ -73,7 +70,7 @@ try {
     # Local LLDB/Python runs can leave bytecode caches in the compiler directory.
     # Remove only generated files inside the newly staged copy, never the source toolchain.
     Remove-CompilerBytecodeCaches "$inputDir/tools/llvm-mingw"
-    Copy-Item -LiteralPath "$PSScriptRoot/../docs/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
+    Copy-Item -LiteralPath "$PSScriptRoot/../docs/user/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/user" -Destination "$inputDir/user" -Recurse
     Copy-Item -LiteralPath "$root/LICENSE", "$root/THIRD-PARTY.md" -Destination $inputDir
     Copy-Item -LiteralPath "$root/src/main/resources/easyknack/notices" -Destination "$inputDir/licenses/upstream" -Recurse
@@ -138,6 +135,9 @@ try {
         if ([IO.Path]::GetDirectoryName($staging) -ne $stagingRoot -or [IO.Path]::GetFileName($staging) -notmatch '^[0-9a-f]{32}$') { throw 'Unsafe package staging path.' }
         $linked = (@(Get-Item -LiteralPath $stagingRoot, $staging) + @(Get-ChildItem -LiteralPath $staging -Recurse -Force)) | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }
         if ($linked) { Write-Warning "Staging contains links; retained: $staging" }
-        else { Remove-Item -LiteralPath $staging -Recurse -Force }
+        else {
+            try { Remove-Item -LiteralPath $staging -Recurse -Force }
+            catch { Write-Warning "Package complete; staging retained because cleanup failed: $($_.Exception.Message)" }
+        }
     }
 }

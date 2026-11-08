@@ -19,7 +19,7 @@ public record UnitSlider(Editor.Slider spec,UnitFormats formats,UnitFormat selec
         var slider=new GLUnitSlider<>(label,spec.value(),spec.min(),spec.max(),spec.step(),spec.integral(),
             spec.bar()?GLSlider.Presentation.BAR:GLSlider.Presentation.BUTTONS,formats.core(),selected);
         slider.setStoredValueListener(value->changed.accept(GLNodeValue.of(value)));
-        slider.setToolTipText(com.vin.easyknack.ui.AppText.literal("Input unit: ")+selected+". Changing units reinterprets connected values.");
+        slider.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Input unit: ")+selected+". Changing units reinterprets connected values.");
         return new Control(slider,value->slider.setStoredValue(((Number)value.toJavaValue()).doubleValue()));
     }
     @SuppressWarnings("unchecked")
@@ -32,7 +32,7 @@ public record UnitSlider(Editor.Slider spec,UnitFormats formats,UnitFormat selec
             for(var item:menu.getItems())if(item.getSubMenu()!=null&&item.getText().equals("Unit"))menu.removeItem(item);
             var units=new com.vingame.glswing.ui.GLPopupMenu();
             for(var unit:unitChoices)units.addItem(unit.toString(),e->changed.accept(unit)).setEnabled(unit!=selected);
-            menu.addSubMenu(com.vin.easyknack.ui.AppText.text("port.unit"),units);
+            menu.addSubMenu(com.vin.easyknack.i18n.AppText.text("port.unit"),units);
         }
     }
     public void updateUnitMenu(GLSlider slider){

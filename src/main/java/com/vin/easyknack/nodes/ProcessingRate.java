@@ -7,7 +7,7 @@ public enum ProcessingRate {
     private final char code;
     ProcessingRate(String id, String label, char code) { this.id = id; this.label = label; this.code = code; }
     public String id() { return id; }
-    public char code() { if(this==AUTO)throw new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Resolve Auto before encoding")); return code; }
+    public char code() { if(this==AUTO)throw new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Resolve Auto before encoding")); return code; }
     public com.vingame.glswing.node.GLNodePort.Shape shape() {
         return switch(this) {case AUDIO -> com.vingame.glswing.node.GLNodePort.Shape.CIRCLE;
             case AUTO, CONTROL -> com.vingame.glswing.node.GLNodePort.Shape.DIAMOND;
@@ -26,10 +26,10 @@ public enum ProcessingRate {
             case AUTO -> "Auto: Audio when a numeric input is Audio; otherwise Control. Each numeric input retains its own rate.";
             case AUDIO -> "AudioRate: one numeric value per sample.";
             case CONTROL -> "ControlRate: one numeric value per DSP block, held for the block.";
-            case EVENT -> com.vin.easyknack.ui.AppText.text("rate.trigger.tooltip");
+            case EVENT -> com.vin.easyknack.i18n.AppText.text("rate.trigger.tooltip");
         });
     }
-    @Override public String toString() { return com.vin.easyknack.ui.AppText.literal(label); }
+    @Override public String toString() { return com.vin.easyknack.i18n.AppText.literal(label); }
     public static final java.util.List<ProcessingRate> NUMERIC = java.util.List.of(AUTO,AUDIO,CONTROL);
     public static NodeBuilder.Row addEditor(NodeBuilder node,PropertyId id){
         return addEditor(node,id,NUMERIC,AUTO);
@@ -52,7 +52,7 @@ public enum ProcessingRate {
     }
     public static ProcessingRate fromId(String id) {
         return java.util.Arrays.stream(values()).filter(rate -> rate.id.equals(id)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown processing rate: ") + id));
+                .orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown processing rate: ") + id));
     }
 }
 

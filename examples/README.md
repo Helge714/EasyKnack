@@ -1,7 +1,7 @@
 # Examples
 
 This directory contains versioned example documents and test fixtures.
-See [reference-v1](reference-v1/README.md) for reference-project validation.
+See [reference-v1](../src/test/resources/reference-projects/README.md) for reference-project validation.
 
 The application's editable example library is generated separately in
 `Documents/EasyKnack/Beispiele`; existing user files are preserved.

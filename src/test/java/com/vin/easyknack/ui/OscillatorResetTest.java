@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.compiler.CompiledManualTargets;
 import static org.junit.jupiter.api.Assertions.*;
 import java.nio.file.*;
 import java.util.*;

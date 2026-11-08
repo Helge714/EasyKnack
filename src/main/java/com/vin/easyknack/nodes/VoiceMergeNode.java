@@ -12,10 +12,10 @@ public final class VoiceMergeNode extends BasicNode {
     }
     public static final PropertyId IN=new PropertyId("audio-in"),OUT=new PropertyId("audio-out"),MODE=new PropertyId("mode");
     @Override public void define(NodeBuilder n,NodeState s){
-        n.addOutput(OUT,"Audio").tooltip(com.vin.easyknack.ui.AppText.literal("Combines voices into one signal per channel. Stereo positions are preserved; downstream effects run once per channel."));
+        n.addOutput(OUT,"Audio").tooltip(com.vin.easyknack.i18n.AppText.literal("Combines voices into one signal per channel. Stereo positions are preserved; downstream effects run once per channel."));
         n.addEditor(MODE,"Mode",Editor.comboBox(List.of(Mode.values()),Mode.ADD,Mode::id))
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Add sums all voices. Mean divides by the configured voice count, including silent/released voices. A mono input passes through."));
-        n.addInput(IN,"Voices").tooltip(com.vin.easyknack.ui.AppText.literal("Voice audio after its envelope. Use Pan before Merge for per-voice placement or after Merge for the whole mix."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Add sums all voices. Mean divides by the configured voice count, including silent/released voices. A mono input passes through."));
+        n.addInput(IN,"Voices").tooltip(com.vin.easyknack.i18n.AppText.literal("Voice audio after its envelope. Use Pan before Merge for per-voice placement or after Merge for the whole mix."));
     }
     @Override public NativeProcessor processor() { return new NativeProcessor("voicemerge", "nodes/VoiceMergeNode.hpp",
             ParameterContract.builder().source(IN).token("combine").value(MODE).build()); }

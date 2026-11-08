@@ -14,7 +14,7 @@ public final class AudioDeviceVolumes {
     public static Value get(String id) { return current.get(id); }
     public static void observe(Runnable listener) { listeners.add(new WeakReference<>(listener)); }
     public static void request(String id,double scalar) {
-        if(!Double.isFinite(scalar) || scalar<0 || scalar>1) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid device volume"));
+        if(!Double.isFinite(scalar) || scalar<0 || scalar>1) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid device volume"));
         pending.put(id,scalar);
     }
     static Map<String,Double> drain() {
@@ -25,14 +25,14 @@ public final class AudioDeviceVolumes {
     public static Map<String,Value> parse(String response) {
         String[] tokens=response.split(" ");
         if(tokens.length<2 || !tokens[0].equals("OK") || !tokens[1].matches("[01]") || (tokens.length-2)%4!=0)
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid volume snapshot"));
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid volume snapshot"));
         var result=new HashMap<String,Value>();
         for(int i=2;i<tokens.length;i+=4) {
             double scalar=Double.parseDouble(tokens[i+1]);
             double peak=Double.parseDouble(tokens[i+3]);
-            if(!Double.isFinite(peak) || peak<0 || peak>1) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid peak"));
-            if(!Double.isFinite(scalar) || scalar<0 || scalar>1 || !tokens[i+2].matches("[01]")) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid volume"));
-            if(result.put(AudioEndpoint.unhex(tokens[i]),new Value(scalar,tokens[i+2].equals("1"),peak))!=null) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Duplicate device"));
+            if(!Double.isFinite(peak) || peak<0 || peak>1) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid peak"));
+            if(!Double.isFinite(scalar) || scalar<0 || scalar>1 || !tokens[i+2].matches("[01]")) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid volume"));
+            if(result.put(AudioEndpoint.unhex(tokens[i]),new Value(scalar,tokens[i+2].equals("1"),peak))!=null) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Duplicate device"));
         }
         return Map.copyOf(result);
     }

@@ -17,14 +17,14 @@ public final class EdgeDetectorNode extends BasicNode {
 	public void define(NodeBuilder node, NodeState state) {
 
 		node.addOutput(OUT, "Trigger").rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
-                .tooltip(com.vin.easyknack.ui.AppText.literal("One trigger for each selected threshold crossing. Audio is checked per sample, Control at its block updates. The first value initializes the detector without a trigger."));
+                .tooltip(com.vin.easyknack.i18n.AppText.literal("One trigger for each selected threshold crossing. Audio is checked per sample, Control at its block updates. The first value initializes the detector without a trigger."));
 		node.addEditor(MODE, "Edge", Editor.comboBox(List.of(EdgeMode.values()), EdgeMode.RISING, EdgeMode::id))
 				.keepVisibleOnHide();
 		ProcessingRate.addEditor(node,RATE);
 		node.addInput(IN, "In", Editor.Slider.button(0.0, -1000000.0, 1000000.0)).rates(PortRates.AUDIO_CONTROL)
-				.signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.literal("A crossing changes between value > threshold and value <= threshold. Choose Rising, Falling or Both. Auto follows the input rate."));
+				.signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.i18n.AppText.literal("A crossing changes between value > threshold and value <= threshold. Choose Rising, Falling or Both. Auto follows the input rate."));
 		node.addInput(THRESHOLD, "Threshold", Editor.Slider.button(0.5, -1000000.0, 1000000.0))
-				.rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.literal("A crossing changes between value > threshold and value <= threshold. Choose Rising, Falling or Both. Auto follows the input rate."));
+				.rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.i18n.AppText.literal("A crossing changes between value > threshold and value <= threshold. Choose Rising, Falling or Both. Auto follows the input rate."));
 	}
 
 	@Override

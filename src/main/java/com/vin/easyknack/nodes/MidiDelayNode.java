@@ -7,7 +7,7 @@ public final class MidiDelayNode extends BasicNode {
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"MIDI").dataType(PortDataType.MIDI).signal(SignalCategory.MIDI).rate(ProcessingRate.EVENT);
         n.addInput(IN,"MIDI").dataType(PortDataType.MIDI).signal(SignalCategory.MIDI).rate(ProcessingRate.EVENT);
-        n.addEditor(VALUE,"Delay",Editor.Slider.button(100,0.0,10000.0).formats(UnitFormats.TIME_MS)).tooltip(com.vin.easyknack.ui.AppText.literal("Delays notes and controller events together. Changes affect new events; queued events retain their due time. Panic clears the queue immediately."));
+        n.addEditor(VALUE,"Delay",Editor.Slider.button(100,0.0,10000.0).formats(UnitFormats.TIME_MS)).tooltip(com.vin.easyknack.i18n.AppText.literal("Delays notes and controller events together. Changes affect new events; queued events retain their due time. Panic clears the queue immediately."));
     }
     @Override public NativeProcessor processor() { return new NativeProcessor("mididelay", "nodes/MidiDelayNode.hpp",
             ParameterContract.builder().source(IN).value(VALUE).build()); }

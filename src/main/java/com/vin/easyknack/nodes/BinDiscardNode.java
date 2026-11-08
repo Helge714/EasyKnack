@@ -8,7 +8,7 @@ public final class BinDiscardNode extends BasicNode {
     @Override public boolean isMuteable(){return false;}
     @Override public void define(NodeBuilder n,NodeState s){
         n.addInput(DISCARD,"Discard",new Editor.Toggle(false)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Nonzero discards this bin. Evaluated before the bin's other work, once per FFT frame. Connect a comparison of Bin Context amplitude. Audio-dependent conditions are not allowed."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Nonzero discards this bin. Evaluated before the bin's other work, once per FFT frame. Connect a comparison of Bin Context amplitude. Audio-dependent conditions are not allowed."));
     }
     @Override public NativeProcessor processor(){return new NativeProcessor("bindiscard","nodes/BinDiscardNode.hpp",ParameterContract.builder().source(DISCARD).value(DISCARD).build());}
 }

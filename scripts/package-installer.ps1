@@ -14,7 +14,7 @@ $Destination = [IO.Path]::GetFullPath($Destination)
 if (!$WixDirectory) {
     $candle = Get-Command candle.exe -ErrorAction SilentlyContinue
     if ($candle) { $WixDirectory = Split-Path -Parent $candle.Source }
-    else { $WixDirectory = Get-ChildItem "$PSScriptRoot/../target/tools" -Directory -Filter 'wix*' | Sort-Object Name -Descending | Select-Object -First 1 -ExpandProperty FullName }
+    else { $WixDirectory = Get-ChildItem "$PSScriptRoot/../.local/tools" -Directory -Filter 'wix*' | Sort-Object Name -Descending | Select-Object -First 1 -ExpandProperty FullName }
 }
 foreach ($name in @('candle.exe','light.exe','WixUIExtension.dll','WixBalExtension.dll')) {
     if (!(Test-Path -LiteralPath "$WixDirectory/$name")) { throw "WiX 3 is required: missing $name" }

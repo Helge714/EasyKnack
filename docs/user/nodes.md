@@ -28,7 +28,7 @@ See the shared [fundamentals](en/index.md) or [Grundlagen](de/index.md).
 
 ## Buffers
 
-[Buffer references](../nodes/en/index.md#buffers) · [File and reader workflows](../Audio-File-Player.md)
+[Buffer references](../nodes/en/index.md#buffers) · [File and reader workflows](../development/features/Audio-File-Player.md)
 
 ## Spectrum and analysis nodes
 

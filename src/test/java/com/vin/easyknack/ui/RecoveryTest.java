@@ -1,4 +1,6 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.document.KnackDocumentCodec;
+import com.vin.easyknack.document.RecoveryStore;
 
 import java.nio.file.*;
 import java.time.*;

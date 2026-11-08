@@ -14,9 +14,9 @@ public final class ParameterContract {
     private final List<Field> fields;
     private ParameterContract(List<Field> fields) {
         this.fields=List.copyOf(fields);
-        if(inputs().stream().distinct().count()!=inputs().size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Duplicate native input"));
+        if(inputs().stream().distinct().count()!=inputs().size())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Duplicate native input"));
         var names=fields.stream().filter(f->f.kind()!=Kind.TOKEN).map(NativeContractGenerator::fieldName).toList();
-        if(names.stream().distinct().count()!=names.size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Native parameter names collide"));
+        if(names.stream().distinct().count()!=names.size())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Native parameter names collide"));
     }
     public static Builder builder(){return new Builder();}
     public List<Field> fields(){return fields;}
@@ -36,15 +36,15 @@ public final class ParameterContract {
             if(f.kind()==Kind.TOKEN){out.add(f.literal());continue;}
             if(f.kind()==Kind.MAPPED){out.add(token(f.mapping().apply(resolved)));continue;}
             var value=merged.get(f.id().value());
-            if(value==null)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing native parameter: ")+f.id());
+            if(value==null)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Missing native parameter: ")+f.id());
             var raw=value.toJavaValue();
             if(f.kind()==Kind.CURVE){out.add(CurveData.nativePayload((String)raw));continue;}
             if(raw instanceof Boolean flag){out.add(flag?"1":"0");continue;}
             if(raw instanceof Number n){
                 double number=n.doubleValue();
-                if(!Double.isFinite(number))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Non-finite parameter: ")+f.id());
+                if(!Double.isFinite(number))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Non-finite parameter: ")+f.id());
                 if(f.kind()==Kind.INTEGER){
-                    if(number!=Math.rint(number)||number<Integer.MIN_VALUE||number>Integer.MAX_VALUE)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Integer required: ")+f.id());
+                    if(number!=Math.rint(number)||number<Integer.MIN_VALUE||number>Integer.MAX_VALUE)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Integer required: ")+f.id());
                     out.add(Integer.toString((int)number));
                 }else out.add(Double.toString(number));
             }else out.add(token((String)raw));
@@ -52,7 +52,7 @@ public final class ParameterContract {
         return out.toString();
     }
     private static String token(String value){
-        if(value==null||!value.matches("[A-Za-z0-9_.:+/-]+"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid native token"));
+        if(value==null||!value.matches("[A-Za-z0-9_.:+/-]+"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid native token"));
         return value;
     }
     public static final class Builder {

@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.compiler.CompiledManualTargets;
 
 import java.util.*;
 import com.vin.easyknack.nodes.*;
@@ -71,7 +72,7 @@ final class SpectralGroups {
             if(ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&p.publicPort().valueTypeId().equals(SignalCategory.SPECTRUM.valueTypeId())).count()!=1
                 ||ports.stream().anyMatch(p->p.publicPort().direction()==GLPortDirection.OUTPUT&&!Set.of(SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId()).contains(p.publicPort().valueTypeId()))
                 ||inputs.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.TRIGGER.valueTypeId()).contains(p.publicPort().valueTypeId())))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("spectral.boundaryLimits"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.text("spectral.boundaryLimits"));
             var connected=graph.connections().stream().filter(w->w.input().nodeId().equals(node.id())).map(w->w.input().portId()).collect(java.util.stream.Collectors.toSet());
             var state=new NodeState(asset.metadata());
             int flags=(state.text(SKIP_EMPTY,"false").equals("true")?1:0)|(state.text(PARALLEL,"true").equals("true")?0:2);
@@ -108,7 +109,7 @@ final class SpectralGroups {
             e.addConnection(wire(uniform.id(),"out",instance.id(),port.publicPort().id()));
         }});
         var root=new GLNodeGraphAsset("bin-program",1,GLNodeGraphAssetKind.PROJECT,graph.snapshot(),GLNodeEditorViewState.empty());
-        var flat=GLCompositeGraphFlattener.flatten(root,registry,limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid spectral group: ")+flat.diagnostics());
+        var flat=GLCompositeGraphFlattener.flatten(root,registry,limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid spectral group: ")+flat.diagnostics());
         var source=GroupSourceExporter.materializeUnits(AutomaticRates.resolve(resolveMutes(flat.graph().orElseThrow())));
         var roots=new LinkedHashMap<String,GLNodeEndpoint>();
         for(var marker:outputMarkers.entrySet()){
@@ -120,12 +121,12 @@ final class SpectralGroups {
         }
         var needed=new HashSet<GLNodeId>();for(var endpoint:roots.values())ancestors(endpoint.nodeId(),source,Set.of(),needed);
         var boundaries=source.nodes().stream().filter(n->needed.contains(n.id())&&(NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode||NodeRegistry.require(n.typeId()) instanceof BinOutputNode)).map(GLGraphNode::id).collect(java.util.stream.Collectors.toSet());
-        if(boundaries.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Use Bin Output or Instance Combine before the group output"));
+        if(boundaries.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Use Bin Output or Instance Combine before the group output"));
         var sharedIds=new HashSet<GLNodeId>();for(var endpoint:roots.values())ancestors(endpoint.nodeId(),source,boundaries,sharedIds);sharedIds.removeAll(boundaries);
         var order=new ArrayList<GLGraphNode>();var done=new HashSet<GLNodeId>();
         for(var n:source.nodes())if(NodeRegistry.require(n.typeId()) instanceof BinDiscardNode)visit(n.id(),source,new HashSet<>(),done,order);
         for(var n:source.nodes())if(boundaries.contains(n.id()))visit(n.id(),source,new HashSet<>(),done,order);
-        if(order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinDiscardNode).count()>1)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Use one Bin Discard; combine conditions with Math or Comparator"));
+        if(order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinDiscardNode).count()>1)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Use one Bin Discard; combine conditions with Math or Comparator"));
         var combines=order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode).toList();
         var spectra=order.stream().filter(n->NodeRegistry.require(n.typeId()) instanceof BinOutputNode).toList();
         var substitutions=new HashMap<GLNodeEndpoint,GLNodeEndpoint>();
@@ -140,13 +141,13 @@ final class SpectralGroups {
                 sharedInputs.put(inputs.get(slot).publicPort().id(),new GLNodeEndpoint(n.id(),"a"));
                 sharedWires.add(wire(n.id(),"audio-out",instance.id(),SpectralGraphNode.external(slot).value()));
             }else{
-                if(done.contains(n.id())||def instanceof BinContextNode||def instanceof BinReadNode||def instanceof InstanceContextNode||def instanceof BinRandomNode||def instanceof BinDiscardNode)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Per-bin values must pass through Instance Combine before shared processing"));
+                if(done.contains(n.id())||def instanceof BinContextNode||def instanceof BinReadNode||def instanceof InstanceContextNode||def instanceof BinRandomNode||def instanceof BinDiscardNode)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Per-bin values must pass through Instance Combine before shared processing"));
                 shared.add(n);
             }
         }
         for(var w:source.connections())if(sharedIds.contains(w.input().nodeId()))sharedWires.add(new GLGraphConnection(w.id(),substitutions.getOrDefault(w.output(),w.output()),w.input()));
         var outputNames=new HashMap<String,GLNodeEndpoint>();roots.forEach((id,endpoint)->outputNames.put(id,substitutions.getOrDefault(endpoint,endpoint)));
-        if(order.size()>256)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Spectral group exceeds 256 scalar nodes"));
+        if(order.size()>256)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Spectral group exceeds 256 scalar nodes"));
         var indices=new HashMap<GLNodeId,Integer>();for(int i=0;i<order.size();i++)indices.put(order.get(i).id(),i);
         var wires=new HashMap<GLNodeEndpoint,GLNodeEndpoint>();source.connections().forEach(w->wires.put(w.input(),w.output()));
         var temporal=new HashSet<GLNodeId>();
@@ -154,17 +155,17 @@ final class SpectralGroups {
             boolean audio=def instanceof OscillatorNode||def instanceof NoiseNode||def instanceof DigitalNoiseNode||def instanceof InstanceCombineNode||source.connections().stream().anyMatch(w->w.input().nodeId().equals(n.id())&&temporal.contains(w.output().nodeId()));
             if(audio)temporal.add(n.id());
             if(audio&&(def instanceof BinDiscardNode||def instanceof BinOutputNode||def instanceof BinHoldNode||def instanceof BinMemoryNode||def instanceof FormulaNode))throw new IllegalArgumentException(def.title()+" must depend only on FFT-frame values, not on generated audio");
-            if(def instanceof OscillatorNode&&wires.containsKey(new GLNodeEndpoint(n.id(),"waveform")))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A custom wavetable needs a complete table, not a scalar bin value"));
-            if(source.connections().stream().anyMatch(w->w.input().nodeId().equals(n.id())&&combines.stream().anyMatch(combine->combine.id().equals(w.output().nodeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Shared Combine outputs cannot feed back into the per-bin area"));
+            if(def instanceof OscillatorNode&&wires.containsKey(new GLNodeEndpoint(n.id(),"waveform")))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("A custom wavetable needs a complete table, not a scalar bin value"));
+            if(source.connections().stream().anyMatch(w->w.input().nodeId().equals(n.id())&&combines.stream().anyMatch(combine->combine.id().equals(w.output().nodeId()))))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Shared Combine outputs cannot feed back into the per-bin area"));
         }
-        if(!combines.isEmpty()&&order.size()>64)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A spectral audio program supports up to 64 per-bin nodes"));
+        if(!combines.isEmpty()&&order.size()>64)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("A spectral audio program supports up to 64 per-bin nodes"));
         var result=new StringBuilder(flags!=0?"BIN2 ":"BIN1 ").append(order.size());if(flags!=0)result.append(' ').append(flags);
         for(var node:order){var def=NodeRegistry.require(node.typeId());if(def instanceof FormulaNode&&new NodeState(node.properties()).number("bufferInputs",0)!=0)throw new IllegalArgumentException("Spectral formulas accept numeric and trigger inputs, not file/delay buffers");if(!supports(def))throw new IllegalArgumentException(def.title()+" is not a stateless bin operation. Use nodes supporting independent spectral-bin evaluation.");
             result.append(' ').append(def.processor().id()).append(" !").append(NativeContractGenerator.fingerprint(def)).append(' ').append(def.encode(new NodeState(node.properties(),wires.containsKey(new GLNodeEndpoint(node.id(),"spectrum"))?Set.of(BinReadNode.SPECTRUM):Set.of()),port->{
                 var endpoint=wires.get(new GLNodeEndpoint(node.id(),port.value()));if(endpoint==null||def instanceof BinContextNode||def instanceof BinReadNode&&port.equals(BinReadNode.SPECTRUM))return -1;
                 var upstream=source.findNode(endpoint.nodeId()).orElseThrow();var layout=NodeRegistry.require(upstream.typeId()).layout(new NodeState(upstream.properties()));
                 var ports=layout.rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).toList();int index=0;while(index<ports.size()&&!ports.get(index).id().equals(endpoint.portId()))index++;
-                if(index==ports.size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing spectral output ")+endpoint.portId()+" on "+upstream.typeId());return Math.addExact(indices.get(endpoint.nodeId()),Math.multiplyExact(256,index));
+                if(index==ports.size())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Missing spectral output ")+endpoint.portId()+" on "+upstream.typeId());return Math.addExact(indices.get(endpoint.nodeId()),Math.multiplyExact(256,index));
             }));
         }return new Program(SpectralGraphNode.hex(result.toString()),outputNames,combines.size(),Math.max(1,spectra.size()),shared,sharedWires,sharedInputs,CompiledManualTargets.collect(order,flat,n->Integer.toString(indices.get(n.id()))));
     }
@@ -183,7 +184,7 @@ final class SpectralGroups {
         return com.vingame.glswing.node.execution.GLMutedGraphResolver.resolve(definitions.normalize(eligible),types);
     }
     private static void visit(GLNodeId id,GLNodeGraphSnapshot graph,Set<GLNodeId> visiting,Set<GLNodeId> done,List<GLGraphNode> order){
-        if(done.contains(id))return;if(!visiting.add(id))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Cyclic bin graph"));
+        if(done.contains(id))return;if(!visiting.add(id))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Cyclic bin graph"));
         for(var w:graph.connections())if(w.input().nodeId().equals(id)&&!w.input().portId().equals("spectrum"))visit(w.output().nodeId(),graph,visiting,done,order);
         visiting.remove(id);done.add(id);order.add(graph.findNode(id).orElseThrow());
     }

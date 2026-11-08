@@ -8,11 +8,11 @@ public final class ContextInputNode extends BasicNode {
     public static final PropertyId CHANNEL=new PropertyId("channel"),SAMPLE_RATE=new PropertyId("sample-rate"),BLOCK_SIZE=new PropertyId("block-size");
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(CHANNEL,"Channel").rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Current rendering channel: −1 = left, +1 = right. Channel-dependent downstream nodes run separately for each side. This is a context value, not a pan control."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Current rendering channel: −1 = left, +1 = right. Channel-dependent downstream nodes run separately for each side. This is a context value, not a pan control."));
         n.addOutput(SAMPLE_RATE,"Sample Rate [Hz]").formats(UnitFormats.CLOCK).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("DSP sample rate in Hz, currently 48000. This is the host processing rate, not an external device's rate."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("DSP sample rate in Hz, currently 48000. This is the host processing rate, not an external device's rate."));
         n.addOutput(BLOCK_SIZE,"Block Size [samples]").formats(new UnitFormats(UnitFormat.SAMPLE,UnitFormat.SAMPLE,UnitFormats.TIME_SECONDS.choices())).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Actual frames per channel in the current DSP block, at most 256. The last block may be shorter; this is not total routing latency."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Actual frames per channel in the current DSP block, at most 256. The last block may be shorter; this is not total routing latency."));
         n.addOutput(TIME,"Time [s]").formats(UnitFormats.TIME_SECONDS).rate(ProcessingRate.AUDIO).signal(SignalCategory.VALUE)
             .tooltip(NodeText.text("context.time.tooltip","Elapsed rendered time in seconds, per sample. Advances while this node is processed; pauses when inactive. Preserved across graph edits. Multiply by degrees per second for continuous rotation."));
     }

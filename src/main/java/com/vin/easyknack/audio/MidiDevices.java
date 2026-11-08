@@ -8,11 +8,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class MidiDevices {
     public record Device(String id,String name,boolean available){
         public Device {
-            if(id==null||!id.matches("[0-9]{1,20}")||name==null||name.length()>4096)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid MIDI device"));
+            if(id==null||!id.matches("[0-9]{1,20}")||name==null||name.length()>4096)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid MIDI device"));
             Long.parseUnsignedLong(id);
         }
         public String reference(){return id+":"+AudioEndpoint.hex(name);}
-        public static Device reference(String value){String[] fields=value.split(":",-1);if(fields.length!=2)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid MIDI reference"));return new Device(fields[0],AudioEndpoint.unhex(fields[1]),fields[0].equals("0"));}
+        public static Device reference(String value){String[] fields=value.split(":",-1);if(fields.length!=2)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid MIDI reference"));return new Device(fields[0],AudioEndpoint.unhex(fields[1]),fields[0].equals("0"));}
         @Override public String toString(){return name+(available?"":" (unavailable)");}
     }
     public static final Device NONE=new Device("0","No device",true);
@@ -35,10 +35,10 @@ public final class MidiDevices {
         listeners.removeIf(r->r.get()==null);for(var ref:List.copyOf(listeners)){var callback=ref.get();if(callback!=null)callback.run();}
     }
     public static List<Device> parse(String response){
-        String[] tokens=response.split(" ");if(tokens.length<2||!tokens[0].equals("OK"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid MIDI response"));
-        int count=Integer.parseInt(tokens[1]);if(count<0||count>4096||tokens.length!=2+2*count)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid MIDI device count"));
+        String[] tokens=response.split(" ");if(tokens.length<2||!tokens[0].equals("OK"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid MIDI response"));
+        int count=Integer.parseInt(tokens[1]);if(count<0||count>4096||tokens.length!=2+2*count)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid MIDI device count"));
         var devices=new ArrayList<Device>();devices.add(KEYBOARD);devices.add(NONE);var ids=new HashSet<String>();ids.add("0");ids.add("1");
-        for(int i=0;i<count;i++){var device=new Device(tokens[2+2*i],AudioEndpoint.unhex(tokens[3+2*i]),true);if(!ids.add(device.id()))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Duplicate MIDI device"));devices.add(device);}
+        for(int i=0;i<count;i++){var device=new Device(tokens[2+2*i],AudioEndpoint.unhex(tokens[3+2*i]),true);if(!ids.add(device.id()))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Duplicate MIDI device"));devices.add(device);}
         return List.copyOf(devices);
     }
     static void unavailable(){drainKeyboard();publish(current.stream().map(d->new Device(d.id(),d.name(),d.id().equals("0")||d.id().equals("1"))).toList());}

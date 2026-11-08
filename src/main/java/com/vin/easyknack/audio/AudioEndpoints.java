@@ -23,17 +23,17 @@ public final class AudioEndpoints {
     }
     public static Snapshot parse(String response) {
         String[] tokens = response.split(" ");
-        if (tokens.length < 3 || !tokens[0].equals("OK") || !tokens[1].matches("[01]{5}")) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid endpoint response"));
+        if (tokens.length < 3 || !tokens[0].equals("OK") || !tokens[1].matches("[01]{5}")) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid endpoint response"));
         int count = Integer.parseInt(tokens[2]);
-        if (count < 0 || count > 4096 || tokens.length != 3 + count * 6) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid endpoint count"));
+        if (count < 0 || count > 4096 || tokens.length != 3 + count * 6) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid endpoint count"));
         var endpoints = new ArrayList<AudioEndpoint>(); var identities = new HashSet<String>();
         for (int i=3; i<tokens.length; i+=6) {
-            if (!tokens[i].matches("[io]") || !tokens[i+4].matches("[01]") || !tokens[i+5].matches("[01]")) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid endpoint flags"));
+            if (!tokens[i].matches("[io]") || !tokens[i+4].matches("[01]") || !tokens[i+5].matches("[01]")) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid endpoint flags"));
             int type = Integer.parseInt(tokens[i+1]);
-            if (type < 0 || type >= AudioEndpoint.Type.values().length) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown endpoint type"));
+            if (type < 0 || type >= AudioEndpoint.Type.values().length) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown endpoint type"));
             var endpoint = new AudioEndpoint(AudioEndpoint.unhex(tokens[i+2]), AudioEndpoint.unhex(tokens[i+3]),
                     AudioEndpoint.Type.values()[type], tokens[i].equals("i"), tokens[i+4].equals("1"), tokens[i+5].equals("1"));
-            if (!identities.add(tokens[i] + endpoint.id())) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Duplicate endpoint"));
+            if (!identities.add(tokens[i] + endpoint.id())) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Duplicate endpoint"));
             endpoints.add(endpoint);
         }
         String flags = tokens[1];

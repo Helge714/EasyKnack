@@ -12,9 +12,9 @@ public final class MixNode extends BasicNode {
     @Override public void define(NodeBuilder n, NodeState s) {
         n.addOutput(OUT,"Out").rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         n.addEditor(MODE,"Mode",Editor.comboBox(List.of("Linear","Equal Power"),"Linear",v->v.equals("Equal Power")?"equalpower":"linear"))
-                .tooltip(com.vin.easyknack.ui.AppText.literal("Linear preserves the level of identical signals. Equal Power preserves expected power for uncorrelated signals; identical signals can gain about 3 dB at the midpoint."));
+                .tooltip(com.vin.easyknack.i18n.AppText.literal("Linear preserves the level of identical signals. Equal Power preserves expected power for uncorrelated signals; identical signals can gain about 3 dB at the midpoint."));
         n.addInput(FACTOR,"Factor",Editor.Slider.bar(.5,0,1)).formats(UnitFormats.PROPORTION).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE)
-        	.tooltip(com.vin.easyknack.ui.AppText.literal("Crossfade: 0 = A, 1 = B. Linear uses weights 1−factor and factor; Equal Power uses cosine and sine weights. Factor is clamped to 0–1."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Crossfade: 0 = A, 1 = B. Linear uses weights 1−factor and factor; Equal Power uses cosine and sine weights. Factor is clamped to 0–1."));
         n.addInput(A,"A",Editor.Slider.button(0)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         n.addInput(B,"B",Editor.Slider.button(0)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         ProcessingRate.addEditor(n,RATE);

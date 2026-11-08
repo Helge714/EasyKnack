@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.document.KnackDocumentCodec;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -45,7 +46,7 @@ final class NodeDocuments implements AutoCloseable {
         document=InstanceGroupMigration.migrate(document);
         document=SpectralInputMigration.migrate(FftMigration.migrate(DelayMigration.migrate(ReaderPositionMigration.migrate(document))));
         if (!document.externalAssets().isEmpty()) throw new IllegalArgumentException(
-                com.vin.easyknack.ui.AppText.literal("Externe Gruppen-Dateien werden noch nicht unterstützt. Bitte Gruppen einbetten."));
+                com.vin.easyknack.i18n.AppText.literal("Externe Gruppen-Dateien werden noch nicht unterstützt. Bitte Gruppen einbetten."));
         // The former waveform alias is now the public Wavetable signal type.
         Map<String,GLNodeGraphAsset> migrated=new LinkedHashMap<>();
         for(var asset:assets(document)){
@@ -94,7 +95,7 @@ final class NodeDocuments implements AutoCloseable {
             var diagnostics = GLNodeGraphValidator.validate(graph, types, GLGraphCyclePolicy.DELAYED_FEEDBACK).diagnostics();
             for (var diagnostic : diagnostics) if (diagnostic.severity() == GLGraphDiagnostic.Severity.ERROR
                     && !diagnostic.code().equals("port.required") && !diagnostic.code().equals("graph.cycle"))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Ungültiges Node-Dokument: ") + diagnostic.message());
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Ungültiges Node-Dokument: ") + diagnostic.message());
             prepared.put(asset.id(), new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(), graph,
                     asset.viewState(), asset.metadata(), asset.compositeDescriptor()));
         }

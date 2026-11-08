@@ -8,7 +8,7 @@ import com.vingame.glswing.ui.GLCheckBox;
 
 /** A second view of the same analysis snapshot; the editor and graph stay intact. */
 final class AnalysisFocusView extends GLContainer {
-    private final GLButton back=new GLButton(com.vin.easyknack.ui.AppText.literal("Back to nodes (Esc)"));
+    private final GLButton back=new GLButton(com.vin.easyknack.i18n.AppText.literal("Back to nodes (Esc)"));
     private AnalysisEditor.Plot plot;
     private final GLButton pause=new GLButton(AppText.text("analysis.pause")),export=new GLButton(AppText.text("analysis.export"));
     private final GLCheckBox logarithmic=new GLCheckBox(AppText.text("analysis.log"));

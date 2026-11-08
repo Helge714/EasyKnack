@@ -98,7 +98,7 @@ public enum MathOperation {
 	}
 
 	public String tooltip() {
-		return com.vin.easyknack.ui.AppText.literal(tooltip);
+		return com.vin.easyknack.i18n.AppText.literal(tooltip);
 	}
 
 	public boolean unary() {
@@ -115,11 +115,11 @@ public enum MathOperation {
 
 	@Override
 	public String toString() {
-		return com.vin.easyknack.ui.AppText.literal(label);
+		return com.vin.easyknack.i18n.AppText.literal(label);
 	}
 
 	public static MathOperation fromId(String id) {
 		return java.util.Arrays.stream(values()).filter(value -> value.id.equals(id)).findFirst()
-				.orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown math operation: ") + id));
+				.orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown math operation: ") + id));
 	}
 }

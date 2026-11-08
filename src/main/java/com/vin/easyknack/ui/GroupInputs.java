@@ -103,7 +103,7 @@ final class GroupInputs {
             }
         }
         var combo=targetCombo(asset,endpoint,groups);if(combo==null)return value;
-        if(value.toJavaValue() instanceof Number number){double index=number.doubleValue();if(index!=Math.rint(index)||index<0||index>=combo.items().size())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Combobox index outside connected editor: ")+index);return GLNodeValue.of(combo.items().get((int)index).id());}
+        if(value.toJavaValue() instanceof Number number){double index=number.doubleValue();if(index!=Math.rint(index)||index<0||index>=combo.items().size())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Combobox index outside connected editor: ")+index);return GLNodeValue.of(combo.items().get((int)index).id());}
         combo.validate(value);return value;
     }
     static double signalValue(GLNodeGraphAsset asset,GLNodeEndpoint endpoint,GLNodeValue value,GLCompositeGraphRegistry groups){
@@ -113,7 +113,7 @@ final class GroupInputs {
             if(template!=null&&port.isBound()){var entry=template.entries().stream().filter(e->e.id().equals(mapped.toJavaValue())).findFirst().orElseThrow();return signalValue(groups.findAsset(nested.assetId()).orElseThrow(),port.internalEndpoint(),entry.value(),groups);}}
         if(mapped.toJavaValue() instanceof Number number)return number.doubleValue();
         var combo=targetCombo(asset,endpoint,groups);if(combo!=null)for(int i=0;i<combo.items().size();i++)if(combo.items().get(i).id().equals(mapped.toJavaValue()))return i;
-        throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Connected input requires a numeric value"));
+        throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Connected input requires a numeric value"));
     }
     private static Editor.ComboBox<GroupChoices.Option> targetCombo(GLNodeGraphAsset asset,GLNodeEndpoint endpoint,GLCompositeGraphRegistry groups){
         var node=asset.graph().findNode(endpoint.nodeId()).orElse(null);if(node==null)return null;

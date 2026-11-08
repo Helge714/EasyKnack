@@ -8,7 +8,7 @@ import com.vingame.glswing.ui.*;
 public record CurveEditor(GLFunctionCurve initial) implements Editor {
     @Override public GLNodeValue defaultValue(){return GLNodeValue.of(CurveData.encode(initial));}
     @Override public void validate(GLNodeValue value){
-        if(!(value instanceof GLNodeValue.TextValue text))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Curve text required"));
+        if(!(value instanceof GLNodeValue.TextValue text))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Curve text required"));
         CurveData.decode(text.value());
     }
     @Override public Control create(String label,Consumer<GLNodeValue> changed){

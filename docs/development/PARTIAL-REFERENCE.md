@@ -33,7 +33,7 @@ repository root, with generated native contracts present (`Maven package`):
 ```powershell
 python -m venv target/partial-reference-env
 target/partial-reference-env/Scripts/python.exe -m pip install -r scripts/requirements-partial-reference.txt
-target/partial-reference-env/Scripts/python.exe scripts/partial-reference.py --cxx target/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe
+target/partial-reference-env/Scripts/python.exe scripts/partial-reference.py --cxx .local/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe
 ```
 
 `--sizes 2048 4096` selects a smaller run. `--output <directory>` preserves separate

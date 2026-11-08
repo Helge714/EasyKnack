@@ -14,22 +14,22 @@ final class EditorTemplatesPanel extends GLContainer {
     private final GLComboBox<String> kind=new GLComboBox<>(List.of("Number","Text"));private final GLLabel status=new GLLabel("");
     EditorTemplatesPanel(EditorTemplates library,GLHistoryManager history,Runnable changed){this.library=library;this.history=history;this.changed=changed;
         kind.setItemTextProvider(AppText::literal);
-        row(new GLLabel(com.vin.easyknack.ui.AppText.literal("Reusable editor templates")));row(templates);
-        button(com.vin.easyknack.ui.AppText.literal("Add combobox"),()->{String id=UUID.randomUUID().toString(),entry=UUID.randomUUID().toString();put(new EditorTemplates.Template(id,"Selection",List.of(new EditorTemplates.Entry(entry,"Option 1",GLNodeValue.of(0.))),entry));});
-        button(com.vin.easyknack.ui.AppText.literal("Remove template"),()->{var t=templates.getSelectedItem();if(t!=null)edit(()->library.remove(t.id()));});
-        row(new GLLabel(com.vin.easyknack.ui.AppText.literal("Template name")));row(name);button(com.vin.easyknack.ui.AppText.literal("Rename template"),()->update(t->new EditorTemplates.Template(t.id(),required(name.getText()),t.entries(),t.initial())));
-        row(new GLLabel(com.vin.easyknack.ui.AppText.literal("Entries")));row(entries);row(label);row(kind);row(value);
-        button(com.vin.easyknack.ui.AppText.literal("Apply entry"),()->change(list->{int i=index(list);var old=list.get(i);GLNodeValue v;
-            if("Number".equals(kind.getSelectedItem())){double number=Double.parseDouble(value.getText());if(!Double.isFinite(number))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Use a finite number"));v=GLNodeValue.of(number);}else v=GLNodeValue.of(required(value.getText()));
+        row(new GLLabel(com.vin.easyknack.i18n.AppText.literal("Reusable editor templates")));row(templates);
+        button(com.vin.easyknack.i18n.AppText.literal("Add combobox"),()->{String id=UUID.randomUUID().toString(),entry=UUID.randomUUID().toString();put(new EditorTemplates.Template(id,"Selection",List.of(new EditorTemplates.Entry(entry,"Option 1",GLNodeValue.of(0.))),entry));});
+        button(com.vin.easyknack.i18n.AppText.literal("Remove template"),()->{var t=templates.getSelectedItem();if(t!=null)edit(()->library.remove(t.id()));});
+        row(new GLLabel(com.vin.easyknack.i18n.AppText.literal("Template name")));row(name);button(com.vin.easyknack.i18n.AppText.literal("Rename template"),()->update(t->new EditorTemplates.Template(t.id(),required(name.getText()),t.entries(),t.initial())));
+        row(new GLLabel(com.vin.easyknack.i18n.AppText.literal("Entries")));row(entries);row(label);row(kind);row(value);
+        button(com.vin.easyknack.i18n.AppText.literal("Apply entry"),()->change(list->{int i=index(list);var old=list.get(i);GLNodeValue v;
+            if("Number".equals(kind.getSelectedItem())){double number=Double.parseDouble(value.getText());if(!Double.isFinite(number))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Use a finite number"));v=GLNodeValue.of(number);}else v=GLNodeValue.of(required(value.getText()));
             list.set(i,new EditorTemplates.Entry(old.id(),required(label.getText()),v));}));
-        button(com.vin.easyknack.ui.AppText.literal("Add entry"),()->change(list->list.add(new EditorTemplates.Entry(UUID.randomUUID().toString(),"Option "+(list.size()+1),GLNodeValue.of((double)list.size())))));
-        button(com.vin.easyknack.ui.AppText.literal("Remove entry"),()->change(list->{if(list.size()<2)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Keep at least one entry"));list.remove(index(list));}));
-        button(com.vin.easyknack.ui.AppText.literal("Move up"),()->move(-1));button(com.vin.easyknack.ui.AppText.literal("Move down"),()->move(1));button(com.vin.easyknack.ui.AppText.literal("Set default"),()->update(t->new EditorTemplates.Template(t.id(),t.label(),t.entries(),entries.getSelectedItem().id())));
-        button(com.vin.easyknack.ui.AppText.literal("Assign indices 0, 1, ..."),()->change(list->{for(int i=0;i<list.size();i++){var e=list.get(i);list.set(i,new EditorTemplates.Entry(e.id(),e.label(),GLNodeValue.of((double)i)));}}));
-        row(new GLLabel(com.vin.easyknack.ui.AppText.literal("Apply a template to an input in Group-IO.")));row(status);
+        button(com.vin.easyknack.i18n.AppText.literal("Add entry"),()->change(list->list.add(new EditorTemplates.Entry(UUID.randomUUID().toString(),"Option "+(list.size()+1),GLNodeValue.of((double)list.size())))));
+        button(com.vin.easyknack.i18n.AppText.literal("Remove entry"),()->change(list->{if(list.size()<2)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Keep at least one entry"));list.remove(index(list));}));
+        button(com.vin.easyknack.i18n.AppText.literal("Move up"),()->move(-1));button(com.vin.easyknack.i18n.AppText.literal("Move down"),()->move(1));button(com.vin.easyknack.i18n.AppText.literal("Set default"),()->update(t->new EditorTemplates.Template(t.id(),t.label(),t.entries(),entries.getSelectedItem().id())));
+        button(com.vin.easyknack.i18n.AppText.literal("Assign indices 0, 1, ..."),()->change(list->{for(int i=0;i<list.size();i++){var e=list.get(i);list.set(i,new EditorTemplates.Entry(e.id(),e.label(),GLNodeValue.of((double)i)));}}));
+        row(new GLLabel(com.vin.easyknack.i18n.AppText.literal("Apply a template to an input in Group-IO.")));row(status);
         templates.addActionListener(e->{if(!updating)loadTemplate();});entries.addActionListener(e->{if(!updating)loadEntry();});refresh();setPreferredGLSize(280,rows.size()*32+20);
     }
-    private static String required(String text){if(text.isBlank())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Enter a name/value"));return text.strip();}
+    private static String required(String text){if(text.isBlank())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Enter a name/value"));return text.strip();}
     private void row(GLContainer c){rows.add(c);addGL(c);}
     private void button(String text,Runnable action){var b=new GLButton(text);b.addActionListener(e->{try{action.run();status.setText("");}catch(RuntimeException ex){status.setText(ex.getMessage());}});row(b);}
     private void edit(Runnable action){var before=library.snapshot();action.run();var after=library.snapshot();library.load(before);try(var transaction=history.beginTransaction("Edit template")){history.perform("Edit template",()->{library.load(after);refresh();changed.run();},()->{library.load(before);refresh();changed.run();});}}

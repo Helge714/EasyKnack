@@ -18,11 +18,11 @@ public enum EdgeMode {
 
 	@Override
 	public String toString() {
-		return com.vin.easyknack.ui.AppText.literal(label);
+		return com.vin.easyknack.i18n.AppText.literal(label);
 	}
 
 	public static EdgeMode fromId(String id) {
 		return java.util.Arrays.stream(values()).filter(value -> value.id.equals(id)).findFirst()
-				.orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown edge mode: ") + id));
+				.orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown edge mode: ") + id));
 	}
 }

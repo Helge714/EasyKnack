@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.document.KnackDocumentCodec;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import org.junit.jupiter.api.Test;

@@ -31,7 +31,7 @@
   tags such as `v0.2.0`, publishing and pushing remain actions requiring user scope;
   ordinary version maintenance does not itself authorize a release.
 - Package identity generation and the Help/About display are implemented; see
-  docs/BUILD-IDENTITY.md. Windows installers use the numeric Maven product version.
+  docs/development/BUILD-IDENTITY.md. Windows installers use the numeric Maven product version.
   Official release CI and publication remain pending; do not claim those are ready.
 
 ## Code navigation

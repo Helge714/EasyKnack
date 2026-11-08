@@ -1,4 +1,10 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.document.KnackDocumentCodec;
+import com.vin.easyknack.compiler.MathFusion;
+import com.vin.easyknack.compiler.SampleFusion;
+import com.vin.easyknack.compiler.StatefulChainSpecialization;
+import com.vin.easyknack.compiler.SpectralSourceSpecialization;
+import com.vin.easyknack.compiler.CompiledManualTargets;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +55,7 @@ final class GroupSourceExporter {
     }
     private static Export createPrepared(GLNodeGraphDocument document,GLGraphNode instance,boolean local){
         var registry=new GLCompositeGraphRegistry();NodeDocuments.assets(document).forEach(registry::registerAsset);
-        var descriptor=registry.findComposite(instance.typeId()).orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Select one group to export.")));
+        var descriptor=registry.findComposite(instance.typeId()).orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Select one group to export.")));
         var asset=registry.findAsset(descriptor.assetId()).orElseThrow();
         var pending=new ArrayDeque<GLNodeGraphAsset>();var checked=new HashSet<String>();pending.add(asset);
         while(!pending.isEmpty()){
@@ -89,7 +95,7 @@ final class GroupSourceExporter {
             var ports=input?inputs:outputs;var outputBase=GroupUnits.base(registry,descriptor,mapping);var outputUnit=GroupUnits.selected(instance,mapping,outputBase);
             ports.add(new Port(mapping,new PropertyId((input?"input_":"output_")+ports.size()),slider,signal,Map.copyOf(choiceValues),!input&&GroupUnits.numeric(mapping)?new UnitFormats(outputUnit,outputUnit,GroupUnits.allowed(mapping,outputBase)):null));
         }
-        if(outputs.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("export.outputsRequired"));
+        if(outputs.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.text("export.outputsRequired"));
         // Sentinel leaves expose boundary endpoints through the existing nested-group flattener.
         var rootNodes=new ArrayList<GLGraphNode>();rootNodes.add(instance.withoutProperty(GLNodeState.HIDDEN).withoutProperty(GLNodeState.MUTED));
         var wires=new ArrayList<GLGraphConnection>();var inputIds=new ArrayList<GLNodeId>();var outputIds=new ArrayList<GLNodeId>();
@@ -100,20 +106,20 @@ final class GroupSourceExporter {
         var root=new GLNodeGraphAsset("export.root",1,GLNodeGraphAssetKind.PROJECT,new GLNodeGraphSnapshot(document.root().graph().graphId(),0,rootNodes,wires),GLNodeEditorViewState.empty());
         var prepared=GroupCompiler.prepare(root,registry);
         var result=SpectralGroups.flatten(prepared,new GLCompositeExpansionLimits(16,256,512,10000));
-        if(!result.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Cannot expand group: ")+result.diagnostics());
+        if(!result.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Cannot expand group: ")+result.diagnostics());
         var graph=materializeUnits(AutomaticRates.resolve(result.graph().orElseThrow()));
         com.vin.easyknack.audio.SampleFeedback.validate(graph);
         var validationTypes=NodeRegistry.executionContracts().types();
         // Sentinel leaves deliberately have unbound inputs; only validate cycle timing here.
-        if(GLNodeGraphValidator.validate(graph,validationTypes,GLGraphCyclePolicy.DELAYED_FEEDBACK).diagnostics().stream().anyMatch(d->d.code().equals("graph.cycle")))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Feedback requires a Delay in every cycle"));
+        if(GLNodeGraphValidator.validate(graph,validationTypes,GLGraphCyclePolicy.DELAYED_FEEDBACK).diagnostics().stream().anyMatch(d->d.code().equals("graph.cycle")))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Feedback requires a Delay in every cycle"));
         Map<GLNodeEndpoint,GLNodeEndpoint> sources=new HashMap<>();graph.connections().forEach(w->sources.put(w.input(),w.output()));
         var order=new ArrayList<GLGraphNode>();var visiting=new HashSet<GLNodeId>();var done=new HashSet<GLNodeId>();
         for(var id:outputIds)visit(id,graph,sources,inputIds,visiting,done,order);
         order.removeIf(n->outputIds.contains(n.id()));
         Set<String> deviceIO=Set.of("input","out","deviceout");
         for(var n:order){var d=NodeRegistry.require(n.typeId());
-            if(deviceIO.contains(d.processor().id()))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Keep audio device I/O outside exported processing groups: ")+d.title());
-            if(GLNodeState.isMuted(n))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Resolve muted nodes before baking: ")+d.title());
+            if(deviceIO.contains(d.processor().id()))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Keep audio device I/O outside exported processing groups: ")+d.title());
+            if(GLNodeState.isMuted(n))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Resolve muted nodes before baking: ")+d.title());
         }
         ProcessingRate boundaryRate=ProcessingRate.CONTROL;
         for(int i=0;i<outputs.size();i++){
@@ -239,15 +245,15 @@ final class GroupSourceExporter {
             var nodes=root.graph().nodes().stream().map(n->n.id().equals(instance.id())?n.withProperty(choice.property,GLNodeValue.of(option.id())):n).toList();
             var variantRoot=new GLNodeGraphAsset(root.id(),root.version(),root.kind(),new GLNodeGraphSnapshot(root.graph().graphId(),root.graph().revision(),nodes,root.graph().connections()),root.viewState());
             var prepared=GroupCompiler.prepare(variantRoot,registry);var flat=SpectralGroups.flatten(prepared,new GLCompositeExpansionLimits(16,256,512,10000));
-            if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid group choice: ")+choice.property);
+            if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid group choice: ")+choice.property);
             var variant=materializeUnits(AutomaticRates.resolve(flat.graph().orElseThrow()));
-            if(!variant.connections().equals(graph.connections()))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Choice changes group wiring: ")+choice.property);
+            if(!variant.connections().equals(graph.connections()))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Choice changes group wiring: ")+choice.property);
             var encoded=new LinkedHashMap<GLNodeId,String[]>();variants.put(option.id(),encoded);
             for(var node:order){
                 var def=NodeRegistry.require(node.typeId());var changed=variant.findNode(node.id()).orElseThrow();
                 java.util.function.ToIntFunction<PropertyId> input=k->reference(sources.get(new GLNodeEndpoint(node.id(),k.value())),order,indices,external);
                 var before=choicePayload(def,node,input);var after=choicePayload(def,changed,input);
-                if(before.length!=after.length)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Choice changes parameter layout: ")+choice.property);
+                if(before.length!=after.length)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Choice changes parameter layout: ")+choice.property);
                 encoded.put(node.id(),after);
             }
           }
@@ -257,7 +263,7 @@ final class GroupSourceExporter {
                 String expression="std::string("+quote(initial)+")";
                 for(var entry:variants.entrySet())expression="p."+choice.id.value()+"_value == "+quote(entry.getKey())+" ? std::string("+quote(entry.getValue().get(node.id())[i])+") : ("+expression+")";
                 String token=Base64.getUrlEncoder().withoutPadding().encodeToString(expression.getBytes(StandardCharsets.UTF_8));
-                if(result.computeIfAbsent(node.id(),id->new HashMap<>()).putIfAbsent(i,token)!=null)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Overlapping group choices"));
+                if(result.computeIfAbsent(node.id(),id->new HashMap<>()).putIfAbsent(i,token)!=null)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Overlapping group choices"));
             }
           }
         }
@@ -267,7 +273,7 @@ final class GroupSourceExporter {
             var def=NodeRegistry.require(node.typeId());
             var tokens=choicePayload(def,node,k->reference(sources.get(new GLNodeEndpoint(node.id(),k.value())),order,indices,external));
             int programToken=SpectralGraphNode.programToken(new NodeState(node.properties()));
-            var changes=result.get(node.id());if(changes.keySet().stream().anyMatch(i->i<programToken))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Choice changes spectral input wiring"));
+            var changes=result.get(node.id());if(changes.keySet().stream().anyMatch(i->i<programToken))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Choice changes spectral input wiring"));
             var programChanges=new HashMap<Integer,String>();changes.forEach((index,value)->programChanges.put(index-programToken,value));
             var program=dynamicPayload(String.join(" ",Arrays.copyOfRange(tokens,programToken,tokens.length)),programChanges);
             var expression="SpectralGraphNode::encodeProgram("+dynamicPlan(program,Map.of(node.id(),programChanges))+")";
@@ -379,7 +385,7 @@ final class GroupSourceExporter {
         if(value instanceof Number number)return Double.toString(number.doubleValue());
         if(value instanceof List<?> list)return "java.util.List.of("+String.join(",",list.stream().map(GroupSourceExporter::javaValue).toList())+")";
         if(value instanceof Map<?,?> map)return "java.util.Map.ofEntries("+String.join(",",map.entrySet().stream().map(e->"java.util.Map.entry("+quote(e.getKey().toString())+","+javaValue(e.getValue())+")").toList())+")";
-        throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported exported property: ")+value);
+        throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported exported property: ")+value);
     }
     private static String nativeSource(String name,String processor,BasicNode definition,List<GLGraphNode> nodes,Map<GLNodeEndpoint,GLNodeEndpoint> sources,List<GLNodeId> external,List<GLNodeId> targets,List<Port> inputs,List<Port> outputs,ProcessingRate boundaryRate,Map<GLNodeId,Map<Integer,String>> dynamic,boolean allowFusion){
         var spectral=SpectralSourceSpecialization.emit(name,nodes,dynamic.keySet());
@@ -413,7 +419,7 @@ final class GroupSourceExporter {
             plan.append(" output").append(i).append(" baked_output ").append(reference(sources.get(new GLNodeEndpoint(targets.get(i),outputs.get(i).endpoint(false))),nodes,indices,external))
                 .append(" ").append(outputs.get(i).nativeKind()).append(" @ ").append(midi?"e e":outputs.get(i).resource()?"c c":boundaryRate.code()+" "+boundaryRate.code());types.add("BakedOutput");
         }
-        if(types.size()>256)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Export exceeds the native graph budget including boundary ports (256)."));
+        if(types.size()>256)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Export exceeds the native graph budget including boundary ports (256)."));
         var s=new StringBuilder("#pragma once\n#include \"ParameterContracts.hpp\"\n#include \"BakedGraph.hpp\"\n#include \"SimdMath.hpp\"\n#include <sstream>\n");
         for(var header:nodes.stream().map(n->NodeRegistry.require(n.typeId()).processor().header()).distinct().toList())s.append("#include ").append(quote(header)).append('\n');
         boolean specialized=dynamic.isEmpty()&&StatefulChainSpecialization.supports(nodes,sources,inputs.size(),outputs.size()) && reference(sources.get(new GLNodeEndpoint(targets.get(0),"audio-in")),nodes,indices,external)==2;
@@ -485,6 +491,6 @@ final class GroupSourceExporter {
         if(endpoint==null)return -1;int index=indices.get(endpoint.nodeId());if(external.contains(endpoint.nodeId()))return index;
         var n=nodes.get(index-external.size());var outputs=NodeRegistry.require(n.typeId()).layout(new NodeState(n.properties())).ports().stream().filter(p->p.direction()==GLPortDirection.OUTPUT).toList();
         for(int i=0;i<outputs.size();i++)if(outputs.get(i).id().equals(endpoint.portId()))return Math.addExact(index,Math.multiplyExact(256,i));
-        throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unresolved output: ")+endpoint);
+        throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unresolved output: ")+endpoint);
     }
 }

@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public final class MidiDeviceEditor implements Editor {
     @Override public GLNodeValue defaultValue(){return GLNodeValue.of(MidiDevices.KEYBOARD.reference());}
-    @Override public void validate(GLNodeValue value){if(!(value instanceof GLNodeValue.TextValue t))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("MIDI device reference required"));MidiDevices.Device.reference(t.value());}
+    @Override public void validate(GLNodeValue value){if(!(value instanceof GLNodeValue.TextValue t))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("MIDI device reference required"));MidiDevices.Device.reference(t.value());}
     @Override public Control create(String label,Consumer<GLNodeValue> changed){
         class Chooser extends GLComboBox<MidiDevices.Device>{
             private MidiDevices.Device selected=MidiDevices.KEYBOARD;

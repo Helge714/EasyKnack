@@ -60,7 +60,7 @@ public class BasicNodeView extends GLNode {
                 GLContainer content = portContent(row);
                 controls.put(row.key(),content);
                 if(row.isDriverAssignable())MidiDrivers.attach(history,id,row.id(),content);
-                if(content instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->write(new PropertyId(GLGraphNode.AUTOMATIC_PREFIX+row.id()),GLNodeValue.of(true)));
+                if(content instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.i18n.AppText.literal("Reset to automatic"),e->write(new PropertyId(GLGraphNode.AUTOMATIC_PREFIX+row.id()),GLNodeValue.of(true)));
                 if(content instanceof com.vingame.glswing.ui.GLToolTipTarget control) {
                     String tip=NodeHints.tooltip(row);
                     control.setToolTipText(tip);

@@ -23,7 +23,8 @@ inline void run(){
     auto poly=AudioGraph::parse("GRAPH 5 d sampledelay 3 0 @ a a s midiin 1 @ c - n midinote 1 0 2 poly 2 @ a c m math 0 0 258 0 add 0 @ a aa o out 0 0 @ a a");
     poly.process(a.data(),16,0,nullptr,&midi);SF_CHECK(poly.nodes[0].voiceCount()==2&&a[3]==0&&a[4]==1&&a[7]==4&&a[8]==6);
     auto bad="GRAPH 3 d sampledelay 1 0 @ a a osc osc -1 440 wave sine 0 @ a ac o out 0 0 @ a a";
-    bool rejected=false;try{AudioGraph::parse(bad);}catch(const std::runtime_error& e){rejected=std::string(e.what()).find("wavetable")!=std::string::npos;}SF_CHECK(rejected);
+    // Resource validation rejects the numeric delay output before scheduling a wavetable loop.
+    bool rejected=false;try{AudioGraph::parse(bad);}catch(const std::runtime_error& e){rejected=std::string(e.what())=="Incompatible resource connection";}SF_CHECK(rejected);
     // Multiple delay boundaries commit simultaneously, independent of graph order.
     auto two=AudioGraph::parse("GRAPH 4 a sampledelay 2 0 @ a a b sampledelay 0 0 @ a a m math 1 0 -1 1 add 0 @ a aa o out 0 0 @ a a");
     two.process(a.data(),8);SF_CHECK(a[0]==0&&a[1]==1&&a[2]==1&&a[3]==2&&a[7]==4);
@@ -52,15 +53,25 @@ inline void run(){
     auto digital=AudioGraph::parse("GRAPH 3 d sampledelay 1 0 @ a a n digitalnoise -1 12000 0 .5 @ ae aa o out 1 0 @ a a");
     digital.process(a.data(),256);auto& events=digital.nodes[1].valueEvents[0][1];SF_CHECK(events.count>10);SF_CHECK(events.events[1].sampleOffset>0);
     auto oscillator=AudioGraph::parse("GRAPH 3 d sampledelay 1 0 @ a a n osc 0 440 @ a a o out 1 0 @ a a");oscillator.process(a.data(),256);
-    bool tableRejected=false;try{AudioGraph::parse("GRAPH 3 d sampledelay 1 0 @ a a n osc -1 440 wave sine 0 @ a ac o out 1 0 @ a a");}catch(const std::runtime_error& e){tableRejected=std::string(e.what()).find("wavetable")!=std::string::npos;}SF_CHECK(tableRejected);
+    bool tableRejected=false;try{AudioGraph::parse("GRAPH 3 d sampledelay 1 0 @ a a n osc -1 440 wave sine 0 @ a ac o out 1 0 @ a a");}catch(const std::runtime_error& e){tableRejected=std::string(e.what())=="Incompatible resource connection";}SF_CHECK(tableRejected);
     auto panned=AudioGraph::parse("GRAPH 4 d sampledelay 2 0 @ a a m math 0 0 -1 .1 add 0 @ a aa p pan 1 -1 -1 @ a aa o out 2 0 @ a a");panned.process(a.data(),16,0,nullptr);panned.process(b.data(),16,1,nullptr);SF_CHECK(a[1]>a[0]&&std::abs(b[0])<1e-6f);
-    // A complete external wavetable stays block-sized even inside a sample island.
-    auto tableGraph=AudioGraph::parse("GRAPH 4 t osc -1 440 @ a a d sampledelay 2 0 @ a a n osc 1 440 wave sine 0 @ a ac o out 2 0 @ a a");
+    // A real external Wavetable resource remains available throughout a sample island.
+    std::array<float,WaveformResource::size> table{};
+    for(std::size_t i=0;i<table.size();i++)table[i]=std::sin(i*6.283185307179586/table.size());
+    auto wave=std::make_shared<WaveformResource>();wave->fromSamples(table);
+    struct TestWave:WaveformNode {
+        explicit TestWave(std::shared_ptr<const WaveformResource> value){wave=std::move(value);}
+        void configure(std::istream&)override{}
+    };
+    auto tableGraph=AudioGraph::compile("GRAPH 4 t testwave @ c - d sampledelay 2 0 @ a a n osc 1 440 wave sine 0 @ a ac o out 2 0 @ a a",
+        [&](const std::string& type)->std::unique_ptr<NodeProcessor>{if(type=="testwave")return std::make_unique<TestWave>(wave);return createNodeProcessor(type);});
     tableGraph.process(a.data(),256);for(float value:a)SF_CHECK(std::isfinite(value));
-    std::array<float,256> table{};for(int i=0;i<256;i++)table[i]=std::sin(i*.0245436926f);
-    auto ob=createNodeProcessor("osc"),os=createNodeProcessor("osc");std::istringstream obp("-1 440 wave sine -1"),osp("-1 440 wave sine -1");ob->configure(obp);os->configure(osp);ob->prepare(48000,256);os->prepare(48000,256);
-    const float* waveInputs[]={nullptr,table.data()};ProcessContext wc{waveInputs,2,a.data(),256,48000,nullptr};wc.blockFrames=256;ob->process(wc);
-    for(int i=0;i<256;i++){wc.output=b.data()+i;wc.bufferSize=1;wc.sampleOffset=i;wc.samplewise=true;os->processSample(wc);}for(int i=0;i<256;i++)SF_CHECK(std::abs(a[i]-b[i])<1e-6f);
+    auto ob=createNodeProcessor("osc"),os=createNodeProcessor("osc");
+    std::istringstream obp("-1 440 wave sine -1"),osp("-1 440 wave sine -1");ob->configure(obp);os->configure(osp);ob->prepare(48000,256);os->prepare(48000,256);
+    const DspResource* waveInputs[]={nullptr,wave.get()};
+    ProcessContext wc{nullptr,2,a.data(),256,48000,nullptr};wc.resourceInputs=waveInputs;wc.blockFrames=256;ob->process(wc);
+    for(int i=0;i<256;i++){wc.output=b.data()+i;wc.bufferSize=1;wc.sampleOffset=i;wc.samplewise=true;os->processSample(wc);}
+    for(int i=0;i<256;i++)SF_CHECK(std::abs(a[i]-b[i])<1e-6f);
     // Shared processors belong to one island and run once, not once per loop.
     auto overlap=AudioGraph::parse("GRAPH 4 d sampledelay 2 0 @ a a e sampledelay 2 0 @ a a m math 0 0 1 0 add 0 @ a aa o out 2 0 @ a a");
     SF_CHECK(overlap.steps.size()==2&&overlap.steps[0].nodes.size()==3);

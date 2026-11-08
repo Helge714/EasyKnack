@@ -27,12 +27,12 @@ public final class SpectrumBlurNode extends BasicNode {
         n.addInput(IN,"Spectrum").dataType(PortDataType.SPECTRUM).signal(SignalCategory.SPECTRUM).rate(ProcessingRate.CONTROL);
         n.addEditor(KERNEL,"Kernel",Editor.comboBox(java.util.List.of("Gaussian","Box","Maximum"),"Gaussian",v->v.toLowerCase(java.util.Locale.ROOT)));
         n.addEditor(SYNTHESIS,"Synthesis",Editor.comboBox(java.util.List.of("Noise","Continuous","Preserve"),"Noise",v->v.toLowerCase(java.util.Locale.ROOT)))
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Noise fills frequency regions using a continuous noise source. Continuous produces bin-centred tones. Preserve changes magnitudes only and may cancel during IFFT overlap. Zero width is always an exact bypass."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Noise fills frequency regions using a continuous noise source. Continuous produces bin-centred tones. Preserve changes magnitudes only and may cancel during IFFT overlap. Zero width is always an exact bypass."));
         n.addEditor(NORMALIZE,"Normalize power",Editor.checkBox(false))
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Preserve total spectral power; in Noise mode this is an expected value, not a per-frame noise limiter. Not a perceived loudness normalization."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Preserve total spectral power; in Noise mode this is an expected value, not a per-frame noise limiter. Not a perceived loudness normalization."));
         var formats=unit(s)==UnitFormat.BIN?UnitFormats.fixed(UnitFormat.BIN):UnitFormats.OCTAVE_WIDTH;
         n.addInput(WIDTH,"Width",Editor.Slider.button(0,0.0,null)).formats(formats).unitChoices(UNITS).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL)
-            .tooltip(com.vin.easyknack.ui.AppText.text("spectrum.blur.width.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("spectrum.blur.width.tooltip"));
     }
     public NativeProcessor processor(){return new NativeProcessor("spectrumblur","nodes/SpectrumBlurNode.hpp",ParameterContract.builder().source(IN).source(WIDTH).value(WIDTH).mapped(UNIT,s->unit(s)==UnitFormat.BIN?"bin":"octave").value(KERNEL).value(NORMALIZE).value(SYNTHESIS).build());}
     public void mute(MuteRouting r,NodeState s){r.connect(IN,OUT);}

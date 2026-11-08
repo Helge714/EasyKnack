@@ -1,10 +1,10 @@
 # DSP-Optimierungen und Messungen
 
-Neu: [spezialisierter Kettenexport gegenüber Handcode](specialized-chain-2026-09-18/README.md)
+Neu: [spezialisierter Kettenexport gegenüber Handcode](archive/specialized-chain-2026-09-18/README.md)
 mit vollständiger äußerer Graphverwaltung und separatem Schleifenfusionsvergleich.
 
-Aktueller Produktionsvergleich: [gezieltes Export-Inlining](export-inline-2026-09-18/README.md).
-Der vorausgehende [Compiler-Mikrobenchmark](stateful-fusion-2026-09-18/README.md)
+Aktueller Produktionsvergleich: [gezieltes Export-Inlining](archive/export-inline-2026-09-18/README.md).
+Der vorausgehende [Compiler-Mikrobenchmark](archive/stateful-fusion-2026-09-18/README.md)
 ist davon getrennt zu betrachten; dessen 19 % sind kein allgemeiner Gruppengewinn.
 
 ## Reproduzieren
@@ -12,7 +12,7 @@ ist davon getrennt zu betrachten; dessen 19 % sind kein allgemeiner Gruppengewin
 Nach `mvn -Pnative-audio verify` (generierte Parameterverträge erforderlich), im Projektordner:
 
 ```powershell
-& target/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe -std=c++17 -O3 -ffp-contract=off -static -I native/audio-host/src -I target/native/generated native/audio-host/benchmarks/DspBenchmark.cpp -o target/dsp-benchmark.exe
+& .local/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe -std=c++17 -O3 -ffp-contract=off -static -I native/audio-host/src -I target/native/generated native/audio-host/benchmarks/DspBenchmark.cpp -o target/dsp-benchmark.exe
 & ./target/dsp-benchmark.exe target/dsp-benchmark.csv
 ```
 
@@ -88,7 +88,7 @@ Sample-Buffer auf fünf reduziert, bei bitgleicher Ausgabe (je 1024 Byte Sampled
 ## Telemetrievergleich (18.09.2026)
 
 ```powershell
-& target/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe -std=c++17 -O2 -ffp-contract=off -static -I native/audio-host/src -I target/native/generated native/audio-host/benchmarks/TelemetryBenchmark.cpp -o target/telemetry-benchmark.exe
+& .local/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe -std=c++17 -O2 -ffp-contract=off -static -I native/audio-host/src -I target/native/generated native/audio-host/benchmarks/TelemetryBenchmark.cpp -o target/telemetry-benchmark.exe
 & ./target/telemetry-benchmark.exe > target/telemetry-writer.csv
 ```
 
@@ -113,7 +113,7 @@ für spätere Parallelisierung daraus ableiten.
 
 Sieben Original-/Export-/Scheduler-Szenarien mit 28 Gleichheitsfällen und 126
 Offline-Messreihen; zusätzlich isolierte Plugininstallation und reale Routing-Langläufe.
-Die DSP-Baseline und ihre Grenzen stehen in [DSP-BASELINE.md](../../../docs/DSP-BASELINE.md),
-die Wiederholungsanleitung bei den [Referenzprojekten](../../../examples/reference-v1/README.md).
+Die DSP-Baseline und ihre Grenzen stehen in [DSP-BASELINE.md](../../../docs/development/DSP-BASELINE.md),
+die Wiederholungsanleitung bei den [Referenzprojekten](../../../src/test/resources/reference-projects/README.md).
 Rohdaten und Messbedingungen: [reference-2026-09-18](reference-2026-09-18).
 `ReferenceHarness.hpp` gehört ausschließlich zum Offline-Test, nicht zum Audio-Callback.

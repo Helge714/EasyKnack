@@ -14,7 +14,7 @@ public final class NodeRegistry {
     public static synchronized void installPlugins(Collection<BasicNode> plugins) {
         var next = new LinkedHashMap<>(BUILTINS);
         for(var node:plugins) if(next.putIfAbsent(node.registration().id(),node)!=null)
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Duplicate plugin node: ")+node.registration().id());
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Duplicate plugin node: ")+node.registration().id());
         DEFINITIONS=Collections.unmodifiableMap(next);
     }
     /** Thread-confined execution contracts, invalidated whenever plugin definitions change. */
@@ -37,7 +37,7 @@ public final class NodeRegistry {
         Map<String, BasicNode> result = new LinkedHashMap<>();
         for (BasicNode node : GeneratedNodes.create()) {
             if (result.putIfAbsent(node.registration().id(), node) != null)
-                throw new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Duplicate node type: ") + node.registration().id());
+                throw new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Duplicate node type: ") + node.registration().id());
         }
         return Collections.unmodifiableMap(result);
     }
@@ -47,7 +47,7 @@ public final class NodeRegistry {
         return Optional.ofNullable(DEFINITIONS.get(variant < 0 ? typeId : typeId.substring(0, variant)));
     }
     public static BasicNode require(String typeId) {
-        return find(typeId).orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown audio node: ") + typeId));
+        return find(typeId).orElseThrow(() -> new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown audio node: ") + typeId));
     }
     public NodeRegistry(GLNodeTypeRegistry types, GLNodeCatalog catalog) {
         this.types = types;
@@ -121,7 +121,7 @@ public final class NodeRegistry {
                             for(var parent=control.component().getGLParent();parent!=null;parent=parent instanceof com.vingame.glswing.component.GLContainer container?container.getGLParent():null)
                                 if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(row.unitProperty().value(),GLNodeValue.of(unit.id()));break;}
                         });
-                        ((com.vingame.glswing.ui.GLSlider)control.component()).getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->{
+                        ((com.vingame.glswing.ui.GLSlider)control.component()).getContextMenu().addItem(com.vin.easyknack.i18n.AppText.literal("Reset to automatic"),e->{
                             for(var parent=control.component().getGLParent();parent!=null;parent=parent instanceof com.vingame.glswing.component.GLContainer container?container.getGLParent():null)
                                 if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(GLGraphNode.AUTOMATIC_PREFIX+row.id(),GLNodeValue.of(true));break;}
                         });

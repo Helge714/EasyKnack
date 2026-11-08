@@ -186,7 +186,7 @@ DSP-clock callback execution time, not whole-machine CPU use or driver-reported 
 Independent WASAPI callback work is not included. With WASAPI only, a silent
 miniaudio clock drives the graph; bounded adaptive SPSC stereo rings connect streams.
 With ASIO selected, one full-duplex driver callback clocks the graph directly.
-See [external routing](../../docs/external-audio-routing.md) for setup and limits.
+See [external routing](../../docs/development/features/external-audio-routing.md) for setup and limits.
 
 ## ASIO endpoints (protocol v6)
 
@@ -304,7 +304,7 @@ necessary. An attached analysis node is a graph consumer even without an Audio O
 The scope is an observer without an audio output. Autocorrelation uses an 8192-sample
 mean-removed window and zero-padded FFT autocorrelation. The shared history/analysis
 pipeline, worker latency and resource contracts are described in
-[the DSP foundation notes](../../docs/FOUNDATION-REFORM.md).
+[the DSP foundation notes](../../docs/development/FOUNDATION-REFORM.md).
 # Block Delay / Feedback
 
 `Effects > Block Delay` retains one prepared DSP block (currently 256 samples,
@@ -322,7 +322,7 @@ Live groups work; Bake/plugin export of groups containing Block Delay is current
 rejected explicitly until generated plans support the commit phase as well.
 Sample-by-sample feedback uses **Effects > Sample Delay** instead. Its one-sample
 delay and supported feedback islands are described in
-[Sample Feedback](../../docs/SAMPLE-FEEDBACK.md).
+[Sample Feedback](../../docs/development/features/SAMPLE-FEEDBACK.md).
 
 ## Manual parameter interpolation (protocol 13)
 

@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.document.KnackDocumentCodec;
 
 import com.vin.easyknack.audio.*;
 import com.vin.easyknack.nodes.*;

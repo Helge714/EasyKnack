@@ -11,7 +11,7 @@ public record AudioDiagnostics(long epoch,long blocks,double mean,double peak,do
             double[] n=new double[16];for(int i=0;i<n.length;i++){n[i]=Double.parseDouble(p[i+2]);if(!Double.isFinite(n[i])||n[i]<0)throw new IllegalArgumentException();}
             for(int i:new int[]{0,1,6,7,9,10,11,12,13,14,15})if(n[i]!=Math.rint(n[i])||n[i]>Long.MAX_VALUE)throw new IllegalArgumentException();
             return new AudioDiagnostics(Long.parseLong(p[2]),Long.parseLong(p[3]),n[2],n[3],n[4],n[5],Long.parseLong(p[8]),Long.parseLong(p[9]),n[8],Long.parseLong(p[11]),Long.parseLong(p[12]),Long.parseLong(p[13]),Long.parseLong(p[14]),Long.parseLong(p[15]),Long.parseLong(p[16]),Long.parseLong(p[17]),AudioEndpoint.unhex(p[18]),AudioEndpoint.unhex(p[19]));
-        }catch(RuntimeException e){throw new IOException(com.vin.easyknack.ui.AppText.literal("Invalid render diagnostics"),e);}
+        }catch(RuntimeException e){throw new IOException(com.vin.easyknack.i18n.AppText.literal("Invalid render diagnostics"),e);}
     }
     public double budgetUs(){return sampleRate>0?frames/sampleRate*1e6:0;}
     public String label(){return String.format(Locale.ROOT,"Render %.1f %% | Peak %.1f %% | Over budget %d",mean,peak,overBudget);}

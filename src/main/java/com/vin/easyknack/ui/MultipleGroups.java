@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.compiler.CompiledManualTargets;
 import java.util.*;
 import com.vin.easyknack.nodes.*;
 import com.vingame.glswing.node.binding.*;
@@ -66,9 +67,9 @@ final class MultipleGroups {
         var countPort=ports.stream().filter(MultipleGroups::countPort).findFirst().orElse(null);
         var inputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT&&!countPort(p)).toList();
         var outputs=ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).toList();
-        if(outputs.isEmpty()||ports.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.SPECTRUM.valueTypeId()).contains(p.publicPort().valueTypeId())&&!(p.publicPort().direction()==GLPortDirection.INPUT&&Set.of(SignalCategory.HISTORY.valueTypeId(),SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.VECTOR.valueTypeId()).contains(p.publicPort().valueTypeId()))))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("instance.boundaryLimits"));
+        if(outputs.isEmpty()||ports.stream().anyMatch(p->!Set.of(SignalCategory.AUDIO.valueTypeId(),SignalCategory.VALUE.valueTypeId(),SignalCategory.WAVETABLE.valueTypeId(),SignalCategory.SPECTRUM.valueTypeId()).contains(p.publicPort().valueTypeId())&&!(p.publicPort().direction()==GLPortDirection.INPUT&&Set.of(SignalCategory.HISTORY.valueTypeId(),SignalCategory.SPECTRUM.valueTypeId(),SignalCategory.VECTOR.valueTypeId()).contains(p.publicPort().valueTypeId()))))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.text("instance.boundaryLimits"));
         for(var p:ports){String id=p.publicPort().id();renamed.put(new GLNodeEndpoint(instance.id(),id),new GLNodeEndpoint(instance.id(),countPort(p)?"count":p.publicPort().direction()==GLPortDirection.INPUT?MultipleGraphNode.input(inputs.indexOf(p)).value():MultipleGraphNode.output(outputs.indexOf(p)).value()));}
-        int maximum=Integer.parseInt(new NodeState(asset.metadata()).text(MAXIMUM,"16"));if(maximum<1||maximum>256)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Maximum instances must be between 1 and 256"));
+        int maximum=Integer.parseInt(new NodeState(asset.metadata()).text(MAXIMUM,"16"));if(maximum<1||maximum>256)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Maximum instances must be between 1 and 256"));
         int count=(int)new NodeState(instance.properties()).number(countPort==null?COUNT_PROPERTY:GroupUnits.key(countPort.publicPort().id()),new NodeState(instance.properties()).number(COUNT_PROPERTY,8));
         checkNested(asset,registry,new HashSet<>());
         var graph=new GLNodeGraph();var inputIds=new ArrayList<GLNodeId>();var outputIds=new ArrayList<GLNodeId>();
@@ -94,9 +95,9 @@ final class MultipleGroups {
             nestedRegistry.registerAsset(candidate);
         }
         for(var descriptor:registry.composites())if(nestedRegistry.findComposite(descriptor.nodeTypeId()).isEmpty())nestedRegistry.registerComposite(descriptor);
-        var flat=SpectralGroups.flatten(new GroupCompiler.Prepared(root,nestedRegistry),limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid Multiple Group: ")+flat.diagnostics());
+        var flat=SpectralGroups.flatten(new GroupCompiler.Prepared(root,nestedRegistry),limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid Multiple Group: ")+flat.diagnostics());
         var source=flat.graph().orElseThrow();
-        for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported node inside Multiple Group: ")+n.typeId());
+        for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported node inside Multiple Group: ")+n.typeId());
         var contracts=NodeRegistry.executionContracts();var types=contracts.types();var definitions=contracts.definitions();
         source=com.vingame.glswing.node.execution.GLMutedGraphResolver.resolve(definitions.normalize(source),types);
         // An empty public boundary has no runtime consumer. Do not schedule orphaned
@@ -108,7 +109,7 @@ final class MultipleGroups {
         var needed=new HashSet<GLNodeId>();for(var output:outputIds)ancestors(output,source,Set.of(),needed);
         var combines=source.nodes().stream().filter(n->needed.contains(n.id())&&NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode).toList();
         var spectralOutputs=source.nodes().stream().filter(n->outputIds.contains(n.id())&&NodeRegistry.require(n.typeId()) instanceof MultipleSpectrumOutputNode).map(GLGraphNode::id).toList();
-        if(combines.isEmpty()&&new NodeState(asset.metadata()).number(EXECUTION,1)>=2&&source.connections().stream().anyMatch(w->outputIds.contains(w.input().nodeId())&&!spectralOutputs.contains(w.input().nodeId())))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Connect an Instance Combine to the group output before shared processing"));
+        if(combines.isEmpty()&&new NodeState(asset.metadata()).number(EXECUTION,1)>=2&&source.connections().stream().anyMatch(w->outputIds.contains(w.input().nodeId())&&!spectralOutputs.contains(w.input().nodeId())))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Connect an Instance Combine to the group output before shared processing"));
         var extraNodes=new ArrayList<GLGraphNode>();var extraWires=new ArrayList<GLGraphConnection>();
         String marker="MULT1";
         if(!combines.isEmpty()){
@@ -120,12 +121,12 @@ final class MultipleGroups {
             for(var output:outputIds)ancestors(output,source,boundaries,shared);
             shared.removeAll(boundaries);
             var overlap=new HashSet<>(shared);overlap.retainAll(perInstance);overlap.removeAll(inputIds);
-            if(!overlap.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance boundary crossed without Combine: connect per-instance signals through Instance Combine before shared processing"));
+            if(!overlap.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Instance boundary crossed without Combine: connect per-instance signals through Instance Combine before shared processing"));
             for(var n:source.nodes())if(shared.contains(n.id())&&NodeRegistry.require(n.typeId()) instanceof InstanceContextNode)
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Context cannot be used in the shared area after Combine"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Instance Context cannot be used in the shared area after Combine"));
             // A Combine feeding another Combine would require entering a new instance domain.
             for(var w:source.connections())if(boundaries.contains(w.output().nodeId())&&perInstance.contains(w.input().nodeId()))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Shared output cannot feed an instance input; use a separate Instance Group"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Shared output cannot feed an instance input; use a separate Instance Group"));
             var substitutions=new HashMap<GLNodeEndpoint,GLNodeEndpoint>();
             for(int i=0;i<combines.size();i++)substitutions.put(new GLNodeEndpoint(combines.get(i).id(),"out"),new GLNodeEndpoint(instance.id(),MultipleGraphNode.output(i).value()));
             // Boundary proxies fan out external inputs to both execution domains.
@@ -157,7 +158,7 @@ final class MultipleGroups {
             outputIds.clear();outputIds.addAll(combines.stream().map(GLGraphNode::id).toList());outputIds.addAll(spectralOutputs);
         }
         long expandedNodes=source.nodes().stream().mapToLong(n->1+(NodeRegistry.require(n.typeId()) instanceof MultipleGraphNode?(long)new NodeState(n.properties()).number("instanceNodeCost",0):0)).sum()*maximum;
-        if(expandedNodes>4096)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Instance Group exceeds 4096 node instances; reduce Maximum instances"));
+        if(expandedNodes>4096)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Instance Group exceeds 4096 node instances; reduce Maximum instances"));
         var ids=source.nodes().stream().map(GLGraphNode::id).toList();
         // Preserve adaptive output policies: external boundaries only acquire their
         // actual rate in the host, including when this group is inside a bake.

@@ -3,6 +3,18 @@
 
 ## Unreleased
 
+- Organize compiler, document, language and measurement code by responsibility.
+  Existing public application aliases, saved preferences, node IDs and document
+  formats remain compatible. GLSwing remains an external Maven dependency.
+- Use shared native build policy in developer, installer and plugin builds;
+  retain existing optimization choices. SDK forwarding headers preserve include
+  paths while implementations move into runtime/resource/DSP folders.
+- Reuse Core Markdown presentation for offline help. Move technical documentation,
+  historical benchmarks and deferred driver work to explicit locations.
+- Store local developer tools in `.local/tools` and new installer output in `dist`.
+  Existing installer and research material is retained. The current first
+  development version covers this cleanup; no host protocol or plugin ABI change.
+
 - Keep long arranged node chains approximately horizontal rather than accumulating
   port offsets. Theme clearances, feedback regions and Undo are preserved.
 - Add connectable Seed inputs to Bin Random and Partial Noise, including group and
@@ -443,7 +455,7 @@
   units use one grouped default-unit menu; the default unit cannot be disabled.
 
 - Copied group editors inherit their style, bounds and allowed units, while
-  exposing their source, coupling targets and permitted defaults. ìNo editorî removes an editor and releases
+  exposing their source, coupling targets and permitted defaults. ‚ÄúNo editor‚Äù removes an editor and releases
   its coupled internal controls without deleting the group port.
 
 - Quick-created group ports snap to the boundary preview and inherit semantic

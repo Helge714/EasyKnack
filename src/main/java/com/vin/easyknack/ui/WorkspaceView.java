@@ -56,7 +56,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     void closeAnalysis(){analysisFocus.clear();workspace.setVisible(true);requestGLFocus(workspace.editor());}
     com.vingame.glswing.node.GLNode activeNode(){return workspace.editor().getActiveNode();}
     private final GLMenuBar menuBar = new GLMenuBar();
-    private final GLLabel heading = new GLLabel(com.vin.easyknack.ui.AppText.literal("EASYKNACK  /  Audio Graph"));
+    private final GLLabel heading = new GLLabel(com.vin.easyknack.i18n.AppText.literal("EASYKNACK  /  Audio Graph"));
     private final com.vingame.glswing.ui.GLButton audioLoad = new com.vingame.glswing.ui.GLButton("DSP —");
     private final PluginActivity pluginActivity=new PluginActivity(()->resized(getWidth(),getHeight()));
     private final WorkspaceController controller = new WorkspaceController();
@@ -65,7 +65,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     private final DocumentActions documents;
     private final VolumeKeyOverlay volumeOverlay;
     private final GLLabel status = new GLLabel(
-            com.vin.easyknack.ui.AppText.literal("Audio gestoppt · Audio → Start · Parameter im Inspector bearbeiten"));
+            com.vin.easyknack.i18n.AppText.literal("Audio gestoppt · Audio → Start · Parameter im Inspector bearbeiten"));
 
     public WorkspaceView(JFrame window) {
         setName("EasyKnack Workspace");
@@ -77,7 +77,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         controller.setVolumeKeyListener(volumeOverlay::show);
         controller.setDiagnosticsListener(diagnostics::accept);
         audioLoad.setGLStyle(audioLoad.getGLStyle().withBackground(ApplicationTheme.current().theme().menuBarStyle().background()).withBorder(0,new java.awt.Color(0,0,0,0)));
-        audioLoad.setToolTipText(com.vin.easyknack.ui.AppText.literal("Open render diagnostics"));
+        audioLoad.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Open render diagnostics"));
         audioLoad.addActionListener(e->toggleDiagnostics());
         documents = new DocumentActions(controller, this, window,pluginActivity::setPhase);
         var editor = workspace.editor();
@@ -95,9 +95,9 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         file.addItem(AppText.text("image.export"),event->GraphImageExport.show(controller,this));
         file.addItem(AppText.text("group.import"),event->documents.importGroups());
         file.addSeparator();
-        file.addItem(com.vin.easyknack.ui.AppText.literal("Beenden"), event -> window.dispatchEvent(
+        file.addItem(com.vin.easyknack.i18n.AppText.literal("Beenden"), event -> window.dispatchEvent(
                 new WindowEvent(window, WindowEvent.WINDOW_CLOSING))).setAcceleratorText("Alt+F4");
-        menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Datei"), file);
+        menuBar.addMenu(com.vin.easyknack.i18n.AppText.literal("Datei"), file);
 
         GLPopupMenu edit = new GLPopupMenu();
         edit.addItem(AppText.text("undo"), event -> controller.history().undo()).setAcceleratorText(shortcut("history.undo"));
@@ -113,8 +113,8 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
             if(controller.actions().canExclude()) controller.actions().exclude();
         }).setAcceleratorText(shortcut("node.exclude-selection"));
         edit.addItem(AppText.text("selectAll"), event -> editor.setSelectedNodes(editor.getNodes())).setAcceleratorText(shortcut("node.select-all"));
-        edit.addItem(com.vin.easyknack.ui.AppText.literal("Auswahl aufheben"), event -> editor.clearSelection());
-        menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Bearbeiten"), edit);
+        edit.addItem(com.vin.easyknack.i18n.AppText.literal("Auswahl aufheben"), event -> editor.clearSelection());
+        menuBar.addMenu(com.vin.easyknack.i18n.AppText.literal("Bearbeiten"), edit);
 
         GLPopupMenu nodes = new GLPopupMenu();
         nodes.addItem(AppText.text("addNode"), event -> controller.showNodeCatalog()).setAcceleratorText(shortcut("node.create"));
@@ -132,18 +132,18 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         nodes.addItem(AppText.text("group.open"), event -> {
             if (controller.actions().canOpenSelectedComposite()) controller.actions().openSelectedComposite();
         }).setAcceleratorText(shortcut("node.open-composite"));
-        nodes.addItem(com.vin.easyknack.ui.AppText.literal("Export group as plugin …"), event -> documents.exportGroup());
-        menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Nodes"), nodes);
+        nodes.addItem(com.vin.easyknack.i18n.AppText.literal("Export group as plugin …"), event -> documents.exportGroup());
+        menuBar.addMenu(com.vin.easyknack.i18n.AppText.literal("Nodes"), nodes);
         GLPopupMenu plugins=new GLPopupMenu();
-        plugins.addItem(com.vin.easyknack.ui.AppText.literal("Install source plugin …"),event->documents.importPlugin());
-        plugins.addItem(com.vin.easyknack.ui.AppText.literal("Rebuild plugins"),event->documents.rebuildPlugins());
-        plugins.addItem(com.vin.easyknack.ui.AppText.literal("Open plugin sources"),event->documents.openPluginSources());
-        plugins.addItem(com.vin.easyknack.ui.AppText.literal("Configure C++ compiler …"),event->documents.configurePluginCompiler());
-        menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Plugins"),plugins);
+        plugins.addItem(com.vin.easyknack.i18n.AppText.literal("Install source plugin …"),event->documents.importPlugin());
+        plugins.addItem(com.vin.easyknack.i18n.AppText.literal("Rebuild plugins"),event->documents.rebuildPlugins());
+        plugins.addItem(com.vin.easyknack.i18n.AppText.literal("Open plugin sources"),event->documents.openPluginSources());
+        plugins.addItem(com.vin.easyknack.i18n.AppText.literal("Configure C++ compiler …"),event->documents.configurePluginCompiler());
+        menuBar.addMenu(com.vin.easyknack.i18n.AppText.literal("Plugins"),plugins);
 
         GLPopupMenu audio = new GLPopupMenu();
-        var startAudio=audio.addItem(com.vin.easyknack.ui.AppText.literal("Start"), event -> controller.startAudio());
-        var stopAudio=audio.addItem(com.vin.easyknack.ui.AppText.literal("Stop"), event -> controller.stopAudio());
+        var startAudio=audio.addItem(com.vin.easyknack.i18n.AppText.literal("Start"), event -> controller.startAudio());
+        var stopAudio=audio.addItem(com.vin.easyknack.i18n.AppText.literal("Stop"), event -> controller.stopAudio());
         startAudio.setAcceleratorText("Ctrl+Enter");
         stopAudio.setAcceleratorText("Ctrl+Shift+Enter");
         stopAudio.setEnabled(false);
@@ -154,20 +154,20 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
                     || state==com.vin.easyknack.audio.AudioHostService.State.RUNNING
                     || state==com.vin.easyknack.audio.AudioHostService.State.PAUSED);
         });
-        audio.addItem(com.vin.easyknack.ui.AppText.literal("Geräte und Anwendungen aktualisieren"), event -> controller.refreshAudioEndpoints());
+        audio.addItem(com.vin.easyknack.i18n.AppText.literal("Geräte und Anwendungen aktualisieren"), event -> controller.refreshAudioEndpoints());
         audio.addItem(AudioDiagnosticsPanel.text("title","Render diagnostics"),event->toggleDiagnostics());
-        menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Audio"), audio);
+        menuBar.addMenu(com.vin.easyknack.i18n.AppText.literal("Audio"), audio);
 
         GLPopupMenu view = new GLPopupMenu();
-        view.addItem(com.vin.easyknack.ui.AppText.literal("Vergrößern"), event -> editor.zoomBy(1.2f)).setAcceleratorText("Ctrl++");
-        view.addItem(com.vin.easyknack.ui.AppText.literal("Verkleinern"), event -> editor.zoomBy(1 / 1.2f)).setAcceleratorText("Ctrl+-");
-        view.addItem(com.vin.easyknack.ui.AppText.literal("Ansicht zurücksetzen"), event -> editor.resetView()).setAcceleratorText("Ctrl+0");
+        view.addItem(com.vin.easyknack.i18n.AppText.literal("Vergrößern"), event -> editor.zoomBy(1.2f)).setAcceleratorText("Ctrl++");
+        view.addItem(com.vin.easyknack.i18n.AppText.literal("Verkleinern"), event -> editor.zoomBy(1 / 1.2f)).setAcceleratorText("Ctrl+-");
+        view.addItem(com.vin.easyknack.i18n.AppText.literal("Ansicht zurücksetzen"), event -> editor.resetView()).setAcceleratorText("Ctrl+0");
         view.addItem(AppText.text("view.fitAll"), event -> editor.fitAllNodes()).setAcceleratorText("Ctrl+Shift+C");
         view.addItem(AppText.text("inspector"), event -> workspace.setInspectorVisible(!workspace.isInspectorVisible())).setAcceleratorText(shortcut("N"));
         view.addSeparator();
-        view.addItem(com.vin.easyknack.ui.AppText.literal("Zurück"), event -> {if(analysisFocus.isVisible())closeAnalysis();else workspace.navigateBack();}).setAcceleratorText("Alt+Left");
-        view.addItem(com.vin.easyknack.ui.AppText.literal("Vorwärts"), event -> workspace.navigateForward()).setAcceleratorText("Alt+Right");
-        menuBar.addMenu(com.vin.easyknack.ui.AppText.literal("Ansicht"), view);
+        view.addItem(com.vin.easyknack.i18n.AppText.literal("Zurück"), event -> {if(analysisFocus.isVisible())closeAnalysis();else workspace.navigateBack();}).setAcceleratorText("Alt+Left");
+        view.addItem(com.vin.easyknack.i18n.AppText.literal("Vorwärts"), event -> workspace.navigateForward()).setAcceleratorText("Alt+Right");
+        menuBar.addMenu(com.vin.easyknack.i18n.AppText.literal("Ansicht"), view);
 
         var settings=new GLPopupMenu();settings.addItem(AppText.text("settings.preferences"),e->SettingsDialog.show(this));settings.addItem(AppText.text("document.settings"),e->DocumentSettings.show(this,controller));menuBar.addMenu(AppText.text("settings"),settings);
         menuBar.addMenu(AppText.text("help"), HelpMenu.create(this));

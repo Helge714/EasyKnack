@@ -15,17 +15,17 @@ public record NodeState(Map<String, GLNodeValue> values, Set<PropertyId> connect
     public double number(String key, double fallback) {
         Object value = values.getOrDefault(key, GLNodeValue.of(fallback)).toJavaValue();
         if (!(value instanceof Number n) || !Double.isFinite(n.doubleValue()))
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid numeric parameter: ") + key);
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid numeric parameter: ") + key);
         return n.doubleValue();
     }
     public String text(String key, String fallback) {
         Object value = values.getOrDefault(key, GLNodeValue.of(fallback)).toJavaValue();
-        if (!(value instanceof String text)) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid text parameter: ") + key);
+        if (!(value instanceof String text)) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid text parameter: ") + key);
         return text;
     }
     public boolean flag(String key, boolean fallback) {
         Object value = values.getOrDefault(key, GLNodeValue.of(fallback)).toJavaValue();
-        if (!(value instanceof Boolean flag)) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid flag: ") + key);
+        if (!(value instanceof Boolean flag)) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid flag: ") + key);
         return flag;
     }
 }

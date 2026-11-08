@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-import com.vin.easyknack.ui.MeasurementTable;
+import com.vin.easyknack.analysis.MeasurementTable;
 import com.vin.easyknack.ui.MeasurementRecorderPanel;
 import com.vingame.glswing.node.model.GLNodeValue;
 

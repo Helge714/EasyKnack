@@ -5,7 +5,7 @@ public record PropertyId(String value) {
     private static final java.util.regex.Pattern VALID=java.util.regex.Pattern.compile("[A-Za-z0-9][A-Za-z0-9._-]*");
     public PropertyId {
         if (value == null || !VALID.matcher(value).matches())
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid property ID: ") + value);
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid property ID: ") + value);
     }
 }
 

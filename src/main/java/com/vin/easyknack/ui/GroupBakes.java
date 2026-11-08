@@ -144,7 +144,7 @@ final class GroupBakes implements AutoCloseable {
         try {
             for(var asset:NodeDocuments.assets(doc))if(asset.compositeDescriptor()!=null)
                 if(asset.compositeDescriptor().propertyMappings().stream().anyMatch(p->p.internalNodeId().equals(id)))
-                    throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("This instance has properties controlled by its parent group. Bake the parent group instead."));
+                    throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("This instance has properties controlled by its parent group. Bake the parent group instead."));
             var currentKey=key(doc,id);
             if(!force){var shared=entries.values().stream().filter(e->e!=entry&&e.enabled&&Objects.equals(e.key,currentKey)).findFirst().orElse(null);
                 if(shared!=null){entry.key=currentKey;entry.source=shared.source;entry.definition=shared.definition;entry.enabled=true;entry.wanted=true;entry.status=shared.status;refresh();changed.run();return;}
@@ -175,7 +175,7 @@ final class GroupBakes implements AutoCloseable {
                         var definitions=new HashMap<GLNodeId,BasicNode>();
                         requested.forEach((key,e)->definitions.put(key,build.definitions().stream()
                             .filter(d->d.processor().id().equals(e.source.definition().processor().id()))
-                            .findFirst().orElseThrow(()->new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Compiled group definition missing")))));
+                            .findFirst().orElseThrow(()->new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Compiled group definition missing")))));
                         NodeRegistry.installPlugins(build.definitions());host=build.host();
                         requested.forEach((key,e)->{
                             var target=entries.get(key);target.source=e.source;target.definition=definitions.get(key);target.enabled=true;target.status=build.cached()?"Baked (cached)":"Baked";
@@ -206,7 +206,7 @@ final class GroupBakes implements AutoCloseable {
             var descriptor=NodeDocuments.assets(source).stream().map(GLNodeGraphAsset::compositeDescriptor).filter(Objects::nonNull).filter(d->d.nodeTypeId().equals(n.typeId())).findFirst().orElseThrow();
             var ports=descriptor.portMappings().stream().filter(p->!GroupInputs.editorOnly(p)&&(p.publicPort().direction()==GLPortDirection.INPUT)==input).toList();
             for(int i=0;i<ports.size();i++)if(ports.get(i).publicPort().id().equals(old.portId()))return new GLNodeEndpoint(old.nodeId(),(input?"input_":"output_")+i);
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Baked group port changed"));
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Baked group port changed"));
         };
         var graph=asset.graph();var nodes=graph.nodes().stream().map(n->{var e=replacements.get(n.id());return e==null?n:replacement(n,e);}).toList();
         var wires=graph.connections().stream().map(c->new GLGraphConnection(c.id(),endpoint.apply(c.output(),false),endpoint.apply(c.input(),true))).toList();
@@ -239,10 +239,10 @@ final class GroupBakes implements AutoCloseable {
     private void refresh(){panels.removeIf(ref->ref.get()==null);for(var ref:panels){var panel=ref.get();if(panel!=null)panel.refresh();}}
     @Override public void close(){closed=true;restoreTimer.stop();generation++;worker.shutdownNow();panels.clear();}
     final class Panel extends GLContainer {
-        final GLNodeId id;final GLLabel status=new GLLabel(com.vin.easyknack.ui.AppText.literal("Not baked"));final GLButton bake=new GLButton(com.vin.easyknack.ui.AppText.literal("Bake")),disable=new GLButton(com.vin.easyknack.ui.AppText.literal("Disable bake")),force=new GLButton(com.vin.easyknack.ui.AppText.literal("Force rebuild"));
+        final GLNodeId id;final GLLabel status=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Not baked"));final GLButton bake=new GLButton(com.vin.easyknack.i18n.AppText.literal("Bake")),disable=new GLButton(com.vin.easyknack.i18n.AppText.literal("Disable bake")),force=new GLButton(com.vin.easyknack.i18n.AppText.literal("Force rebuild"));
         Panel(GLNodeId id){this.id=id;addGL(status);addGL(bake);addGL(disable);addGL(force);setPreferredGLSize(220,100);panels.add(new WeakReference<>(this));
             bake.addActionListener(e->GroupBakes.this.bake(id));disable.addActionListener(e->GroupBakes.this.disable(id));force.addActionListener(e->GroupBakes.this.bake(id,true));refresh();}
-        void refresh(){status.setText(GroupBakes.this.status(id));bake.setToolTipText(com.vin.easyknack.ui.AppText.literal("Compile this editable group. Switching hosts briefly interrupts audio. ")+GroupBakes.this.status(id)+(host==null?"":"\nAudio host: "+host));bake.setEnabled(!busy&&!closed&&!enabled(id));disable.setEnabled(!busy&&enabled(id));force.setEnabled(!busy&&!closed);force.setToolTipText(com.vin.easyknack.ui.AppText.literal("Regenerate and compile this group without reusing a cached build. Switching hosts briefly interrupts audio."));}
+        void refresh(){status.setText(GroupBakes.this.status(id));bake.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Compile this editable group. Switching hosts briefly interrupts audio. ")+GroupBakes.this.status(id)+(host==null?"":"\nAudio host: "+host));bake.setEnabled(!busy&&!closed&&!enabled(id));disable.setEnabled(!busy&&enabled(id));force.setEnabled(!busy&&!closed);force.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Regenerate and compile this group without reusing a cached build. Switching hosts briefly interrupts audio."));}
         @Override protected void record(com.vingame.glswing.rendering.GLContext2D context){}
         @Override protected void resized(float w,float h){status.setBounds(0,0,w,26);bake.setBounds(0,30,w*.48f,28);disable.setBounds(w*.5f,30,w*.5f,28);force.setBounds(0,62,w,28);}
     }

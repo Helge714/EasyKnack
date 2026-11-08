@@ -9,9 +9,9 @@ public final class TriggerDelayNode extends BasicNode {
         n.addOutput(OUT,"Trigger").previousStep().rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
         n.addInput(IN,"Trigger",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
         n.addInput(TIME,"Time",Editor.Slider.button(.25,1.0/com.vin.easyknack.audio.AudioProcessing.SAMPLE_RATE,10.0).formats(UnitFormats.TIME_SECONDS)).rate(ProcessingRate.CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggerdelay.time.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggerdelay.time.tooltip"));
         n.addInput(RESET,"Reset",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggerdelay.reset.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggerdelay.reset.tooltip"));
     }
     public NativeProcessor processor(){return new NativeProcessor("triggerdelay","nodes/TriggerDelayNode.hpp",
         ParameterContract.builder().source(IN).source(TIME).value(TIME).source(RESET).build());}

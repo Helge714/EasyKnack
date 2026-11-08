@@ -107,7 +107,7 @@ final class GroupCompiler {
                 var adapterEndpoints=new ArrayList<GLNodeEndpoint>();
                 for(var endpoint:p.internalEndpoints()) {
                 var target=GroupInputSettings.checkbox(p)?UnitFormat.FACTOR:GroupUnits.targetOrBase(original,d,p.withEndpoints(List.of(endpoint)),base);
-                if(!base.compatible(target))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Group input units do not match the internal input: ")+p.publicPort().id());
+                if(!base.compatible(target))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Group input units do not match the internal input: ")+p.publicPort().id());
                 var id=new GLNodeId(UUID.nameUUIDFromBytes((asset.id()+"/unit/"+p.publicPort().id()+"/"+endpoint).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
                 var def=new UnitConverterNode();var values=new HashMap<>(def.defaults());
                 values.put("from",GLNodeValue.of(base.id()));values.put("to",GLNodeValue.of(target.id()));values.put("value",GLNodeValue.of(fallback));values.put("rate",GLNodeValue.of(new NodeState(p.presentation().editorOptions()).text(GroupInputSettings.RATE,"auto")));

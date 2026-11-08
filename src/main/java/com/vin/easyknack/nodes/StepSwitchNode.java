@@ -42,10 +42,10 @@ public final class StepSwitchNode extends BasicNode {
         var output=n.addOutput(OUT,"Value").dataType(type.dataType).signal(type.signal);
         if(!numeric)output.textKey("stepswitch.selected");
         if(numeric||type==Type.VECTOR)output.rates(PortRates.AUDIO_CONTROL);else output.rate(ProcessingRate.CONTROL);
-        var indexOutput=n.addOutput(INDEX,"Index").signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.text("stepswitch.index.help"));
+        var indexOutput=n.addOutput(INDEX,"Index").signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.i18n.AppText.text("stepswitch.index.help"));
         if(numeric)indexOutput.rates(PortRates.AUDIO_CONTROL);else indexOutput.rate(ProcessingRate.CONTROL);
         n.addEditor(TYPE,"Data type",Editor.comboBox(List.of(Type.values()),Type.VALUE,Type::id)).inspectorOnly()
-            .tooltip(com.vin.easyknack.ui.AppText.text("stepswitch.resource.help"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("stepswitch.resource.help"));
         n.addEditor(STEPS,"Steps",Editor.Slider.button(4,1.,(double)MAX_STEPS).integers().discrete()).editorCopyable(false).keepVisibleOnHide()
             .tooltip("Number of inputs, 1–32. Removing the active step returns to the first input. Undo restores removed connections.");
         n.addEditor(MODE,"Selection",Editor.comboBox(List.of(Mode.values()),Mode.TRIGGER,Mode::id)).inspectorOnly();
@@ -62,7 +62,7 @@ public final class StepSwitchNode extends BasicNode {
         }
         for(int i=0;i<count(s);i++)n.addEditor(name(i),NodeText.text("easyknack.routing.stepswitch.stepName","Step name")+" "+(i+1),new Editor.Text("")).inspectorOnly().inspectorVisible(false);
         n.addEditor(ORDER,NodeText.text("stepswitch.order","Input order"),new StepOrderEditor(s)).inspectorOnly().editorCopyable(false);
-        if(numeric||type==Type.VECTOR)ProcessingRate.addEditor(n,RATE).tooltip(numeric?"Auto uses AudioRate when a trigger or audio input is connected, otherwise ControlRate. ControlRate samples at block start and defers later triggers to the next block. Audio switching is immediate and can click.":com.vin.easyknack.ui.AppText.text("stepswitch.resource.help"));
+        if(numeric||type==Type.VECTOR)ProcessingRate.addEditor(n,RATE).tooltip(numeric?"Auto uses AudioRate when a trigger or audio input is connected, otherwise ControlRate. ControlRate samples at block start and defers later triggers to the next block. Audio switching is immediate and can click.":com.vin.easyknack.i18n.AppText.text("stepswitch.resource.help"));
     }
     @Override public Map<String,GLNodeValue> defaults(){
         var values=new HashMap<>(super.defaults());for(int i=0;i<MAX_STEPS;i++)values.putIfAbsent(input(i).value(),GLNodeValue.of(0.));values.put(NEXT.value(),GLNodeValue.of(0.));values.put(SELECTION.value(),selection(0,0));return Map.copyOf(values);

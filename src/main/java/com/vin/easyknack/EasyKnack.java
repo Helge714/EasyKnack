@@ -21,38 +21,38 @@ public final class EasyKnack {
         }
         Runtime.getRuntime().addShutdownHook(new Thread(launches::close, "EasyKnack instance cleanup"));
         GLApplication.builder()
-                .locale(com.vin.easyknack.ui.ApplicationSettings.locale())
-                .title(com.vin.easyknack.ui.AppText.literal("EasyKnack — Audio Workspace"))
+                .locale(com.vin.easyknack.app.ApplicationSettings.locale())
+                .title(com.vin.easyknack.i18n.AppText.literal("EasyKnack — Audio Workspace"))
                 .backend(GLBackend.CANVAS)
                 .splash(splash -> splash.size(560, 392).padding(40))
                 .splashView(ApplicationArtwork::splash)
                 .size(1280, 800)
                 .minimumSize(900, 600)
                 .prepare(plan -> plan
-                        .background(com.vin.easyknack.ui.AppText.literal("Loading EasyKnack theme"), task -> {
+                        .background(com.vin.easyknack.i18n.AppText.literal("Loading EasyKnack theme"), task -> {
                             ApplicationTheme.current();
                             return null;
                         })
-                        .background(com.vin.easyknack.ui.AppText.literal("Preparing audio plugins"), task -> {
+                        .background(com.vin.easyknack.i18n.AppText.literal("Preparing audio plugins"), task -> {
                             var plugins=com.vin.easyknack.plugins.PluginManager.current();
                             var build=plugins.startup(task::detail);
                             if(build!=null)plugins.activate(build);
                             return null;
                         })
-                        .background(com.vin.easyknack.ui.AppText.literal("Preparing examples"), task -> {com.vin.easyknack.ui.ExampleLibrary.initialize();return null;})
-                        .background(com.vin.easyknack.ui.AppText.text("startup.documentation"), task -> {
+                        .background(com.vin.easyknack.i18n.AppText.literal("Preparing examples"), task -> {com.vin.easyknack.ui.ExampleLibrary.initialize();return null;})
+                        .background(com.vin.easyknack.i18n.AppText.text("startup.documentation"), task -> {
                             com.vin.easyknack.ui.DocumentationPreparation.prepare(task::detail,task::progress);
                             return null;
                         })
-                        .awt(com.vin.easyknack.ui.AppText.text("startup.formulaEditor"), task -> {
+                        .awt(com.vin.easyknack.i18n.AppText.text("startup.formulaEditor"), task -> {
                             com.vin.easyknack.ui.FormulaEditorPreparation.prepare();
                             return null;
                         })
-                        .gl(com.vin.easyknack.ui.AppText.text("startup.formulaFont"), task -> {
+                        .gl(com.vin.easyknack.i18n.AppText.text("startup.formulaFont"), task -> {
                             com.vin.easyknack.ui.FormulaEditorPreparation.prepareFont(task.requireGL());
                             return null;
                         })
-                        .gl(com.vin.easyknack.ui.AppText.text("startup.documentationFonts"), task -> {
+                        .gl(com.vin.easyknack.i18n.AppText.text("startup.documentationFonts"), task -> {
                             com.vin.easyknack.ui.DocumentationPreparation.prepareFonts(task.requireGL(),task::progress);
                             return null;
                         }))

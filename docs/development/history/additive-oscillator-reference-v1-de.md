@@ -149,7 +149,7 @@ ganze Grundton-Umdrehung nicht zwangsläufig dieselbe Phase für alle Teiltöne.
 
 Weiterführende Seiten sind derzeit auf Englisch verfügbar:
 
-- [Eigene Wellenformen und Wavetable-Ressourcen](../../WAVEFORMS.md)
-- [Phasen-Reset von Oszillatoren](../../OSCILLATOR-RESET.md)
-- [Einheiten und Interpretation verbundener Werte](../../PORT-UNITS.md)
-- [Sampleweises Feedback](../../SAMPLE-FEEDBACK.md)
+- [Eigene Wellenformen und Wavetable-Ressourcen](../features/WAVEFORMS.md)
+- [Phasen-Reset von Oszillatoren](../features/OSCILLATOR-RESET.md)
+- [Einheiten und Interpretation verbundener Werte](../features/PORT-UNITS.md)
+- [Sampleweises Feedback](../features/SAMPLE-FEEDBACK.md)

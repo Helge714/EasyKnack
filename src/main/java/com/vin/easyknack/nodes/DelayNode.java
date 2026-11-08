@@ -15,7 +15,7 @@ public final class DelayNode extends BasicNode {
 		node.addInput(IN, "In", Editor.Slider.button(0.0)).rate(ProcessingRate.AUDIO)
 				.signal(SignalCategory.AUDIO);
 		node.addInput(TIME, "Time", Editor.Slider.button(0.25, 0.0, 10.0).formats(UnitFormats.TIME_SECONDS)).rate(ProcessingRate.CONTROL)
-				.signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.literal("Delay time, sampled once per block. Feedback uses at least one sample and automatically selects the processing step. Time modulation must originate outside the feedback loop."));
+				.signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.i18n.AppText.literal("Delay time, sampled once per block. Feedback uses at least one sample and automatically selects the processing step. Time modulation must originate outside the feedback loop."));
 	}
 
 	@Override

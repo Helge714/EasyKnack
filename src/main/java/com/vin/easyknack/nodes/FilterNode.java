@@ -16,9 +16,9 @@ public final class FilterNode extends BasicNode {
         n.addOutput(OUT,"Audio Out");
         n.addEditor(MODE,"Mode",Editor.comboBox(List.of(Mode.values()),Mode.LOWPASS,Mode::id)).keepVisibleOnHide();
         n.addEditor(ORDER,"Order",Editor.comboBox(List.of("2","4","6","8"),"2",v->v))
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Higher orders give steeper slopes using cascaded second-order sections. Resonance is distributed across the sections. Order 2 preserves the original filter."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Higher orders give steeper slopes using cascaded second-order sections. Resonance is distributed across the sections. Order 2 preserves the original filter."));
         n.addEditor(COMPENSATE,"Level compensation",Editor.checkBox(false))
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Matches smoothed output RMS to input RMS with gain limited to 0.25-4. Not loudness normalization or a limiter; cannot restore removed frequencies. Adds no latency."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Matches smoothed output RMS to input RMS with gain limited to 0.25-4. Not loudness normalization or a limiter; cannot restore removed frequencies. Adds no latency."));
         n.addInput(IN,"Audio In");
         n.addInput(CUTOFF,"Cutoff",Editor.Slider.button(1000,5.0,20000.0).step(1).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE);
         n.addInput(Q,"Resonance",Editor.Slider.bar(.707,.1,30).unit(UnitFormat.Q)).signal(SignalCategory.VALUE);

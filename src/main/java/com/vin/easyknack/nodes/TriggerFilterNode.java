@@ -9,7 +9,7 @@ public final class TriggerFilterNode extends BasicNode {
         n.addOutput(OUT,"Trigger").rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
         n.addInput(IN,"Trigger",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
         n.addInput(CONDITION,"Condition",Editor.Slider.bar(1,0,1)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggerfilter.condition.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggerfilter.condition.tooltip"));
     }
     public NativeProcessor processor(){return new NativeProcessor("triggerfilter","nodes/TriggerFilterNode.hpp",
         ParameterContract.builder().source(IN).source(CONDITION).value(CONDITION).build());}

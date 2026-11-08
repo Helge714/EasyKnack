@@ -8,6 +8,11 @@ import org.junit.jupiter.api.io.TempDir;
 class PluginSdkTest {
     @TempDir Path directory;
 
+    @Test void checkoutCompilerDiscoveryUsesDurableTools() {
+        Path checkout = Path.of("").toAbsolutePath();
+        assertTrue(com.vin.easyknack.InstallationPaths.compilerRoots().contains(checkout.resolve(".local/tools")));
+    }
+
     @Test void developmentSdkMatchesPackagedSources() throws Exception {
         var source = PluginSdk.developmentSource(Path.of("target/classes"));
         assertNotNull(source);
@@ -16,6 +21,11 @@ class PluginSdkTest {
         assertArrayEquals(Files.readAllBytes(zip), PluginSdk.bytes());
         PluginSdk.unpack(new java.io.ByteArrayInputStream(PluginSdk.bytes()), directory.resolve("unpacked"));
         assertTrue(Files.isRegularFile(directory.resolve("unpacked/src/NodeProcessor.hpp")));
+        var build = new NativeBuildSettings(directory.resolve("unpacked"));
+        assertEquals(java.util.List.of("-std=c++17", "-O3", "-ffp-contract=off"), build.compile());
+        assertTrue(build.libraries().contains("-lws2_32"));
+        assertTrue(Files.isRegularFile(directory.resolve("unpacked/src/runtime/GraphNode.hpp")));
+        assertTrue(Files.readString(directory.resolve("unpacked/src/GraphRuntime.hpp")).contains("runtime/GraphRuntime.hpp"));
         assertTrue(Files.readString(directory.resolve("unpacked/LICENSE")).contains("GNU GENERAL PUBLIC LICENSE"));
         assertTrue(Files.readString(directory.resolve("unpacked/LICENSING.md")).contains("GPL-3.0-only"));
     }

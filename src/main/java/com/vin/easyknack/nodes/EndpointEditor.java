@@ -11,7 +11,7 @@ public record EndpointEditor(AudioEndpoint fallback) implements Editor {
     @Override public GLNodeValue defaultValue() { return GLNodeValue.of(fallback.reference()); }
     @Override public void validate(GLNodeValue value) {
         if (!(value instanceof GLNodeValue.TextValue text) || AudioEndpoint.reference(text.value()).input() != fallback.input())
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Wrong endpoint direction"));
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Wrong endpoint direction"));
     }
     @Override public String viewKey() { return "endpoint:" + fallback.input(); }
     @Override public Control create(String label, Consumer<GLNodeValue> changed) {

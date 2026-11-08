@@ -7,7 +7,7 @@
     <booleanAttribute key="M2_OFFLINE" value="false"/>
     <stringAttribute key="M2_PROFILES" value="native-audio"/>
     <listAttribute key="M2_PROPERTIES">
-        <listEntry value="audio.cxx=${workspace_loc:/easy-knack}/target/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe"/>
+        <listEntry value="audio.cxx=${workspace_loc:/easy-knack}/.local/tools/llvm-mingw-20250305-ucrt-x86_64/bin/clang++.exe"/>
     </listAttribute>
     <stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
     <booleanAttribute key="M2_SKIP_TESTS" value="false"/>

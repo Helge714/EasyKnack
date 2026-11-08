@@ -92,7 +92,7 @@ final class CompositePortColors implements GLNodeEditorListener {
                         .findFirst().orElse(SignalCategory.AUDIO);
                 port.setColor(ApplicationTheme.current().signal(category));
                 port.setConnectionDashed(com.vin.easyknack.nodes.PortDataType.isReference(category.valueTypeId()));
-                if(category==SignalCategory.MIDI){port.setShape(GLNodePort.Shape.DOUBLE_DIAMOND);port.setToolTipText(com.vin.easyknack.ui.AppText.literal("MIDI events with sample positions."));}
+                if(category==SignalCategory.MIDI){port.setShape(GLNodePort.Shape.DOUBLE_DIAMOND);port.setToolTipText(com.vin.easyknack.i18n.AppText.literal("MIDI events with sample positions."));}
             }
         }
     }

@@ -6,7 +6,7 @@ public final class TriggerPulseNode extends BasicNode {
     public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Pulse").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO);
         n.addInput(IN,"Trigger").dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggerpulse.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggerpulse.tooltip"));
     }
     public NativeProcessor processor(){return new NativeProcessor("triggerpulse","nodes/TriggerPulseNode.hpp",ParameterContract.builder().source(IN).build());}
 }

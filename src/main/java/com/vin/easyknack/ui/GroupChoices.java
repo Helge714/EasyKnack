@@ -41,7 +41,7 @@ final class GroupChoices {
     record Candidate(GLNodeId node,String property,String label,Editor.ComboBox<Option> editor){public String toString(){return label;}}
     static <T> Editor.ComboBox<Option> copy(Editor.ComboBox<T> source,GLNodeValue initial){
         var options=source.items().stream().map(v->new Option(source.id().apply(v),v.toString())).toList();
-        var selected=options.stream().filter(v->v.id().equals(initial.toJavaValue())).findFirst().orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown group choice: ")+initial));
+        var selected=options.stream().filter(v->v.id().equals(initial.toJavaValue())).findFirst().orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown group choice: ")+initial));
         return Editor.comboBox(options,selected,Option::id);
     }
     static List<Choice> choices(GLNodeGraphAsset asset,GLCompositeGraphRegistry registry){
@@ -62,7 +62,7 @@ final class GroupChoices {
         }return result;
     }
     static GLNodeGraphAsset store(GLNodeGraphAsset asset,Choice choice,List<GLCompositePropertyMapping> bindings){
-        if(choice.editor.items().isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A combobox needs at least one entry"));
+        if(choice.editor.items().isEmpty())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("A combobox needs at least one entry"));
         var metadata=new HashMap<>(asset.metadata());metadata.put(META+choice.id(),GLNodeValue.of(Map.of("label",choice.label(),"entries",choice.editor.items().stream().map(o->Map.of("id",o.id(),"label",o.label())).toList())));
         var d=asset.compositeDescriptor();var properties=new ArrayList<>(d.properties());int position=java.util.stream.IntStream.range(0,properties.size()).filter(i->properties.get(i).id().equals(choice.id())).findFirst().orElse(properties.size());properties.removeIf(p->p.id().equals(choice.id()));
         properties.add(position,new GLCompositePropertyDescriptor(choice.id(),"text",GLCompositeValueKind.TEXT,choice.editor.defaultValue()));
@@ -122,7 +122,7 @@ final class GroupChoices {
         }return result;
     }
     private static Editor.ComboBox<Option> resolve(GLNodeGraphAsset asset,String property,GLCompositeGraphRegistry registry,Set<String> visited){
-        if(!visited.add(asset.id()+"/"+property))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Recursive group choice"));
+        if(!visited.add(asset.id()+"/"+property))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Recursive group choice"));
         var stored=asset.metadata().get(META+property);
         if(stored!=null){var data=(Map<?,?>)stored.toJavaValue();var options=new ArrayList<Option>();for(var raw:(List<?>)data.get("entries")){var entry=(Map<?,?>)raw;options.add(new Option((String)entry.get("id"),(String)entry.get("label")));}
             if(options.isEmpty())return null;var initial=asset.compositeDescriptor().findProperty(property).orElseThrow().defaultValue();return Editor.comboBox(options,options.stream().filter(o->o.id().equals(initial.toJavaValue())).findFirst().orElse(options.get(0)),Option::id);
@@ -133,7 +133,7 @@ final class GroupChoices {
             var nested=registry.findComposite(node.typeId()).orElse(null);
             var candidate=nested==null?nodeEditor(node,binding.internalPropertyId()):resolve(registry.findAsset(nested.assetId()).orElseThrow(),binding.internalPropertyId(),registry,new HashSet<>(visited));
             if(candidate==null)return null;
-            if(result!=null&&!result.items().equals(candidate.items()))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Mapped group choices must have identical options: ")+property);
+            if(result!=null&&!result.items().equals(candidate.items()))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Mapped group choices must have identical options: ")+property);
             result=candidate;
         }return result;
     }

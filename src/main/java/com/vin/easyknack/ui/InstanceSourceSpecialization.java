@@ -62,7 +62,7 @@ final class InstanceSourceSpecialization {
     }
 
     private record Operation(String type,Map<String,String> fields,List<Integer> sources) {
-        String field(String name){String value=fields.get(name);if(value==null)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported field: ")+name);return value;}
+        String field(String name){String value=fields.get(name);if(value==null)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported field: ")+name);return value;}
         String value(String id){return field(id+"_value");}
         int source(String id){return Integer.parseInt(field(id+"_source"));}
     }
@@ -71,30 +71,30 @@ final class InstanceSourceSpecialization {
         var definitions=new HashMap<String,BasicNode>();
         NodeRegistry.builtinDefinitions().forEach(d->definitions.putIfAbsent(d.processor().id(),d));
         var tokens=new ArrayDeque<>(List.of(new String(HexFormat.of().parseHex(hex),StandardCharsets.UTF_8).trim().split("\\s+")));
-        if(!tokens.remove().equals("MULT3"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Legacy instance program"));
+        if(!tokens.remove().equals("MULT3"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Legacy instance program"));
         int inputs=Integer.parseInt(tokens.remove()),outputs=Integer.parseInt(tokens.remove());
         for(int i=0;i<inputs+outputs;i++)tokens.remove();
-        if(!tokens.remove().equals("1"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Legacy reduction"));
+        if(!tokens.remove().equals("1"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Legacy reduction"));
         int policies=Integer.parseInt(tokens.remove());for(int i=0;i<policies*2;i++)tokens.remove();
-        if(!tokens.remove().equals("GRAPH"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing graph"));
+        if(!tokens.remove().equals("GRAPH"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Missing graph"));
         int count=Integer.parseInt(tokens.remove());var result=new ArrayList<Operation>();
         for(int i=0;i<count;i++){
             tokens.remove();String type=tokens.remove();var d=definitions.get(type);
-            if(d==null||!Set.of("math","unitconvert","multipleinput","instancecontext","osc","instancecombine","digitalnoise","noise").contains(type))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported scalar kernel"));
-            if(!tokens.remove().equals("!"+NativeContractGenerator.fingerprint(d)))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown contract"));
+            if(d==null||!Set.of("math","unitconvert","multipleinput","instancecontext","osc","instancecombine","digitalnoise","noise").contains(type))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported scalar kernel"));
+            if(!tokens.remove().equals("!"+NativeContractGenerator.fingerprint(d)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown contract"));
             var fields=new HashMap<String,String>();var sources=new ArrayList<Integer>();
             for(var f:d.processor().contract().fields()){
-                if(f.kind()==ParameterContract.Kind.CURVE)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Variable field"));
+                if(f.kind()==ParameterContract.Kind.CURVE)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Variable field"));
                 String value=tokens.remove();
-                if(f.kind()==ParameterContract.Kind.TOKEN){if(!value.equals(f.literal()))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Token mismatch"));}
+                if(f.kind()==ParameterContract.Kind.TOKEN){if(!value.equals(f.literal()))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Token mismatch"));}
                 else fields.put(NativeContractGenerator.fieldName(f),value);
                 if(f.kind()==ParameterContract.Kind.SOURCE)sources.add(Integer.parseInt(value));
             }
-            if(!tokens.remove().equals("@"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Missing rates"));tokens.remove();tokens.remove();
+            if(!tokens.remove().equals("@"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Missing rates"));tokens.remove();tokens.remove();
             if("~".equals(tokens.peek())){tokens.remove();while(!"~".equals(tokens.remove())){} }
             result.add(new Operation(type,fields,sources));
         }
-        if(!tokens.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Trailing program data"));
+        if(!tokens.isEmpty())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Trailing program data"));
         return result;
     }
     private static String scalarKernel(String program){
@@ -109,7 +109,7 @@ final class InstanceSourceSpecialization {
             }
             var audioBody=new StringBuilder();
             for(int i:dynamic){var op=ops.get(i);
-                String type=switch(op.type){case "digitalnoise"->"DigitalNoiseNode";case "noise"->"NoiseNode";case "math"->"MathNode";case "unitconvert"->"UnitConverterNode";default->throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unsupported modulator"));};
+                String type=switch(op.type){case "digitalnoise"->"DigitalNoiseNode";case "noise"->"NoiseNode";case "math"->"MathNode";case "unitconvert"->"UnitConverterNode";default->throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported modulator"));};
                 audioBody.append("        renderUpstream(").append(i).append(",frames,[](NodeProcessor& p,ProcessContext& c){static_cast<").append(type).append("&>(p).").append(type).append("::process(c);});\n");
                 for(int ref:op.sources)if(ref>=0&&!dynamic.contains(ref%256))stores.add(ref);
             }
@@ -141,7 +141,7 @@ final class InstanceSourceSpecialization {
                     }
                     case "unitconvert" -> body.append("        const float n").append(i).append("p0=UnitConverterNode::evaluate(").append(input(op,"value"))
                         .append(",UnitFormat::").append(identifier(op.value("from"))).append(",UnitFormat::").append(identifier(op.value("to"))).append(",g.preparedSampleRate);\n");
-                    default -> throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Non-scalar dependency"));
+                    default -> throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Non-scalar dependency"));
                 }
             }
             for(int ref:stores)body.append("        g.nodes[").append(ref%256).append("].voice(0).channelCache[0].outputs[").append(ref/256).append("][0]=").append(variable(ref)).append(";\n");
@@ -152,12 +152,12 @@ final class InstanceSourceSpecialization {
         }catch(IllegalArgumentException|NoSuchElementException e){return null;}
     }
     private static void visit(int i,List<Operation> ops,Set<Integer> done,Set<Integer> visiting,List<Integer> order){
-        if(done.contains(i))return;if(!visiting.add(i))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Feedback"));
+        if(done.contains(i))return;if(!visiting.add(i))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Feedback"));
         for(int ref:ops.get(i).sources)if(ref>=0)visit(ref%256,ops,done,visiting,order);
         visiting.remove(i);done.add(i);order.add(i);
     }
     private static String variable(int ref){return "n"+(ref%256)+"p"+(ref/256);}
     private static String input(Operation op,String id){int ref=op.source(id);return ref<0?number(op.value(id)):variable(ref);}
-    private static String number(String text){float value=Float.parseFloat(text);if(!Float.isFinite(value))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Non-finite constant"));return Float.toString(value)+"f";}
-    private static String identifier(String value){if(!value.matches("[a-z][a-z_]*"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid identifier"));return value;}
+    private static String number(String text){float value=Float.parseFloat(text);if(!Float.isFinite(value))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Non-finite constant"));return Float.toString(value)+"f";}
+    private static String identifier(String value){if(!value.matches("[a-z][a-z_]*"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid identifier"));return value;}
 }

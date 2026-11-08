@@ -44,7 +44,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
                 var countPort=descriptor.portMappings().stream().filter(MultipleGroups::countPort).findFirst().orElse(null);
                 String countKey=countPort==null?MultipleGroups.COUNT_PROPERTY:GroupUnits.key(countPort.publicPort().id());
                 countControl=com.vin.easyknack.nodes.Editor.Slider.button(8,0.0,256.0).integers().create("Count",v->{if(!updating)writer.set(node.id(),new PropertyId(countKey),v);});
-                ((GLSlider)countControl.component()).setToolTipText(com.vin.easyknack.ui.AppText.literal("Active instances, limited by Maximum instances in Group-General. Fixed Control input; no internal wiring is required."));
+                ((GLSlider)countControl.component()).setToolTipText(com.vin.easyknack.i18n.AppText.literal("Active instances, limited by Maximum instances in Group-General. Fixed Control input; no internal wiring is required."));
                 if(countControl.component() instanceof GLSlider slider)UnitSlider.bindHistory(slider,()->history);
                 publicControls.put(countKey,countControl.component());
                 if(countPort==null)addContent(countControl.component());else {var port=addInput(countPort.publicPort().id(),countControl.component());port.setContentHiddenWhenConnected(true);}

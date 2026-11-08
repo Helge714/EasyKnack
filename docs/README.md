@@ -15,3 +15,5 @@ The application's Help menu and node-context Documentation action open these
 references offline in the selected language. The
 [consolidation review](development/DOCUMENTATION-MIGRATION.md) records replaced
 legacy pages and guides retained for their additional workflows.
+
+[Developer architecture, builds and technical feature notes](development/README.md) live under `development/`; dated design material lives under `development/history/`. Public node references remain under `nodes/` and user instructions under `user/`.

@@ -10,12 +10,12 @@ public final class TriggerTimerNode extends BasicNode {
     public void define(NodeBuilder n,NodeState s){
         var unit=UnitFormat.fromId(s.text(UNIT,"second"));
         n.addOutput(ELAPSED,NodeText.text("triggertimer.elapsed","Elapsed")+" ["+unit.suffix()+"]").formats(new UnitFormats(unit,unit,List.of(UnitFormat.SECOND,UnitFormat.MS,UnitFormat.SAMPLE))).unitProperty(UNIT).rate(ProcessingRate.AUDIO).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggertimer.elapsed.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggertimer.elapsed.tooltip"));
         n.addOutput(INTERVAL,NodeText.text("triggertimer.interval","Interval")+" ["+unit.suffix()+"]").formats(new UnitFormats(unit,unit,List.of(UnitFormat.SECOND,UnitFormat.MS,UnitFormat.SAMPLE))).unitProperty(UNIT).rate(ProcessingRate.AUDIO).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggertimer.interval.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggertimer.interval.tooltip"));
         n.addInput(IN,"Trigger",new Editor.Trigger()).rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER);
         n.addInput(SMOOTHING,"Smoothing",Editor.Slider.bar(0,0,1)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.text("triggertimer.smoothing.tooltip"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("triggertimer.smoothing.tooltip"));
         n.addEditor(UNIT,"Unit",Editor.comboBox(List.of(UnitFormat.SECOND,UnitFormat.MS,UnitFormat.SAMPLE),UnitFormat.SECOND,UnitFormat::id));
     }
     public NativeProcessor processor(){return new NativeProcessor("triggertimer","nodes/TriggerTimerNode.hpp",

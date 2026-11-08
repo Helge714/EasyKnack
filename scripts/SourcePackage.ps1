@@ -24,7 +24,7 @@ function Get-SourceSnapshot([string]$Root) {
     $files = [Collections.Generic.List[object]]::new()
     foreach ($relative in ($output.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries) | Sort-Object -Unique -CaseSensitive)) {
         # Deliberate source roots; never archive IDE settings, caches or credential folders.
-        if ($relative -notmatch '^(src/|native/|scripts/|docs/|examples/|\.github/|[^/]+\.(md|xml|bat)|LICENSE$|\.gitignore$|\.gitattributes$)') { continue }
+        if ($relative -notmatch '^(src/|native/|scripts/|docs/|examples/|\.github/|[^/]+\.(md|xml|bat)|LICENSE$|\.gitignore$|\.gitattributes$|\.editorconfig$|\.clang-format$)') { continue }
         if ($relative -match '(^|/)(target|build|\.git|\.aws|\.codex|\.settings)/|\.(exe|dll|class|jar|zip|pdb|obj|key|pfx|pem)$') { continue }
         $path = Join-Path $Root $relative
         if (!(Test-Path -LiteralPath $path -PathType Leaf)) { continue }

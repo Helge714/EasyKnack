@@ -32,8 +32,8 @@ before sharing; an allowlisted source file can still contain private information
 With PowerShell 7, from the repository root:
 
 ```powershell
-./scripts/package-sources.ps1 -Image 'target/distribution/BUILD/EasyKnack' `
-  -ProjectSources 'target/distribution/BUILD/EasyKnack-project-sources.zip' `
+./scripts/package-sources.ps1 -Image 'dist/BUILD/EasyKnack' `
+  -ProjectSources 'dist/BUILD/EasyKnack-project-sources.zip' `
   -Destination 'target/source-review' -Download
 ./scripts/test-source-package.ps1
 ```

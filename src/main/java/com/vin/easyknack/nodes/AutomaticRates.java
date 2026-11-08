@@ -20,7 +20,7 @@ public final class AutomaticRates {
         if(definition instanceof FormulaNode&&state.text("rate","auto").equals("control")){
             int used=(int)state.number("usedInputs",65535);
             if(state.number("triggerOutputs",0)!=0||((int)state.number("triggerInputs",0)&used)!=0||incoming.entrySet().stream().anyMatch(e->(used&(1<<Integer.parseInt(e.getKey().value().substring(2))))!=0&&e.getValue()==ProcessingRate.AUDIO))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.text("formula.controlLoss"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.text("formula.controlLoss"));
         }
         var layout=definition.layout(state);
         if(!state.text("rate","").equals("auto")&&layout.rows().stream().noneMatch(NodeBuilder.Row::adaptive))return values;

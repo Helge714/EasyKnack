@@ -16,7 +16,7 @@ public final class InspectorEditor extends GLContainer {
         this.row=row;this.definition=definition;this.nodeId=model.id();
         row=definition.layout(new NodeState(model.properties())).rows().stream().filter(r->r.id().equals(this.row.id())).findFirst().orElse(row);
         editor=row.editor().create(row.label(),value->{if(!synchronizing)changed.accept(value);});
-        if(editor.component() instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.ui.AppText.literal("Reset to automatic"),e->{
+        if(editor.component() instanceof GLSlider slider)slider.getContextMenu().addItem(com.vin.easyknack.i18n.AppText.literal("Reset to automatic"),e->{
             for(var parent=getGLParent();parent!=null;parent=parent instanceof GLContainer c?c.getGLParent():null)
                 if(parent instanceof com.vingame.glswing.node.GLNodePropertyInspector inspector){inspector.setSelectedProperty(GLGraphNode.AUTOMATIC_PREFIX+this.row.id(),GLNodeValue.of(true));break;}
         });

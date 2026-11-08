@@ -140,7 +140,8 @@ class AdvancedSourceExportTest {
             var export=exports.get(kind);var f=fixtures.get(kind);var d=export.definition();
             String rate=d.layout(new NodeState(d.defaults())).rows().stream().filter(r->r.kind()==NodeBuilder.RowKind.OUTPUT).map(r->String.valueOf(r.rate().code())).findFirst().orElseThrow();
             final int scenario=kind;
-            String prefix=kind==5?" source midiin 1 @ e - note midinote 0 0 2 poly 3 @ e e":f.midi?" source midiin 1 @ e -":" source context @ c -";
+            // MIDI Note exposes numeric frequency/gate/velocity at Audio rate; only Trigger is sparse.
+            String prefix=kind==5?" source midiin 1 @ e - note midinote 0 0 2 poly 3 @ aaea e":f.midi?" source midiin 1 @ e -":" source context @ c -";
             String patch="GRAPH "+(kind<2||kind==6?3:kind==4||kind==5?5:6)+prefix+" baked "+d.processor().id()+" !"+NativeContractGenerator.fingerprint(d)+" "+d.encode(new NodeState(d.defaults()),p->scenario==5?(p.value().equals("input_0")?1:257):0)+" @ "+rate+(kind==5?" aa":kind==6?" -":f.midi?" e":" a")+f.tail;
             cpp.append("{const std::string patch=").append(quote(patch)).append(";const std::string reference=").append(quote(reference(f))).append(";auto baked=AudioGraph::compile(patch,factory);auto original=AudioGraph::parse(reference);Source source;std::array<float,256> a{},b{};\n");
             if(kind==3)cpp.append("assert(baked.nodes[1].voiceCount()==3);assert(static_cast<BakedGraphProcessor&>(*baked.nodes[1].processor).runtime==static_cast<BakedGraphProcessor&>(*baked.nodes[1].voice(2).processor).runtime);\n");

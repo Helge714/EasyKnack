@@ -13,11 +13,11 @@ public final class ScaleQuantizerNode extends BasicNode {
         n.addEditor(SCALE,"Scale",Editor.comboBox(List.of("Chromatic","Major","Minor","Major pentatonic","Minor pentatonic"),"Chromatic",v->v.toLowerCase(java.util.Locale.ROOT).replace(' ','_')));
         ProcessingRate.addEditor(n,RATE);
         n.addInput(IN,"Frequency",Editor.Slider.button(440,0.0,20000.0).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Quantizes positive Hz to the nearest allowed equal-tempered note, measured in semitones. Ties choose the lower note. Invalid/zero input returns zero in Scale mode. Use Pitch Hold before this node for unreliable detection."));
-        n.addInput(TARGET,"Fixed target",Editor.Slider.button(440,1.0,20000.0).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL).tooltip(com.vin.easyknack.ui.AppText.literal("Used only in Fixed mode. Scale mode uses Root and Scale instead."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Quantizes positive Hz to the nearest allowed equal-tempered note, measured in semitones. Ties choose the lower note. Invalid/zero input returns zero in Scale mode. Use Pitch Hold before this node for unreliable detection."));
+        n.addInput(TARGET,"Fixed target",Editor.Slider.button(440,1.0,20000.0).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL).tooltip(com.vin.easyknack.i18n.AppText.literal("Used only in Fixed mode. Scale mode uses Root and Scale instead."));
         n.addEditor(TUNING,"A4 tuning",Editor.Slider.button(440,400.0,480.0).formats(UnitFormats.FREQUENCY)).inspectorOnly();
         n.addInput(HYSTERESIS,"Hysteresis",Editor.Slider.button(.1,0.0,12.0).formats(HYSTERESIS_UNITS)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Extra distance beyond the midpoint before changing note. Default: 0.1 semitone (10 cent). Zero selects the nearest note immediately. Only affects Scale mode."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Extra distance beyond the midpoint before changing note. Default: 0.1 semitone (10 cent). Zero selects the nearest note immediately. Only affects Scale mode."));
     }
     public NativeProcessor processor(){return new NativeProcessor("scalequantizer","nodes/ScaleQuantizerNode.hpp",ParameterContract.builder().source(IN).value(IN).source(TARGET).value(TARGET).value(MODE).value(ROOT).value(SCALE).value(TUNING).source(HYSTERESIS).value(HYSTERESIS).build());}
     public void mute(MuteRouting r,NodeState s){r.connect(IN,OUT);}

@@ -17,10 +17,10 @@ public final class UnitConverterNode extends BasicNode {
     }
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Out ["+to(s).suffix()+"]").formats(new UnitFormats(to(s),to(s),to(s).compatible())).unitProperty(TO).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
-        n.addEditor(FROM,"From",Editor.comboBox(List.of(UnitFormat.values()),UnitFormat.FACTOR,UnitFormat::id).grouped(u->com.vin.easyknack.ui.AppText.text("unit.group."+u.dimension())));
+        n.addEditor(FROM,"From",Editor.comboBox(List.of(UnitFormat.values()),UnitFormat.FACTOR,UnitFormat::id).grouped(u->com.vin.easyknack.i18n.AppText.text("unit.group."+u.dimension())));
         n.addEditor(TO,"To",Editor.comboBox(destinations(from(s)),to(s),UnitFormat::id));
         n.addInput(IN,"Value ["+from(s).suffix()+"]",Editor.Slider.button(0)).formats(new UnitFormats(from(s),from(s),from(s).compatible())).unitProperty(FROM).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE)
-            .tooltip(com.vin.easyknack.ui.AppText.text("unit.converter.period"));
+            .tooltip(com.vin.easyknack.i18n.AppText.text("unit.converter.period"));
         ProcessingRate.addEditor(n,RATE);
     }
     @Override public NativeProcessor processor(){return new NativeProcessor("unitconvert","nodes/UnitConverterNode.hpp",

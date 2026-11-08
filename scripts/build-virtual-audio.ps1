@@ -2,7 +2,7 @@ param([ValidateSet('Debug', 'Release')][string]$Configuration = 'Debug')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 & "$PSScriptRoot/build-driver-reference.ps1" -PrepareOnly
-$manifest = Get-Content "$root/native/virtual-audio/sysvad-source-manifest.json" -Raw | ConvertFrom-Json
+$manifest = Get-Content "$root/native/experimental/virtual-audio/sysvad-source-manifest.json" -Raw | ConvertFrom-Json
 $upstream = "$root/target/driver-research/Windows-driver-samples"
 $buildRoot = "$root/target/virtual-audio/source"
 foreach ($entry in $manifest.files) {
@@ -11,8 +11,8 @@ foreach ($entry in $manifest.files) {
     Copy-Item -LiteralPath (Join-Path $upstream $entry.path) -Destination $destination
 }
 $sample = "$buildRoot/audio/sysvad"
-Copy-Item "$root/native/virtual-audio/*.hpp" -Destination $sample
-Copy-Item "$root/native/virtual-audio/KernelBridge.cpp" -Destination $sample
+Copy-Item "$root/native/experimental/virtual-audio/*.hpp" -Destination $sample
+Copy-Item "$root/native/experimental/virtual-audio/KernelBridge.cpp" -Destination $sample
 
 function Replace-One([string]$text, [string]$pattern, [string]$replacement) {
     $regex = [regex]::new($pattern, [Text.RegularExpressions.RegexOptions]::Singleline)
@@ -117,7 +117,7 @@ foreach ($relative in @('EndpointsCommon/EndpointsCommon.vcxproj', 'TabletAudioS
     }
     Write-Source $path $text
 }
-Copy-Item "$root/native/virtual-audio/EasyKnackAudio.inx" "$sample/TabletAudioSample/EasyKnackAudio.inx"
+Copy-Item "$root/native/experimental/virtual-audio/EasyKnackAudio.inx" "$sample/TabletAudioSample/EasyKnackAudio.inx"
 $path = "$sample/TabletAudioSample/TabletAudioSample.rc"
 Write-Source $path ((Get-Content $path -Raw).Replace('Microsoft Virtual Audio Tablet Sample Driver', 'EasyKnack Virtual Audio (SysVAD derived)').Replace('TabletAudioSample.sys', 'EasyKnackAudio.sys'))
 $vswhere = "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe"

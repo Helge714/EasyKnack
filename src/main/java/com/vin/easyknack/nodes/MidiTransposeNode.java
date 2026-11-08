@@ -7,7 +7,7 @@ public final class MidiTransposeNode extends BasicNode {
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"MIDI").dataType(PortDataType.MIDI).signal(SignalCategory.MIDI).rate(ProcessingRate.EVENT);
         n.addInput(IN,"MIDI").dataType(PortDataType.MIDI).signal(SignalCategory.MIDI).rate(ProcessingRate.EVENT);
-        n.addEditor(VALUE,"Transpose",Editor.Slider.button(0,-48.0,48.0).formats(UnitFormats.PITCH_SEMITONE)).tooltip(com.vin.easyknack.ui.AppText.literal("Pitch offset: 1 st = one semitone, 2 st = one whole tone, 0.01 st = one cent. Applies to new notes; fractional tuning is preserved internally."));
+        n.addEditor(VALUE,"Transpose",Editor.Slider.button(0,-48.0,48.0).formats(UnitFormats.PITCH_SEMITONE)).tooltip(com.vin.easyknack.i18n.AppText.literal("Pitch offset: 1 st = one semitone, 2 st = one whole tone, 0.01 st = one cent. Applies to new notes; fractional tuning is preserved internally."));
     }
     @Override public NativeProcessor processor() { return new NativeProcessor("miditranspose", "nodes/MidiTransposeNode.hpp",
             ParameterContract.builder().source(IN).value(VALUE).build()); }

@@ -1,24 +1,17 @@
 package com.vin.easyknack.ui;
-
-import java.nio.file.*;
-import java.util.*;
-import java.util.prefs.Preferences;
-
-/** User preferences never modify documents or command-line overrides. */
+import java.nio.file.Path;
+import java.util.Locale;
+/** Compatibility alias preserving existing preferences and public source references. */
+@Deprecated
 public final class ApplicationSettings {
-    private static final Preferences PREFS=Preferences.userNodeForPackage(ApplicationSettings.class);
     private ApplicationSettings(){}
-    private static volatile Locale previewLocale;
-    static void previewLocale(Locale locale){previewLocale=locale;}
-    public static Locale locale(){if(previewLocale!=null)return previewLocale;return Locale.forLanguageTag(System.getProperty("easyknack.language",PREFS.get("language",Locale.getDefault().getLanguage().equals("de")?"de":"en")));}
-    public static String theme(){return System.getProperty("easyknack.theme",PREFS.get("theme",""));}
-    public static void save(String language,String theme)throws Exception{PREFS.put("language",language);PREFS.put("theme",theme);PREFS.flush();}
-    public static int autosaveSeconds(){return Math.max(5,Math.min(3600,PREFS.getInt("autosaveSeconds",30)));}
-    public static int recoveryDays(){return Math.max(1,Math.min(365,PREFS.getInt("recoveryDays",7)));}
-    public static double connectionCurvature(){double v=PREFS.getDouble("connectionCurvature",1);return Double.isFinite(v)?Math.max(0,Math.min(1,v)):1;}
-    public static void save(String language,String theme,int seconds,int days,double curvature)throws Exception{
-        if(seconds<5||seconds>3600||days<1||days>365||!Double.isFinite(curvature)||curvature<0||curvature>1)throw new IllegalArgumentException("Invalid application settings");
-        PREFS.putInt("autosaveSeconds",seconds);PREFS.putInt("recoveryDays",days);PREFS.putDouble("connectionCurvature",curvature);save(language,theme);
-    }
-    public static Path examples(){return Path.of(System.getProperty("easyknack.examples",Path.of(System.getProperty("user.home"),"Documents","EasyKnack","Beispiele").toString()));}
+    static void previewLocale(Locale locale){com.vin.easyknack.app.ApplicationSettings.previewLocale(locale);}
+    public static Locale locale(){return com.vin.easyknack.app.ApplicationSettings.locale();}
+    public static String theme(){return com.vin.easyknack.app.ApplicationSettings.theme();}
+    public static void save(String language,String theme)throws Exception{com.vin.easyknack.app.ApplicationSettings.save(language,theme);}
+    public static int autosaveSeconds(){return com.vin.easyknack.app.ApplicationSettings.autosaveSeconds();}
+    public static int recoveryDays(){return com.vin.easyknack.app.ApplicationSettings.recoveryDays();}
+    public static double connectionCurvature(){return com.vin.easyknack.app.ApplicationSettings.connectionCurvature();}
+    public static void save(String language,String theme,int seconds,int days,double curvature)throws Exception{com.vin.easyknack.app.ApplicationSettings.save(language,theme,seconds,days,curvature);}
+    public static Path examples(){return com.vin.easyknack.app.ApplicationSettings.examples();}
 }

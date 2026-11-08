@@ -4,7 +4,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$manifest = Get-Content "$projectRoot/native/virtual-audio/sysvad-source-manifest.json" -Raw | ConvertFrom-Json
+$manifest = Get-Content "$projectRoot/native/experimental/virtual-audio/sysvad-source-manifest.json" -Raw | ConvertFrom-Json
 $sourceRoot = "$projectRoot/target/driver-research/Windows-driver-samples"
 
 # Keep the upstream sample separate from EasyKnack's eventual driver changes.

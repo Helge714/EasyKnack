@@ -9,6 +9,6 @@ public enum SpectrumView {
     @Override public String toString(){return NodeText.text("spectrum.view."+id(),label);}
     public static void addEditor(NodeBuilder node,PropertyId id){
         node.addEditor(id,"Data",Editor.comboBox(java.util.List.of(values()),MAGNITUDE,SpectrumView::id))
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Magnitude: one-sided amplitude. Phase: radians relative to the start of the window. Power: squared amplitude, not power spectral density."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Magnitude: one-sided amplitude. Phase: radians relative to the start of the window. Power: squared amplitude, not power spectral density."));
     }
 }

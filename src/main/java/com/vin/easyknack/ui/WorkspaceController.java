@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.compiler.CompiledManualTargets;
 
 import java.util.Map;
 import java.util.UUID;
@@ -140,8 +141,8 @@ final class WorkspaceController implements AutoCloseable {
         guardActions();
         for(var definition:List.of(new com.vin.easyknack.nodes.BinContextNode(),new com.vin.easyknack.nodes.BinOutputNode(),new com.vin.easyknack.nodes.PartialContextNode(),new com.vin.easyknack.nodes.PartialOutputNode()))
             catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(types.find(definition.registration().id()).orElseThrow(),definition.title(),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),definition.defaults(),"bin"));
-        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(SpectralGroups.CREATE_TYPE),com.vin.easyknack.ui.AppText.literal("New Spectral Group"),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),Map.of(),"bins spectrum"));
-        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(MultipleGroups.CREATE_TYPE),com.vin.easyknack.ui.AppText.literal("New Instance Group"),com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"instances additive unison"));
+        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(SpectralGroups.CREATE_TYPE),com.vin.easyknack.i18n.AppText.literal("New Spectral Group"),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),Map.of(),"bins spectrum"));
+        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(MultipleGroups.CREATE_TYPE),com.vin.easyknack.i18n.AppText.literal("New Instance Group"),com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"instances additive unison"));
         catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(FormulaGroups.CREATE),AppText.text("formula.new"),com.vin.easyknack.nodes.NodeCategory.MATH.path(),Map.of(),"code formula math"));
         catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(new com.vingame.glswing.node.model.GLNodeTypeDescriptor(PartialGroups.CREATE),AppText.text("partials.new"),com.vin.easyknack.nodes.NodeCategory.SPECTRAL.path(),Map.of(),"partials tracks"));
         workspace.setNodeCreationFilter(this::nodeAllowedInContext);
@@ -674,7 +675,7 @@ final class WorkspaceController implements AutoCloseable {
         if(audio!=null) audio.setVolumeLinks(audioVolumeLinks());
         bakes.validate();
         var flattened = flattenedAudioGraph(true);
-        if (!flattened.isValid()) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Composite-Graph ist nicht ausführbar: ")+flattened.diagnostics());
+        if (!flattened.isValid()) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Composite-Graph ist nicht ausführbar: ")+flattened.diagnostics());
         var aliases=new java.util.HashMap<String,java.util.List<String>>();
         flattened.origins().forEach((id,origin)->{
             aliases.computeIfAbsent(origin.sourceNodeId().toString(),key->new java.util.ArrayList<>()).add(id.toString());
@@ -749,42 +750,17 @@ final class WorkspaceController implements AutoCloseable {
         return result;
     }
 
-    /** Keep leaf nodes until public group ports have been expanded onto their endpoints. */
     private GLNodeGraphSnapshot executableCompositeMutes(GLNodeGraphSnapshot snapshot) {
-        var leafMutes=new java.util.HashSet<GLNodeId>();
-        var masked=new GLNodeGraphSnapshot(snapshot.graphId(),snapshot.revision(),snapshot.nodes().stream().map(n->{
-            var clean=n.withoutProperty(GLNodeState.HIDDEN);
-            if(composites.findComposite(n.typeId()).isEmpty()){
-                if(GLNodeState.isMuted(n))leafMutes.add(n.id());
-                return clean.withoutProperty(GLNodeState.MUTED);
-            }
-            return GLNodeState.isMuted(n)?clean:clean.withoutProperty(GLNodeState.MUTED);
-        }).toList(),snapshot.connections());
-        var resolved=GLMutedGraphResolver.resolve(masked,types);
-        return new GLNodeGraphSnapshot(resolved.graphId(),resolved.revision(),resolved.nodes().stream()
-            .map(n->leafMutes.contains(n.id())?n.withProperty(GLNodeState.MUTED,com.vingame.glswing.node.model.GLNodeValue.of(true)):n).toList(),resolved.connections());
+        return com.vin.easyknack.graph.GraphExecutionPolicy.compositeMutes(snapshot,composites,types);
     }
-
     private GLNodeGraphSnapshot executableGraph(GLNodeGraphSnapshot snapshot) {
-        var muteable = new GLNodeGraphSnapshot(snapshot.graphId(), snapshot.revision(), snapshot.nodes().stream()
-                // Keep an explicit zero source connected. Disconnecting would activate downstream slider defaults.
-                .map(n -> GLNodeState.isMuted(n) && NodeRegistry.find(n.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.InputNode
-                        ? n.withType(new com.vin.easyknack.nodes.MathNode().registration().id(),n.typeVersion())
-                            .withoutProperty(GLNodeState.MUTED)
-                            .withProperty(com.vin.easyknack.nodes.MathNode.A.value(),com.vingame.glswing.node.model.GLNodeValue.of(0.0))
-                            .withProperty(com.vin.easyknack.nodes.MathNode.B.value(),com.vingame.glswing.node.model.GLNodeValue.of(0.0)) : n)
-                .map(n -> NodeRegistry.find(n.typeId()).map(def -> def.isMuteable() ? n : n.withoutProperty(GLNodeState.MUTED)).orElse(n))
-                .toList(), snapshot.connections());
-        var resolved = com.vin.easyknack.audio.FeedbackConnections.markDelayBypasses(muteable, GLMutedGraphResolver.resolve(muteable, types), types);
-        return new GLNodeGraphSnapshot(resolved.graphId(), resolved.revision(), resolved.nodes().stream()
-                .map(node -> node.withoutProperty(GLNodeState.HIDDEN).withoutProperty(GLNodeState.MUTED)).toList(),
-                resolved.connections());
+        return com.vin.easyknack.graph.GraphExecutionPolicy.executable(snapshot,types);
     }
 
     GroupSourceExporter.Export exportSelectedGroup() {
         var selected=workspace.editor().getSelectedNodes();
-        if(selected.size()!=1)throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Select exactly one group to export."));
-        var id=compositeColors.modelId(selected.iterator().next()).orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Select a group to export.")));
+        if(selected.size()!=1)throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Select exactly one group to export."));
+        var id=compositeColors.modelId(selected.iterator().next()).orElseThrow(()->new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Select a group to export.")));
         return GroupSourceExporter.create(snapshotDocument(),workspace.currentGraph().snapshot().findNode(id).orElseThrow());
     }
 

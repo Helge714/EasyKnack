@@ -9,7 +9,7 @@ public final class BinHoldNode extends BasicNode {
         n.addOutput(OUT,"Value").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO);
         n.addInput(IN,"Value",Editor.Slider.button(0)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         n.addInput(TRIGGER,"Capture",new Editor.Trigger()).signal(SignalCategory.TRIGGER).dataType(PortDataType.TRIGGER).rate(ProcessingRate.EVENT)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Captures the next complete FFT frame, separately for each bin and channel. Before capture, values pass through. Holding magnitude alone keeps the incoming phase; it is not an independent spectral freeze."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Captures the next complete FFT frame, separately for each bin and channel. Before capture, values pass through. Holding magnitude alone keeps the incoming phase; it is not an independent spectral freeze."));
     }
     public NativeProcessor processor(){return new NativeProcessor("binhold","nodes/BinHoldNode.hpp",ParameterContract.builder().source(IN).value(IN).source(TRIGGER).build());}
     public void mute(MuteRouting r,NodeState s){r.connect(IN,OUT);}

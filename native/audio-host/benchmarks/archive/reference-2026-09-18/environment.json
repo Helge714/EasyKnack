@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-18",
+  "cpu": "11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz",
+  "os": "Microsoft Windows NT 10.0.26200.0",
+  "powerProfile": "GUID des Energieschemas: 381b4222-f694-41f0-9685-ff5bb260df2e  (Ausbalanciert)",
+  "compiler": "LLVM-MinGW 20250305; clang 20.1.0; x86_64-w64-windows-gnu",
+  "flags": "-std=c++17 -O2 -static",
+  "sampleRate": 48000,
+  "source": "src/test/resources/reference-projects",
+  "renderChannels": 2,
+  "offlineTelemetry": "none; steady_clock wall time around graph.process for both channels",
+  "hardwareTelemetry": "RenderTelemetry enabled",
+  "parallelProjectBuilds": false,
+  "benchmarkSha256": "F900E51E2FFFB9DE6F0A13A5F353AFA39E58D840A5F906ADFE2FC15414808E17",
+  "hostSha256": "1F0156D2E538D40FEE7800767FC05C2E47113471FEB7B99DA297DE4EDFC09566",
+  "pluginHostSha256": "7230CF3A1B92FE38581E974E29F872A627A965C581660358B8E152D332F7AB08",
+  "harnessSha256": "D3C6201871F6CCCFB45C191674B7DAC14AF735D094506E704E8F19488BA2EE1F"
+}

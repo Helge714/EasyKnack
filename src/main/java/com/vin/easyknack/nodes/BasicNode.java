@@ -55,7 +55,7 @@ public abstract class BasicNode {
     }
     public final RegisterNode registration() {
         RegisterNode registration = getClass().getAnnotation(RegisterNode.class);
-        if (registration == null) throw new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Missing @RegisterNode: ") + getClass());
+        if (registration == null) throw new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Missing @RegisterNode: ") + getClass());
         return registration;
     }
     public String textPrefix(){return registration().id();}

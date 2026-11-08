@@ -41,7 +41,7 @@ public final class AdditiveOscillatorNode extends BasicNode {
         node.addInput(FREQUENCY, "Frequency", Editor.Slider.button(440, 0.00001, 20000.0).step(1).formats(UnitFormats.FREQUENCY)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         node.addInput(PHASE, "Phase", Editor.Slider.button(0, 0.0, 360.0).step(1).formats(UnitFormats.PHASE)).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         node.addInput(RESET,"Reset",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT)
-            .tooltip(com.vin.easyknack.ui.AppText.literal("Reset all partials before this sample; Phase is then applied once. Unconnected: click to reset at the next block."));
+            .tooltip(com.vin.easyknack.i18n.AppText.literal("Reset all partials before this sample; Phase is then applied once. Unconnected: click to reset at the next block."));
     }
     @Override public NativeProcessor processor() {
         return new NativeProcessor("additive", "nodes/AdditiveOscillatorNode.hpp",

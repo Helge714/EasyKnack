@@ -10,7 +10,7 @@ public interface Editor {
     /** Numeric on/off input: portable 0/1 values, independent of boolean parameters. */
     record Toggle(boolean value) implements Editor {
         public GLNodeValue defaultValue(){return GLNodeValue.of(value?1.0:0.0);}
-        public void validate(GLNodeValue v){if(!(v.toJavaValue() instanceof Number n)||(n.doubleValue()!=0&&n.doubleValue()!=1))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Checkbox value must be 0 or 1"));}
+        public void validate(GLNodeValue v){if(!(v.toJavaValue() instanceof Number n)||(n.doubleValue()!=0&&n.doubleValue()!=1))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Checkbox value must be 0 or 1"));}
         public Control create(String label,java.util.function.Consumer<GLNodeValue> changed){
             var box=new com.vingame.glswing.ui.GLCheckBox(label);box.setSelected(value);
             box.addActionListener(e->changed.accept(GLNodeValue.of(box.isSelected()?1.0:0.0)));
@@ -56,7 +56,7 @@ public interface Editor {
             return new Control(checkbox,value->checkbox.setSelected((Boolean)value.toJavaValue()));
         }
         if(this instanceof ComboBox<?> spec)return comboControl(spec,changed);
-        throw new UnsupportedOperationException(com.vin.easyknack.ui.AppText.literal("Editor must provide a control: ") + getClass().getName());
+        throw new UnsupportedOperationException(com.vin.easyknack.i18n.AppText.literal("Editor must provide a control: ") + getClass().getName());
     }
     private static <T> Control comboControl(ComboBox<T> spec,java.util.function.Consumer<GLNodeValue> changed){
         var combo=spec.createCombo();combo.setSelectedItem(spec.value());
@@ -82,7 +82,7 @@ public interface Editor {
                     || max != null && !Double.isFinite(max) || min != null && max != null && min >= max
                     || min != null && value < min || max != null && value > max
                     || !Double.isFinite(step) || step <= 0 || integral && value != Math.rint(value))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid slider bounds/default/step"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid slider bounds/default/step"));
         }
         public static Slider button(double value, Double min, Double max) { return new Slider(value, min, max, .01); }
         public static Slider button(double value, double step) { return new Slider(value, null, null, step); }
@@ -102,14 +102,14 @@ public interface Editor {
             if (!(raw instanceof Number n) || !Double.isFinite(n.doubleValue())
                     || min != null && n.doubleValue() < min || max != null && n.doubleValue() > max
                     || integral && n.doubleValue() != Math.rint(n.doubleValue()))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Value outside slider bounds"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Value outside slider bounds"));
         }
     }
     record CheckBox(boolean value) implements Editor {
         @Override public GLNodeValue defaultValue() { return GLNodeValue.of(value); }
         @Override public String viewKey() { return "checkbox"; }
         @Override public void validate(GLNodeValue value) {
-            if (!(value instanceof GLNodeValue.BooleanValue)) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Boolean required"));
+            if (!(value instanceof GLNodeValue.BooleanValue)) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Boolean required"));
         }
     }
     record ComboBox<T>(List<T> items, T value, Function<T, String> id, Function<T,String> group) implements Editor {
@@ -117,22 +117,22 @@ public interface Editor {
         public ComboBox<T> grouped(Function<T,String> group){return new ComboBox<>(items,value,id,group);}
         public com.vingame.glswing.ui.GLComboBox<T> createCombo(){
             var combo=new com.vingame.glswing.ui.GLComboBox<T>();
-            combo.setItemTextProvider(item->item instanceof Enum<?>||item instanceof String?com.vin.easyknack.ui.AppText.literal(item.toString()):item.toString());
+            combo.setItemTextProvider(item->item instanceof Enum<?>||item instanceof String?com.vin.easyknack.i18n.AppText.literal(item.toString()):item.toString());
             var groups=new java.util.LinkedHashMap<String,java.util.List<T>>();
             for(T item:items)groups.computeIfAbsent(group.apply(item),k->new java.util.ArrayList<>()).add(item);
-            groups.forEach((label,values)->{if(label==null||label.isBlank())values.forEach(combo::addItem);else combo.addSubMenu(com.vin.easyknack.ui.AppText.literal(label),values);});
+            groups.forEach((label,values)->{if(label==null||label.isBlank())values.forEach(combo::addItem);else combo.addSubMenu(com.vin.easyknack.i18n.AppText.literal(label),values);});
             combo.setSelectedItem(value);return combo;
         }
         public ComboBox {
             items = List.copyOf(items);
             if (!items.contains(value) || items.stream().map(id).distinct().count() != items.size())
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unique choices and a valid default required"));
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unique choices and a valid default required"));
         }
         @Override public GLNodeValue defaultValue() { return GLNodeValue.of(id.apply(value)); }
         @Override public String viewKey() { return "combo:" + items.stream().map(id).toList(); }
         @Override public void validate(GLNodeValue value) {
             if (!(value instanceof GLNodeValue.TextValue text) || items.stream().noneMatch(i -> id.apply(i).equals(text.value())))
-                throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Unknown choice: ") + value);
+                throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown choice: ") + value);
         }
     }
     static CheckBox checkBox(boolean value) { return new CheckBox(value); }

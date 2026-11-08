@@ -54,7 +54,7 @@ final class GroupUnits {
         var raw=port.presentation().editorOptions().get(ALLOWED);
         if(!(raw instanceof GLNodeValue.ListValue list))return numeric(port)?base.compatible():List.of(base);
         var values=list.values().stream().map(v->UnitFormat.fromId((String)v.toJavaValue())).distinct().toList();
-        if(values.isEmpty()||values.stream().anyMatch(v->!base.compatible(v)))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Incompatible group units"));
+        if(values.isEmpty()||values.stream().anyMatch(v->!base.compatible(v)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Incompatible group units"));
         return values;
     }
     static UnitFormat selected(GLGraphNode node,GLCompositePortMapping port,UnitFormat base){

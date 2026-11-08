@@ -26,6 +26,11 @@ public final class InstallationPaths {
         // Packaged applications never select a compiler from the current directory.
         if (Files.isRegularFile(base.resolve("installation.properties")))
             return List.of(base.resolve("tools"));
-        return List.of(base.resolve("tools"), Path.of("tools"), Path.of("target/tools"));
+        Path checkout = base.getParent();
+        if (base.getFileName().toString().equals("target") && checkout != null
+                && Files.isRegularFile(checkout.resolve("pom.xml"))
+                && Files.isRegularFile(checkout.resolve("src/main/java/com/vin/easyknack/InstallationPaths.java")))
+            return List.of(checkout.resolve(".local/tools"), base.resolve("tools"));
+        return List.of(base.resolve("tools"), Path.of(".local/tools"), Path.of("tools"), Path.of("target/tools"));
     }
 }

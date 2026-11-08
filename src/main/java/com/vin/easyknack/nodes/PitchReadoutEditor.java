@@ -15,7 +15,7 @@ public record PitchReadoutEditor(String relativePath) implements Editor {
     public static final class Readout extends GLContainer {
         private final String relativePath;
         private String id="";
-        private final GLLabel detected=new GLLabel(com.vin.easyknack.ui.AppText.literal("Detected: --")),target=new GLLabel(com.vin.easyknack.ui.AppText.literal("Target: --")),confidence=new GLLabel(com.vin.easyknack.ui.AppText.literal("Confidence: --"));
+        private final GLLabel detected=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Detected: --")),target=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Target: --")),confidence=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Confidence: --"));
         private final Runnable refresh=this::refresh;
         public Readout(String relativePath){
             this.relativePath=relativePath;addGL(detected);addGL(target);addGL(confidence);
@@ -24,8 +24,8 @@ public record PitchReadoutEditor(String relativePath) implements Editor {
         public void bind(String nodeId){id=nodeId+(relativePath.isEmpty()?"":"/"+relativePath);refresh();}
         private void refresh(){
             var f=AudioAnalysis.frame(id);
-            detected.setText(com.vin.easyknack.ui.AppText.literal("Detected: ")+(f==null?"--":pitch(f.frequency())));
-            target.setText(com.vin.easyknack.ui.AppText.literal("Target: ")+(f==null||f.values().length==0?"--":pitch(f.values()[0])));
+            detected.setText(com.vin.easyknack.i18n.AppText.literal("Detected: ")+(f==null?"--":pitch(f.frequency())));
+            target.setText(com.vin.easyknack.i18n.AppText.literal("Target: ")+(f==null||f.values().length==0?"--":pitch(f.values()[0])));
             confidence.setText(f==null?"Confidence: --":String.format(Locale.ROOT,"Confidence: %.0f %%",100*f.confidence()));
         }
         public String detectedText(){return detected.getText();}

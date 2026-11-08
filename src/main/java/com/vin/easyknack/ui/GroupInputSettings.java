@@ -22,11 +22,11 @@ final class GroupInputSettings extends GLContainer {
     final GLComboBox<Kind> kind=new GLComboBox<>();
     final GLComboBox<EditorTemplates.Template> model=new GLComboBox<>();
     final GLComboBox<Source> source=new GLComboBox<>();
-    private final GLLabel rateLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Rate")),kindLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Editor")),modelLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Model")),sourceLabel=new GLLabel(com.vin.easyknack.ui.AppText.text("group.editor.source"));
+    private final GLLabel rateLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Rate")),kindLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Editor")),modelLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Model")),sourceLabel=new GLLabel(com.vin.easyknack.i18n.AppText.text("group.editor.source"));
     private final GLTextEditor minimum=new GLTextEditor(),maximum=new GLTextEditor(),value=new GLTextEditor();
-    private final GLLabel minLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Minimum (empty = unbounded)")),maxLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Maximum (empty = unbounded)")),valueLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Value")),unitsLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Allowed units"));
+    private final GLLabel minLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Minimum (empty = unbounded)")),maxLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Maximum (empty = unbounded)")),valueLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Value")),unitsLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Allowed units"));
     final GLCheckBox integer=new GLCheckBox(AppText.text("group.slider.integer"));
-    private final GLCheckBox checked=new GLCheckBox(com.vin.easyknack.ui.AppText.literal("Default: on"));
+    private final GLCheckBox checked=new GLCheckBox(com.vin.easyknack.i18n.AppText.literal("Default: on"));
     private final GLLabel status=new GLLabel("");
     private final NodeTooltipLabel formulaName=new NodeTooltipLabel(AppText.text("formula.identifier"));
     private final GLTextEditor formulaIdentifier=new GLTextEditor();
@@ -220,7 +220,7 @@ final class GroupInputSettings extends GLContainer {
             if(mode==Kind.COPY){showReadOnlyRate(inheritedRate(p));}
             if(!p.presentation().socketVisible()){showReadOnlyRate(selectedRate(p)==ProcessingRate.EVENT?ProcessingRate.EVENT:ProcessingRate.CONTROL);}
             var state=new NodeState(p.presentation().editorOptions());
-            if(mode==Kind.COMBO){modelLabel.setVisible(true);model.setVisible(true);model.removeAllItems();templates.all().forEach(model::addItem);var applied=GroupInputs.template(p);if(applied!=null){var found=model.getItems().stream().filter(t->t.id().equals(applied.id())).findFirst().orElse(null);if(found==null){model.addItem(applied);found=applied;}model.setSelectedItem(found);}else model.setSelectedItem(null);model.setToolTipText(com.vin.easyknack.ui.AppText.literal("Choose a model defined in Editors. Its values follow the internal connections."));}
+            if(mode==Kind.COMBO){modelLabel.setVisible(true);model.setVisible(true);model.removeAllItems();templates.all().forEach(model::addItem);var applied=GroupInputs.template(p);if(applied!=null){var found=model.getItems().stream().filter(t->t.id().equals(applied.id())).findFirst().orElse(null);if(found==null){model.addItem(applied);found=applied;}model.setSelectedItem(found);}else model.setSelectedItem(null);model.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Choose a model defined in Editors. Its values follow the internal connections."));}
             if(mode==Kind.COPY){sourceLabel.setVisible(true);source.setVisible(true);source.removeAllItems();sources().forEach(source::addItem);source.setSelectedItem(null);source.getItems().stream().filter(s->s.type().equals(state.text(GroupEditorCopies.SOURCE_TYPE,""))&&s.property().equals(state.text(GroupEditorCopies.SOURCE_PROPERTY,""))||s.endpoints().stream().anyMatch(e->e.toString().equals(state.text("copySource","")))).findFirst().ifPresent(source::setSelectedItem);source.setEnabled(!source.getItems().isEmpty());source.setVisible(!p.isBound()&&!source.getItems().isEmpty());sourceLabel.setVisible(source.isVisible());}
             if(mode==Kind.CHECKBOX||mode==Kind.COPY&&checkbox(p)){checked.setVisible(true);checked.setSelected(state.number("default",0)!=0);}
             if(mode==Kind.SLIDER&&p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER)&&!checkbox(p)){

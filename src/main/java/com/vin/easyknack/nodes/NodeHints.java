@@ -1,7 +1,7 @@
 package com.vin.easyknack.nodes;
 
 import java.util.ArrayList;
-import com.vin.easyknack.ui.AppText;
+import com.vin.easyknack.i18n.AppText;
 
 /** Current metadata shared by node controls, ports and inspector editors. */
 public final class NodeHints {

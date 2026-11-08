@@ -1,13 +1,14 @@
 # Build storage and examples
 
-`target` is generated storage, but local developer tools and diagnostics may also
-live there. Do not remove it wholesale while using these tools.
+`target` contains disposable builds and older local investigations. Compiler tools
+now live in `.local/tools`; new release images go to `dist`. Existing research
+material and older release outputs under `target` still require individual review.
 
 | Location | Purpose |
 | --- | --- |
 | `target/package-work/<GUID>` | Temporary Windows packaging inputs and build logs. Failed builds retain these for diagnosis. |
-| `target/distribution` | Finished packages, installers and corresponding source archives. Keep the versions you need. |
-| `target/tools` | Local compiler/tool downloads; removal requires downloading them again. |
+| `dist/` | New finished packages, installers and matching source archives. Old packages under `target/distribution` are preserved. |
+| `.local/tools` | Durable local compilers and packaging tools, excluded from Git and Maven clean. |
 | `target/*audit*`, reference and benchmark folders | Local investigation and measurement artifacts; review individually. |
 | `%USERPROFILE%/.easyknack/plugins/cache` | Runtime plugin and Bake cache, separate from Maven output. Do not delete while EasyKnack runs. |
 
@@ -29,7 +30,7 @@ runtime caches and user documents are excluded.
 ## Example folders
 
 - `examples/` in the repository contains source examples and reproducible test/
-  benchmark fixtures. `examples/reference-v1` has its own documentation.
+  benchmark fixtures. `src/test/resources/reference-projects` has its own documentation.
 - The application uses `Documents/EasyKnack/Beispiele` by default. It generates
   editable examples there without overwriting existing files. The
   `easyknack.examples` system property can select another folder.

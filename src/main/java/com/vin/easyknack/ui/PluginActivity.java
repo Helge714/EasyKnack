@@ -20,7 +20,7 @@ final class PluginActivity extends GLContainer implements AutoCloseable {
     }
     private void refresh(){
         long seconds=(System.nanoTime()-started)/1_000_000_000;
-        label.setText(com.vin.easyknack.ui.AppText.literal("Plugin installation / build")+".".repeat(1+(int)(seconds%3))+"   "+phase+"   ("+seconds+" s)");
+        label.setText(com.vin.easyknack.i18n.AppText.literal("Plugin installation / build")+".".repeat(1+(int)(seconds%3))+"   "+phase+"   ("+seconds+" s)");
     }
     @Override protected void record(GLContext2D context){}
     @Override protected void resized(float width,float height){label.setBounds(24,0,Math.max(0,width-48),height);}

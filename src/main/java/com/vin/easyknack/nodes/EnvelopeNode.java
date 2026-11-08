@@ -9,12 +9,12 @@ public final class EnvelopeNode extends BasicNode {
     @Override public void define(NodeBuilder n,NodeState s){
         n.addOutput(OUT,"Envelope").signal(SignalCategory.VALUE);
         n.addEditor(CURVE,"Envelope",new CurveEditor(CurveData.ADSR)).keepVisibleOnHide().growVertically();
-        n.addInput(GATE,"Gate",Editor.Slider.bar(0,0,1)).signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.ui.AppText.literal("A rise above 0 starts Attack/Decay. While positive, holds at Sustain. Returning to 0 starts Release."));
-        n.addInput(TRIGGER,"Trigger",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT).tooltip(com.vin.easyknack.ui.AppText.literal("Each trigger restarts the envelope, even while Gate remains high. Unconnected: click to trigger."));
+        n.addInput(GATE,"Gate",Editor.Slider.bar(0,0,1)).signal(SignalCategory.VALUE).tooltip(com.vin.easyknack.i18n.AppText.literal("A rise above 0 starts Attack/Decay. While positive, holds at Sustain. Returning to 0 starts Release."));
+        n.addInput(TRIGGER,"Trigger",new Editor.Trigger()).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER).rate(ProcessingRate.EVENT).tooltip(com.vin.easyknack.i18n.AppText.literal("Each trigger restarts the envelope, even while Gate remains high. Unconnected: click to trigger."));
         n.addInput(DURATION,"Attack + Decay",Editor.Slider.button(300,0.0,60000.0).step(1).formats(UnitFormats.TIME_MS)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         n.addInput(RELEASE,"Release",Editor.Slider.button(300,0.0,60000.0).step(1).formats(UnitFormats.TIME_MS)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
         n.addInput(SUSTAIN,"Sustain position",Editor.Slider.bar(.5,.01,.99)).rates(PortRates.AUDIO_CONTROL).signal(SignalCategory.VALUE);
-        n.addEditor(HOLD,"Hold",Editor.checkBox(true)).tooltip(com.vin.easyknack.ui.AppText.text("envelope.hold.tooltip"));
+        n.addEditor(HOLD,"Hold",Editor.checkBox(true)).tooltip(com.vin.easyknack.i18n.AppText.text("envelope.hold.tooltip"));
     }
     @Override public NativeProcessor processor() { return new NativeProcessor("envelope", "nodes/EnvelopeNode.hpp",
             ParameterContract.builder().source(GATE).value(GATE).source(TRIGGER).value(TRIGGER).source(DURATION).value(DURATION).source(RELEASE).value(RELEASE).source(SUSTAIN).value(SUSTAIN).value(HOLD).curve(CURVE).build()); }

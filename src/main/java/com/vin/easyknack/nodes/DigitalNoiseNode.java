@@ -23,20 +23,20 @@ public final class DigitalNoiseNode extends BasicNode {
 		node.addOutput(FACTOR, "Factor").formats(new UnitFormats(UnitFormat.FACTOR,UnitFormat.FACTOR,java.util.List.of(UnitFormat.FACTOR,UnitFormat.PERCENT,UnitFormat.CENT,UnitFormat.SEMITONE,UnitFormat.OCTAVE))).signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
 				.tooltip(NodeText.text("digitalnoise.factor.help","Random factor held for one self-modulated cycle. Time-weighted deviations are symmetric in octaves. Strength 1 spans 0.5x to 2x; this does not fix the arithmetic mean frequency or linear spectral centroid."));
 		node.addOutput(TRIGGER, "Trigger").rate(ProcessingRate.EVENT).dataType(PortDataType.TRIGGER).signal(SignalCategory.TRIGGER)
-				.tooltip(com.vin.easyknack.ui.AppText.literal("One-sample pulse whenever a new random factor is drawn."));
+				.tooltip(com.vin.easyknack.i18n.AppText.literal("One-sample pulse whenever a new random factor is drawn."));
 		node.addOutput(FREQUENCY_OUT, "Frequency").formats(UnitFormats.CLOCK).signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
-				.tooltip(com.vin.easyknack.ui.AppText.literal("Base frequency multiplied by this sample's Factor, in Hz. Connect directly to an oscillator's Frequency input."));
+				.tooltip(com.vin.easyknack.i18n.AppText.literal("Base frequency multiplied by this sample's Factor, in Hz. Connect directly to an oscillator's Frequency input."));
 		node.addInput(FREQUENCY, "Frequency",
 				Editor.Slider.button(440, 0.00001, 20000.0).step(1).formats(UnitFormats.FREQUENCY))
 				.signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL)
-				.tooltip(com.vin.easyknack.ui.AppText.literal("Base frequency. The currently held random factor determines ")
-						+ com.vin.easyknack.ui.AppText.literal("the duration of the current cycle."));
+				.tooltip(com.vin.easyknack.i18n.AppText.literal("Base frequency. The currently held random factor determines ")
+						+ com.vin.easyknack.i18n.AppText.literal("the duration of the current cycle."));
 		node.addInput(STRENGTH, "Strength", Editor.Slider.button(0, 0.0, 1.0)).signal(SignalCategory.VALUE)
 				.rates(PortRates.AUDIO_CONTROL)
 				.tooltip(NodeText.text("digitalnoise.strength.help","Maximum deviation in octaves: 0 = factor 1; 1 = 0.5x to 2x. Gaussian uses a standard deviation of Strength / 3, truncated at ±Strength. Distribution is compensated for each cycle's duration."));
 		node.addEditor(DISTRIBUTION,"Distribution",Editor.comboBox(java.util.List.of(Distribution.values()),Distribution.UNIFORM,Distribution::id));
 		node.addInput(SEED,"Seed",Editor.Slider.button(-1,-1.0,16777215.0).integers().discrete()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL)
-		    .tooltip(com.vin.easyknack.ui.AppText.literal("-1 = automatic seed per logical node, shared by channel and instance copies. Connect Context Channel or Instance Index/Seed for independent randomness. Changing the seed restarts the random cycle."));
+		    .tooltip(com.vin.easyknack.i18n.AppText.literal("-1 = automatic seed per logical node, shared by channel and instance copies. Connect Context Channel or Instance Index/Seed for independent randomness. Changing the seed restarts the random cycle."));
 	}
 
 	@Override

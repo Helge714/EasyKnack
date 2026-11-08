@@ -10,13 +10,13 @@ import com.vin.easyknack.nodes.*;
 class ReferenceProjectsTest {
     @Test void versionedDocumentsRemainValidAndDeterministic() throws Exception {
         try(var files=new NodeDocuments()){
-            var routing=Path.of("examples/reference-v1/routing.knack");
+            var routing=Path.of("src/test/resources/reference-projects/routing.knack");
             if(Boolean.getBoolean("easyknack.references.generate")){
                 Files.createDirectories(routing.getParent());files.write(routing,ReferenceProjects.routing()).toCompletableFuture().get();
             }
             assertEquals(6,files.read(routing).toCompletableFuture().get().root().graph().nodes().size());
             for(var p:ReferenceProjects.all()){
-                var file=Path.of("examples/reference-v1",p.name()+".knack");
+                var file=Path.of("src/test/resources/reference-projects",p.name()+".knack");
                 if(Boolean.getBoolean("easyknack.references.generate")){
                     Files.createDirectories(file.getParent());files.write(file,p.document()).toCompletableFuture().get();
                 }

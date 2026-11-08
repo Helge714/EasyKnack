@@ -52,13 +52,13 @@ public final class AudioAnalysis {
 	public static Map<String, Frame> parse(String response) {
 
 		if (response == null || response.isBlank()) {
-			throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid analysis snapshot"));
+			throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid analysis snapshot"));
 		}
 
 		String[] tokens = response.trim().split("\\s+");
 
 		if (tokens.length == 0 || !tokens[0].equals("OK")) {
-			throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid analysis snapshot"));
+			throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid analysis snapshot"));
 		}
 
 		/*
@@ -88,7 +88,7 @@ public final class AudioAnalysis {
 			 * id frequency confidence span symmetric valueCount
 			 */
 			if (tokens.length - i < 6) {
-				throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid analysis snapshot"));
+				throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid analysis snapshot"));
 			}
 
 			String id = tokens[i++];
@@ -102,7 +102,7 @@ public final class AudioAnalysis {
 			int symmetricFlag = parseInt(tokens[i++]);
 
 			if (symmetricFlag != 0 && symmetricFlag != 1) {
-				throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid analysis symmetry flag"));
+				throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid analysis symmetry flag"));
 			}
 
 			boolean symmetric = symmetricFlag != 0;
@@ -110,7 +110,7 @@ public final class AudioAnalysis {
 			int count = parseInt(tokens[i++]);
 
 			if (count < 0 || count > MAX_VALUES || i + count > tokens.length) {
-				throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid analysis value count"));
+				throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid analysis value count"));
 			}
 
 			float[] values = new float[count];
@@ -136,7 +136,7 @@ public final class AudioAnalysis {
 		 * = 260 tokens per frame.
 		 */
 		if ((tokens.length - 1) % 260 != 0) {
-			throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid analysis snapshot"));
+			throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid analysis snapshot"));
 		}
 
 		var result = new HashMap<String, Frame>();
@@ -162,7 +162,7 @@ public final class AudioAnalysis {
 		double result = Double.parseDouble(value);
 
 		if (!Double.isFinite(result)) {
-			throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Non-finite analysis value"));
+			throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Non-finite analysis value"));
 		}
 
 		return result;
@@ -173,7 +173,7 @@ public final class AudioAnalysis {
 		float result = Float.parseFloat(value);
 
 		if (!Float.isFinite(result)) {
-			throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Non-finite analysis value"));
+			throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Non-finite analysis value"));
 		}
 
 		return result;

@@ -12,10 +12,10 @@ public final class OscilloscopeNode extends BasicNode {
     @Override public com.vingame.glswing.node.GLNodeResizeMode resizeMode(){return com.vingame.glswing.node.GLNodeResizeMode.BOTH;}
     public void define(NodeBuilder n,NodeState s){
         n.addEditor(GRAPH,"Oscilloscope",new AnalysisEditor(false)).keepVisibleOnHide().growVertically();
-        n.addInput(IN,"Audio In").tooltip(com.vin.easyknack.ui.AppText.literal("All polyphonic audio voices are summed before analysis."));
-        n.addEditor(CHANNEL,"Channel",Editor.comboBox(java.util.List.of("Left","Right","Mix"),"Left",v->v.toLowerCase(java.util.Locale.ROOT))).tooltip(com.vin.easyknack.ui.AppText.literal("Mix displays (Left + Right) / 2. Mono keeps its level; opposite-phase channels cancel."));
-        n.addEditor(VERTICAL_RANGE,"Vertical range",Editor.Slider.button(1,.001,null)).tooltip(com.vin.easyknack.ui.AppText.literal("Visible vertical range: minus this value to plus this value. Changes only the display scale, not the signal or analysis."));
-        n.addEditor(LOW,"Trigger low",Editor.Slider.button(-.1,-1.0,1.0)).tooltip(com.vin.easyknack.ui.AppText.literal("Arms below this threshold; captures when the signal then crosses the high threshold. Auto-captures when no crossing occurs."));
+        n.addInput(IN,"Audio In").tooltip(com.vin.easyknack.i18n.AppText.literal("All polyphonic audio voices are summed before analysis."));
+        n.addEditor(CHANNEL,"Channel",Editor.comboBox(java.util.List.of("Left","Right","Mix"),"Left",v->v.toLowerCase(java.util.Locale.ROOT))).tooltip(com.vin.easyknack.i18n.AppText.literal("Mix displays (Left + Right) / 2. Mono keeps its level; opposite-phase channels cancel."));
+        n.addEditor(VERTICAL_RANGE,"Vertical range",Editor.Slider.button(1,.001,null)).tooltip(com.vin.easyknack.i18n.AppText.literal("Visible vertical range: minus this value to plus this value. Changes only the display scale, not the signal or analysis."));
+        n.addEditor(LOW,"Trigger low",Editor.Slider.button(-.1,-1.0,1.0)).tooltip(com.vin.easyknack.i18n.AppText.literal("Arms below this threshold; captures when the signal then crosses the high threshold. Auto-captures when no crossing occurs."));
         n.addEditor(HIGH,"Trigger high",Editor.Slider.button(.1,-1.0,1.0));
         n.addEditor(WINDOW,"Window",Editor.Slider.button(20,6.0,200.0).formats(UnitFormats.TIME_MS));
     }

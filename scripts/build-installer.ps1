@@ -35,7 +35,7 @@ try {
         } | Select-Object -First 1
     }
     if (!$Toolchain) {
-        $Toolchain = Get-ChildItem "$root/target/tools" -Directory -Filter 'llvm-mingw*' -ErrorAction SilentlyContinue |
+        $Toolchain = Get-ChildItem "$root/.local/tools" -Directory -Filter 'llvm-mingw*' -ErrorAction SilentlyContinue |
             Sort-Object Name -Descending | Where-Object { Test-Path -LiteralPath "$($_.FullName)/bin/clang++.exe" } |
             Select-Object -First 1 -ExpandProperty FullName
     }
@@ -43,7 +43,7 @@ try {
         $candle = Get-Command candle.exe -ErrorAction SilentlyContinue
         if ($candle) { $WixDirectory = Split-Path -Parent $candle.Source }
         else {
-            $WixDirectory = Get-ChildItem "$root/target/tools" -Directory -Filter 'wix*' -ErrorAction SilentlyContinue |
+            $WixDirectory = Get-ChildItem "$root/.local/tools" -Directory -Filter 'wix*' -ErrorAction SilentlyContinue |
                 Sort-Object Name -Descending | Where-Object { Test-Path -LiteralPath "$($_.FullName)/candle.exe" } |
                 Select-Object -First 1 -ExpandProperty FullName
         }
@@ -54,7 +54,7 @@ try {
         @('WiX', $WixDirectory, 'light.exe')
     )) {
         if (!$entry[1] -or !(Test-Path -LiteralPath (Join-Path $entry[1] $entry[2]) -PathType Leaf)) {
-            throw "Missing $($entry[0]). See docs/WINDOWS-PACKAGE.md for tool paths and overrides."
+            throw "Missing $($entry[0]). See docs/development/WINDOWS-PACKAGE.md for tool paths and overrides."
         }
         Write-Host "$($entry[0]): $($entry[1])"
     }
@@ -87,7 +87,7 @@ try {
     } else { & $Maven --version }
     if ($LASTEXITCODE -ne 0) { throw 'Maven tool check failed.' }
     if ($CheckTools) { Write-Host 'All build tools found. No installer was built.'; exit 0 }
-    $destination = Join-Path $root "target/distribution/$(Get-Date -Format 'yyyyMMdd-HHmmss-fff')"
+    $destination = Join-Path $root "dist/$(Get-Date -Format 'yyyyMMdd-HHmmss-fff')"
     $arguments = @{JdkHome=$JdkHome; Toolchain=$Toolchain; WixDirectory=$WixDirectory; Destination=$destination; Type='exe'}
     if ($MavenClasspath) { $arguments.MavenClasspath = $MavenClasspath }
     else { $arguments.Maven = $Maven }

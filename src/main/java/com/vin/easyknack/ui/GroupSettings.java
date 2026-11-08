@@ -18,21 +18,21 @@ final class GroupSettings extends GLContainer {
     private final Runnable changed;
     private final EditorTemplatesPanel templatesPanel;
     private final GroupInputSettings inputSettings;
-    private final GLLabel kindLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Node type (title color)")),categoryLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Add menu category"));
+    private final GLLabel kindLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Node type (title color)")),categoryLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Add menu category"));
     private final GLComboBox<NodeKind> kind=new GLComboBox<>(List.of(NodeKind.values()));
     private final GLComboBox<NodeCategory> category=new GLComboBox<>(List.of(NodeCategory.choices()));
-    private final List<GLLabel> routingLabels=List.of(new GLLabel(com.vin.easyknack.ui.AppText.literal("Insert: input")),new GLLabel(com.vin.easyknack.ui.AppText.literal("Insert: output")),new GLLabel(com.vin.easyknack.ui.AppText.literal("Mute bypass: input")),new GLLabel(com.vin.easyknack.ui.AppText.literal("Mute bypass: output")));
+    private final List<GLLabel> routingLabels=List.of(new GLLabel(com.vin.easyknack.i18n.AppText.literal("Insert: input")),new GLLabel(com.vin.easyknack.i18n.AppText.literal("Insert: output")),new GLLabel(com.vin.easyknack.i18n.AppText.literal("Mute bypass: input")),new GLLabel(com.vin.easyknack.i18n.AppText.literal("Mute bypass: output")));
     private final List<GLComboBox<String>> routing=List.of(new GLComboBox<>(),new GLComboBox<>(),new GLComboBox<>(),new GLComboBox<>());
     private static final List<String> ROUTING_KEYS=List.of(GroupRouting.INSERT_IN,GroupRouting.INSERT_OUT,GroupRouting.MUTE_IN,GroupRouting.MUTE_OUT);
     private final GLContainer general=new GLContainer(){
         @Override protected void record(com.vingame.glswing.rendering.GLContext2D c){}
         @Override protected void resized(float w,float h){float y=0;if(formulaRate.isVisible()){formulaRateLabel.setBounds(0,y,w,20);formulaRate.setBounds(0,y+22,w,28);y+=54;}kindLabel.setBounds(0,y,w,20);y+=22;kind.setBounds(0,y,w,28);y+=32;categoryLabel.setBounds(0,y,w,20);y+=22;category.setBounds(0,y,w,28);y+=36;for(int i=0;i<routing.size();i++){routingLabels.get(i).setBounds(0,y,w,20);y+=22;routing.get(i).setBounds(0,y,w,28);y+=32;}if(skipEmpty.isVisible()){skipEmpty.setBounds(0,y,w,28);y+=36;parallelBins.setBounds(0,y,w,28);y+=36;}if(maximumLabel.isVisible()){maximumLabel.setBounds(0,y,w,20);maximumInstances.setBounds(0,y+22,w,28);mergeLabel.setBounds(0,y+54,w,20);mergeMode.setBounds(0,y+76,w,28);}}
     };
-    private final GLLabel maximumLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Maximum instances (1-256)")),mergeLabel=new GLLabel(com.vin.easyknack.ui.AppText.literal("Instance mix"));
+    private final GLLabel maximumLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Maximum instances (1-256)")),mergeLabel=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Instance mix"));
     private final GLTextEditor maximumInstances=new GLTextEditor();
     private final GLComboBox<String> mergeMode=new GLComboBox<>(List.of("sum","mean"));
-    private final GLCheckBox skipEmpty=new GLCheckBox(com.vin.easyknack.ui.AppText.literal("Skip empty input bins"));
-    private final GLCheckBox parallelBins=new GLCheckBox(com.vin.easyknack.ui.AppText.literal("Parallel bins (automatic)"));
+    private final GLCheckBox skipEmpty=new GLCheckBox(com.vin.easyknack.i18n.AppText.literal("Skip empty input bins"));
+    private final GLCheckBox parallelBins=new GLCheckBox(com.vin.easyknack.i18n.AppText.literal("Parallel bins (automatic)"));
     private final GLLabel formulaRateLabel=new GLLabel(AppText.text("formula.rate"));
     private final GLComboBox<ProcessingRate> formulaRate=new GLComboBox<>(ProcessingRate.NUMERIC);
     private boolean updating;
@@ -49,12 +49,12 @@ final class GroupSettings extends GLContainer {
         formulaRate.addActionListener(e->{if(formulaRate.getSelectedItem()!=null)setMetadata(FormulaGroups.RATE,formulaRate.getSelectedItem().id());});
         general.addGL(parallelBins);
         category.setItemTextProvider(NodeCategory::path);mergeMode.setItemTextProvider(AppText::literal);
-        parallelBins.setToolTipText(com.vin.easyknack.ui.AppText.literal("Use one shared worker for sufficiently large independent FFT-bin programs. Small programs and per-bin audio voices stay serial; busy workers fall back to serial execution."));
+        parallelBins.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Use one shared worker for sufficiently large independent FFT-bin programs. Small programs and per-bin audio voices stay serial; busy workers fall back to serial execution."));
         parallelBins.addActionListener(e->setMetadata(SpectralGroups.PARALLEL,Boolean.toString(parallelBins.isSelected())));
-        skipEmpty.setToolTipText(com.vin.easyknack.ui.AppText.literal("Skip bins whose input coefficient is exactly zero, before Discard and bin processing. Disable when creating bins or reading other bins. Applies after Spectrum Prune too."));
+        skipEmpty.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Skip bins whose input coefficient is exactly zero, before Discard and bin processing. Disable when creating bins or reading other bins. Applies after Spectrum Prune too."));
         skipEmpty.addActionListener(e->setMetadata(SpectralGroups.SKIP_EMPTY,Boolean.toString(skipEmpty.isSelected())));
-        maximumInstances.setToolTipText(com.vin.easyknack.ui.AppText.literal("Reserved instance capacity. Active Count is controlled on the group node. Storage is prepared outside the audio thread."));
-        maximumInstances.addActionListener(e->{if(updating)return;try{int n=Integer.parseInt(maximumInstances.getText().strip());if(n<1||n>256)throw new IllegalArgumentException();setMetadata(MultipleGroups.MAXIMUM,Integer.toString(n));}catch(IllegalArgumentException ex){maximumInstances.setToolTipText(com.vin.easyknack.ui.AppText.literal("Enter an integer from 1 to 256."));}});
+        maximumInstances.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Reserved instance capacity. Active Count is controlled on the group node. Storage is prepared outside the audio thread."));
+        maximumInstances.addActionListener(e->{if(updating)return;try{int n=Integer.parseInt(maximumInstances.getText().strip());if(n<1||n>256)throw new IllegalArgumentException();setMetadata(MultipleGroups.MAXIMUM,Integer.toString(n));}catch(IllegalArgumentException ex){maximumInstances.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Enter an integer from 1 to 256."));}});
         mergeMode.addActionListener(e->{if(mergeMode.getSelectedItem()!=null)setMetadata(MultipleGroups.MERGE,mergeMode.getSelectedItem());});
         kind.addActionListener(e->{if(kind.getSelectedItem()!=null)setMetadata("easyknack.kind",kind.getSelectedItem().name());});
         category.addActionListener(e->{if(category.getSelectedItem()!=null)setMetadata("easyknack.category",category.getSelectedItem().path());});

@@ -39,17 +39,17 @@ public final class AudioHostService implements AutoCloseable {
     private volatile Consumer<AudioDiagnostics> diagnosticsListener=value->{};
     private boolean diagnosticsUnavailable;
     public void setDiagnosticsListener(Consumer<AudioDiagnostics> listener){diagnosticsListener=listener;}
-    public void resetDiagnostics(){worker.execute(()->{if(client!=null)try{client.command("DIAGNOSTICS_RESET");}catch(java.io.IOException e){status(com.vin.easyknack.ui.AppText.literal("Diagnostics reset failed: ")+e.getMessage());}});}
+    public void resetDiagnostics(){worker.execute(()->{if(client!=null)try{client.command("DIAGNOSTICS_RESET");}catch(java.io.IOException e){status(com.vin.easyknack.i18n.AppText.literal("Diagnostics reset failed: ")+e.getMessage());}});}
     private AudioHostClient client;
     private boolean playing;
     private boolean retainedGraph;
     public void trigger(String nodeId){
         if(closed||!wanted)return;
-        if(!nodeId.matches("[A-Za-z0-9_.:/-]+"))throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid trigger node ID"));
+        if(!nodeId.matches("[A-Za-z0-9_.:/-]+"))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid trigger node ID"));
         worker.execute(()->{
             if(!closed&&wanted&&graph.error()==null&&!java.util.Objects.equals(graph.command(),sent))tick();
             if(!closed&&wanted&&playing&&client!=null)try{client.command("TRIGGER "+nodeId);}
-            catch(java.io.IOException failure){status(com.vin.easyknack.ui.AppText.literal("Trigger failed: ")+failure.getMessage());}
+            catch(java.io.IOException failure){status(com.vin.easyknack.i18n.AppText.literal("Trigger failed: ")+failure.getMessage());}
         });
     }
     private String sent;
@@ -73,7 +73,7 @@ public final class AudioHostService implements AutoCloseable {
     AudioHostService(boolean poll) { this(poll, false); }
     AudioHostService(boolean poll, boolean nullDevice) {
         this.nullDevice = nullDevice;
-        MidiDevices.setKeyboardWakeup(()->{if(!closed)try{worker.execute(()->{try{sendKeyboard();}catch(Exception failure){status(com.vin.easyknack.ui.AppText.literal("MIDI keyboard: ")+failure.getMessage());MidiDevices.requestPanic();}});}catch(RejectedExecutionException ignored){}});
+        MidiDevices.setKeyboardWakeup(()->{if(!closed)try{worker.execute(()->{try{sendKeyboard();}catch(Exception failure){status(com.vin.easyknack.i18n.AppText.literal("MIDI keyboard: ")+failure.getMessage());MidiDevices.requestPanic();}});}catch(RejectedExecutionException ignored){}});
         if(poll) worker.scheduleWithFixedDelay(this::tick, 0, 20, TimeUnit.MILLISECONDS);
     }
     private void sendKeyboard() throws java.io.IOException {
@@ -87,7 +87,7 @@ public final class AudioHostService implements AutoCloseable {
     public void update(String graph,java.nio.file.Path executable) { this.graph=new GraphUpdate(graph,null,executable); }
     public synchronized void start() {
         if(closed || state!=State.STOPPED) return;
-        wanted=true; state(State.STARTING); status(graph.error()==null?com.vin.easyknack.ui.AppText.literal("Audio startet ..."):"Audio pausiert: "+graph.error());
+        wanted=true; state(State.STARTING); status(graph.error()==null?com.vin.easyknack.i18n.AppText.literal("Audio startet ..."):"Audio pausiert: "+graph.error());
     }
     public synchronized void stop() {
         if(closed || !wanted) return;
@@ -102,7 +102,7 @@ public final class AudioHostService implements AutoCloseable {
             rejectedGraph=null;discoveryRequested=true;lastVolumeKey=0;
         });
     }
-    public void invalidGraph(String message) { graph = new GraphUpdate(null, message,graph.executable()); status(com.vin.easyknack.ui.AppText.literal("Audio pausiert: ") + message); }
+    public void invalidGraph(String message) { graph = new GraphUpdate(null, message,graph.executable()); status(com.vin.easyknack.i18n.AppText.literal("Audio pausiert: ") + message); }
     private void status(String text) { SwingUtilities.invokeLater(() -> { if (!closed) listener.accept(text); }); }
 
     void tick() {
@@ -135,7 +135,7 @@ public final class AudioHostService implements AutoCloseable {
                     // File-buffer load failures retain the previous graph and playback.
                     retainedGraph=failure.getMessage().contains("FILE_BUFFER_LOAD:") && sent!=null;
                     if(!retainedGraph){playing = false; sent = null;} rejectedGraph = latest;
-                    status((retainedGraph?com.vin.easyknack.ui.AppText.text("buffer.previousGraph"):com.vin.easyknack.ui.AppText.literal("Audio pausiert: ")) + failure.getMessage());
+                    status((retainedGraph?com.vin.easyknack.i18n.AppText.text("buffer.previousGraph"):com.vin.easyknack.i18n.AppText.literal("Audio pausiert: ")) + failure.getMessage());
                 }
             }
             boolean valid = latest.error() == null && (latest != rejectedGraph || retainedGraph);
@@ -143,7 +143,7 @@ public final class AudioHostService implements AutoCloseable {
             boolean stopped=playing&&!next;
             if (playing != next) {
                 client.command(next ? "PLAY" : "STOP"); playing = next;
-                status(next ? com.vin.easyknack.ui.AppText.literal("Audio aktiv · 48 kHz · Stereo") : valid ? com.vin.easyknack.ui.AppText.literal("Audio gestoppt") : "Audio pausiert: " + latest.error());
+                status(next ? com.vin.easyknack.i18n.AppText.literal("Audio aktiv · 48 kHz · Stereo") : valid ? com.vin.easyknack.i18n.AppText.literal("Audio gestoppt") : "Audio pausiert: " + latest.error());
             }
             state(wanted && !valid ? State.PAUSED : playing ? State.RUNNING : State.STOPPED);
             if(stopped){
@@ -154,14 +154,14 @@ public final class AudioHostService implements AutoCloseable {
             sendVolumeLinks(client::command);
             for(var request:AudioDeviceVolumes.drain().entrySet()) {
                 try { client.command("VOLUME "+AudioEndpoint.hex(request.getKey())+" "+request.getValue()); }
-                catch(java.io.IOException failure) { status(com.vin.easyknack.ui.AppText.literal("Gerätelautstärke: ")+failure.getMessage()); }
+                catch(java.io.IOException failure) { status(com.vin.easyknack.i18n.AppText.literal("Gerätelautstärke: ")+failure.getMessage()); }
             }
             if (System.nanoTime() >= nextVolumes) {
             nextVolumes = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(100);
             String volumeResponse=client.command("VOLUMES");
             var volumes=AudioDeviceVolumes.parse(volumeResponse);
             String[] key=client.command("VOLUME_KEY_EVENT").split(" ");
-            if(key.length!=4 || !key[0].equals("OK")) throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Invalid volume key event"));
+            if(key.length!=4 || !key[0].equals("OK")) throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid volume key event"));
             long sequence=Long.parseLong(key[1]);
             if(sequence!=lastVolumeKey) {
                 lastVolumeKey=sequence;
@@ -169,7 +169,7 @@ public final class AudioHostService implements AutoCloseable {
                 SwingUtilities.invokeLater(()->{ if(!closed) volumeKeyListener.accept(event); });
             }
             boolean unavailable=!volumeLinks.equals("VOLUME_LINKS") && volumeResponse.startsWith("OK 0");
-            if(unavailable && !volumeKeysUnavailable) status(com.vin.easyknack.ui.AppText.literal("Lautstärketasten: Kopplung oder ausgewähltes Windows-Gerät nicht verfügbar"));
+            if(unavailable && !volumeKeysUnavailable) status(com.vin.easyknack.i18n.AppText.literal("Lautstärketasten: Kopplung oder ausgewähltes Windows-Gerät nicht verfügbar"));
             volumeKeysUnavailable=unavailable;
             SwingUtilities.invokeLater(()->{ if(!closed) AudioDeviceVolumes.publish(volumes); });
             }
@@ -201,7 +201,7 @@ public final class AudioHostService implements AutoCloseable {
             String routing = AudioEndpoint.unhex(client.command("ROUTING_STATUS").substring(3));
             if (state != State.PAUSED && !routing.equals(routingStatus)) {
                 routingStatus = routing;
-                status(routing.isEmpty() ? (playing ? com.vin.easyknack.ui.AppText.literal("Audio aktiv · 48 kHz · Stereo") : com.vin.easyknack.ui.AppText.literal("Audio gestoppt")) : routing);
+                status(routing.isEmpty() ? (playing ? com.vin.easyknack.i18n.AppText.literal("Audio aktiv · 48 kHz · Stereo") : com.vin.easyknack.i18n.AppText.literal("Audio gestoppt")) : routing);
             }
         } catch (Exception failure) {
             wanted = false; playing = false; sent = null; sentVolumeLinks=null;
@@ -209,7 +209,7 @@ public final class AudioHostService implements AutoCloseable {
             SwingUtilities.invokeLater(()->AudioDeviceVolumes.publish(java.util.Map.of()));
             SwingUtilities.invokeLater(MidiDevices::unavailable);
             if (client != null) client.close(); client = null;
-            status(com.vin.easyknack.ui.AppText.literal("Audiohost: ") + failure.getMessage());
+            status(com.vin.easyknack.i18n.AppText.literal("Audiohost: ") + failure.getMessage());
             loadStatus("DSP —");
             SwingUtilities.invokeLater(() -> {
                 if (!closed) AudioEndpoints.publish(new AudioEndpoints.Snapshot(

@@ -1,4 +1,5 @@
 package com.vin.easyknack.ui;
+import com.vin.easyknack.document.KnackDocumentCodec;
 import java.nio.file.*;
 import java.io.*;
 import java.util.*;

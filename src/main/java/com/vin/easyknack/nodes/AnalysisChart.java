@@ -3,7 +3,7 @@ package com.vin.easyknack.nodes;
 import java.awt.Color;
 import java.util.*;
 import com.vin.easyknack.audio.AudioAnalysis;
-import com.vin.easyknack.ui.AppText;
+import com.vin.easyknack.i18n.AppText;
 
 /** Shared axes and peak-preserving geometry for on-screen and raster-export rendering. */
 public final class AnalysisChart {

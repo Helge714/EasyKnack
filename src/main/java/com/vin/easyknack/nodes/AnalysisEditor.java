@@ -1,7 +1,7 @@
 package com.vin.easyknack.nodes;
 
 import com.vin.easyknack.audio.AudioAnalysis;
-import com.vin.easyknack.ui.AppText;
+import com.vin.easyknack.i18n.AppText;
 import com.vingame.glswing.node.model.GLNodeValue;
 import com.vingame.glswing.ui.*;
 import com.vingame.glswing.layout.GLSize;

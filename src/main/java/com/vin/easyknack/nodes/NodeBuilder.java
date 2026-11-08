@@ -60,7 +60,7 @@ public final class NodeBuilder {
         private SignalCategory signal = SignalCategory.AUDIO;
         private GLPortTiming timing = GLPortTiming.CURRENT;
         /** Marks an output whose value was produced in the preceding DSP step. */
-        public Row previousStep() { if(kind!=RowKind.OUTPUT)throw new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Previous-step timing requires an output"));timing=GLPortTiming.PREVIOUS_STEP;return this; }
+        public Row previousStep() { if(kind!=RowKind.OUTPUT)throw new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Previous-step timing requires an output"));timing=GLPortTiming.PREVIOUS_STEP;return this; }
         private Row(RowKind kind, PropertyId key, String label, Editor editor) {
             this.kind = kind; this.key = Objects.requireNonNull(key); this.label = label; this.editor = editor;
         }
@@ -82,7 +82,7 @@ public final class NodeBuilder {
         public PortDataType dataType() { return dataType; }
         /** A model property edited in the sidebar, with no row or socket in the node. */
         public Row inspectorOnly() {
-            if (kind != RowKind.EDITOR) throw new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Only standalone editors can be inspector-only"));
+            if (kind != RowKind.EDITOR) throw new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Only standalone editors can be inspector-only"));
             inspectorOnly = true; return this;
         }
         public ProcessingRate rate() { return rate; }
@@ -96,7 +96,7 @@ public final class NodeBuilder {
         public char hostInputRate() { return adaptive ? 'a' : rate.code(); }
         public Row signal(SignalCategory value) { requirePort(); signal = Objects.requireNonNull(value); return this; }
         private void requirePort() {
-            if (kind == RowKind.EDITOR) throw new IllegalStateException(com.vin.easyknack.ui.AppText.literal("Standalone editors have no signal port"));
+            if (kind == RowKind.EDITOR) throw new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Standalone editors have no signal port"));
         }
         /** The entire row stays visible when the workspace Hide action collapses the node. */
         public Row keepVisibleOnHide() { return keepVisibleOnHide(true); }
@@ -109,7 +109,7 @@ public final class NodeBuilder {
     public Row addEditor(PropertyId id, String label, Editor editor) { return add(new Row(RowKind.EDITOR, id, label, Objects.requireNonNull(editor))); }
     private Row add(Row row) {
         if (row.id() == null || row.id().isBlank() || row.label() == null || rows.stream().anyMatch(r -> r.id().equals(row.id())))
-            throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("A unique stable row ID and label are required: ") + row.id());
+            throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("A unique stable row ID and label are required: ") + row.id());
         rows.add(row);
         return row;
     }
@@ -118,7 +118,7 @@ public final class NodeBuilder {
         for(var row:rows){
             if(row.rates!=null){
                 if(row.dataType!=PortDataType.SIGNAL&&row.dataType!=PortDataType.VECTOR)
-                    throw new IllegalArgumentException(com.vin.easyknack.ui.AppText.literal("Numeric rates cannot be assigned to ")+row.dataType);
+                    throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Numeric rates cannot be assigned to ")+row.dataType);
                 row.adaptive=row.rates==PortRates.AUDIO_CONTROL&&requested.equals("auto");
                 var selected=row.adaptive?ProcessingRate.fromId(state.text(row.kind==RowKind.INPUT
                         ?ProcessingRate.EFFECTIVE+".input."+row.id():ProcessingRate.EFFECTIVE,"control"))
@@ -156,7 +156,7 @@ public final class NodeBuilder {
     }
     public List<Row> rows() { return List.copyOf(rows); }
     void translate(String nodeId) {
-        rows.forEach(row -> {row.label = NodeText.text(row.textKey==null?nodeId+"."+row.id():row.textKey,row.label);row.tooltip=NodeText.text((row.textKey==null?nodeId+"."+row.id():row.textKey)+".tooltip",row.tooltip==null?"":row.tooltip);var slider=row.editor instanceof UnitSlider u?u.spec():row.editor instanceof Editor.Slider v?v:null;if(slider!=null||row.editor instanceof VectorEditor){String hint=com.vin.easyknack.ui.AppText.text(slider==null||slider.continuousChanges()?"control.tooltip.continuous":"control.tooltip.discrete");row.tooltip=row.tooltip==null||row.tooltip.isBlank()?hint:row.tooltip+"\n"+hint;}});
+        rows.forEach(row -> {row.label = NodeText.text(row.textKey==null?nodeId+"."+row.id():row.textKey,row.label);row.tooltip=NodeText.text((row.textKey==null?nodeId+"."+row.id():row.textKey)+".tooltip",row.tooltip==null?"":row.tooltip);var slider=row.editor instanceof UnitSlider u?u.spec():row.editor instanceof Editor.Slider v?v:null;if(slider!=null||row.editor instanceof VectorEditor){String hint=com.vin.easyknack.i18n.AppText.text(slider==null||slider.continuousChanges()?"control.tooltip.continuous":"control.tooltip.discrete");row.tooltip=row.tooltip==null||row.tooltip.isBlank()?hint:row.tooltip+"\n"+hint;}});
     }
     public List<GLNodePortDescriptor> ports() {
         return rows.stream().filter(r -> r.kind() != RowKind.EDITOR).map(r -> r.kind() == RowKind.OUTPUT
