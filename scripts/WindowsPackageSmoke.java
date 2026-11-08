@@ -4,6 +4,7 @@ import java.nio.file.*;
 import java.util.*;
 import javax.swing.SwingUtilities;
 import com.vin.easyknack.audio.*;
+import com.vin.easyknack.document.KnackDocumentCodec;
 import com.vin.easyknack.formula.*;
 import com.vin.easyknack.nodes.*;
 import com.vin.easyknack.plugins.*;

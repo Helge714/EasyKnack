@@ -65,7 +65,9 @@ public static class EasyKnackWindowProbe {
                         $children += @($next | ForEach-Object { Get-Process -Id $_ -ErrorAction SilentlyContinue })
                         $parents = $next
                     }
-                    $windowProcess = @(@($process) + $children | Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -like '*EasyKnack*' -and [EasyKnackWindowProbe]::IsWorkspace($_.MainWindowHandle) } | Select-Object -First 1)
+                    # The early application frame can already have full workspace dimensions.
+                    # Wait for DocumentActions to install the actual document title before closing it.
+                    $windowProcess = @(@($process) + $children | Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -like '* — EasyKnack*' -and [EasyKnackWindowProbe]::IsWorkspace($_.MainWindowHandle) } | Select-Object -First 1)
                 } while ($windowProcess.Count -eq 0 -and [DateTime]::UtcNow -lt $deadline)
                 if ($windowProcess.Count -eq 0) { throw 'Main application window did not open.' }
                 Write-Host "Launcher window OK: $($windowProcess[0].MainWindowTitle)"
@@ -80,7 +82,10 @@ public static class EasyKnackWindowProbe {
                     throw "Workspace opened, but its initial document is marked modified; the save confirmation prevents an unattended close test."
                 }
                 $windowProcess[0].CloseMainWindow() | Out-Null
-                if (!$process.WaitForExit(30000)) { throw 'Application did not close normally.' }
+                if (!$process.WaitForExit(30000)) {
+                    & "$JdkHome/bin/jcmd.exe" $windowProcess[0].Id Thread.print *> "$work/close-threads.log"
+                    throw "Application did not close normally; thread dump: $work/close-threads.log"
+                }
                 if ($process.ExitCode -ne 0) { throw "Launcher exited with code $($process.ExitCode)" }
             } finally {
                 $env:JAVA_TOOL_OPTIONS = $oldOptions

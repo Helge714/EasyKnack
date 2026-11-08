@@ -3,6 +3,11 @@
 
 ## Unreleased
 
+- Treat the first themed viewport as startup initialization, avoiding a false
+  unsaved-document prompt. Actual graph edits and recovered documents remain dirty.
+- Speed up packaging tree copies and checksum inventories while preserving every
+  file, empty directory and checksum; refuse linked or existing copy targets.
+
 - Organize compiler, document, language and measurement code by responsibility.
   Existing public application aliases, saved preferences, node IDs and document
   formats remain compatible. GLSwing remains an external Maven dependency.

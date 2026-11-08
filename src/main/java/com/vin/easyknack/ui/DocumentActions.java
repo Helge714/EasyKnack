@@ -31,6 +31,7 @@ final class DocumentActions implements AutoCloseable {
     private boolean recoveryStarted,recoveryWriting,recoveryFailed,titleChecking;
 
     private GLNodeGraphDocument checkpoint;
+    private boolean initialViewCheckpointScheduled;
     private Path path;
     private boolean busy, closed;
     private String activity="";
@@ -49,6 +50,25 @@ final class DocumentActions implements AutoCloseable {
         titleTimer = new Timer(700, event -> refreshTitleInBackground()); titleTimer.start();
     }
     private boolean modified() { return checkpoint==null || !checkpoint.equals(NodeDocuments.comparable(controller.snapshotDocument())); }
+    /** The first themed viewport is presentation initialization, before user interaction. */
+    void initializeViewCheckpoint() {
+        if (initialViewCheckpointScheduled) return;
+        initialViewCheckpointScheduled = true;
+        var saved = checkpoint;
+        if (saved == null) return; // A recovered document deliberately remains unsaved.
+        EventQueue.invokeLater(() -> {
+            if (closed || checkpoint != saved) return;
+            var current = controller.snapshotDocument().root();
+            var previous = saved.root();
+            if (!current.graph().graphId().equals(previous.graph().graphId())) return;
+            // Preserve the original graph/metadata checkpoint: real edits must remain dirty.
+            var initialized = new com.vingame.glswing.node.document.GLNodeGraphAsset(
+                    previous.id(), previous.version(), previous.kind(), previous.graph(),
+                    current.viewState(), previous.metadata(), previous.compositeDescriptor());
+            checkpoint = new GLNodeGraphDocument(initialized, saved.embeddedAssets(), saved.externalAssets());
+            updateTitle();
+        });
+    }
     boolean canOpenExternal() { return !busy && !closed && closeDecision == null; }
     /** Startup only: no user document exists to discard before the window is shown. */
     void openInitial(Path source) {

@@ -221,6 +221,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         status.setBounds(12,bottom,Math.max(0,width-loadWidth-28),32);
         pluginActivity.setBounds(12,bottom,Math.max(0,width-loadWidth-28),28);
         status.setVisible(!pluginActivity.isVisible());
+        if (documents != null && width > 0 && height > 0) documents.initializeViewCheckpoint();
     }
 
     private void ungroup(){
