@@ -2,13 +2,15 @@
 
 ## Deutsch
 
-Öffne `stochastic-bin-width.knack` als Beispiel oder importiere daraus die Gruppe
+Im Examples-Menü unter **Spectral → Stochastic Bin Width** verfügbar.
+Öffne alternativ `stochastic-bin-width.knack` als Beispiel oder importiere daraus die Gruppe
 **Stochastic Bin Width**. Das Beispiel verbindet einen Oszillator über FFT,
 Stochastic Bin Width und IFFT mit dem Audioausgang. Die Gruppe lässt sich auch in
 einen eigenen Graphen kopieren. Es werden ausschließlich vorhandene Nodes benutzt.
 
-- **Width:** maximaler Abstand zum Quell-Bin in FFT-Bins, also eine halbe
-  Kernelbreite. Standard: 8, entsprechend höchstens ±8 Bins. Kleine Breiten sind
+- **Width:** maximaler logarithmischer Abstand in Oktaven, also eine halbe
+  Kernelbreite. Standard: 0,25 (±3 Halbtöne). 1 bedeutet eine Oktave nach oben
+  oder unten, also Frequenzfaktoren 0,5 bis 2. Intern auf 0–16 Oktaven begrenzt. Kleine Breiten sind
   durch die ganzzahlige Bin-Auswahl quantisiert. Width 0 liest denselben Bin.
 - **Gaussian:** an = angenähertes Gauß-Kernel, auf ±3σ begrenzt; aus = Box-Kernel.
   Bei Gauß entspricht σ einem Drittel von Width, vor der Rundung auf ganze Bins.
@@ -28,7 +30,7 @@ Quelle lesen kann. Mehrere Ausgangs-Bins dürfen dieselbe Quelle wählen; andere
 Quellen können unberücksichtigt bleiben. Das ist eine stochastische Abtastung,
 keine bijektive Permutation und keine Leistungsnormalisierung. Es wird pro
 Ausgangs-Bin ein ganzer Quell-Bin gelesen, statt dessen Inhalt über alle
-Nachbar-Bins zu mitteln. Die Breite ist hier in Bins, nicht in Oktaven.
+Nachbar-Bins zu mitteln. Die Auswahl ist im logarithmischen Frequenzraum verteilt, nicht im linearen Bin-Abstand.
 
 Seed und Vary by frame sind gekoppelte Editoren. Dafür gilt die bestehende
 Einschränkung von EasyKnack: diesen Aufbau live verwenden; Bake/Quellcodeexport
@@ -36,12 +38,14 @@ gekoppelter Slider und Checkboxen ohne Socket ist noch nicht unterstützt.
 
 ## English
 
+Available under **Examples → Spectral → Stochastic Bin Width**.
 Open `stochastic-bin-width.knack` as a working example, or import its
 **Stochastic Bin Width** group. The example connects an oscillator through FFT,
 the group and IFFT to Audio Out. The group uses only existing nodes.
 
-Width is a kernel radius in FFT bins (default 8, at most ±8 bins). Gaussian selects
-an approximate truncated normal distribution with σ = Width/3 before rounding;
+Width is a logarithmic kernel radius in octaves (default 0.25, ±3 semitones;
+clamped to 0–16 octaves). Width 1 spans frequency factors 0.5 to 2. Gaussian selects
+an approximate truncated normal distribution in log frequency with σ = Width/3 before rounding;
 otherwise the kernel is uniform. Seed makes the selection reproducible. Vary by
 frame selects new source bins for each FFT frame; off keeps the mapping fixed.
 Whole source bins are read, without complex interpolation between neighbours.

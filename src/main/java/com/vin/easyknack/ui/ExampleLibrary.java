@@ -9,6 +9,7 @@ public final class ExampleLibrary {
     public static void initialize()throws IOException{
         var root=ApplicationSettings.examples();Files.createDirectories(root);
         installSampler(root);
+        installStochasticBinWidth(root);
         var marker=root.resolve(".easyknack-examples-v1");if(Files.exists(marker))return;
         var examples=new LinkedHashMap<String,java.util.function.Supplier<GLNodeGraphDocument>>();
         examples.put("Harmonizer.knack",HarmonizerExample::create);
@@ -21,6 +22,13 @@ public final class ExampleLibrary {
             try(var out=Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)){codec.write(entry.getValue().get(),out);}
         }
         Files.writeString(marker,"Built-in examples copied once; user files are never replaced.\n",StandardOpenOption.CREATE_NEW);
+    }
+    static void installStochasticBinWidth(Path root)throws IOException{
+        var path=root.resolve("Spectral/Stochastic Bin Width.knack");
+        Files.createDirectories(path.getParent());
+        if(!Files.exists(path))try(var out=Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)){
+            new KnackDocumentCodec().write(StochasticBinWidthExample.create(),out);
+        }
     }
     private static void installSampler(Path root)throws IOException{
         var marker=root.resolve(".easyknack-sampler-v1");if(Files.exists(marker))return;

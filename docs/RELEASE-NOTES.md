@@ -1,6 +1,9 @@
 # Release notes
 
+
 ## Unreleased
+
+- Stochastic Bin Width now uses an octave-based kernel (default +/-0.25 octaves) and installs under Examples > Spectral. Existing user example files are preserved. The previous repository preset used a linear bin radius.
 
 - Improve Arrange all nodes: align connected ports, keep feedback regions together,
   compact narrow branches and pack independent components into free space. Group
