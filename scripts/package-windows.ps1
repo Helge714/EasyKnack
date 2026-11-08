@@ -66,7 +66,7 @@ try {
         }
     } finally { $application.Dispose() }
     Write-Host 'Bundling compiler, headers, libraries and license notices...'
-    Copy-Item -LiteralPath $Toolchain -Destination "$inputDir/tools/llvm-mingw" -Recurse
+    [EasyKnackPackageFiles]::CopyTree($Toolchain, "$inputDir/tools/llvm-mingw")
     # Local LLDB/Python runs can leave bytecode caches in the compiler directory.
     # Remove only generated files inside the newly staged copy, never the source toolchain.
     Remove-CompilerBytecodeCaches "$inputDir/tools/llvm-mingw"
@@ -103,9 +103,7 @@ try {
     Copy-Item -LiteralPath "$PSScriptRoot/windows/Start-EasyKnack.ps1", "$PSScriptRoot/windows/JavaPrerequisite.ps1" -Destination $inputDir
     Copy-Item -LiteralPath "$root/src/main/resources/branding/EKIcon.ico" -Destination "$inputDir/EKIcon.ico"
     Write-Host 'Recording package file hashes...'
-    $inventory = @(Get-ChildItem -LiteralPath $inputDir -File -Recurse | ForEach-Object {
-        [pscustomobject]@{path=$_.FullName.Substring($inputDir.Length+1); bytes=$_.Length; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
-    })
+    $inventory = [EasyKnackPackageFiles]::Inventory($inputDir)
     $inventory | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath "$inputDir/inventory.json" -Encoding utf8
     Write-Host 'Creating launcher for a separately installed JDK (no runtime bundled)...'
     $image = Join-Path $Destination 'EasyKnack'

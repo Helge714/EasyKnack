@@ -38,3 +38,17 @@ if (!(Test-Path "$work/staged/compiler/python/example.py")) { throw 'Python sour
 if (!(Test-Path "$work/staged/compiler/python/standalone.pyc")) { throw 'Non-cache Python module was removed.' }
 Write-Host 'Source-package tests passed: deterministic bytes, Unicode paths, exclusions, no overwrite, no traversal, source mutation detection.'
 Write-Host 'Compiler cache cleanup passed: only staged bytecode removed; original toolchain and Python sources preserved.'
+# Fast packaging traversal must retain Unicode paths and byte/hash identity.
+$fastSource = "$work/fast-source"; $fastDestination = "$work/fast-copy"
+New-Item -ItemType Directory -Path "$fastSource/empty", "$fastSource/ä" -Force | Out-Null
+[IO.File]::WriteAllBytes("$fastSource/ä/data.bin", [byte[]](0,1,127,255))
+[EasyKnackPackageFiles]::CopyTree($fastSource,$fastDestination)
+if (!(Test-Path -LiteralPath "$fastDestination/empty" -PathType Container)) { throw 'Empty directory was lost.' }
+$inventory = [EasyKnackPackageFiles]::Inventory($fastDestination)
+if ($inventory.Count -ne 1 -or $inventory[0].bytes -ne 4) { throw 'Inventory shape mismatch.' }
+if ($inventory[0].sha256 -ne (Get-FileHash -LiteralPath "$fastSource/ä/data.bin" -Algorithm SHA256).Hash) { throw 'Inventory checksum mismatch.' }
+$rejected=$false;try {[EasyKnackPackageFiles]::CopyTree($fastSource,$fastDestination)}catch{$rejected=$true}
+if (!$rejected) { throw 'Copy overwrote an existing destination.' }
+$rejected=$false;try {[EasyKnackPackageFiles]::CopyTree($fastSource,"$fastSource/nested")}catch{$rejected=$true}
+if (!$rejected) { throw 'Copy accepted a recursive destination.' }
+Write-Host 'Fast tree copy and inventory passed: Unicode, empty directories, exact hashes and no overwrite.'

@@ -1,6 +1,7 @@
 #Requires -Version 7.0
 # Shared, side-effect-free helpers. ZIP order and timestamps are fixed.
 Set-StrictMode -Version Latest
+if (-not ('EasyKnackPackageFiles' -as [type])) { Add-Type -Path "$PSScriptRoot/PackageFiles.cs" }
 function Remove-CompilerBytecodeCaches([string]$StagedCompiler) {
     $compilerRoot = [IO.Path]::GetFullPath($StagedCompiler)
     foreach ($cacheFile in Get-ChildItem -LiteralPath $compilerRoot -Recurse -File -Filter '*.pyc') {
