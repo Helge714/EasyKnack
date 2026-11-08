@@ -3,6 +3,15 @@
 
 ## Unreleased
 
+- Keep long arranged node chains approximately horizontal rather than accumulating
+  port offsets. Theme clearances, feedback regions and Undo are preserved.
+- Add connectable Seed inputs to Bin Random and Partial Noise, including group and
+  generated execution. Rebuild Java and the audio host together; regenerate old
+  exported plugins that embed these changed processor parameter contracts.
+- Document example-folder ownership and provide report-first cleanup of old Windows
+  packaging staging. Successful package builds retain logs and remove their own
+  staging; finished packages, compiler tools and runtime Bake caches are preserved.
+
 - Use automatic node sizes in the Stochastic Bin Width example instead of fixed oversized rectangles.
 
 - Stochastic Bin Width now uses an octave-based kernel (default +/-0.25 octaves) and installs under Examples > Spectral. Existing user example files are preserved. The previous repository preset used a linear bin radius.

@@ -35,6 +35,11 @@
 - [x] MP3-Unterstützung für den Recorder
 - [x] Recorder braucht einen Savebutton im Inspector zum manuellen Speichern (nur aktiviert, wenn auch etwas aufgenommen wurde) — exportiert die letzte abgeschlossene Aufnahme zusätzlich per „Speichern unter“.
 
+- [x] Autoformatierung scheint schon besser zu sein, es gibt aber die Tendenz aufsteigender Graphen, kannst du leicht verlängerte Verbindungen akzeptieren, wenn sie eine mehr horizontale Ausrichtung der Nodes erlaubt, also dass Eingang und Ausgang ungefähr auf einer Ebene liegen?
+- [x] es scheint mehrere Example-Ordner im Projekt zu geben, außerdem ist target enorm groß angewachsen mit irgendwelchen Bakes, ist das nötig? — [Ordner und sichere Bereinigung](docs/development/BUILD-STORAGE.md); bestehende Dateien bleiben erhalten.
+- [x] der Seed-Eingang bei Multiplegroup randoms wie partial und spectral group sollte einen Port bekommen
+
+
 # EasyKnack backlog
 
 Current work only. Historical implementation notes, superseded plans and original

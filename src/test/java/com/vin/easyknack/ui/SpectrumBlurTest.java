@@ -14,7 +14,7 @@ class SpectrumBlurTest {
         }
         for(boolean bin:List.of(false,true))for(boolean frame:List.of(false,true)){
             var values=new HashMap<>(node.defaults());values.put("by-bin",com.vingame.glswing.node.model.GLNodeValue.of(bin));values.put("by-frame",com.vingame.glswing.node.model.GLNodeValue.of(frame));
-            assertEquals("0 "+(bin?frame?"frame":"fixed":frame?"shared-frame":"constant"),node.encode(new NodeState(values),p->-1));
+            assertEquals("-1 0 "+(bin?frame?"frame":"fixed":frame?"shared-frame":"constant"),node.encode(new NodeState(values),p->-1));
         }
     }
     @Test void kernelDefaultsAndContract(){

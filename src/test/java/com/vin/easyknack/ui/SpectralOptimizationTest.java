@@ -33,7 +33,7 @@ class SpectralOptimizationTest {
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void parallelRangesMatchSerialAndBakedAndBusyWorkerFallsBack()throws Exception{
         String body=instruction(new BinContextNode(),Map.of(),-1)+" "
-            +instruction(new BinRandomNode(),Map.of("by-frame",GLNodeValue.of(true)))+" "
+            +instruction(new BinRandomNode(),Map.of("by-frame",GLNodeValue.of(true)),1280)+" "
             +instruction(new MathNode(),Map.of("operation",GLNodeValue.of("add"),"clamp",GLNodeValue.of(false)),0,1)+" "
             +instruction(new MathNode(),Map.of("b",GLNodeValue.of(.5),"clamp",GLNodeValue.of(false)),2,-1)+" "
             +instruction(new BinOutputNode(),Map.of(),3,256);

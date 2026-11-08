@@ -1,5 +1,6 @@
 #pragma once
 #include "BinContextNode.hpp"
+#include "../PartialRandom.hpp"
 #include <cstdint>
 namespace easyknack {
 /** Counter-based randomness: independent of traversal order, channel and graph rebuilds. */
@@ -7,6 +8,8 @@ struct BinRandomNode : BinAccess {
     std::uint64_t seed=0;bool perFrame=false,perBin=true;
     bool canShareChannels()const noexcept override{return true;}
     bool supportsScalarInputs()const noexcept override{return true;}
+    bool supportsLiveParameters()const noexcept override{return true;}
+    void applyParameters(const NodeProcessor& p)noexcept override{auto& other=static_cast<const BinRandomNode&>(p);seed=other.seed;perFrame=other.perFrame;perBin=other.perBin;}
     void configure(std::istream& in)override{
         auto p=parameters::BinRandomNodeParameters::read(in);sources=p.sources();seed=static_cast<std::uint64_t>(p.seed_value);perFrame=p.mode_value=="frame"||p.mode_value=="shared-frame";
         perBin=p.mode_value!="constant"&&p.mode_value!="shared-frame";
@@ -17,7 +20,7 @@ struct BinRandomNode : BinAccess {
     }
     void process(ProcessContext& c)noexcept override{
         if(!frame){c.output[0]=0;return;}
-        auto key=hash(seed)^hash(static_cast<std::uint64_t>(perBin?bin:0)+0x243f6a8885a308d3ULL);
+        auto key=hash(counterSeed(c,seed))^hash(static_cast<std::uint64_t>(perBin?bin:0)+0x243f6a8885a308d3ULL);
         if(perFrame)key^=hash(static_cast<std::uint64_t>(frame->start)+0x13198a2e03707344ULL);
         c.output[0]=static_cast<float>(hash(key)>>40)*(1.f/16777216.f);
     }

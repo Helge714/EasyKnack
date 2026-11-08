@@ -35,6 +35,8 @@ class PartialsTest {
         var out=graph.snapshot().nodes().stream().filter(n->n.typeId().equals(new PartialOutputNode().registration().id())).findFirst().orElseThrow();
         var noise=add(graph,new PartialNoiseNode());graph.edit("Partial noise",e->{for(var w:graph.snapshot().connections())if(w.input().nodeId().equals(out.id())&&w.input().portId().equals("amplitude"))e.removeConnection(w.id());});
         connect(graph,noise,"out",out.id(),"amplitude");
+        var context=graph.snapshot().nodes().stream().filter(n->n.typeId().equals(new PartialContextNode().registration().id())).findFirst().orElseThrow();
+        connect(graph,context.id(),"seed",noise,"seed");
         var changed=new GLNodeGraphAsset(asset.id(),asset.version(),asset.kind(),graph.snapshot(),asset.viewState(),asset.metadata(),asset.compositeDescriptor());
         return new GLNodeGraphDocument(doc.root(),Map.of(changed.id(),changed),List.of());
     }
@@ -44,7 +46,7 @@ class PartialsTest {
         assertEquals("New Partial Group",AppText.text("partials.new"));
     }
     @Test void partialResourcesCanBeExportedAtGroupBoundaries(){
-        var doc=document(false);var instance=doc.root().graph().nodes().stream().filter(n->doc.embeddedAssets().values().stream().anyMatch(a->a.compositeDescriptor().nodeTypeId().equals(n.typeId()))).findFirst().orElseThrow();
+        var doc=noiseDocument();var instance=doc.root().graph().nodes().stream().filter(n->doc.embeddedAssets().values().stream().anyMatch(a->a.compositeDescriptor().nodeTypeId().equals(n.typeId()))).findFirst().orElseThrow();
         var exported=GroupSourceExporter.create(doc,instance);
         assertFalse(exported.files().isEmpty());
         assertTrue(exported.files().values().stream().anyMatch(s->s.contains("PartialGraphNode")));

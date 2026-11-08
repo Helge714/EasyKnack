@@ -9,6 +9,33 @@ import com.vingame.glswing.node.model.GLNodeValue;
 
 class BinRandomTest {
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void connectedSeedOverridesManualSeedAndHandlesInvalidValues()throws Exception{
+        var dir=Files.createTempDirectory(Path.of("target"),"counter-seed-").toAbsolutePath();
+        var source=dir.resolve("test.cpp");
+        Files.writeString(source,"""
+            #include "nodes/BinRandomNode.hpp"
+            #include "nodes/PartialNoiseNode.hpp"
+            #include <cassert>
+            using namespace easyknack;
+            template<class T> void verify(T& node){
+                float seed=23.9f,out=0,silence=0;const float* inputs[]{&seed};
+                ProcessContext c{inputs,1,&out,1,48000,&silence,1};
+                node.seed=23;node.process(c);float expected=out;
+                node.seed=123;node.process(c);assert(out==expected);
+                inputs[0]=nullptr;node.process(c);assert(out!=expected);
+                node.seed=23;node.process(c);assert(out==expected);
+                inputs[0]=&seed;seed=std::numeric_limits<float>::quiet_NaN();node.process(c);assert(out==expected);
+                seed=-1;node.process(c);float zero=out;inputs[0]=nullptr;node.seed=0;node.process(c);assert(out==zero);
+                inputs[0]=&seed;seed=1e30f;node.process(c);float maximum=out;
+                inputs[0]=nullptr;node.seed=2147483647;node.process(c);assert(out==maximum);
+                node.seed=2147483646;node.process(c);assert(out!=maximum);
+            }
+            int main(){StreamSpectrumFrame frame;BinRandomNode bin;bin.frame=&frame;bin.bin=7;verify(bin);
+                PartialNoiseNode partial;partial.active=true;partial.partialId=7;verify(partial);}
+            """);
+        RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
+    }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void binRandomIsReproducibleAndFrameModeChangesOnlyWithFramePosition()throws Exception{
         var random=new BinRandomNode();var output=new BinOutputNode();var spectral=new SpectralGraphNode();
         var code=new StringBuilder("#include \"AudioGraph.hpp\"\n#include <cassert>\nusing namespace easyknack;int main(){\n");

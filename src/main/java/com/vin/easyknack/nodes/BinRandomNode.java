@@ -24,11 +24,11 @@ public final class BinRandomNode extends BasicNode {
     @Override public void define(NodeBuilder node,NodeState state){
         node.addOutput(OUT,"Random").signal(SignalCategory.VALUE).rate(ProcessingRate.AUDIO)
             .tooltip(com.vin.easyknack.ui.AppText.literal("Uniform random value from 0 (inclusive) to 1 (exclusive) per bin. Same seed, bin and frame produce the same value, also across channels."));
-        node.addEditor(SEED,"Seed",Editor.Slider.button(0,0.0,2147483647.0).integers().discrete());
+        node.addInput(SEED,"Seed",Editor.Slider.button(0,0.0,2147483647.0).integers().discrete()).signal(SignalCategory.VALUE).rates(PortRates.AUDIO_CONTROL);
         state=normalizeState(state);
         node.addEditor(BY_BIN,"Vary by bin",Editor.checkBox(state.flag(BY_BIN,true))).tooltip(com.vin.easyknack.ui.AppText.literal("Different random values for each frequency bin. Disabled: all bins share the same value."));
         node.addEditor(BY_FRAME,"Vary by frame",Editor.checkBox(state.flag(BY_FRAME,false))).tooltip(com.vin.easyknack.ui.AppText.literal("New random values for every FFT window, not every audio block. Disabled: values remain constant over time."));
     }
     @Override public NativeProcessor processor(){return new NativeProcessor("binrandom","nodes/BinRandomNode.hpp",
-        ParameterContract.builder().integer(SEED).value(MODE).build());}
+        ParameterContract.builder().source(SEED).integer(SEED).value(MODE).build());}
 }

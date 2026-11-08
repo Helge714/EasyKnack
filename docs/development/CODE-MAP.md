@@ -88,6 +88,9 @@ Paths below are relative to `native/audio-host/src/`.
 
 ## Resources, builds and tests
 
+- Packaging staging and example-folder ownership: [BUILD-STORAGE.md](BUILD-STORAGE.md); `scripts/clean-build-staging.ps1` reports or explicitly removes old GUID staging directories.
+- Context random Seed ports: `BinRandomNode`, `PartialNoiseNode`, native `PartialRandom.hpp`; tests `BinRandomTest`, `PartialsTest`.
+
 - `src/main/resources/easyknack*.gltheme`: selectable bundles over external Core presets.
 - `src/main/resources/easyknack/themes/`: shared color and geometry fragments; fragments are not selectable themes.
 - `src/main/resources/application*.properties`, `nodes*.properties`: UI and node translations.
