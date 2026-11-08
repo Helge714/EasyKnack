@@ -34,6 +34,7 @@ $sourceSnapshot = Get-SourceSnapshot $root
 $projectSources = Join-Path $Destination 'EasyKnack-project-sources.zip'
 Write-ProjectSources $root $projectSources $sourceSnapshot
 Push-Location $root
+$packageSucceeded = $false
 try {
     Write-Host 'Building and testing Java application...'
     if ($MavenClasspath) {
@@ -124,5 +125,19 @@ try {
         & "$PSScriptRoot/package-installer.ps1" -Image $image -WixDirectory $WixDirectory -Type $Type -Destination $Destination
     }
     Assert-SourceSnapshot $root $sourceSnapshot
-    Write-Host "Build logs: $work"
-} finally { Pop-Location }
+    $logDestination = Join-Path $Destination 'build-logs'
+    New-Item -ItemType Directory -Force -Path $logDestination | Out-Null
+    Get-ChildItem -LiteralPath $work -File -Filter '*.log' | Copy-Item -Destination $logDestination
+    Write-Host "Build logs: $logDestination"
+    $packageSucceeded = $true
+} finally {
+    Pop-Location
+    if ($packageSucceeded) {
+        $stagingRoot = [IO.Path]::GetFullPath((Join-Path $root 'target/package-work'))
+        $staging = [IO.Path]::GetFullPath($work)
+        if ([IO.Path]::GetDirectoryName($staging) -ne $stagingRoot -or [IO.Path]::GetFileName($staging) -notmatch '^[0-9a-f]{32}$') { throw 'Unsafe package staging path.' }
+        $linked = (@(Get-Item -LiteralPath $stagingRoot, $staging) + @(Get-ChildItem -LiteralPath $staging -Recurse -Force)) | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }
+        if ($linked) { Write-Warning "Staging contains links; retained: $staging" }
+        else { Remove-Item -LiteralPath $staging -Recurse -Force }
+    }
+}
