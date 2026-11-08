@@ -73,7 +73,7 @@ final class StochasticBinWidthExample {
         ports.add(new GLCompositePortMapping(GLNodePortDescriptor.input("Gaussian",SignalCategory.VALUE.valueTypeId(),false,1),new GLNodeEndpoint(select.id(),"gaussian"),slider(gaussian?1:0,"factor",true)));
         var descriptor=new GLCompositeNodeDescriptor("easyknack.group."+assetId,assetId,1,ports);
         var metadata=Map.of(SpectralGroups.MARKER,GLNodeValue.of(true),SpectralGroups.SKIP_EMPTY,GLNodeValue.of("false"),"easyknack.title",GLNodeValue.of("Stochastic Bin Width"),"easyknack.category",GLNodeValue.of("Spectral"),"easyknack.kind",GLNodeValue.of("SPECTRUM"),GroupRouting.INSERT_IN,GLNodeValue.of("spectrum"),GroupRouting.INSERT_OUT,GLNodeValue.of("out"),GroupRouting.MUTE_IN,GLNodeValue.of("spectrum"),GroupRouting.MUTE_OUT,GLNodeValue.of("out"));
-        var views=new LinkedHashMap<GLNodeId,GLNodeViewState>();int at=0;for(var n:List.of(context,random,select,reader,compensate,output))views.put(n.id(),new GLNodeViewState(40+(at/2)*360,60+(at++%2)*360,280,300));
+        var views=new LinkedHashMap<GLNodeId,GLNodeViewState>();int at=0;for(var n:List.of(context,random,select,reader,compensate,output))views.put(n.id(),new GLNodeViewState(40+(at/2)*360,60+(at++%2)*360));
         var asset=new GLNodeGraphAsset(assetId,1,GLNodeGraphAssetKind.COMPOSITE,graph.snapshot(),new GLNodeEditorViewState(views),metadata,descriptor);
         var registry=new GLCompositeGraphRegistry();registry.registerAsset(index);registry.registerAsset(phase);registry.registerAsset(asset);
         for(var entry:Map.of("Seed","seed","Vary by frame","by-frame").entrySet())ports.add(GroupEditorCopies.copy(new GLCompositePortMapping(GLNodePortDescriptor.input(entry.getKey(),SignalCategory.VALUE.valueTypeId(),false,1),null),new GLNodeEndpoint(random.id(),entry.getValue()),asset,registry));
@@ -81,7 +81,7 @@ final class StochasticBinWidthExample {
         var root=new GLNodeGraph();var instance=new GLGraphNode(id("instance"),descriptor.nodeTypeId(),Map.of());
         var osc=node("oscillator",new OscillatorNode());var fft=node("fft",new SpectrumNode());var ifft=node("ifft",new IFFTNode());var audio=node("audio-output",new OutputNode());
         root.edit("Example",edit->{for(var n:List.of(osc,fft,instance,ifft,audio))edit.addNode(n);edit.addConnection(wire(osc.id(),"audio-out",fft.id(),"audio-in"));edit.addConnection(wire(fft.id(),"analysis",instance.id(),"spectrum"));edit.addConnection(wire(instance.id(),"out",ifft.id(),"spectrum"));edit.addConnection(wire(ifft.id(),"out",audio.id(),"audio-in"));});
-        var rootViews=new LinkedHashMap<GLNodeId,GLNodeViewState>();at=0;for(var n:List.of(osc,fft,instance,ifft,audio))rootViews.put(n.id(),new GLNodeViewState(40+at++*340,80,280,420));
+        var rootViews=new LinkedHashMap<GLNodeId,GLNodeViewState>();at=0;for(var n:List.of(osc,fft,instance,ifft,audio))rootViews.put(n.id(),new GLNodeViewState(40+at++*340,80));
         return new Fixture(new GLNodeGraphDocument(new GLNodeGraphAsset("example.root",1,GLNodeGraphAssetKind.PROJECT,root.snapshot(),new GLNodeEditorViewState(rootViews)),Map.of(assetId,asset,index.id(),index,phase.id(),phase),List.of()),instance,assetId);
     }
 }
