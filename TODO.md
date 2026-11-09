@@ -19,6 +19,7 @@
 - [x] Doppelklick im Filechooser öffnet einen Ordner nur in der Seitenleiste, erst ein erneuter Doppelklick öffnet ihn im Hauptbereich. Die beiden sollten getrennt von einander sein, ein Doppelklick in der Seitenleiste öffnet den Ordner nur dort, ein Einfachklick im Seitenmenu öffnet den Ordner im Hauptbereich. Ein Doppelklick im Hauptbereich öffnet ihn nur dort.
 
 # Nice to have
+- [ ] Einordnung und Sichtbarkeit spezialisierter Forschungs-Nodes wie Sine Cloud festlegen.
 - [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
 - [x] Namensänderungen sollten resetable sein.
 - [x] Tooltips von Controls sollten immer auch den Namen des Controls anzeigen

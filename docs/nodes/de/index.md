@@ -20,6 +20,7 @@
 - [Hüllkurve](envelope.md)
 - [Rauschen](noise.md)
 - [Oszillator](oscillator.md)
+- [Sinuswolke (Sine Cloud)](sine-cloud.md)
 - [Wellenform](waveform.md)
 
 ## Effekte

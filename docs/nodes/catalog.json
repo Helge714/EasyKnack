@@ -2,6 +2,14 @@
   "schema": 1,
   "nodes": [
     {
+      "id": "easyknack.audio.sinecloud",
+      "slug": "sine-cloud",
+      "category": "generator",
+      "title": {"en": "Sine Cloud", "de": "Sinuswolke"},
+      "source": "SineCloudNode.java",
+      "kind": "node"
+    },
+    {
       "id": "easyknack.analysis.analysisaverage",
       "slug": "analysis-average",
       "category": "analysis",

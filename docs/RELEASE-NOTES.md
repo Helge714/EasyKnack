@@ -3,6 +3,8 @@
 
 ## Unreleased
 
+- Add Sine Cloud, a research generator for up to one million equal-amplitude, linearly spaced tones with seeded random phases. Background IFFT tables crossfade on control changes; Actual count exposes grid limits. Existing FFT limits and document/audio protocols are unchanged. Covered by the first development version.
+
 - Treat the first themed viewport as startup initialization, avoiding a false
   unsaved-document prompt. Actual graph edits and recovered documents remain dirty.
 - Speed up packaging tree copies and checksum inventories while preserving every

@@ -20,6 +20,7 @@
 - [Envelope](envelope.md)
 - [Noise](noise.md)
 - [Oscillator](oscillator.md)
+- [Sine Cloud](sine-cloud.md)
 - [Waveform](waveform.md)
 
 ## Effects
