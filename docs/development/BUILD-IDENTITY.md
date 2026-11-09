@@ -10,6 +10,12 @@ When Eclipse is compiling the same checkout, use
 classes and package output from Eclipse's `target/classes`. The default remains
 `target`; this option does not modify tracked versions or IDE settings.
 
+An isolated validation build does not update Eclipse's generated node registry.
+After adding or removing `@RegisterNode` classes, also regenerate the default
+`target/generated-sources/annotations` registry and compile it for the IDE launch.
+Maven Update Project and Refresh alone do not run this annotation processor.
+Check the registry used by `target/classes`, not only the isolated test output.
+
 Properties include the Maven version/artifact, UTC build time, full Git commit,
 dirty status (including untracked, non-ignored files), build kind and identifier.
 Git absence, inaccessible repositories and source archives produce `unknown`
