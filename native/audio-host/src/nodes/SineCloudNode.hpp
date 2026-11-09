@@ -16,8 +16,17 @@ struct SineCloudNode:NodeProcessor {
     bool canShareChannels()const noexcept override{return true;}
     bool supportsLiveParameters()const noexcept override{return true;}
     void configure(std::istream& in)override{
+        auto start=in.tellg();std::string marker;in>>marker;
+        // Preserve existing baked/source-plugin configurations from the first version.
+        if(marker=="!2303724719fab0c8"){
+            int a,b,c,d;unsigned count,seed;double lo,hi;
+            if(!(in>>a>>count>>b>>lo>>c>>hi>>d>>seed)||a< -1||b< -1||c< -1||d< -1||count<1||count>1000000||seed>16777215||
+                !std::isfinite(lo)||!std::isfinite(hi)||lo<.00001||lo>20000||hi<.00001||hi>20000)throw std::runtime_error("Invalid legacy Sine Cloud parameters");
+            sources={a,b,c,d};settings={count,seed,lo,hi,false};return;
+        }
+        in.clear();in.seekg(start);
         auto p=parameters::SineCloudNodeParameters::read(in);sources=p.sources();
-        settings={unsigned(p.count_value),unsigned(p.seed_value),p.minimum_value,p.maximum_value};
+        settings={unsigned(p.count_value),unsigned(p.seed_value),p.minimum_value,p.maximum_value,p.gaussian_value!=0};
     }
     void applyParameters(const NodeProcessor& other)noexcept override{settings=static_cast<const SineCloudNode&>(other).settings;}
     void prepare(double rate,std::size_t)override{
@@ -35,7 +44,7 @@ struct SineCloudNode:NodeProcessor {
     void process(ProcessContext& c)noexcept override{
         if(!worker){std::fill_n(c.output,c.bufferSize,0.f);if(auto* out=c.outputAt(1))std::fill_n(out,c.bufferSize,0.f);return;}
         auto p=settings;
-        p.count=unsigned(std::llround(std::clamp(finite(c.numericInput(0,float(p.count))[0],p.count),1.,1000000.)));
+        p.count=unsigned(std::llround(std::clamp(finite(c.numericInput(0,float(p.count))[0],p.count),1.,double(SineCloudTable::maximumCount))));
         p.minimum=std::clamp(finite(c.numericInput(1,float(p.minimum))[0],p.minimum),.00001,sampleRate*.5);
         p.maximum=std::clamp(finite(c.numericInput(2,float(p.maximum))[0],p.maximum),.00001,sampleRate*.5);
         p.seed=unsigned(std::llround(std::clamp(finite(c.numericInput(3,float(p.seed))[0],p.seed),0.,16777215.)));
