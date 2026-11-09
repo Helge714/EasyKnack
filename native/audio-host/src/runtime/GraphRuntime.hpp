@@ -164,6 +164,8 @@ struct AudioGraph {
             node.outputRates=rate.size()==1?std::string(node.processor->outputCount(),rate[0]):rate;
             // Frequency was appended after Factor/Trigger; old exports retain their port indices.
             if(node.processorId=="digitalnoise"&&node.outputRates=="ae"&&node.processor->outputCount()==3)node.outputRates+="a";
+            // Period was appended after Audio/Actual count; preserve older exports.
+            if(node.processorId=="sinecloud"&&node.outputRates=="ac"&&node.processor->outputCount()==3)node.outputRates+="c";
             if(node.outputRates.size()!=node.processor->outputCount())throw std::runtime_error("output rate count mismatch");
             if(node.processor->executionRate())rate=std::string(1,node.processor->executionRate());
             node.controlRate = rate.find_first_not_of('c')==std::string::npos;

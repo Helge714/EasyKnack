@@ -3,6 +3,10 @@
 
 ## Unreleased
 
+- Expose the active Sine Cloud table period in seconds, initially zero and updated when a new table becomes active. Existing Audio/Actual count output positions are preserved.
+
+- Add an optional Randomize phases toggle to Sine Cloud (on by default). Off starts all sine components at phase zero and ignores Seed without rebuilding playback; existing documents and native payloads retain random phases.
+
 - Extend Sine Cloud to ten million tones and optional Gaussian frequency density (linear Hz, +/-3 sigma), retaining equal component amplitudes and exact periodic playback. Larger tables are allocated only when needed; existing documents default to Uniform and old native payloads remain readable. Covered by the current first-development version.
 
 - Add Sine Cloud, a research generator for up to one million equal-amplitude, linearly spaced tones with seeded random phases. Background IFFT tables crossfade on control changes; Actual count exposes grid limits. Existing FFT limits and document/audio protocols are unchanged. Covered by the first development version.

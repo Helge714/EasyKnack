@@ -15,6 +15,7 @@ class SineCloudTest {
         assertEquals(4,node.processor().inputs().size());
         assertFalse(node.supportsSampleFeedback());
         var values=new java.util.HashMap<>(node.defaults());values.put("count",GLNodeValue.of(10000000));values.put("gaussian",GLNodeValue.of(true));
+        assertEquals(GLNodeValue.of(true),values.get("randomize"));values.put("randomize",GLNodeValue.of(false));
         var graph=new GLNodeGraph();var id=GLNodeId.random();
         graph.edit("Research stimulus",e->e.addNode(new GLGraphNode(id,node.registration().id(),values)));
         var document=new com.vingame.glswing.node.document.GLNodeGraphDocument(

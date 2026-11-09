@@ -17,8 +17,8 @@ struct SineCloudTable {
     struct Settings {
         unsigned count=10000,seed=0;
         double minimum=20,maximum=20000;
-        bool gaussian=false;
-        bool operator==(const Settings& p)const{return count==p.count&&seed==p.seed&&minimum==p.minimum&&maximum==p.maximum&&gaussian==p.gaussian;}
+        bool gaussian=false,randomPhases=true;
+        bool operator==(const Settings& p)const{return count==p.count&&seed==p.seed&&minimum==p.minimum&&maximum==p.maximum&&gaussian==p.gaussian&&randomPhases==p.randomPhases;}
     };
     std::vector<float> samples;
     unsigned count=0;
@@ -74,7 +74,7 @@ struct SineCloudTable {
         for(unsigned j=0;j<count;j++){
             auto bin=count==1?first:first+(std::uint64_t(j)*(last-first)+(count-1)/2)/(count-1);
             if(p.gaussian&&count>1)bin=first+std::size_t(std::llround((last-first)*gaussianPosition(double(j)/(count-1))));
-            double phase=(random(rng)>>11)*0x1.0p-53*tau;
+            double phase=p.randomPhases?(random(rng)>>11)*0x1.0p-53*tau:-tau/4; // IFFT cosine phase -> sine phase zero.
             bins[bin]=std::polar(1.,phase);bins[size-bin]=std::conj(bins[bin]);
         }
         spectrumTransform(bins.data(),size,true);
@@ -97,7 +97,7 @@ private:
     std::atomic<bool> stopping{false};
     std::atomic<std::uint64_t> version{0};
     std::atomic<unsigned> count{10000},seed{0};
-    std::atomic<bool> gaussian{false};
+    std::atomic<bool> gaussian{false},randomPhases{true};
     std::atomic<double> minimum{20},maximum{20000};
     SineCloudTable::Settings submitted;
     bool requested=false;
@@ -107,7 +107,7 @@ private:
         while(!stopping.load()){
             auto v=version.load();
             if(v&&!(v&1)&&v!=completed){
-                SineCloudTable::Settings p{count.load(),seed.load(),minimum.load(),maximum.load(),gaussian.load()};
+                SineCloudTable::Settings p{count.load(),seed.load(),minimum.load(),maximum.load(),gaussian.load(),randomPhases.load()};
                 if(version.load()!=v)continue;
                 for(auto& slot:slots){
                     int expected=free;
@@ -126,8 +126,9 @@ public:
     explicit SineCloudWorker(double sampleRate):rate(sampleRate),thread([this]{loop();}){}
     ~SineCloudWorker(){stopping.store(true);thread.join();}
     std::uint64_t request(SineCloudTable::Settings p)noexcept{
+        if(!p.randomPhases)p.seed=0; // Seed changes cannot restart an unrandomized stimulus.
         if(!requested||!(p==submitted)){
-            version.fetch_add(1);count.store(p.count);seed.store(p.seed);minimum.store(p.minimum);maximum.store(p.maximum);gaussian.store(p.gaussian);
+            version.fetch_add(1);count.store(p.count);seed.store(p.seed);minimum.store(p.minimum);maximum.store(p.maximum);gaussian.store(p.gaussian);randomPhases.store(p.randomPhases);
             submitted=p;requested=true;version.fetch_add(1);
         }
         return version.load();
