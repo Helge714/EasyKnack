@@ -72,7 +72,7 @@ class ReferenceProjectsTest {
         var source=dir.resolve("references.cpp");Files.writeString(source,cpp);
         Files.copy(Path.of("native/audio-host/benchmarks/ReferenceHarness.hpp"),dir.resolve("ReferenceHarness.hpp"),StandardCopyOption.REPLACE_EXISTING);
         // Compilation is separate from the standalone measurement; no other build runs during it.
-        RateConverterTest.run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O3","-ffp-contract=off","-static","-I",dir.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),source.toString(),"-o",dir.resolve("references.exe").toString()));
+        RateConverterTest.run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O3","-ffp-contract=off","-static","-I",dir.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),source.toString(),Path.of("native/audio-host/src/nodes/LorisLibrary.cpp").toAbsolutePath().toString(),"-o",dir.resolve("references.exe").toString()));
         var process=new ProcessBuilder(dir.resolve("references.exe").toString(),dir.toString()).redirectErrorStream(true).redirectOutput(dir.resolve("run.log").toFile()).start();
         try{
             assertTrue(process.waitFor(10,java.util.concurrent.TimeUnit.MINUTES),"Reference matrix timed out");

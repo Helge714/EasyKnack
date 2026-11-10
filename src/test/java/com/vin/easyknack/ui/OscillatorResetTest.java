@@ -103,7 +103,9 @@ class OscillatorResetTest {
             var values=new HashMap<>(d.defaults());values.put("frequency",GLNodeValue.of(480.));values.put("phase",GLNodeValue.of(90.));
             if(d instanceof AdditiveOscillatorNode)values.put("harmonics",GLNodeValue.of(3));
             String body=d.encode(new NodeState(values),p->-1),payload="!"+NativeContractGenerator.fingerprint(d)+" "+body;
-            String legacy=(d instanceof OscillatorNode?"!e5d6fa7b1b0ad545":"!51e01ae3a60f12dc")+" "+body.substring(0,body.lastIndexOf(' '));
+            // Historical contracts must stay literal; current encoders may add fields.
+            String legacy=d instanceof OscillatorNode?"!e5d6fa7b1b0ad545 -1 480 wave sine -1 -1 90":
+                "!51e01ae3a60f12dc -1 sine 3 1 0 -1 480 -1 90 inputs -1 -1 -1";
             code.append("""
                 {
                     %s block,chunk,old;
