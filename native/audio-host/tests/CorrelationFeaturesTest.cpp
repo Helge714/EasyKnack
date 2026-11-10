@@ -15,7 +15,7 @@ int main(){
     // The same snapshot is held, including during graph handover; parameter changes re-evaluate it.
     curve[100]=.2f;node.process(context);assert(out[0][0]>.79);
     CorrelationFeaturesNode inherited;inherited.inheritState(node);inherited.process(context);assert(out[0][0]>.79);
-    auto settings=node;settings.threshold=.9;node.applyParameters(settings);node.process(context);assert(out[4][0]==0);
+    CorrelationFeaturesNode settings;settings.applyParameters(node);settings.threshold=.9;node.applyParameters(settings);node.process(context);assert(out[4][0]==0);
     curve.fill(0);curve[0]=1;curve[99]=curve[101]=.7f;curve[100]=.8f;++r.sequence;
     node.process(context);assert(out[0][0]>.79&&out[1][0]==0&&out[2][0]==0&&out[3][0]>6&&out[4][0]==0);
     settings.threshold=.3;node.applyParameters(settings);node.process(context);assert(out[4][0]==1);
