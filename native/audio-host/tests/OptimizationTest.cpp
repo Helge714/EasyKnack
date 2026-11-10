@@ -17,12 +17,12 @@ int main(){
     }
 #endif
     AdditiveOscillatorNode spectrum;
-    for(unsigned count:{1u,144u,5u,72u,1u})for(float slope:{1.f,0.f,2.3f,4.f})for(float cents:{0.f,100.f,-100.f,2400.f,-2400.f}){
-        spectrum.updateSpectrum(slope,cents,count);
+    for(unsigned count:{1u,144u,5u,72u,1u})for(float slope:{1.f,0.f,2.3f,4.f})for(float exponent:{0.f,.5f,1.f,1.4f,2.f,4.f}){
+        spectrum.updateSpectrum(slope,exponent,count);
         for(unsigned h=0;h<144;h++){
-            double ratio=h==0?1:(h+1)*std::exp2(cents/1200.0);
+            double ratio=std::pow(h+1,static_cast<double>(exponent));
             double weight=h<count?std::pow(h+1,-slope):0;
-            assert(spectrum.ratios[h]==ratio&&spectrum.weights[h]==weight);
+            assert(std::abs(spectrum.ratios[h]-ratio)<=ratio*1e-12&&spectrum.weights[h]==weight);
         }
     }
     // Multiple outputs, fan-out, stereo, short buffers and changing oscillator state.
