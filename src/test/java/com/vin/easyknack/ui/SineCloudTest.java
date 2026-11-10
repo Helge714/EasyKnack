@@ -16,6 +16,12 @@ class SineCloudTest {
         assertFalse(node.supportsSampleFeedback());
         var values=new java.util.HashMap<>(node.defaults());values.put("count",GLNodeValue.of(10000000));values.put("gaussian",GLNodeValue.of(true));
         assertEquals(GLNodeValue.of(true),values.get("randomize"));values.put("randomize",GLNodeValue.of(false));
+        double nyquist=com.vin.easyknack.audio.AudioProcessing.SAMPLE_RATE*.5;
+        values.put("maximum",GLNodeValue.of(nyquist));values.put("minimum",GLNodeValue.of(nyquist-1000));
+        for(String input:java.util.List.of("minimum","maximum")){
+            var row=node.layout(new NodeState(values)).rows().stream().filter(r->r.id().equals(input)).findFirst().orElseThrow();
+            assertEquals(nyquist,((UnitSlider)row.editor()).spec().max());
+        }
         var graph=new GLNodeGraph();var id=GLNodeId.random();
         graph.edit("Research stimulus",e->e.addNode(new GLGraphNode(id,node.registration().id(),values)));
         var document=new com.vingame.glswing.node.document.GLNodeGraphDocument(
@@ -29,7 +35,9 @@ class SineCloudTest {
     void equalSpectralAmplitudesTenMillionToneCapacityAndRealtimeHandover()throws Exception{
         var dir=Files.createTempDirectory(Path.of("target"),"sine-cloud-test-").toAbsolutePath();
         Files.writeString(dir.resolve("ParameterContracts.hpp"),NativeContractGenerator.generate(NodeRegistry.builtinDefinitions()));
-        var definition=new SineCloudNode();String payload="!"+NativeContractGenerator.fingerprint(definition)+" "+definition.encode(new NodeState(definition.defaults()),p->-1);
+        var definition=new SineCloudNode();var parameters=new java.util.HashMap<>(definition.defaults());
+        parameters.put("maximum",GLNodeValue.of(com.vin.easyknack.audio.AudioProcessing.SAMPLE_RATE*.5));
+        String payload="!"+NativeContractGenerator.fingerprint(definition)+" "+definition.encode(new NodeState(parameters),p->-1);
         var source=dir.resolve("test.cpp");
         Files.writeString(source,Files.readString(Path.of("native/audio-host/tests/SineCloudTest.cpp")).replace("SINE_CLOUD_PAYLOAD",AdvancedSourceExportTest.quote(payload)));
         RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);

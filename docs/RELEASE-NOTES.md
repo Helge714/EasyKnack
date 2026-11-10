@@ -3,6 +3,8 @@
 
 ## Unreleased
 
+- Derive Sine Cloud frequency editor and parameter limits from the DSP Nyquist frequency (currently 24 kHz), allowing tones above 20 kHz. Existing frequency defaults and saved settings remain unchanged.
+
 - Expose the active Sine Cloud table period in seconds, initially zero and updated when a new table becomes active. Existing Audio/Actual count output positions are preserved.
 
 - Add an optional Randomize phases toggle to Sine Cloud (on by default). Off starts all sine components at phase zero and ignores Seed without rebuilding playback; existing documents and native payloads retain random phases.

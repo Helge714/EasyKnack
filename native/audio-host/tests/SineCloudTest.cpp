@@ -28,6 +28,17 @@ int main(){
     for(float x:a.samples)assert(std::isfinite(x)&&std::abs(x)<=1);
     auto narrow=SineCloudTable::plan({10000000,0,100,100.01,true},48000);assert(narrow.count<20&&narrow.count>=1);
     a.build({100,0,24000,50000},48000);assert(a.last<a.samples.size()/2&&a.count==1);
+    for(double rate:{44100.,48000.,96000.}){
+        auto plan=SineCloudTable::plan({7,0,rate*.5-1000,rate},rate);
+        assert(plan.count==7&&plan.last<plan.size/2);
+        assert(double(plan.first)*rate/plan.size>=rate*.5-1000);
+        assert(double(plan.last)*rate/plan.size<rate*.5);
+    }
+    a.build({7,0,23000,24000},48000);
+    bins.assign(a.samples.begin(),a.samples.end());spectrumTransform(bins.data(),bins.size());
+    unsigned upperLines=0;
+    for(unsigned k=1;k<bins.size()/2;k++)if(std::abs(bins[k])>1){++upperLines;assert(double(k)*48000/bins.size()>=23000);}
+    assert(upperLines==7);
     a.build({1,0,440,440},48000);assert(a.count==1&&a.first==a.last);
     a.build({7,42,700,100},65536);b.build({7,42,100,700},65536);assert(a.samples==b.samples);
     for(bool gaussian:{false,true}){
