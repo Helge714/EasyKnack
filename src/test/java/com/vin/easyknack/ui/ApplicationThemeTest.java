@@ -37,6 +37,8 @@ class ApplicationThemeTest {
         javax.swing.SwingUtilities.invokeAndWait(()->{
             var previous=ApplicationTheme.current();
             try(var controller=new WorkspaceController()){
+                // Match startup: apply the application theme before measuring document views.
+                controller.workspace().setGLTheme(previous.theme());
                 controller.openDocument("Themes",StarterDocument.create());
                 var document=NodeDocuments.comparable(controller.snapshotDocument());
                 var node=controller.workspace().editor().getNodes().get(0);
