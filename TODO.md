@@ -138,6 +138,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 ## Release readiness
 
+Repository audit and ordered candidate gates: [release readiness](docs/development/RELEASE-READINESS.md)
+(2026-11-10). Existing installer builds are not acceptance evidence for the latest sources.
+
 - [ ] Test installation, upgrade, uninstallation, file association and recovery on a
   clean Windows machine without development tools. Test read-only install paths,
   external x64 JDK 25 discovery/installation assistance and compiler prerequisites.

@@ -104,6 +104,7 @@ Paths below are relative to `native/audio-host/src/`.
 - `native/audio-host/tests/`, `native/audio-host/benchmarks/`: native validation and performance cases.
 - `docs/user/`: user instructions; `docs/development/`: contributor references.
 - `docs/RELEASE-NOTES.md`: product changes; `TODO.md`: pending work.
+- Release candidate gates and audit evidence: [RELEASE-READINESS.md](RELEASE-READINESS.md).
 - `target/`: generated/build artifacts and local diagnostic scripts; not authoritative source or permanent build instructions.
 
 For a small fix, locate the nearest existing regression test first. Run focused
