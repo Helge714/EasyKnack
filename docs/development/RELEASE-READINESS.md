@@ -4,6 +4,10 @@ Audited application baseline: `ae41864`; paired local GLSwing change: `2f5ed7c`.
 This is a repository and packaging-readiness review, not acceptance of a release
 binary. No installer was rebuilt, installed or published during this audit.
 
+Follow-up: Core source correspondence is now complete for the frozen November
+candidate; see [the reviewed reconstruction](source-audit/GLSWING-2026-11-10.md).
+The original findings below retain the hashes observed at the initial audit.
+
 ## Current state
 
 - EasyKnack: `0.0.1-SNAPSHOT`; external GLSwing: `0.2.0-SNAPSHOT` in `pom.xml`.

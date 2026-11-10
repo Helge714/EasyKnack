@@ -76,6 +76,10 @@ or public upload is performed by these scripts.
 
 ## Candidate source match (2026-10-07)
 
+Current Core correspondence is recorded in [the November review](source-audit/GLSWING-2026-11-10.md).
+The current source lock selects that newly frozen candidate; the October evidence
+below describes the older artifacts and does not validate subsequent rebuilds.
+
 The former GLSwing source mismatch review is resolved: an isolated rebuild of
 907 captured source/build files produced all 927 runtime classes and resources
 identically. Only generated build identity and Eclipse-specific Maven metadata
