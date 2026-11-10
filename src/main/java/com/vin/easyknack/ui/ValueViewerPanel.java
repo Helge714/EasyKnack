@@ -18,6 +18,7 @@ public final class ValueViewerPanel extends GLContainer {
         String id="";String[] names={"Value 1"},units={""};
         java.util.List<ValueSeries.Entry> series=ValueSeries.visible(new NodeState(java.util.Map.of()),1);
         double window=10;boolean paused,numbers,overlay;
+        long presentationRevision;
         ValueHistory.Snapshot frozen;
         ValueHistory.Snapshot frozenView;
         java.util.List<ValueSeries.Entry> frozenSeries;
@@ -33,6 +34,13 @@ public final class ValueViewerPanel extends GLContainer {
     private int drag;
     private boolean expanded;
     private double pressX;
+    private long renderedHistory=-1,renderedPresentation=-1,cachedHistory=-1;
+    private Session cachedSession;
+    private String[] cachedNames,cachedUnits;
+    private java.util.List<ValueSeries.Entry> cachedSeries;
+    private int cachedPoints;
+    private ValueHistory.Snapshot screenSnapshot,visibleSource,visibleScreen;
+    private double visibleZoom,visiblePan;
     public ValueViewerPanel(Consumer<GLNodeValue> changed){this(new Session(),changed,false);}
     private ValueViewerPanel(Session session,Consumer<GLNodeValue> changed,boolean expanded){
         this.session=session;this.changed=changed;this.expanded=expanded;
@@ -52,6 +60,7 @@ public final class ValueViewerPanel extends GLContainer {
         configure(state);
     }
     public void configure(NodeState state){
+        session.presentationRevision++;
         int count=ValueViewerNode.count(state);session.window=state.number(ValueViewerNode.WINDOW,10);
         session.names=new String[count];session.units=new String[count];
         session.series=ValueSeries.visible(state,count);
@@ -62,11 +71,16 @@ public final class ValueViewerPanel extends GLContainer {
         session.views.removeIf(ref->ref.get()==null);
         for(var ref:session.views){var view=ref.get();if(view!=null&&view!=this)view.refresh();}
     }
-    public void options(String options){session.numbers=options.contains("values");session.overlay=options.contains("overlay");refresh();}
-    private void saveOptions(){changed.accept(GLNodeValue.of((session.numbers?"values":"history")+(session.overlay?";overlay":"")));refresh();}
+    public void options(String options){
+        boolean numbers=options.contains("values"),overlay=options.contains("overlay");
+        if(session.numbers!=numbers||session.overlay!=overlay)session.presentationRevision++;
+        session.numbers=numbers;session.overlay=overlay;refresh();
+    }
+    private void saveOptions(){session.presentationRevision++;changed.accept(GLNodeValue.of((session.numbers?"values":"history")+(session.overlay?";overlay":"")));refresh();}
     public boolean isPaused(){return session.paused;}
     public void setPaused(boolean value){
         if(value==session.paused)return;
+        session.presentationRevision++;
         if(value)session.frozen=session.history.snapshot(session.names,session.units,true);
         session.frozenView=null;
         session.paused=value;if(!value){session.frozen=null;zoom=1;pan=0;}refresh();
@@ -75,7 +89,10 @@ public final class ValueViewerPanel extends GLContainer {
         var packet=AudioAnalysis.frame(session.id);
         if(packet==null)session.history.resetTransport();else session.history.accept(packet);
     }
-    private void dataReceived(){receive();if(!session.paused)refresh();}
+    private void dataReceived(){
+        receive();
+        if(renderedPresentation!=session.presentationRevision||!session.paused&&renderedHistory!=session.history.revision())refresh();
+    }
     private void refresh(){
         mode.setText(AppText.text(session.numbers?"viewer.history":"viewer.values"));
         pause.setText(AppText.text(session.paused?"analysis.resume":"analysis.pause"));
@@ -90,7 +107,8 @@ public final class ValueViewerPanel extends GLContainer {
         if(Double.isFinite(cursorA))info+=" · "+measurement(s,"A",cursorA);
         if(Double.isFinite(cursorB))info+=" · "+measurement(s,"B",cursorB);
         if(Double.isFinite(cursorA)&&Double.isFinite(cursorB))info+=" · Δt "+AnalysisChart.number(Math.abs(cursorB-cursorA))+" s";
-        status.setText(info);status.setToolTipText(info);chart.invalidateRecording();chart.repaintGL();
+        status.setText(info);status.setToolTipText(info);chart.invalidateRecording();
+        renderedHistory=session.history.revision();renderedPresentation=session.presentationRevision;
     }
     private String measurement(ValueHistory.Snapshot s,String name,double at){
         if(s.size()==0)return name+" —";
@@ -98,6 +116,7 @@ public final class ValueViewerPanel extends GLContainer {
         String result=name+" "+AnalysisChart.number(at-s.end())+" s";
         for(int p=0;p<s.channels();p++)result+=" / "+s.names()[p]+" "+AnalysisChart.number(s.value()[p][nearest])+" "+s.units()[p];return result;
     }
+    /** Screen queries reuse reduced data; live export queries retain independent full-resolution copies. */
     public ValueHistory.Snapshot snapshot(boolean screen){
         if(session.paused&&session.frozen!=null){
             if(session.frozenView==null||!session.series.equals(session.frozenSeries)){
@@ -105,12 +124,23 @@ public final class ValueViewerPanel extends GLContainer {
             }
             return session.frozenView;
         }
-        return ValueSeries.reorder(session.history.snapshot(session.names,session.units,false,screen?Math.max(100,(int)chart.getWidth()*2):Integer.MAX_VALUE),session.series);
+        if(!screen)return ValueSeries.reorder(session.history.snapshot(session.names,session.units,false),session.series);
+        int points=Math.max(100,(int)chart.getWidth()*2);
+        if(screenSnapshot==null||cachedSession!=session||cachedHistory!=session.history.revision()||cachedPoints!=points||
+                cachedNames!=session.names||cachedUnits!=session.units||cachedSeries!=session.series){
+            screenSnapshot=ValueSeries.reorder(session.history.snapshot(session.names,session.units,false,points),session.series);
+            cachedSession=session;cachedHistory=session.history.revision();cachedPoints=points;
+            cachedNames=session.names;cachedUnits=session.units;cachedSeries=session.series;
+        }
+        return screenSnapshot;
     }
     public ValueHistory.Snapshot visibleSnapshot(boolean screen){
-        var s=snapshot(screen);if(s.size()==0||zoom==1)return s;
+        var s=snapshot(screen);if(s.size()==0||zoom==1){if(screen){visibleSource=null;visibleScreen=null;}return s;}
+        if(screen&&visibleSource==s&&visibleZoom==zoom&&visiblePan==pan)return visibleScreen;
         double span=s.end()-s.time()[0],end=s.end()-pan*span,start=end-span/zoom;
-        return s.range(start,end);
+        var visible=s.range(start,end);
+        if(screen){visibleSource=s;visibleZoom=zoom;visiblePan=pan;visibleScreen=visible;}
+        return visible;
     }
     private Color[] colors(){
         int channels=session.paused&&session.frozen!=null?session.frozen.channels():session.names.length;

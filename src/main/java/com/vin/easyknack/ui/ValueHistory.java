@@ -25,10 +25,12 @@ public final class ValueHistory {
     private float[][] low=new float[1][capacity],high=new float[1][capacity],last=new float[1][capacity];
     private double[] time=new double[capacity];
     private AudioAnalysis.Frame lastPacket;
+    private long revision;
+    public long revision(){return revision;}
     public void configure(int count,double duration){
         if(count<1||count>8||!Double.isFinite(duration)||duration<=0)throw new IllegalArgumentException("Invalid value history settings");
         if(channels==count&&seconds==duration)return;
-        channels=count;seconds=duration;resize();
+        channels=count;seconds=duration;resize();revision++;
     }
     private void resize(){
         int desired=(int)Math.min(MAX_RECORDS/channels,Math.ceil(seconds/Math.max(1e-9,interval))+2);
@@ -50,6 +52,7 @@ public final class ValueHistory {
         if(stride<1||buckets<0||8L+(long)buckets*count*3!=v.length)return;
         long end=0;for(int j=0;j<4;j++){int word=(int)v[4+j];if(word<0||word>65535)return;end|=(long)word<<(16*j);}
         if(end<0)return;
+        long previousSample=lastSample;int previousSize=size;double previousRate=rate,previousInterval=interval;
         double nextInterval=stride/nextRate;
         if(rate!=nextRate||interval!=nextInterval||end<lastSample){size=cursor=0;lastSample=-1;rate=nextRate;interval=nextInterval;resize();}
         lastPacket=packet;
@@ -62,6 +65,7 @@ public final class ValueHistory {
             cursor=(cursor+1)%capacity;size=Math.min(capacity,size+1);lastSample=sample;
         }
         while(size>0&&time[(cursor+capacity-size)%capacity]<end/rate-seconds)size--;
+        if(previousSample!=lastSample||previousSize!=size||previousRate!=rate||previousInterval!=interval)revision++;
     }
     public Snapshot snapshot(String[] names,String[] units,boolean frozen){return snapshot(names,units,frozen,Integer.MAX_VALUE);}
     /** Screen snapshots are reduced before allocation; extrema survive reduction. */
@@ -80,5 +84,5 @@ public final class ValueHistory {
         for(int p=0;p<channels;p++){if(labels[p]==null)labels[p]="Value "+(p+1);if(suffixes[p]==null)suffixes[p]="";}
         return new Snapshot(t,lo,hi,values,interval*step,labels,suffixes,frozen,java.time.Instant.now().toString());
     }
-    public void resetTransport(){lastPacket=null;lastSample=-1;size=cursor=0;}
+    public void resetTransport(){if(lastPacket!=null||lastSample!=-1||size!=0)revision++;lastPacket=null;lastSample=-1;size=cursor=0;}
 }

@@ -20,6 +20,8 @@ public class BasicNodeView extends GLNode {
         private final GLHistoryManager history;
         private final GLNodeId id;
         private final String structure;
+        private final List<PropertyId> inputProperties;
+        private final boolean vectorEditors;
         private final java.util.Locale presentationLocale=ApplicationSettings.locale();
         private final List<Consumer<NodeState>> updates = new ArrayList<>();
         private final Map<PropertyId,GLContainer> controls = new LinkedHashMap<>();
@@ -51,6 +53,8 @@ public class BasicNodeView extends GLNode {
             category = definition.registration().kind();
             setTitleGradientEnabled(true);
             var layout = definition.layout(new NodeState(model.properties()));
+            inputProperties=layout.rows().stream().filter(row->row.kind()==NodeBuilder.RowKind.INPUT).map(NodeBuilder.Row::key).toList();
+            vectorEditors=layout.rows().stream().anyMatch(row->row.editor() instanceof VectorEditor);
             structure = structure(layout);
             setPortOrder(definition.portOrder());
             setResizeMode(definition.resizeMode());
@@ -167,13 +171,12 @@ public class BasicNodeView extends GLNode {
         private void updateBindings(GLGraphNode model) {
             synchronizing = true;
             try {
-                var connected = definition.layout(new NodeState(model.properties())).rows().stream()
-                        .filter(row -> row.kind() == NodeBuilder.RowKind.INPUT)
-                        .filter(row -> findPort(row.id()) != null && findPort(row.id()).getActiveConnectionCount() > 0)
-                        .map(NodeBuilder.Row::key).collect(java.util.stream.Collectors.toSet());
-                if(model.equals(lastModel) && connected.equals(lastConnected) && ApplicationSettings.locale().equals(bindingLocale)) return;
+                boolean sameConnections=true;
+                for(var property:inputProperties){var port=findPort(property.value());if((port!=null&&port.getActiveConnectionCount()>0)!=lastConnected.contains(property)){sameConnections=false;break;}}
+                if(model.equals(lastModel)&&sameConnections&&ApplicationSettings.locale().equals(bindingLocale))return;
+                var connected=inputProperties.stream().filter(key->findPort(key.value())!=null&&findPort(key.value()).getActiveConnectionCount()>0).collect(java.util.stream.Collectors.toSet());
                 bindingLocale=ApplicationSettings.locale();
-                boolean vectorConnectionsChanged=!connected.equals(lastConnected) && definition.layout(new NodeState(model.properties())).rows().stream().anyMatch(r->r.editor() instanceof VectorEditor);
+                boolean vectorConnectionsChanged=!sameConnections&&vectorEditors;
                 lastModel=model;lastConnected=connected;
                 var state = new NodeState(model.properties(), connected);
                 var layout=definition.layout(state);
