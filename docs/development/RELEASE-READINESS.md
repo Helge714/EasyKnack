@@ -6,6 +6,8 @@ binary. No installer was rebuilt, installed or published during this audit.
 
 Follow-up: Core source correspondence is now complete for the frozen November
 candidate; see [the reviewed reconstruction](source-audit/GLSWING-2026-11-10.md).
+The full automated regression run is now complete with five unresolved cases;
+see [results and release blockers](source-audit/REGRESSION-2026-11-10.md).
 The original findings below retain the hashes observed at the initial audit.
 
 ## Current state

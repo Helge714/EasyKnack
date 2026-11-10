@@ -1,4 +1,6 @@
 # Bugs
+- [ ] Release blocker: Harmonizer-Exporttest verfehlt Pitch-Hold-Akzeptanz bzw. Frequenzgenauigkeit; erneute Ausführung desselben Testprogramms reproduziert den Fehler. Siehe `HarmonizerTest.exampleAndExportRunWithAnalysisAndStatefulNodes` und [Regressionstestlauf](docs/development/source-audit/REGRESSION-2026-11-10.md).
+- [ ] Release blocker: Gruppieren der beiden Math-Nodes einer Feedback-Schleife bei außerhalb verbleibendem stummgeschaltetem Delay liefert Stille statt des bisherigen Fallback-Werts. Reproduziert durch `FeedbackWarningAudioTest.groupingMutedDelayPreservesAudio`; siehe [Regressionstestlauf](docs/development/source-audit/REGRESSION-2026-11-10.md).
 - [x] Wenn man einen Step Switch innerhalb einer Gruppe von Trigger auf Index umstellt, verschwindet er, bis man die Gruppe verlässt und neu öffnet.
 - [x] manchmal funktioniert undo nicht mehr, ohne Fehlermeldung
 - [x] wenn man Einträge in einer custom-Combobox ändert, erscheinen diese Änderungen erst im Node, wenn man die Combobox entfernt und dann wieder hinzufügt
@@ -140,6 +142,9 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
 
 Repository audit and ordered candidate gates: [release readiness](docs/development/RELEASE-READINESS.md)
 (2026-11-10). Existing installer builds are not acceptance evidence for the latest sources.
+
+- [ ] Resolve remaining native export validation failures in SourceExportAndAnalysisTest
+  and SpecializedChainTest; see [regression evidence](docs/development/source-audit/REGRESSION-2026-11-10.md).
 
 - [ ] Test installation, upgrade, uninstallation, file association and recovery on a
   clean Windows machine without development tools. Test read-only install paths,

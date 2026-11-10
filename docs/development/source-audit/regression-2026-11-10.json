@@ -1,0 +1,215 @@
+{
+  "date": "2026-11-10",
+  "applicationBaseline": "20bd9bdbb61dd86ab41975c879adcb1d5e884e0b",
+  "core": {
+    "binarySha256": "eea05e32a6fea473cab16b4a56c7a20fc596d28b96a6baf8fdcfd3774e20bf5f",
+    "rebuiltSha256": "ba30d27b5d8dccec115a16efdd7c2939159e1b5393e02c0a112678acee11c5e4",
+    "classCount": 962,
+    "differences": [
+      "META-INF/glswing/build.properties"
+    ],
+    "classDifferences": [],
+    "commit": "2f5ed7c",
+    "sourceFiles": 789,
+    "sourceJarMatchedEntries": 532,
+    "coreTests": {
+      "tests": 171,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "artifacts": {
+      "glswing-0.2.0-SNAPSHOT-build-inputs.zip": "f435b7b4c71bbd997325c2d75c184c61149a356851dafed9cc582059f19166a8",
+      "glswing-0.2.0-SNAPSHOT-sources.jar": "14eded0b82007d6ded3575f9d4fe1f387de8eab01d7af5124a87c224cb06df58",
+      "glswing-0.2.0-SNAPSHOT.jar": "eea05e32a6fea473cab16b4a56c7a20fc596d28b96a6baf8fdcfd3774e20bf5f",
+      "glswing-parent-0.2.0-SNAPSHOT.pom": "31405f2c4ef8a565978f4b24f0171f6c0cdc54faabf690e1886ad76b248ff995"
+    }
+  },
+  "application": {
+    "totals": {
+      "tests": 723,
+      "failures": 14,
+      "errors": 1,
+      "skipped": 7
+    },
+    "failedCases": [
+      {
+        "test": "com.vin.easyknack.ui.ApplicationThemeTest.variantsPreviewOnExistingNodesWithoutEditingTheDocument",
+        "kind": "failure",
+        "message": "expected: <GLNodeGraphDocument[root=GLNodeGraphAsset[id=easyknack.root, version=1, kind=PROJECT, graph=GLNodeGraphSnapshot[graphId=f1fe7e6c-0052-496b-ad2e-62f95ba3753b, revision=0, nodes=[GLGraphNode[id=752a933a-81f7-487b-a9c4-7c137686abef, typeId=easyknack.audio.oscillator, typeVersion=1, properties={__automaticDefault.waveform=TextValue[value=sine], __automatic.waveform=BooleanValue[value=true], phase=DecimalValue[value=0.0], __automatic.frequency.unit=BooleanValue[value=true], frequency.unit=TextValue[value=hz], frequency=DecimalValue[value=440.0], phase.unit=TextValue[value=turn], __automaticDefault.reset=DecimalValue[value=0.0], __automatic.reset=BooleanValue[value=true], __automatic.frequency=BooleanValue[value=true], __automatic.phase=BooleanValue[value=true], __automaticDefault.phase=DecimalValue[value=0.0], __automaticDefault.frequency.unit=TextValue[value=hz], __automaticDefault.frequency=DecimalValue[value=440.0], __automaticDefault.phase.unit=TextValue[value=turn], __automa"
+      },
+      {
+        "test": "com.vin.easyknack.ui.CorrelationFeaturesTest.peaksSilenceHnrFrameCadenceAndAverageMetadata",
+        "kind": "failure",
+        "message": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\tests\\CorrelationFeaturesTest.cpp:18:10: error: call to implicitly-deleted copy constructor of 'CorrelationFeaturesNode'\n   18 |     auto settings=node;settings.threshold=.9;node.applyParameters(settings);node.process(context);assert(out[4][0]==0);\n      |          ^        ~~~~\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/nodes/CorrelationFeaturesNode.hpp:7:34: note: copy constructor of 'CorrelationFeaturesNode' is implicitly deleted because base class 'NodeProcessor' has a deleted copy constructor\n    7 | struct CorrelationFeaturesNode : NodeProcessor {\n      |                                  ^\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/nodes/../NodeProcessor.hpp:104:43: note: copy constructor of 'NodeProcessor' is implicitly deleted because field 'controls' has a"
+      },
+      {
+        "test": "com.vin.easyknack.ui.FeedbackWarningAudioTest.groupingMutedDelayPreservesAudio",
+        "kind": "failure",
+        "message": "Assertion failed: std::abs(value-.1f)<1e-5f, file C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\feedback-group-audio-6932493499435081363\\test.cpp, line 3\n ==> expected: <0> but was: <-1073740791>"
+      },
+      {
+        "test": "com.vin.easyknack.ui.FoundationReformTest.exportedResourceGraphMatchesOriginalInBothChannels",
+        "kind": "failure",
+        "message": "In file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\resource-native-9731313442610243640\\test.cpp:2:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\resource-native-9731313442610243640/BakedGroupc9c39fa5a4dd.hpp:4:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/SimdMath.hpp:3:\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/dsp/SimdMath.hpp:15:12: warning: 12 enumeration values not handled in switch: 'power', 'remainder', 'modulo'... [-Wswitch]\n   15 |     switch(operation){\n      |            ^~~~~~~~~\n1 warning generated.\nld.lld: error: undefined symbol: easyknack::LorisStream::~LorisStream()\n>>> referenced by C:/Users/rende/AppData/Local/Temp/test-771e1c.o:(easyknack::PartialAnalysisNode::~PartialAnalysisNode())\n>>> referenced "
+      },
+      {
+        "test": "com.vin.easyknack.ui.HarmonizerTest.exampleAndExportRunWithAnalysisAndStatefulNodes",
+        "kind": "failure",
+        "message": "Assertion failed: hold->accepted&&std::abs(hold->held-sourceFrequency)<sourceFrequency*.01, file C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\harmonizer-export-14408138207549039488\\test.cpp, line 22\n ==> expected: <0> but was: <-1073740791>"
+      },
+      {
+        "test": "com.vin.easyknack.ui.MeasurementRecorderTest.nativeCaptureAndUnconnectedManualRecorder",
+        "kind": "error",
+        "message": ""
+      },
+      {
+        "test": "com.vin.easyknack.ui.OptimizationTest.simdSpectrumAndBufferReuseMatchReferences",
+        "kind": "failure",
+        "message": "Assertion failed: spectrum.ratios[h]==ratio&&spectrum.weights[h]==weight, file C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\tests\\OptimizationTest.cpp, line 25\n ==> expected: <0> but was: <-1073740791>"
+      },
+      {
+        "test": "com.vin.easyknack.ui.OscillatorResetTest.resetIsSampleAccurateAcrossAdjacentEventsChunksStereoAndStateTransfer",
+        "kind": "failure",
+        "message": "libc++abi: terminating due to uncaught exception of type std::runtime_error: Missing parameter: spread\n ==> expected: <0> but was: <-1073740791>"
+      },
+      {
+        "test": "com.vin.easyknack.ui.PureFusionTest.mixedPureOperationsConstantsAndCommonExpressionsMatchScheduler",
+        "kind": "failure",
+        "message": "#pragma once\n#include \"ParameterContracts.hpp\"\n#include \"BakedGraph.hpp\"\n#include \"SimdMath.hpp\"\n#include <sstream>\n#include \"nodes/UnitConverterNode.hpp\"\n#include \"nodes/MathNode.hpp\"\n#include \"nodes/MixNode.hpp\"\n#include \"nodes/MapRangeNode.hpp\"\nnamespace easyknack {\nstruct BakedGroup905eff81c5c2:BakedGraphProcessor {\n    void configure(std::istream& in)override{auto p=parameters::BakedGroup905eff81c5c2Parameters::read(in);sources=p.sources();\n        configureGraph(\"GRAPH 11 input0 baked_input 0 0 0 @ a - node0 unitconvert !7f7bc15f2eb92337 0 0.0 factor factor @ a a node1 math !f2c12009349832d2 1 0.0 -1 0.3 multiply 0 @ a aa node2 unitconvert !7f7bc15f2eb92337 0 0.0 factor factor @ a a node3 math !f2c12009349832d2 3 0.0 -1 0.3 multiply 0 @ a aa node4 mix !35ad97674505797a 2 0.0 4 0.0 -1 0.25 linear @ a aaa node5 math !f2c12009349832d2 -1 2.0 -1 3.0 multiply 0 @ a aa node6 maprange !98c23c5e5bb8a10b 5 0.0 -1 -1.0 6 1.0 -1 -2.0 -1 2.0 0 @ a aaaaa node7 unitconvert !7f7bc15f2eb92337 7 "
+      },
+      {
+        "test": "com.vin.easyknack.ui.ReferenceProjectsTest.compareAndMeasureOriginalExportAndScheduledExport",
+        "kind": "failure",
+        "message": "In file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\reference-v1\\references.cpp:3:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\reference-v1/BakedGroup225863692787.hpp:4:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/SimdMath.hpp:3:\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/dsp/SimdMath.hpp:15:12: warning: 12 enumeration values not handled in switch: 'power', 'remainder', 'modulo'... [-Wswitch]\n   15 |     switch(operation){\n      |            ^~~~~~~~~\n1 warning generated.\nld.lld: error: undefined symbol: easyknack::LorisStream::~LorisStream()\n>>> referenced by C:/Users/rende/AppData/Local/Temp/references-b7a203.o:(easyknack::PartialAnalysisNode::~PartialAnalysisNode())\n>>> referenced by C:/Users/rende/AppData/Local/Te"
+      },
+      {
+        "test": "com.vin.easyknack.ui.SourceExportAndAnalysisTest.generatedNativeGroupMatchesOscillatorAndAnalysisDetectsPitch",
+        "kind": "failure",
+        "message": "expected: <0> but was: <-1073741571>"
+      },
+      {
+        "test": "com.vin.easyknack.ui.SourceExportAndAnalysisTest.hostAcceptsTemporalContractsAndPublishesLiveAnalysis",
+        "kind": "failure",
+        "message": "easyknack.partials.context ==> Unexpected exception thrown: java.lang.IllegalArgumentException: Partial-only nodes require a Partial Group."
+      },
+      {
+        "test": "com.vin.easyknack.ui.SpecializedChainTest.specializedChainMatchesOriginalPreviousExportAndHandwritten",
+        "kind": "failure",
+        "message": "In file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain\\comparison.cpp:2:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain/Export.hpp:4:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/SimdMath.hpp:3:\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/dsp/SimdMath.hpp:15:12: warning: 12 enumeration values not handled in switch: 'power', 'remainder', 'modulo'... [-Wswitch]\n   15 |     switch(operation){\n      |            ^~~~~~~~~\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain\\comparison.cpp:6:\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain/SpecializedChainHarne"
+      },
+      {
+        "test": "com.vin.easyknack.ui.SpectralFeaturesTest.momentsFluxFrameCadenceAndPeakCapture",
+        "kind": "failure",
+        "message": "C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\tests\\SpectralFeaturesTest.cpp:36:10: error: call to implicitly-deleted copy constructor of 'SpectralFeaturesNode'\n   36 |     auto settings=linear;settings.logarithmic=true;linear.applyParameters(settings);\n      |          ^        ~~~~~~\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/nodes/SpectralFeaturesNode.hpp:7:31: note: copy constructor of 'SpectralFeaturesNode' is implicitly deleted because base class 'NodeProcessor' has a deleted copy constructor\n    7 | struct SpectralFeaturesNode : NodeProcessor {\n      |                               ^\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/nodes/../NodeProcessor.hpp:104:43: note: copy constructor of 'NodeProcessor' is implicitly deleted because field 'controls' has a deleted copy constructor\n  104 |     std::unique_p"
+      },
+      {
+        "test": "com.vin.easyknack.ui.WaveformTest.nativeTablesCaptureAndBothOscillators",
+        "kind": "failure",
+        "message": "ld.lld: error: undefined symbol: easyknack::LorisStream::~LorisStream()\n>>> referenced by C:/Users/rende/AppData/Local/Temp/test-743a7e.o:(std::__1::default_delete<easyknack::LorisStream>::operator()[abi:ne200100](easyknack::LorisStream*) const)\n\nld.lld: error: undefined symbol: easyknack::LorisStream::LorisStream()\n>>> referenced by C:/Users/rende/AppData/Local/Temp/test-743a7e.o:(std::__1::unique_ptr<easyknack::LorisStream, std::__1::default_delete<easyknack::LorisStream>> std::__1::make_unique[abi:ne200100]<easyknack::LorisStream, 0>())\n\nld.lld: error: undefined symbol: easyknack::LorisStream::reset()\n>>> referenced by C:/Users/rende/AppData/Local/Temp/test-743a7e.o:(easyknack::PartialAnalysisNode::analyze())\n>>> referenced by C:/Users/rende/AppData/Local/Temp/test-743a7e.o:(easyknack::PartialAnalysisNode::analyze())\n>>> referenced by C:/Users/rende/AppData/Local/Temp/test-743a7e.o:(easyknack::PartialAnalysisNode::analyze())\n\nld.lld: error: undefined symbol: easyknack::LorisStream::"
+      }
+    ],
+    "skippedCases": [
+      {
+        "test": "com.vin.easyknack.audio.AudioHostClientTest.systemAndApplicationCopyCaptureOpenWithoutOutputOrRoutingChanges",
+        "reason": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "test": "com.vin.easyknack.audio.AudioHostClientTest.defaultOutputOpensAndClosesWhileSilent",
+        "reason": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "test": "com.vin.easyknack.audio.AudioHostClientTest.availableAsioDriverRunsSilentGraphAndReturnsToWasapi",
+        "reason": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "test": "com.vin.easyknack.audio.AudioHostClientTest.discoversWindowsMidiDevicesWithoutOpeningThem",
+        "reason": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "test": "com.vin.easyknack.ui.InstanceFalloffDocumentTest.convert",
+        "reason": "System property [easyknack.test.falloffDocument] does not exist"
+      },
+      {
+        "test": "com.vin.easyknack.ui.InstancePerformanceTest.generate",
+        "reason": "System property [easyknack.test.benchmark] does not exist"
+      },
+      {
+        "test": "com.vin.easyknack.ui.LoadedSliderRenderingTest.loadedSlidersRender",
+        "reason": "System property [easyknack.test.document] does not exist"
+      }
+    ]
+  },
+  "focusedCorrections": {
+    "totals": {
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "failedCases": [],
+    "skippedCases": []
+  },
+  "nativePrograms": {
+    "passed": [
+      "WindowsAudioBackendTest",
+      "AsioBackendTest",
+      "AudioGraphTest",
+      "SharedAudioTransportTest",
+      "DriverBridgeTest"
+    ],
+    "hostSha256": "bf92f74d703b3d0292f1ae2083f3541ced557c9e80db08950e74723b084ed401"
+  },
+  "enabledFlags": [
+    "easyknack.test.audio",
+    "easyknack.test.gl",
+    "easyknack.test.references"
+  ],
+  "notEnabled": [
+    "easyknack.test.device",
+    "easyknack.test.benchmark",
+    "easyknack.test.document",
+    "easyknack.test.falloffDocument"
+  ],
+  "installerAcceptance": false,
+  "resolvedBaselineCases": [
+    "com.vin.easyknack.ui.ApplicationThemeTest.variantsPreviewOnExistingNodesWithoutEditingTheDocument",
+    "com.vin.easyknack.ui.CorrelationFeaturesTest.peaksSilenceHnrFrameCadenceAndAverageMetadata",
+    "com.vin.easyknack.ui.FoundationReformTest.exportedResourceGraphMatchesOriginalInBothChannels",
+    "com.vin.easyknack.ui.MeasurementRecorderTest.nativeCaptureAndUnconnectedManualRecorder",
+    "com.vin.easyknack.ui.OptimizationTest.simdSpectrumAndBufferReuseMatchReferences",
+    "com.vin.easyknack.ui.OscillatorResetTest.resetIsSampleAccurateAcrossAdjacentEventsChunksStereoAndStateTransfer",
+    "com.vin.easyknack.ui.PureFusionTest.mixedPureOperationsConstantsAndCommonExpressionsMatchScheduler",
+    "com.vin.easyknack.ui.ReferenceProjectsTest.compareAndMeasureOriginalExportAndScheduledExport",
+    "com.vin.easyknack.ui.SpectralFeaturesTest.momentsFluxFrameCadenceAndPeakCapture",
+    "com.vin.easyknack.ui.WaveformTest.nativeTablesCaptureAndBothOscillators"
+  ],
+  "unresolvedCases": [
+    {
+      "test": "com.vin.easyknack.ui.FeedbackWarningAudioTest.groupingMutedDelayPreservesAudio",
+      "kind": "failure",
+      "message": "Assertion failed: std::abs(value-.1f)<1e-5f, file C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\feedback-group-audio-6932493499435081363\\test.cpp, line 3\n ==> expected: <0> but was: <-1073740791>"
+    },
+    {
+      "test": "com.vin.easyknack.ui.HarmonizerTest.exampleAndExportRunWithAnalysisAndStatefulNodes",
+      "kind": "failure",
+      "message": "Assertion failed: hold->accepted&&std::abs(hold->held-sourceFrequency)<sourceFrequency*.01, file C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\harmonizer-export-14408138207549039488\\test.cpp, line 22\n ==> expected: <0> but was: <-1073740791>"
+    },
+    {
+      "test": "com.vin.easyknack.ui.SourceExportAndAnalysisTest.generatedNativeGroupMatchesOscillatorAndAnalysisDetectsPitch",
+      "kind": "failure",
+      "message": "expected: <0> but was: <-1073741571>"
+    },
+    {
+      "test": "com.vin.easyknack.ui.SourceExportAndAnalysisTest.hostAcceptsTemporalContractsAndPublishesLiveAnalysis",
+      "kind": "failure",
+      "message": "easyknack.partials.context ==> Unexpected exception thrown: java.lang.IllegalArgumentException: Partial-only nodes require a Partial Group."
+    },
+    {
+      "test": "com.vin.easyknack.ui.SpecializedChainTest.specializedChainMatchesOriginalPreviousExportAndHandwritten",
+      "kind": "failure",
+      "message": "In file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain\\comparison.cpp:2:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain/Export.hpp:4:\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/SimdMath.hpp:3:\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\native\\audio-host\\src/dsp/SimdMath.hpp:15:12: warning: 12 enumeration values not handled in switch: 'power', 'remainder', 'modulo'... [-Wswitch]\n   15 |     switch(operation){\n      |            ^~~~~~~~~\nIn file included from C:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain\\comparison.cpp:6:\nC:\\Users\\rende\\eclipse-workspace\\easy-knack\\target\\release-validation-20261110\\app\\target\\specialized-chain/SpecializedChainHarne"
+    }
+  ],
+  "applicationGatePassed": false
+}
