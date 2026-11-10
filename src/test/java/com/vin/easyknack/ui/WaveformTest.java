@@ -69,7 +69,7 @@ class WaveformTest {
         var source=dir.resolve("test.cpp");Files.writeString(source,Files.readString(Path.of("native/audio-host/tests/WaveformTest.cpp")).replace("// GRAPH_TEST",integration));
         RateConverterTest.run(List.of("powershell.exe","-NoProfile","-ExecutionPolicy","Bypass","-File",Path.of("scripts/generate-native-nodes.ps1").toAbsolutePath().toString(),"-OutputDirectory",dir.toString()));
         var executable=dir.resolve("test.exe");
-        RateConverterTest.run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O0","-static","-I",dir.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),source.toString(),"-o",executable.toString()));
+        RateConverterTest.run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O0","-static","-I",dir.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),source.toString(),Path.of("native/audio-host/src/nodes/LorisLibrary.cpp").toAbsolutePath().toString(),"-o",executable.toString()));
         RateConverterTest.run(List.of(executable.toString()));
     }
 }
