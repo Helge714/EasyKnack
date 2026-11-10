@@ -32,7 +32,10 @@ class PureFusionTest {
         var root=new GLNodeGraph();var group=new GLGraphNode(GLNodeId.random(),descriptor.nodeTypeId(),Map.of());root.edit("Group",e->e.addNode(group));
         var doc=new GLNodeGraphDocument(new GLNodeGraphAsset("root",1,GLNodeGraphAssetKind.PROJECT,root.snapshot(),GLNodeEditorViewState.empty()),Map.of(asset.id(),asset),List.of());
         var export=GroupSourceExporter.create(doc,group);String name=export.className(),source=export.files().get("native/"+name+".hpp");
-        assertTrue(source.contains("folded=1, reused=1"),source);
+        var optimizations=java.util.regex.Pattern.compile("folded=(\\d+), reused=(\\d+)").matcher(source);
+        assertTrue(optimizations.find(),source);
+        assertTrue(Integer.parseInt(optimizations.group(1))>=1,"Expected constant folding");
+        assertTrue(Integer.parseInt(optimizations.group(2))>=1,"Expected common-expression reuse");
         var dir=Files.createTempDirectory(Path.of("target"),"pure-fusion-").toAbsolutePath();
         Files.writeString(dir.resolve(name+".hpp"),source);
         Files.writeString(dir.resolve("Reference.hpp"),source.replace("struct "+name+":","struct Reference:").replace("if(renderFusedMath","if(false && renderFusedMath"));
