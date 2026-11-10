@@ -3,6 +3,8 @@
 
 ## Unreleased
 
+- Reuse graph rate and diagnostic structure keys across scalar edits; cache execution-area and mute diagnostics until relevant structure changes. Pair with GLSwing connection-gradient reuse and conservative offscreen-node traversal; preserve crossing wires, focused editors, warning updates and custom color callbacks. Covered by the current development versions.
+
 - Reuse reduced Value Viewer snapshots across status, cursor and chart rendering; invalidate on data, size and series changes while keeping full export copies and capture intact. Skip unchanged analysis redraws, duplicate repaint requests and redundant layouts during unchanged node binding updates. Covered by the current development version.
 
 - Size new and loaded nodes synchronously from themed editor dimensions, including groups. Honor wider editor requirements and preserve larger saved sizes; remove deferred repacking and fixed standard-width overrides. Device names remain in independent popups. Covered by the existing development version.

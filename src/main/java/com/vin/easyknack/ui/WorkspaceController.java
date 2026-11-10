@@ -79,7 +79,7 @@ final class WorkspaceController implements AutoCloseable {
     }
     private final Map<com.vingame.glswing.node.GLNode,GLGraphNode> presented=new java.util.IdentityHashMap<>();
     private boolean presentationRefreshPending;
-    private static Object rateKey(GLNodeGraphSnapshot s){return List.of(s.graphId(),s.nodes().stream().map(n->List.of(n.id(),n.typeId(),n.properties().getOrDefault("rate",com.vingame.glswing.node.model.GLNodeValue.of("")))).toList(),s.connections());}
+    private final WorkspaceGraphKey rateKeys=new WorkspaceGraphKey(n->List.of(n.id(),n.typeId(),n.properties().getOrDefault("rate",com.vingame.glswing.node.model.GLNodeValue.of(""))));
     private final com.vingame.glswing.history.GLHistoryManagerListener rateHistoryListener=manager->{presented.clear();refreshNodePresentation();};
 
     WorkspaceController() {
@@ -605,7 +605,7 @@ final class WorkspaceController implements AutoCloseable {
         var current = workspace.currentGraph();
         if (current != null) {
             var snapshot = current.snapshot();
-            var topology=List.of(rateKey(snapshot),rateKey(graph.snapshot()),composites.assets().stream().map(a->List.of(rateKey(a.graph()),a.compositeDescriptor()==null?"":a.compositeDescriptor())).toList());
+            var topology=rateKeys.update(snapshot,graph.snapshot(),composites.assets());
             boolean connectionsChanged=!topology.equals(rateTopology);
             if(connectionsChanged){
                 rateTopology=topology;var rates=new HashMap<GLNodeId,com.vingame.glswing.node.model.GLNodeValue>();

@@ -77,7 +77,8 @@ final class GraphDiagnostics {
     }
     /** Slider values do not alter legality, except the fixed feedback delay length. */
     static Object key(GLNodeGraphSnapshot graph){
-        return List.of(graph.graphId(),graph.connections(),graph.nodes().stream().map(n->List.of(n.id(),n.typeId(),GLNodeState.isMuted(n),
-            new NodeState(n.properties()).text("rate","auto"),new NodeState(n.properties()).flag("synchronous",true),n.typeId().contains("delay")?n.properties():Map.of())).toList());
+        return List.of(graph.graphId(),graph.connections(),graph.nodes().stream().map(GraphDiagnostics::nodeKey).toList());
     }
+    static Object nodeKey(GLGraphNode n){return List.of(n.id(),n.typeId(),GLNodeState.isMuted(n),
+        new NodeState(n.properties()).text("rate","auto"),new NodeState(n.properties()).flag("synchronous",true),n.typeId().contains("delay")?n.properties():Map.of());}
 }
