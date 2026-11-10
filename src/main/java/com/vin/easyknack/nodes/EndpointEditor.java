@@ -26,8 +26,11 @@ public record EndpointEditor(AudioEndpoint fallback) implements Editor {
                     if (!refreshing && getSelectedItem() != null) {
                         selected = getSelectedItem(); changed.accept(GLNodeValue.of(selected.reference()));
                     }
-                }); refresh();
+                }); refresh();fitButton();
             }
+            // Device names use the independent popup; they must not widen the node.
+            private void fitButton(){setPreferredGLSize(getGLStyle().minimumWidth(),getGLStyle().height());}
+            @Override protected void themeChanged(){super.themeChanged();fitButton();}
             void refresh() {
                 refreshing = true;
                 try {

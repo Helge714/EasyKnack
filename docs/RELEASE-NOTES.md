@@ -3,6 +3,8 @@
 
 ## Unreleased
 
+- Size new and loaded nodes synchronously from themed editor dimensions, including groups. Honor wider editor requirements and preserve larger saved sizes; remove deferred repacking and fixed standard-width overrides. Device names remain in independent popups. Covered by the existing development version.
+
 - Derive Sine Cloud frequency editor and parameter limits from the DSP Nyquist frequency (currently 24 kHz), allowing tones above 20 kHz. Existing frequency defaults and saved settings remain unchanged.
 
 - Expose the active Sine Cloud table period in seconds, initially zero and updated when a new table becomes active. Existing Audio/Actual count output positions are preserved.

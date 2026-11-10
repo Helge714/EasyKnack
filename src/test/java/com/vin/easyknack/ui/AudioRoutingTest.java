@@ -60,7 +60,10 @@ class AudioRoutingTest {
                 assertEquals(Map.of(speakers.id(),0.0),AudioDeviceVolumesTest.drainRequests());
                 slider.setValue(23);
                 assertEquals(Map.of(speakers.id(),.23),AudioDeviceVolumesTest.drainRequests());
-                assertEquals(view.get().getGLStyle().minimumWidth(),view.get().getPreferredGLSize().width());
+                assertEquals(chooser.getGLStyle().minimumWidth(),chooser.getPreferredGLSize().width(),.01,
+                        "Long device names belong in the popup, not the button width");
+                assertTrue(view.get().getPreferredGLSize().width()>=Math.max(view.get().getGLStyle().minimumWidth(),
+                        chooser.getPreferredGLSize().width()+view.get().getGLStyle().contentPadding().horizontal()));
             } finally { AudioDeviceVolumes.publish(Map.of()); AudioEndpoints.publish(previous); }
         });
     }

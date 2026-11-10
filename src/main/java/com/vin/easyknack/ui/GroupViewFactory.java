@@ -28,8 +28,6 @@ final class GroupViewFactory implements GLNodeViewFactory {
         private final Map<String,com.vin.easyknack.nodes.Editor.Control> choiceControls=new LinkedHashMap<>();
         private final Map<String,com.vingame.glswing.component.GLContainer> publicControls=new LinkedHashMap<>();
         private final Map<GLControl,String> controlledTooltips=new IdentityHashMap<>();
-        private float appliedMinimumWidth=Float.NaN;
-        private boolean themeRefreshPending;
         private com.vin.easyknack.nodes.Editor.Control countControl;
         private boolean updating;private NodeKind kind;private GLTheme cachedTheme;private GLNodeStyle cachedStyle;
         GroupView(GLGraphNode node){
@@ -92,7 +90,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
                         u->writer.set(node.id(),new PropertyId(GroupUnits.unitKey(port.id())),GLNodeValue.of(u.id()))));
                 }
 
-                
+
             }
             for(var choice:GroupChoices.choices(groups.findAsset(descriptor.assetId()).orElseThrow(),groups)){
                 if(choiceControls.containsKey(choice.id()))continue;
@@ -102,7 +100,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
             }
             CompositePortColors.apply(this,descriptor);update(node);
             String monitor=new NodeState(groups.findAsset(descriptor.assetId()).orElseThrow().metadata()).text(PitchReadoutEditor.GROUP_MONITOR,"");
-            if(!monitor.isEmpty()){var readout=new PitchReadoutEditor.Readout(monitor);readout.bind(node.id().toString());addContent(readout);applyThemeWidth();}
+            if(!monitor.isEmpty()){var readout=new PitchReadoutEditor.Readout(monitor);readout.bind(node.id().toString());addContent(readout);}
         }
         private NodeKind groupKind(){return NodeKind.valueOf(new NodeState(groups.findAsset(descriptor.assetId()).orElseThrow().metadata()).text("easyknack.kind","AUDIO"));}
         GLNodeId nodeId(){return nodeId;}
@@ -128,30 +126,10 @@ final class GroupViewFactory implements GLNodeViewFactory {
             }finally{updating=false;}
             var next=groupKind();if(kind!=next){kind=next;cachedTheme=null;invalidateRecording();}
             setTitle(catalog.find(node.typeId()).map(GLNodeCatalogEntry::displayName).orElse("Group"));
-            applyThemeWidth();
-        }
-        private void applyThemeWidth(){
-            float width=getGLStyle().minimumWidth();
-                appliedMinimumWidth=width;
-                for(var c:getContents())c.setMaximumGLSize(Math.max(0,width-getGLStyle().contentPadding().horizontal()),Float.MAX_VALUE);
-                clearPreferredGLSize();setPreferredGLSize(width,getPreferredGLSize().height());
         }
         @Override public void setContentHidden(boolean hidden){
             if(isContentHidden()==hidden)return;
-            clearPreferredGLSize();super.setContentHidden(hidden);applyThemeWidth();
-        }
-        @Override protected void themeChanged(){
-            float before=Float.isNaN(appliedMinimumWidth)?getPreferredGLSize().width():appliedMinimumWidth;
-            float widthBefore=getWidth();boolean automatic=widthBefore<=0||Math.abs(widthBefore-before)<.5f;
-            super.themeChanged();
-            if(themeRefreshPending)return;
-            themeRefreshPending=true;
-            // Editors receive the inherited theme after their parent node.
-            java.awt.EventQueue.invokeLater(()->{
-                themeRefreshPending=false;cachedTheme=null;super.themeChanged();applyThemeWidth();
-                float width=automatic&&Math.abs(getWidth()-widthBefore)<.5f?getPreferredGLSize().width():Math.max(getWidth(),getPreferredGLSize().width());
-                setSize(width,getPreferredGLSize().height());
-            });
+            clearPreferredGLSize();super.setContentHidden(hidden);
         }
         @Override public GLNodeStyle getGLStyle(){
             if(kind==null)return super.getGLStyle();var theme=getGLTheme();

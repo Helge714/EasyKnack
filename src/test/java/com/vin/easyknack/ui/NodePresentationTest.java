@@ -12,6 +12,33 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.ui.*;
 
 class NodePresentationTest {
+    @Test void initialAndLoadedSizesAlreadyFitEditorsWithoutADeferredRepack()throws Exception{
+        var controllers=new WorkspaceController[2];var views=new GLNode[2];var sizes=new float[4];
+        SwingUtilities.invokeAndWait(()->{
+            for(int i=0;i<2;i++)controllers[i]=new WorkspaceController();
+            var theme=GLThemeLoader.loadResource("/easyknack.gltheme");
+            theme=theme.withSliderStyle(theme.sliderStyle().withGeometry(3,26,360));
+            for(var c:controllers)c.workspace().setGLTheme(theme);
+            var definition=new MathNode();
+            controllers[0].workspace().currentGraph().edit("Math",edit->edit.addNode(new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults())));
+            views[0]=controllers[0].workspace().editor().getNodes().get(0);
+            assertTrue(views[0].getWidth()>=360+views[0].getGLStyle().contentPadding().horizontal());
+            controllers[1].openDocument("Sized",controllers[0].snapshotDocument());
+            views[1]=controllers[1].workspace().editor().getNodes().get(0);
+            for(int i=0;i<2;i++){
+                assertEquals(views[i].getPreferredGLSize().width(),views[i].getWidth(),.01);
+                assertEquals(views[i].getPreferredGLSize().height(),views[i].getHeight(),.01);
+                sizes[i*2]=views[i].getWidth();sizes[i*2+1]=views[i].getHeight();
+            }
+        });
+        SwingUtilities.invokeAndWait(()->{
+            for(int i=0;i<2;i++){assertEquals(sizes[i*2],views[i].getWidth());assertEquals(sizes[i*2+1],views[i].getHeight());}
+            views[0].setSize(700,500);controllers[1].openDocument("User size",controllers[0].snapshotDocument());
+            views[1]=controllers[1].workspace().editor().getNodes().get(0);
+            assertEquals(700,views[1].getWidth());assertEquals(500,views[1].getHeight());
+        });
+        SwingUtilities.invokeAndWait(()->{try{assertEquals(700,views[1].getWidth());assertEquals(500,views[1].getHeight());}finally{for(var c:controllers)c.close();}});
+    }
     @RegisterNode(id = "test.presentation", title = "Test", category = NodeCategory.MATH, kind = NodeKind.VALUE)
     public static final class PresentationNode extends BasicNode {
         boolean createdView;

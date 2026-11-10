@@ -35,7 +35,6 @@ public class BasicNodeView extends GLNode {
             var model=lastModel;lastModel=null;if(model!=null)updateBindings(model);
         }
         private final Map<PropertyId,Boolean> rowVisibility=new HashMap<>();
-        private boolean themeRefreshPending;
         private NodeKind category;
         private GLTheme categoryTheme;
         private com.vingame.glswing.node.GLNodeStyle categoryStyle;
@@ -90,7 +89,6 @@ public class BasicNodeView extends GLNode {
                 }
             }
             updateBindings(model);
-            applyThemeWidth();
         }
         void refreshPortColors(){
             categoryTheme=null;categoryStyle=null;
@@ -98,20 +96,12 @@ public class BasicNodeView extends GLNode {
                 var port=findPort(row.id());if(port!=null)port.setColor(ApplicationTheme.current().signal(row.signal()));
             }
         }
-        private void applyThemeWidth() {
-            float width=getGLStyle().minimumWidth();
-            float contentWidth=Math.max(0,width-getGLStyle().contentPadding().horizontal());
-            for(var content:getContents()) content.setMaximumGLSize(contentWidth,Float.MAX_VALUE);
-            clearPreferredGLSize();
-            setPreferredGLSize(width,getPreferredGLSize().height());
-        }
         @Override public void setContentHidden(boolean hidden) {
             if(isContentHidden()==hidden)return;
             clearPreferredGLSize();
             for(var content:controls.values()) { if(content instanceof GLCurveEditor curve)curve.setPreview(hidden); if(content instanceof AnalysisEditor.Plot plot)plot.setPreview(hidden); }
             setResizeMode(hidden?com.vingame.glswing.node.GLNodeResizeMode.HORIZONTAL:definition.resizeMode());
             super.setContentHidden(hidden);
-            applyThemeWidth();
         }
         @Override public com.vingame.glswing.node.GLNodeStyle getGLStyle() {
             if (category == null) return super.getGLStyle();
@@ -120,26 +110,6 @@ public class BasicNodeView extends GLNode {
                 categoryTheme = theme; categoryStyle = ApplicationTheme.current().nodeStyle(theme, category);
             }
             return categoryStyle;
-        }
-        @Override protected void themeChanged() {
-            var before = getPreferredGLSize();
-            float widthBefore = getWidth(), heightBefore = getHeight();
-            boolean autoWidth = getWidth() <= 0 || Math.abs(getWidth() - before.width()) < .5f;
-            boolean autoHeight = getHeight() <= 0 || Math.abs(getHeight() - before.height()) < .5f;
-            super.themeChanged();
-            if (themeRefreshPending) return;
-            themeRefreshPending = true;
-            // Core propagates the theme parent-first. Measure again after the editors
-            // have received it; otherwise the node still uses their old preferred sizes.
-            java.awt.EventQueue.invokeLater(() -> {
-                themeRefreshPending = false;
-                super.themeChanged();
-                applyThemeWidth();
-                var preferred = getPreferredGLSize();
-                setSize(autoWidth && Math.abs(getWidth() - widthBefore) < .5f ? preferred.width() : Math.max(getWidth(), preferred.width()),
-                        autoHeight && Math.abs(getHeight() - heightBefore) < .5f
-                                ? preferred.height() : Math.max(getHeight(), preferred.height()));
-            });
         }
         /** Allows custom nodes to decorate resource-port labels as well as editors. */
         protected GLContainer portContent(NodeBuilder.Row row) {
@@ -250,10 +220,9 @@ public class BasicNodeView extends GLNode {
                 }
                 invalidateRecording();
                 if(geometryChanged) {
-                    applyThemeWidth();
-                    float preferredHeight = getPreferredGLSize().height();
-                    if (getWidth() > 0 && Math.abs(preferredHeight - previousPreferredHeight) > .5f)
-                        setSize(getWidth(), automaticHeight ? preferredHeight : Math.max(getHeight(), preferredHeight));
+                    var preferred=getPreferredGLSize();
+                    if (getWidth() > 0)
+                        setSize(Math.max(getWidth(),preferred.width()), automaticHeight ? preferred.height() : Math.max(getHeight(), preferred.height()));
                 }
             }
             finally { synchronizing = false; }

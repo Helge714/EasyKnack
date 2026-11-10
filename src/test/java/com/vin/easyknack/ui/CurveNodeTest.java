@@ -56,7 +56,7 @@ class CurveNodeTest {
                 assertTrue(curve.getPreferredGLSize().height()<height);assertEquals(audio,controller.audioGraph());
                 curve.mouseClicked(mouse(curve,MouseEvent.MOUSE_CLICKED,30,10,2));assertEquals(after,curve.getCurve());
                 controller.actions().toggleHidden();assertFalse(curve.isPreview());assertEquals(height,curve.getPreferredGLSize().height());
-                assertEquals(original.getGLStyle().minimumWidth(),original.getPreferredGLSize().width());
+                assertTrue(original.getPreferredGLSize().width()>=curve.getPreferredGLSize().width()+original.getGLStyle().contentPadding().horizontal());
                 try{
                     var codec=new KnackDocumentCodec();var bytes=new java.io.ByteArrayOutputStream();codec.write(controller.snapshotDocument(),bytes);
                     reopened.openDocument("Curve",codec.read(new java.io.ByteArrayInputStream(bytes.toByteArray()),codec.currentSchemaVersion()));
