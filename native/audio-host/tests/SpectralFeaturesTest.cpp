@@ -33,7 +33,7 @@ int main(){
     assert(approximately(log.values[0],220*std::exp2(1.5)));assert(approximately(log.values[1],std::sqrt(.75)));
     assert(approximately(log.values[2],-2/std::sqrt(3.)));assert(approximately(log.values[3],7./3));
     // A live scale change re-evaluates the held frame and resets flux history.
-    auto settings=linear;settings.logarithmic=true;linear.applyParameters(settings);
+    SpectralFeaturesNode settings;settings.applyParameters(linear);settings.logarithmic=true;linear.applyParameters(settings);
     octaveBins[4]=std::sqrt(2.);measure(linear);assert(approximately(linear.values[0],440));assert(linear.values[4]==0);
     octaveBins[1]=octaveBins[4]=0;octaveBins[0]=1;log.ready=false;measure(log);
     for(int p:{0,1,2,3})assert(log.values[p]==0); // DC has no log frequency.
