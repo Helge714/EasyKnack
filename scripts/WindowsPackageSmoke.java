@@ -36,6 +36,20 @@ public final class WindowsPackageSmoke {
             check(NodeDocumentation.read("nodes/" + language + "/fft.md").startsWith("#"), "Bundled node reference missing: " + language);
         }
         System.out.println("Offline manuals and node references OK");
+        SwingUtilities.invokeAndWait(() -> {
+            var root = new com.vingame.glswing.component.GLContainer() {
+                protected void record(com.vingame.glswing.rendering.GLContext2D context) { }
+            };
+            root.setBounds(0,0,300,90);
+            var label = new com.vingame.glswing.ui.GLLabel("Repeated capture font");
+            root.addGL(label); label.setBounds(10,10,270,50);
+            var first = com.vingame.glswing.rendering.GLComponentImageCapture.capture(root,300,90,300,90,false);
+            var second = com.vingame.glswing.rendering.GLComponentImageCapture.capture(root,300,90,300,90,false);
+            var pixels = first.getRGB(0,0,300,90,null,0,300);
+            check(Arrays.stream(pixels).anyMatch(pixel -> (pixel & 0xffffff) != 0), "Image capture has no text");
+            check(Arrays.equals(pixels,second.getRGB(0,0,300,90,null,0,300)), "Repeated image capture lost text");
+        });
+        System.out.println("Repeated image capture preserves text");
         ExampleLibrary.initialize();
         var plugins = new PluginManager(work.resolve("plugins"));
         check(plugins.startup(System.out::println) == null, "Fresh startup unexpectedly needs a plugin build");

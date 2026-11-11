@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix missing text on repeated graph image exports with context-owned capture fonts in the external GLSwing dependency; verify the repeated capture in the packaged application smoke test.
+
 - Include both offline manuals and full node references beside the Windows application; correct the external quick-start links and check bundled help during package smoke validation.
 
 - Consolidate workflow guides into twelve concise German/English chapters; retain the detailed bilingual node tables and keep old workflow links through forwarding pages. Help now opens the independently selected manual language.

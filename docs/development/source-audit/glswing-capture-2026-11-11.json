@@ -1,0 +1,25 @@
+{
+  "binarySha256": "325897fc1bd0f5a97f785098fc2a557b147a467f2440fbf450d8534d1377c9f8",
+  "rebuiltSha256": "5192a0ed38574e00d1399feb719b55040693177fcd2b5f2be5502e1e8237fd17",
+  "classCount": 962,
+  "differences": [
+    "META-INF/glswing/build.properties",
+    "META-INF/maven/com.vingame/glswing/pom.properties"
+  ],
+  "classDifferences": [],
+  "coreCommit": "fc1261bbb03fe5d6c90cfd912439822c08b8cce5",
+  "trackedBuildFiles": 774,
+  "matchedSourceJarEntries": 532,
+  "tests": {
+    "tests": 172,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "artifacts": {
+    "glswing-0.2.0-SNAPSHOT-build-inputs.zip": "241605fb50b6bae61ebdca5c5a25bc4d365bf10f42463ee50f10e03c9f34512a",
+    "glswing-0.2.0-SNAPSHOT-sources.jar": "734850bd9cd9f35a91727c0e324a1e15ea4ebc9d184967077c96264e689a7182",
+    "glswing-0.2.0-SNAPSHOT.jar": "325897fc1bd0f5a97f785098fc2a557b147a467f2440fbf450d8534d1377c9f8",
+    "glswing-0.2.0-SNAPSHOT.pom": "f14e3bc5e416cd8867686cab52815e3e6e025496a9ccef6954fdc3b7f3d28c87"
+  }
+}
