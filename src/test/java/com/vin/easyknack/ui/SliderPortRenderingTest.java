@@ -19,13 +19,13 @@ class SliderPortRenderingTest {
             var profile = GLProfile.get(GLProfile.GL3); var caps = new GLCapabilities(profile); caps.setOnscreen(false);
             var drawable = GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null, caps, null, 360, 180);
             drawable.display(); var nativeContext = drawable.getContext(); nativeContext.makeCurrent();
-            GLRenderer2D renderer = null;
+            GLRenderer2D renderer = null;var fonts=new OffscreenFonts(drawable);
             try {
                 var gl = drawable.getGL().getGL3(); gl.glViewport(0,0,360,180); renderer = GLRenderer2D.create(gl);
                 float[] zoom = {1};
                 var root = new GLContainer() { @Override protected void record(GLContext2D c) { }
                     @Override protected void transformComponent(GLContext2D c) { c.setTransform(c.getTransform().copy().scale(zoom[0])); } };
-                root.setBounds(0,0,360,180); root.setGLTheme(ApplicationTheme.current().theme());
+                fonts.attach(root);root.setBounds(0,0,360,180); root.setGLTheme(ApplicationTheme.current().theme());
                 var port = GLNodePort.input("control"); port.setShape(GLNodePort.Shape.DIAMOND); port.setColor(Color.ORANGE);
                 port.setBounds(20,25,20,20); root.addGL(port);
                 var slider = GLSlider.fixed("Frequency",0,20000,440); slider.setUnit("Hz"); slider.setBounds(60,20,260,30); root.addGL(slider);
@@ -80,7 +80,7 @@ class SliderPortRenderingTest {
                 try { javax.imageio.ImageIO.write(image,"png",new java.io.File("target/slider-unit-preview.png")); }
                 catch(java.io.IOException e) { throw new RuntimeException(e); }
                 editing.cancelValueEditing();
-            } finally { if(renderer!=null) renderer.dispose(drawable.getGL().getGL3()); nativeContext.release(); drawable.destroy(); }
+            } finally { fonts.dispose(renderer); }
         });
     }
     private static void draw(GL3 gl, GLRenderer2D renderer, GLContainer root) {

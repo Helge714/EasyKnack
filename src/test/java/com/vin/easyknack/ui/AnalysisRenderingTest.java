@@ -19,11 +19,11 @@ class AnalysisRenderingTest {
         SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,680,520);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try(var controller=new WorkspaceController()){
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,680,520);renderer=GLRenderer2D.create(gl);
                 var root=new GLContainer(){@Override protected void record(GLContext2D c){}};
-                root.setBounds(0,0,680,520);root.setGLTheme(ApplicationTheme.current().theme());
+                fonts.attach(root);root.setBounds(0,0,680,520);root.setGLTheme(ApplicationTheme.current().theme());
                 for(int i=0;i<3;i++){
                     BasicNode definition=i==0?new OscilloscopeNode():new AutocorrelationNode();
                     var id=GLNodeId.random();float[] samples=new float[256];for(int n=0;n<256;n++)samples[n]=(float)(Math.cos(n*.12)*(i==0?1:Math.exp(-n/300.0)));
@@ -55,7 +55,7 @@ class AnalysisRenderingTest {
                 assertEquals("Connection",status.getSelectedText());status.setSelectable(false);
                 frame=renderer.beginFrame(gl,680,520,Projection2D.TOP_LEFT_PIXELS.create(680,520));root.renderComponent(frame);renderer.endFrame();
                 assertNotSame(status,renderer.readPickResult(gl,650,465).getTarget());assertEquals(GL.GL_NO_ERROR,gl.glGetError());
-            }finally{if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            }finally{fonts.dispose(renderer);}
         });
     }
 }

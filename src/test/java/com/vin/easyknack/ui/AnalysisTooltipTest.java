@@ -37,27 +37,28 @@ class AnalysisTooltipTest {
         SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,680,520);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             var p=new AnalysisEditor.Plot(true,true);
             try{
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,680,520);renderer=GLRenderer2D.create(gl);
-                var root=new GLContainer(){protected void record(GLContext2D c){}};root.setBounds(0,0,680,520);
+                var root=new GLContainer(){protected void record(GLContext2D c){}};fonts.attach(root);root.setBounds(0,0,680,520);
                 var button=new GLButton("Underlying button");root.addGL(button);button.setBounds(0,0,680,520);
                 root.addGL(p);p.setBounds(0,0,200,100);p.bind("tooltip-gpu");
                 AudioAnalysis.publish(Map.of("tooltip-gpu",new AudioAnalysis.Frame(0,0,24000,new float[33])));
                 p.mouseEntered(mouse(p,MouseEvent.MOUSE_ENTERED));p.mouseMoved(mouse(p,MouseEvent.MOUSE_MOVED));
                 var sessions=GLToolTipManager.class.getDeclaredField("SESSIONS");sessions.setAccessible(true);
-                var session=((Map<?,?>)sessions.get(null)).get(root);assertNotNull(session);
+                var session=((Map<?,?>)sessions.get(null)).get(fonts.surface());assertNotNull(session);
                 var show=session.getClass().getDeclaredMethod("show");show.setAccessible(true);show.invoke(session);
-                var tip=root.getGLChildren().get(2);
+                var tip=fonts.surface().getGLChildren().get(1);
                 for(int i=0;i<3;i++){
-                    var frame=renderer.beginFrame(gl,680,520,Projection2D.TOP_LEFT_PIXELS.create(680,520));root.renderComponent(frame);renderer.endFrame();
+                    var frame=renderer.beginFrame(gl,680,520,Projection2D.TOP_LEFT_PIXELS.create(680,520));fonts.render(frame);renderer.endFrame();
                 }
                 assertFalse(root.isGLLayoutDirty(),"Rendering must settle instead of invalidating layout continuously");
                 assertSame(button,renderer.readPickResult(gl,(int)(tip.getX()+tip.getWidth()/2),(int)(tip.getY()+tip.getHeight()/2)).getTarget());
                 p.mouseExited(mouse(p,MouseEvent.MOUSE_EXITED));assertEquals(2,root.getGLChildren().size());
+                assertEquals(1,fonts.surface().getGLChildren().size());
             }catch(ReflectiveOperationException e){throw new AssertionError(e);}
-            finally{GLToolTipManager.leave(p);AudioAnalysis.clear();if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            finally{GLToolTipManager.leave(p);AudioAnalysis.clear();fonts.dispose(renderer);}
         });
     }
 }

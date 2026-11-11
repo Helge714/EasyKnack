@@ -54,7 +54,7 @@ class ValueHistoryTest {
         javax.swing.SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,1000,720);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try{
                 var panel=new ValueViewerPanel(v->{});var definition=new com.vin.easyknack.nodes.ValueViewerNode();
                 var properties=new java.util.HashMap<>(definition.defaults());properties.put("inputs",com.vingame.glswing.node.model.GLNodeValue.of(8.));
@@ -62,7 +62,7 @@ class ValueHistoryTest {
                 float[] payload=new float[8+100*8*3];payload[0]=1;payload[1]=10;payload[2]=100;payload[4]=1000;
                 for(int b=0;b<100;b++)for(int p=0;p<8;p++){float value=(float)Math.sin(b*.1+p);int i=8+(b*8+p)*3;payload[i]=value-.05f;payload[i+1]=value+.05f;payload[i+2]=value;}
                 AudioAnalysis.publish(java.util.Map.of("values-render",new AudioAnalysis.Frame(8,1000,0,payload)));
-                panel.setGLTheme(ApplicationTheme.current().theme());panel.setBounds(0,0,1000,720);
+                panel.setGLTheme(ApplicationTheme.current().theme());fonts.attach(panel);panel.setBounds(0,0,1000,720);
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,1000,720);renderer=GLRenderer2D.create(gl);
                 for(String mode:new String[]{"history","values"}){
                     panel.options(mode);var frame=renderer.beginFrame(gl,1000,720,Projection2D.TOP_LEFT_PIXELS.create(1000,720));frame.clear(Color.BLACK);panel.renderComponent(frame);renderer.endFrame();
@@ -72,7 +72,7 @@ class ValueHistoryTest {
                     assertEquals(1000,image.getWidth());javax.imageio.ImageIO.write(image,"png",new java.io.File("target/value-viewer-"+mode+".png"));
                     assertEquals(GL.GL_NO_ERROR,gl.glGetError());
                 }
-            }catch(java.io.IOException ex){throw new AssertionError(ex);}finally{AudioAnalysis.clear();if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            }catch(java.io.IOException ex){throw new AssertionError(ex);}finally{AudioAnalysis.clear();fonts.dispose(renderer);}
         });
     }
 }

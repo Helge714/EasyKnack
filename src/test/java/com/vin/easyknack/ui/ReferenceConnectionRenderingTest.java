@@ -18,10 +18,10 @@ class ReferenceConnectionRenderingTest {
         SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,700,250);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try {
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,700,250);renderer=GLRenderer2D.create(gl);
-                var editor=new GLNodeEditor();editor.setGLTheme(ApplicationTheme.current().theme());editor.setBounds(0,0,700,250);
+                var editor=new GLNodeEditor();fonts.attach(editor);editor.setGLTheme(ApplicationTheme.current().theme());editor.setBounds(0,0,700,250);
                 var source=new GLNode("Source");var out=source.addOutput("out",new GLLabel("Reference"));
                 var target=new GLNode("Target");var in=target.addInput("in",new GLLabel("Reference"));
                 editor.addNode(source,20,70);editor.addNode(target,550,70);
@@ -38,7 +38,7 @@ class ReferenceConnectionRenderingTest {
                     if(dashed)assertTrue(gaps>60,"Reference cable must have visible gaps, including its border");else assertTrue(gaps<5,"Value cable must remain solid");
                 }
                 assertEquals(GL.GL_NO_ERROR,gl.glGetError());
-            }finally{if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            }finally{fonts.dispose(renderer);}
         });
     }
 }

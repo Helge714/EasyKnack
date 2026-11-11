@@ -19,11 +19,11 @@ class CurveRenderingTest {
         SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,680,520);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try(var controller=new WorkspaceController()){
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,680,520);renderer=GLRenderer2D.create(gl);
                 var root=new GLContainer(){@Override protected void record(GLContext2D c){}};
-                root.setBounds(0,0,680,520);root.setGLTheme(ApplicationTheme.current().theme());
+                fonts.attach(root);root.setBounds(0,0,680,520);root.setGLTheme(ApplicationTheme.current().theme());
                 var envelope=new EnvelopeNode();var mapping=new CurveNode();
                 var shape=com.vingame.glswing.ui.GLFunctionCurve.identity().insert(.5,.5).mode(0,GLFunctionCurve.Mode.BEZIER).mode(1,GLFunctionCurve.Mode.BEZIER).handle(0,false,.2,0).handle(2,true,.8,1);
                 for(int i=0;i<3;i++){
@@ -43,7 +43,7 @@ class CurveRenderingTest {
                 assertTrue(lit>100,"Curve lines, controls and labels must be visible");
                 try{javax.imageio.ImageIO.write(image,"png",new java.io.File("target/curve-editor-preview.png"));}catch(java.io.IOException e){throw new AssertionError(e);}
                 assertEquals(GL.GL_NO_ERROR,gl.glGetError());
-            }finally{if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            }finally{fonts.dispose(renderer);}
         });
     }
 }

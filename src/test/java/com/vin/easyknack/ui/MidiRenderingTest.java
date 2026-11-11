@@ -18,10 +18,10 @@ class MidiRenderingTest {
         SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,1100,440);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try{
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,1100,440);renderer=GLRenderer2D.create(gl);
-                var root=new GLContainer(){@Override protected void record(GLContext2D c){}};root.setBounds(0,0,1100,440);root.setGLTheme(ApplicationTheme.current().theme());
+                var root=new GLContainer(){@Override protected void record(GLContext2D c){}};fonts.attach(root);root.setBounds(0,0,1100,440);root.setGLTheme(ApplicationTheme.current().theme());
                 int i=0;
                 for(BasicNode definition:java.util.List.of(new MidiInputNode(),new MidiNoteNode(),new MidiTransposeNode(),new MidiDelayNode(),new VoiceMergeNode())){
                     var node=definition.createView(new NodeViewContext((id,key,value)->{},new com.vingame.glswing.history.GLHistoryManager()),new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults()));
@@ -39,7 +39,7 @@ class MidiRenderingTest {
                 int shadowY=(int)(tip.getY()+tip.getHeight()+3),shadowX=(int)(tip.getX()+tip.getWidth()/2);
                 assertTrue((image.getRGB(shadowX,shadowY)&255)<50,"Tooltip shadow must extend below its bounds");
                 javax.imageio.ImageIO.write(image,"png",new java.io.File("target/midi-controls-preview.png"));assertEquals(GL.GL_NO_ERROR,gl.glGetError());
-            }catch(Exception e){throw new AssertionError(e);}finally{if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            }catch(Exception e){throw new AssertionError(e);}finally{fonts.dispose(renderer);}
         });
     }
 }

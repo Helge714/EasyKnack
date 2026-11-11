@@ -12,10 +12,10 @@ class VerticalTabsRenderingTest {
         javax.swing.SwingUtilities.invokeAndWait(()->{
             var caps=new GLCapabilities(GLProfile.get(GLProfile.GL3));caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(caps.getGLProfile()).createOffscreenAutoDrawable(null,caps,null,480,440);drawable.display();drawable.getContext().makeCurrent();
-            GLRenderer2D renderer=null;
+            GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try{
                 var gl=drawable.getGL().getGL3();gl.glViewport(0,0,480,440);renderer=GLRenderer2D.create(gl);
-                var tabs=new GLTabbedPane();tabs.setGLTheme(ApplicationTheme.current().theme());tabs.setTabPlacement(GLTabbedPane.Placement.LEFT);tabs.setBounds(0,0,480,440);
+                var tabs=new GLTabbedPane();fonts.attach(tabs);tabs.setGLTheme(ApplicationTheme.current().theme());tabs.setTabPlacement(GLTabbedPane.Placement.LEFT);tabs.setBounds(0,0,480,440);
                 for(String name:java.util.List.of("Properties","Editors","Group-General","Group-IO"))tabs.addTab(name,new GLLabel(name));
                 var nested=new GLScrollPane(new GLLabel("Zero-sized nested content"));nested.setBounds(0,0,0,0);
                 var host=new GLContainer(){protected void record(GLContext2D c){}};host.addGL(nested);tabs.addTab("Empty",host);
@@ -35,7 +35,7 @@ class VerticalTabsRenderingTest {
                     }
                 }
                 try(var controller=new WorkspaceController()){
-                    controller.openDocument("Sidebar",GroupUnitsTest.document(false));var workspace=controller.workspace();workspace.setBounds(0,0,480,1200);workspace.setInspectorVisible(true);workspace.openComposite("test.asset");
+                    controller.openDocument("Sidebar",GroupUnitsTest.document(false));var workspace=controller.workspace();fonts.attach(workspace);workspace.setBounds(0,0,480,1200);workspace.setInspectorVisible(true);workspace.openComposite("test.asset");
                     for(int selected:new int[]{3,2,3,1,3,2,3}){
                         workspace.inspectorTabs().setSelectedIndex(selected);
                         var c=renderer.beginFrame(gl,480,440,Projection2D.TOP_LEFT_PIXELS.create(480,440));c.clear(java.awt.Color.DARK_GRAY);workspace.renderComponent(c);renderer.endFrame();
@@ -58,7 +58,7 @@ class VerticalTabsRenderingTest {
                         }
                     }
                 }
-            }finally{if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());drawable.getContext().release();drawable.destroy();}
+            }finally{fonts.dispose(renderer);}
         });
     }
 }

@@ -13,17 +13,17 @@ class NodeTooltipLabelRenderingTest {
         SwingUtilities.invokeAndWait(()->{
             var profile=GLProfile.get(GLProfile.GL3);var caps=new GLCapabilities(profile);caps.setOnscreen(false);
             var drawable=GLDrawableFactory.getFactory(profile).createOffscreenAutoDrawable(null,caps,null,240,50);
-            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;
+            drawable.display();var context=drawable.getContext();context.makeCurrent();GLRenderer2D renderer=null;var fonts=new OffscreenFonts(drawable);
             try {
                 var gl=drawable.getGL().getGL3();renderer=GLRenderer2D.create(gl);
-                var label=new NodeTooltipLabel("Out [Hz]",true);label.setBounds(0,0,240,50);
+                var label=new NodeTooltipLabel("Out [Hz]",true);fonts.attach(label);label.setBounds(0,0,240,50);
                 var frame=renderer.beginFrame(gl,240,50,Projection2D.TOP_LEFT_PIXELS.create(240,50));
                 label.renderComponent(frame);renderer.endFrame();assertFalse(label.isRecordingDirty());
                 label.setText("Out [ms]");assertTrue(label.isRecordingDirty());
                 frame=renderer.beginFrame(gl,240,50,Projection2D.TOP_LEFT_PIXELS.create(240,50));
                 label.renderComponent(frame);renderer.endFrame();assertFalse(label.isRecordingDirty());
                 assertEquals("Out [ms]",label.getText());
-            } finally {if(renderer!=null)renderer.dispose(drawable.getGL().getGL3());context.release();drawable.destroy();}
+            } finally {fonts.dispose(renderer);}
         });
     }
 }
