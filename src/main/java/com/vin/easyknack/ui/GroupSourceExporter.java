@@ -134,14 +134,15 @@ final class GroupSourceExporter {
         var choices=new ArrayList<ChoiceParameter>();
         for(var choice:groupChoices)choices.add(new ChoiceParameter(choice.id(),choice.label(),inputs.stream().filter(p->GroupInputs.choice(p.mapping)&&GroupInputs.property(p.mapping).equals(choice.id())).map(Port::id).findFirst().orElse(new PropertyId("choice_"+choices.size())),GroupChoices.copy(choice.editor(),GroupChoices.selection(asset,choice,instance.properties().getOrDefault(choice.id(),choice.editor().defaultValue())))));
         var dynamic=choiceTokens(root,registry,instance,choices,graph,order,sources,inputIds);
-        var definition=new ExportDefinition(className,processor,inputs,outputs,ratePlan,choices,editorOrder(asset,inputs,choices));
+        boolean experimental=ExperimentalFeatures.requiresOptIn(instance.typeId(),registry.assets());
+        var definition=new ExportDefinition(className,processor,inputs,outputs,ratePlan,choices,editorOrder(asset,inputs,choices),experimental);
         String monitorSource=new NodeState(asset.metadata()).text(PitchReadoutEditor.GROUP_MONITOR,"");
         String monitorPath="";
         for(int i=0;i<order.size();i++){
             var origin=result.origins().get(order.get(i).id());
             if(origin!=null&&origin.sourceNodeId().toString().equals(monitorSource)&&order.get(i).typeId().equals("easyknack.analysis.pitchmonitor"))monitorPath="node"+i;
         }
-        String java=javaSource(className,processor,asset,inputs,outputs,ratePlan,choices,monitorPath);
+        String java=javaSource(className,processor,asset,inputs,outputs,ratePlan,choices,monitorPath,experimental);
         String cpp=nativeSource(className,processor,definition,order,sources,inputIds,outputIds,inputs,outputs,boundaryRate,dynamic,choices.isEmpty());
         var files=new LinkedHashMap<String,String>();
         files.putAll(com.vin.easyknack.plugins.PluginLicensing.files());
@@ -298,10 +299,10 @@ final class GroupSourceExporter {
     private static String formatsSource(UnitFormats f){
         return "new UnitFormats(UnitFormat."+f.stored().name()+",UnitFormat."+f.initial().name()+",java.util.List.of("+String.join(",",f.choices().stream().map(u->"UnitFormat."+u.name()).toList())+"))";
     }
-    private static String javaSource(String name,String processor,GLNodeGraphAsset asset,List<Port> inputs,List<Port> outputs,BakedRatePlan ratePlan,List<ChoiceParameter> choices,String monitorPath){
+    private static String javaSource(String name,String processor,GLNodeGraphAsset asset,List<Port> inputs,List<Port> outputs,BakedRatePlan ratePlan,List<ChoiceParameter> choices,String monitorPath,boolean experimental){
         String kind=new NodeState(asset.metadata()).text("easyknack.kind","AUDIO");
         var category=Arrays.stream(NodeCategory.choices()).filter(c->c.matches(new NodeState(asset.metadata()).text("easyknack.category",""))).findFirst().orElse(NodeCategory.EFFECT);
-        var s=new StringBuilder("package com.vin.easyknack.nodes;\n@RegisterNode(id=\"easyknack.baked.").append(processor.replace("_", "")).append("\",title=").append(quote(groupTitle(asset))).append(",category=NodeCategory.").append(category.name()).append(",kind=NodeKind.").append(NodeKind.valueOf(kind).name()).append(")\npublic final class ").append(name).append(" extends BasicNode {\n");
+        var s=new StringBuilder("package com.vin.easyknack.nodes;\n@RegisterNode(id=\"easyknack.baked.").append(processor.replace("_", "")).append("\",title=").append(quote(groupTitle(asset))).append(",category=NodeCategory.").append(category.name()).append(",kind=NodeKind.").append(NodeKind.valueOf(kind).name()).append(",experimental=").append(experimental).append(")\npublic final class ").append(name).append(" extends BasicNode {\n");
         s.append("    private record Choice(String id,String label){public String toString(){return label;}}\n");
         s.append("    private static final BakedRatePlan PLAN=").append(ratePlanSource(ratePlan)).append(";\n");
         s.append("    public java.util.Map<String,com.vingame.glswing.node.model.GLNodeValue> defaults(){var values=new java.util.HashMap<>(super.defaults());values.put(\"rate\",com.vingame.glswing.node.model.GLNodeValue.of(\"auto\"));return values;}\n");
@@ -346,8 +347,9 @@ final class GroupSourceExporter {
     }
     private static List<Port> concat(List<Port> a,List<Port> b){var result=new ArrayList<>(a);result.addAll(b);return result;}
     static final class ExportDefinition extends BasicNode {
-        final String name,id;final List<Port> inputs,outputs;final BakedRatePlan ratePlan;final List<ChoiceParameter> choices;final List<String> editorOrder;
-        ExportDefinition(String name,String id,List<Port> inputs,List<Port> outputs,BakedRatePlan ratePlan,List<ChoiceParameter> choices,List<String> editorOrder){this.editorOrder=List.copyOf(editorOrder);this.name=name;this.id=id;this.inputs=inputs;this.outputs=outputs;this.ratePlan=ratePlan;this.choices=List.copyOf(choices);}
+        final String name,id;final List<Port> inputs,outputs;final BakedRatePlan ratePlan;final List<ChoiceParameter> choices;final List<String> editorOrder;final boolean experimental;
+        ExportDefinition(String name,String id,List<Port> inputs,List<Port> outputs,BakedRatePlan ratePlan,List<ChoiceParameter> choices,List<String> editorOrder,boolean experimental){this.experimental=experimental;this.editorOrder=List.copyOf(editorOrder);this.name=name;this.id=id;this.inputs=inputs;this.outputs=outputs;this.ratePlan=ratePlan;this.choices=List.copyOf(choices);}
+        @Override public boolean isExperimental(){return experimental;}
         public String textPrefix(){return "easyknack.export.definition";}
         public String nativeParameterType(){return name+"Parameters";}
         public void define(NodeBuilder n,NodeState s){

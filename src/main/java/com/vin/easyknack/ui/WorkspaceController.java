@@ -784,6 +784,7 @@ final class WorkspaceController implements AutoCloseable {
     boolean isPartialContext(){return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(PartialGroups::partial).orElse(false));}
     boolean isMultipleContext(){return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(MultipleGroups::multiple).orElse(false));}
     private boolean nodeAllowedInContext(com.vingame.glswing.node.model.GLNodeCatalogEntry entry){
+        if(!ApplicationSettings.experimentalFeatures()&&ExperimentalFeatures.requiresOptIn(entry.type().id(),composites.assets()))return false;
         if(workspace.currentAssetId()!=null&&composites.findAsset(workspace.currentAssetId()).map(FormulaGroups::isFormula).orElse(false))return false;
         var definition=NodeRegistry.find(entry.type().id()).orElse(null);
         if(isPartialContext())return entry.type().id().equals(FormulaGroups.CREATE)||PartialGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(a->!PartialGroups.partial(a)&&!SpectralGroups.spectral(a)&&!MultipleGroups.multiple(a)).orElse(false);

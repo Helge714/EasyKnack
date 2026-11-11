@@ -4,6 +4,7 @@
 ## Unreleased
 
 - Preserve stored internal numeric fallbacks at socket-only group boundaries when feedback wires are ignored. Keep explicit public editor defaults.
+- Add an opt-in Experimental features setting (off by default), including dependent groups, examples and newly exported plugins. Mark Pitch Hold experimental; existing documents retain their nodes and execution. No document/audio protocol change; covered by the current first-development version.
 
 
 - Reuse graph rate and diagnostic structure keys across scalar edits; cache execution-area and mute diagnostics until relevant structure changes. Pair with GLSwing connection-gradient reuse and conservative offscreen-node traversal; preserve crossing wires, focused editors, warning updates and custom color callbacks. Covered by the current development versions.

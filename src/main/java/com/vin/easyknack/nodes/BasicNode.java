@@ -25,6 +25,7 @@ public abstract class BasicNode {
     public String nativeParameterType(){return getClass().getSimpleName()+"Parameters";}
     /** Protocol payload is owned by the node alongside its native binding. */
     public String encode(NodeState state, ToIntFunction<PropertyId> input) { return processor().contract().encode(this,state,input); }
+    public boolean isExperimental() { return registration().experimental(); }
     public boolean isListedInCatalog() { return true; }
     public boolean isMuteable() { return true; }
     /** Opt in only when the native processor implements the sample-feedback contract. */
@@ -62,7 +63,7 @@ public abstract class BasicNode {
     public final NodeBuilder layout(NodeState state) {
         state=normalizeState(state);NodeBuilder builder = new NodeBuilder(); define(builder, state); builder.applyInteractionPolicy(manualControlPorts()); builder.applyFormats(state); MidiDriverSettingsEditor.addSettings(builder,state); builder.applyRates(state); builder.translate(textPrefix()); builder.validate(state); return builder;
     }
-    public final String title() { return NodeText.text(registration().id() + ".title", registration().title()); }
+    public final String title() { return NodeText.text(registration().id() + ".title", registration().title())+(isExperimental()?" ["+com.vin.easyknack.i18n.AppText.text("experimental")+"]":""); }
     public Map<String, GLNodeValue> defaults() { return layout(new NodeState(Map.of())).defaults(); }
 }
 

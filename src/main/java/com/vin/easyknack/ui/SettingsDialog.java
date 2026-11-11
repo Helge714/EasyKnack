@@ -16,18 +16,20 @@ final class SettingsDialog {
             final GLLabel autosaveLabel=new GLLabel(AppText.text("settings.autosave")),retentionLabel=new GLLabel(AppText.text("settings.retention"));
             final GLNumberSpinner interval=new GLNumberSpinner(5,3600,ApplicationSettings.autosaveSeconds()),retention=new GLNumberSpinner(1,365,ApplicationSettings.recoveryDays());
             final GLSlider curvature=GLSlider.fixed(AppText.text("settings.curvature"),0,1,oldCurvature);
+            final GLCheckBox experimental=new GLCheckBox(AppText.text("settings.experimental"));
             final GLLabel message=new GLLabel("");
             boolean previewing;
             {language.setSelectedItem(ApplicationSettings.locale().getLanguage().equals("de")?"Deutsch":"English");
                 theme.setSelectedItem(choices.stream().filter(c->c.id().equals(ApplicationSettings.theme())).findFirst().orElseGet(()->choices.stream().filter(c->c.resource().equals("/easyknack.gltheme")).findFirst().orElseThrow()));
-                for(var c:List.of(languageLabel,themeLabel,language,theme,autosaveLabel,retentionLabel,interval,retention,curvature,save,cancel,message))addGL(c);
+                for(var c:List.of(languageLabel,themeLabel,language,theme,autosaveLabel,retentionLabel,interval,retention,curvature,experimental,save,cancel,message))addGL(c);
+                experimental.setSelected(ApplicationSettings.experimentalFeatures());
                 interval.setIntegerValuesOnly(true);interval.setUnit("s");retention.setIntegerValuesOnly(true);retention.setUnit(AppText.text("settings.days"));
                 curvature.setToolTipText(AppText.text("settings.curvature.hint"));curvature.addChangeListener(e->owner.previewCurvature(curvature.getValue()));
                 language.addActionListener(e->preview());theme.addActionListener(e->preview());
                 cancel.addActionListener(e->ref[0].close());
                 save.addActionListener(e->{try{
                     var selected=ApplicationTheme.loadSelection(theme.getSelectedItem().id());
-                    ApplicationSettings.save(language.getSelectedItem().equals("Deutsch")?"de":"en",theme.getSelectedItem().id(),(int)interval.getValue(),(int)retention.getValue(),curvature.getValue());
+                    ApplicationSettings.save(language.getSelectedItem().equals("Deutsch")?"de":"en",theme.getSelectedItem().id(),(int)interval.getValue(),(int)retention.getValue(),curvature.getValue(),experimental.isSelected());
                     ApplicationTheme.activate(selected);committed[0]=true;ref[0].close();owner.applySettings();
                 }catch(Exception failure){message.setText(failure.getMessage());}});
             }
@@ -41,8 +43,8 @@ final class SettingsDialog {
                 }catch(Exception failure){message.setText(failure.getMessage());}finally{previewing=false;}
             }
             protected void record(GLContext2D c){}
-            protected void resized(float w,float h){languageLabel.setBounds(20,20,130,28);language.setBounds(160,20,w-180,28);themeLabel.setBounds(20,65,130,28);theme.setBounds(160,65,w-180,28);autosaveLabel.setBounds(20,110,250,28);interval.setBounds(290,110,w-310,28);retentionLabel.setBounds(20,155,250,28);retention.setBounds(290,155,w-310,28);curvature.setBounds(20,205,w-40,32);message.setBounds(20,250,w-40,44);cancel.setBounds(w-230,h-45,100,28);save.setBounds(w-120,h-45,100,28);}
+            protected void resized(float w,float h){languageLabel.setBounds(20,20,130,28);language.setBounds(160,20,w-180,28);themeLabel.setBounds(20,65,130,28);theme.setBounds(160,65,w-180,28);autosaveLabel.setBounds(20,110,250,28);interval.setBounds(290,110,w-310,28);retentionLabel.setBounds(20,155,250,28);retention.setBounds(290,155,w-310,28);curvature.setBounds(20,205,w-40,32);experimental.setBounds(20,250,w-40,28);message.setBounds(20,285,w-40,44);cancel.setBounds(w-230,h-45,100,28);save.setBounds(w-120,h-45,100,28);}
         };
-        ref[0]=new GLDialog(AppText.text("settings"),panel);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(650,355);ref[0].closedFuture().thenRun(()->{if(!committed[0]){owner.previewAppearance(oldLocale,oldTheme);ApplicationSettings.previewLocale(null);owner.previewCurvature(oldCurvature);}});ref[0].show(owner);
+        ref[0]=new GLDialog(AppText.text("settings"),panel);ref[0].setDecoration(GLDialog.Decoration.THEMED);ref[0].setSize(650,395);ref[0].closedFuture().thenRun(()->{if(!committed[0]){owner.previewAppearance(oldLocale,oldTheme);ApplicationSettings.previewLocale(null);owner.previewCurvature(oldCurvature);}});ref[0].show(owner);
     }
 }

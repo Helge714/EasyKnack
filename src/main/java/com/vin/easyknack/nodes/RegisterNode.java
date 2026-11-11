@@ -9,5 +9,6 @@ public @interface RegisterNode {
     String title();
     NodeCategory category();
     NodeKind kind();
+    boolean experimental() default false;
 }
 

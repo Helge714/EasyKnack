@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id="easyknack.analysis.pitchhold",title="Pitch Hold",category=NodeCategory.ANALYSIS,kind=NodeKind.ANALYSIS)
+@RegisterNode(id="easyknack.analysis.pitchhold",title="Pitch Hold",category=NodeCategory.ANALYSIS,kind=NodeKind.ANALYSIS,experimental=true)
 public final class PitchHoldNode extends BasicNode {
     public static final PropertyId IN=new PropertyId("frequency"),CONFIDENCE=new PropertyId("confidence"),THRESHOLD=new PropertyId("threshold"),INITIAL=new PropertyId("initial"),OUT=new PropertyId("out"),VALID=new PropertyId("valid"),RATE=new PropertyId("rate");
     public void define(NodeBuilder n,NodeState s){

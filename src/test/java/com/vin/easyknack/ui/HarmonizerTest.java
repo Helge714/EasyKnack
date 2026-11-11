@@ -55,7 +55,8 @@ class HarmonizerTest {
         var dir=Path.of("target/examples");Files.createDirectories(dir);
         try(var files=new NodeDocuments()){files.write(dir.resolve("Harmonizer.knack"),doc).toCompletableFuture().get();}
     }
-    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    static boolean experimentalAudio(){return Boolean.getBoolean("easyknack.test.audio")&&Boolean.getBoolean("easyknack.test.experimental");}
+    @Test @org.junit.jupiter.api.condition.EnabledIf("experimentalAudio")
     void exampleAndExportRunWithAnalysisAndStatefulNodes()throws Exception{
         var doc=HarmonizerExample.create();String command=patch(doc);
         var group=doc.root().graph().nodes().stream().filter(n->n.typeId().equals("easyknack.group.harmonizer")).findFirst().orElseThrow();
