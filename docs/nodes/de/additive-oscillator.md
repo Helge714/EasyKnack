@@ -69,7 +69,7 @@ Die übrigen Funktionen entsprechen dem normalen [Oszillator](oscillator.md).
 
 ## Delayable
 
-| [Sampleweises Feedback](../../development/features/SAMPLE-FEEDBACK.md) |
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
 | --- |
 | Unterstützt |
 
