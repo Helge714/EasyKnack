@@ -27,6 +27,15 @@ public final class WindowsPackageSmoke {
         System.out.println("Application: " + com.vin.easyknack.InstallationPaths.applicationDirectory());
         check(Files.isRegularFile(Path.of(System.getProperty("java.home"), "bin/javac.exe")), "No external javac");
         ApplicationTheme.current();
+        Path application = com.vin.easyknack.InstallationPaths.applicationDirectory();
+        check(Files.readString(application.resolve("README.md")).contains("user/en/start.md"), "Packaged manual entry point missing");
+        for (String language : List.of("de", "en")) {
+            check(Files.isRegularFile(application.resolve("user/" + language + "/start.md")), "External manual missing: " + language);
+            check(Files.isRegularFile(application.resolve("nodes/" + language + "/index.md")), "External node references missing: " + language);
+            check(NodeDocumentation.read("user/" + language + "/index.md").contains("instance-group.md"), "Bundled manual missing: " + language);
+            check(NodeDocumentation.read("nodes/" + language + "/fft.md").startsWith("#"), "Bundled node reference missing: " + language);
+        }
+        System.out.println("Offline manuals and node references OK");
         ExampleLibrary.initialize();
         var plugins = new PluginManager(work.resolve("plugins"));
         check(plugins.startup(System.out::println) == null, "Fresh startup unexpectedly needs a plugin build");

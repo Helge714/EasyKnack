@@ -70,8 +70,9 @@ try {
     # Local LLDB/Python runs can leave bytecode caches in the compiler directory.
     # Remove only generated files inside the newly staged copy, never the source toolchain.
     Remove-CompilerBytecodeCaches "$inputDir/tools/llvm-mingw"
-    Copy-Item -LiteralPath "$PSScriptRoot/../docs/user/WINDOWS-QUICK-START.md" -Destination "$inputDir/README.md"
+    @('# EasyKnack', '', 'Start here: [English manual](user/en/start.md) / [Deutsches Handbuch](user/de/start.md).', '', 'A Windows x64 JDK 25 including javac is required. Start EasyKnack.exe from the parent folder.', '', 'Offline node references: [English](nodes/en/index.md) / [Deutsch](nodes/de/index.md).') | Set-Content -LiteralPath "$inputDir/README.md" -Encoding utf8
     Copy-Item -LiteralPath "$PSScriptRoot/../docs/user" -Destination "$inputDir/user" -Recurse
+    Copy-Item -LiteralPath "$PSScriptRoot/../docs/nodes" -Destination "$inputDir/nodes" -Recurse
     Copy-Item -LiteralPath "$root/LICENSE", "$root/THIRD-PARTY.md" -Destination $inputDir
     Copy-Item -LiteralPath "$root/src/main/resources/easyknack/notices" -Destination "$inputDir/licenses/upstream" -Recurse
     New-Item -ItemType Directory -Path "$inputDir/licenses/asio", "$inputDir/licenses/miniaudio" | Out-Null

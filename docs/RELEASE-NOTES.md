@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Include both offline manuals and full node references beside the Windows application; correct the external quick-start links and check bundled help during package smoke validation.
+
 - Consolidate workflow guides into twelve concise German/English chapters; retain the detailed bilingual node tables and keep old workflow links through forwarding pages. Help now opens the independently selected manual language.
 - Standardize visible Multiple Group naming as Instance Group (Instanzgruppe); saved document identifiers and plugin/audio contracts remain unchanged.
 
