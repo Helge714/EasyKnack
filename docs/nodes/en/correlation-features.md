@@ -1,49 +1,37 @@
 # Correlation Features
-
-## Overview
-
 Reduces autocorrelation to periodicity, period and noise descriptors.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Autocorrelation | [Analysis resource](../../user/en/data-types.md#analysis) | — | Correlation resource | — | — | [Control](../../user/en/rates.md#control) | Always |
-| Minimum frequency | [Editor](../../user/en/reference-tables.md) | ≥ 0.001 Hz | — | 20 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | — | Inspector |
-| Maximum frequency | [Editor](../../user/en/reference-tables.md) | ≥ 0.001 Hz | — | 20000 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | — | Inspector |
-| Periodicity threshold | [Editor](../../user/en/reference-tables.md) | 0–1 | — | 0.3 | [Factor](../../user/en/units.md), [%](../../user/en/units.md) | — | Inspector |
-| Silence threshold | [Editor](../../user/en/reference-tables.md) | ≥ 0 | — | 0.000001 | [Factor](../../user/en/units.md), [%](../../user/en/units.md) | — | Inspector |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Autocorrelation | — | Analysis resource; Correlation resource; Control |
+| Minimum frequency | ≥ 0.001 Hz; Default: 20 Hz; Hz, kHz | Editor; Inspector |
+| Maximum frequency | ≥ 0.001 Hz; Default: 20000 Hz; Hz, kHz | Editor; Inspector |
+| Periodicity threshold | 0–1; Default: 0.3; Factor, % | Editor; Inspector |
+| Silence threshold | ≥ 0; Default: 0.000001; Factor, % | Editor; Inspector |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Periodicity | [Value](../../user/en/data-types.md#value) | 0–1 | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
-| Period | [Value](../../user/en/data-types.md#value) | ≥ 0 s | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
-| Frequency | [Value](../../user/en/data-types.md#value) | ≥ 0 Hz | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
-| HNR | [Value](../../user/en/data-types.md#value) | ±120 dB | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
-| Valid | [Value](../../user/en/data-types.md#value) | 0–1 | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Periodicity | Value; 0–1; Control |
+| Period | Value; ≥ 0 s; Control |
+| Frequency | Value; ≥ 0 Hz; Control |
+| HNR | Value; ±120 dB; Control |
+| Valid | Value; 0–1; Control |
 
 ## Behavior
-
 Searches positive local correlation peaks within the frequency bounds, with sub-sample peak interpolation. At least three periods must fit the analyzed window. Periodicity p is the selected normalized correlation peak, not a probability. Period is its lag in seconds; Frequency = 1/Period. HNR = `10·log10(p/(1−p))`, limited to ±120 dB: 0 dB means equal estimated periodic and residual power, positive values favor periodic power. It depends on the upstream window and normalization. Valid = 1 only when peak and source RMS pass both thresholds; otherwise Period/Frequency are zero. Values hold between frames. Feed [Autocorrelation](autocorrelation.md) or its averaged result, not a raw spectrum.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | — | — |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| — | — |
+| Mute | No bypass |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/correlation-features.md)

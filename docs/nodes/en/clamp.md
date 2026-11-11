@@ -1,43 +1,33 @@
 # Clamp
-
-## Overview
-
 Limits, folds or wraps values around ±1.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Mode | [Editor](../../user/en/reference-tables.md) | Clip, Foldback, Wrap, Soft Clip | — | Clip | — | — | Always |
-| Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
-| In | [Value](../../user/en/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Mode | Clip, Foldback, Wrap, Soft Clip; Default: Clip | Editor |
+| Rate | Auto, Audio, Control; Default: Auto | Editor; Inspector |
+| In | ±1 000 000; Default: 0 | Value; ±∞; Auto |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md#value) | ±1 | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Out | Value; ±1 |
 
 ## Behavior
-
 Clip limits to ±1. Foldback reflects excess values at the boundaries. Wrap repeats an interval of width 2. Soft Clip computes `tanh(x)`, approaching ±1 continuously.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | In | Out |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| In | Out |
+| Mute | In → Out |
+| Insertion | In → Out |
+| Sample feedback | Supported |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/clamp.md)

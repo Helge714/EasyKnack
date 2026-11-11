@@ -1,45 +1,33 @@
 # Bin Random
-
-## Overview
-
 Supplies deterministic random numbers per bin and frame.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Seed | [Value](../../user/en/data-types.md#value) | 0–2 147 483 647, integer | 0–2 147 483 647 | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Vary by bin | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Always |
-| Vary by frame | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Seed | 0–2 147 483 647, integer; Default: 0 | Value; 0–2 147 483 647; Auto |
+| Vary by bin | Off / On; Default: On | Editor |
+| Vary by frame | Off / On; Default: Off | Editor |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Random | [Value](../../user/en/data-types.md#value) | 0–1, excluding 1 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Random | Value; 0–1, excluding 1; Audio (bin/frame) |
 
 ## Behavior
-
 Uniform values depend on Seed and the enabled bin/frame keys. Bin only gives a fixed random value per frequency. Frame only gives one shared random value per window. Both varies per bin and window; neither gives one constant random value. Equal keys also give equal values across channels. Frame means FFT window, not audio block. Only valid in [Spectral Groups](spectral-group.md).
 
 A connected Seed is sampled once per evaluated bin, rounded down and limited to 0–2 147 483 647. Non-finite values use the manual Seed. Without a connection the integer editor value is retained exactly. Connect a context index or a group input to vary the seed per instance.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | — | — |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| — | — |
+| Mute | No bypass |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/bin-random.md)

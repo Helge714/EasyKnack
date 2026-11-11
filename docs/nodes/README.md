@@ -2,7 +2,7 @@
 
 Start with the [English index](en/index.md) or [German index](de/index.md).
 Each node has one maintained Markdown page per language. The references include
-inspector-only settings in their Inputs tables, marked **Inspector / Inspektor**.
+inspector-only settings in compact Controls tables; shared explanations live in the twelve-chapter manual.
 
 Run `python scripts/build-docs.py` from the repository root to render and validate
 the HTML preview under `target/docs/`. Open `target/docs/nodes/en/index.html` or
@@ -25,14 +25,14 @@ processors are deliberately excluded, rather than advertised as usable nodes.
 The preview builder audits registration IDs without executing the application.
 It rejects undocumented registrations, exclusions of public nodes, duplicate
 IDs/slugs, missing translations/index links, wrong section sequences and broken
-local links or anchors. Technical tables and explanations remain manual; changing
+local links or anchors. Compact technical tables and explanations remain manual; changing
 a registration does not regenerate them or prove their accuracy.
 
 Follow the [documentation work order](../development/NODE-DOCUMENTATION.md) when
 adding or updating references. Update both languages with relevant node changes.
 Maven bundles the maintained Markdown and catalog. Runtime **Help → Node reference**
 uses the active node; **Node index** always opens the directory. Node-context
-**Documentation** resolves the clicked node. Both resolve the application language (English
+**Documentation** resolves the clicked node. Both resolve the independently selected documentation language (English
 fallback), then show a native GLSwing dialog with tables, links and browsing
 history. Each selected page is read and parsed in the background; no browser or
 HTML-file export is needed to read it. Installed help requires no Python,

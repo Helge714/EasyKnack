@@ -1,48 +1,37 @@
 # Pitch Hold
-
-## Overview
-
 Experimental: enable **Document settings → Enable experimental features** to add this node or open dependent examples from the Examples menu. Pitch detection/acceptance is not yet reliable in all tested cases. Existing projects keep their nodes when the setting is off.
 
 Holds the last sufficiently confident frequency.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Frequency | [Value](../../user/en/data-types.md#value) | 0–20000 Hz | ≥ 0 Hz | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | [Auto](../../user/en/rates.md#auto) | Always |
-| Confidence | [Value](../../user/en/data-types.md#value) | 0–1 | ±∞ | 1 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Minimum confidence | [Value](../../user/en/data-types.md#value) | 0–1 | ±∞ | 0.8 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Rate | [Editor](../../user/en/reference-tables.md) | Auto / Audio / Control | — | Auto | — | — | Inspector |
-| Initial frequency | [Editor](../../user/en/reference-tables.md) | 1–20000 Hz | — | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | — | Inspector |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Frequency | 0–20000 Hz; Default: 440 Hz; Hz, kHz | Value; ≥ 0 Hz; Auto |
+| Confidence | 0–1; Default: 1 | Value; ±∞; Auto |
+| Minimum confidence | 0–1; Default: 0.8 | Value; ±∞; Auto |
+| Rate | Auto / Audio / Control; Default: Auto | Editor; Inspector |
+| Initial frequency | 1–20000 Hz; Default: 440 Hz; Hz, kHz | Editor; Inspector |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Frequency [Hz] | [Value](../../user/en/data-types.md#value) | > 0 Hz | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
-| Valid | [Value](../../user/en/data-types.md#value) | 0–1 | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Frequency [Hz] | Value; > 0 Hz |
+| Valid | Value; 0–1 |
 
 ## Behavior
-
 Accepts positive finite Frequency when Confidence meets Minimum confidence. Otherwise the previous accepted value is held; before the first accepted value it uses Initial frequency. Valid describes the current input, even while output is held. No automatic fade or smoothing is applied.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | Frequency | Frequency [Hz] |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| Frequency | Frequency [Hz] |
+| Mute | Frequency → Frequency [Hz] |
+| Insertion | Frequency → Frequency [Hz] |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/pitch-hold.md)

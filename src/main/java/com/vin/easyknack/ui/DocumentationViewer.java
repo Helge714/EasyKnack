@@ -64,7 +64,7 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
         return current==null?CompletableFuture.completedFuture(null):navigate(new Position(current.page(),current.anchor(),0,0),false);
     }
     private String pageStatus(DocumentationPage.Document document,String page){
-        return document.title()+(contentLocale().getLanguage().equals("de")&&!page.contains("/de/")?" — "+AppText.text("help.englishFallback"):"");
+        return document.title()+(contentLocale().getLanguage().equals("de")&&!page.contains("/de/")?" \u2014 "+AppText.text("help.englishFallback"):"");
     }
     Position position(){return current==null?null:new Position(current.page(),"",scroll.getHorizontalScrollOffset(),scroll.getVerticalScrollOffset());}
     CompletableFuture<Void> openPage(String page){return navigate(new Position(page,"",0,0),true);}

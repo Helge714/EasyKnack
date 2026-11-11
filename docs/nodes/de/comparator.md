@@ -1,46 +1,36 @@
 # Vergleicher (Comparator)
-
-## Übersicht
-
 Wandelt einen Zahlenvergleich in 0 oder 1 um.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Operation | [Editor](../../user/de/reference-tables.md) | <, <=, >, >=, ==, != | — | < | — | — | Immer |
-| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
-| A | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
-| B | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Operation | <, <=, >, >=, ==, !=; Standard: < | Editor |
+| Rate | Auto, Audio, Control; Standard: Auto | Editor; Inspektor |
+| A | ±1 000 000; Standard: 0 | Wert; ±∞; Auto |
+| B | ±1 000 000; Standard: 0 | Wert; ±∞; Auto |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | 0–1 | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Ausgang (Out) | Wert; 0–1 |
 
 ## Verhalten
-
 Eine neue Verbindung an einem belegten Eingang A oder B verschiebt die bisherige Verbindung zum anderen Eingang, wenn dieser frei und kompatibel ist. Andernfalls wird die bisherige Verbindung ersetzt.
 
 Gibt bei erfülltem Vergleich 1 aus, sonst 0. Gleichheit vergleicht die Zahlen direkt und ist kein Toleranztest. Der Ausgang ist ein numerisches Gate, kein Trigger. Für Ereignisse dient [Threshold Trigger](threshold-trigger.md).
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | A | Ausgang (Out) |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| A | Ausgang (Out) |
+| Mute | A → Ausgang (Out) |
+| Einfügen | A → Ausgang (Out) |
+| Sample-Feedback | Unterstützt |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/comparator.md)

@@ -1,43 +1,32 @@
 # Sample & Hold
-
-## Overview
-
 Captures and holds a value on a Trigger.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
-| In | [Value](../../user/en/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Trigger | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Rate | Auto, Audio, Control; Default: Auto | Editor; Inspector |
+| In | ±1 000 000; Default: 0 | Value; ±∞; Auto |
+| Trigger | Button | Trigger; Trigger |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md#value) | ±∞ | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Out | Value; ±∞ |
 
 ## Behavior
-
 Each Trigger captures the input at its sample position; the result is held until another trigger. Initial held value is 0. Auto chooses Audio when Trigger is connected so within-block events remain visible. Forced Control reports the block-start value and later captures affect following output. Manual capture occurs at the next block.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | In | Out |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| In | Out |
+| Mute | In → Out |
+| Insertion | In → Out |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/sample-hold.md)

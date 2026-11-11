@@ -1,45 +1,35 @@
 # Triggerzähler (Trigger Counter)
-
-## Übersicht
-
 Zählt Eingangstrigger und gibt deren nullbasierten Index aus.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Trigger | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
-| Zurücksetzen (Reset) | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
-| Wrap | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Immer |
-| Anzahl (Count) | [Wert](../../user/de/data-types.md#value) | 1–16 777 216, ganzzahlig | 1–16 777 216, gerundet | 16 | — | [Control](../../user/de/rates.md#control) | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Trigger | Button | Trigger; Trigger |
+| Zurücksetzen (Reset) | Button | Trigger; Trigger |
+| Wrap | Aus / An; Standard: Aus | Editor |
+| Anzahl (Count) | 1–16 777 216, ganzzahlig; Standard: 16 | Wert; 1–16 777 216, gerundet; Control |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Index | [Wert](../../user/de/data-types.md#value) | 0–16 777 215 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
-| Trigger | [Trigger](../../user/de/data-types.md#trigger) | — | [Trigger](../../user/de/rates.md#trigger) | [Auto](../../user/de/data-types.md#channels) |
-
-## Verhalten
-
-Der erste Trigger liefert Index 0; folgende erhöhen ihn. Zwischen Ereignissen bleibt der Index erhalten. Wrap durchläuft 0…Count−1; ohne Wrap sättigt der Zähler bei 16 777 215. Reset bereitet Index 0 vor; ein gleichzeitiger Trigger zählt weiterhin als erstes Ereignis. Der Trigger-Ausgang reicht die gezählten Ereignisse weiter.
-
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | Trigger | Trigger |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| Ausgang | Signal |
 | --- | --- |
+| Index | Wert; 0–16 777 215; Audio |
 | Trigger | Trigger |
 
-## Delayable
+## Verhalten
+Der erste Trigger liefert Index 0; folgende erhöhen ihn. Zwischen Ereignissen bleibt der Index erhalten. Wrap durchläuft 0…Count−1; ohne Wrap sättigt der Zähler bei 16 777 215. Reset bereitet Index 0 vor; ein gleichzeitiger Trigger zählt weiterhin als erstes Ereignis. Der Trigger-Ausgang reicht die gezählten Ereignisse weiter.
 
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Unterstützt |
+## Routing
+| Funktion | Verhalten |
+| --- | --- |
+| Mute | Trigger → Trigger |
+| Einfügen | Trigger → Trigger |
+| Sample-Feedback | Unterstützt |
+
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/trigger-counter.md)

@@ -1,42 +1,31 @@
 # Bin Smoothing
-
-## Overview
-
 Blends new bin values into per-bin memory.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Value | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Update | [Value](../../user/en/data-types.md#value) | 0–1 | 0–1 | 1 | — | [Auto](../../user/en/rates.md#auto) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Value | ±∞; Default: 0 | Value; ±∞; Auto |
+| Update | 0–1; Default: 1 | Value; 0–1; Auto |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Value | [Value](../../user/en/data-types.md#value) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Value | Value; ±∞; Audio (bin/frame) |
 
 ## Behavior
-
 Each FFT frame computes `held = (1−u) × held + u × value`. The first frame initializes directly. Update 0 holds and 1 replaces. Smaller hops update more frequently, so the same factor has a different time response at another hop size. Audio inputs are sampled at the window end. Only valid in [Spectral Groups](spectral-group.md).
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | Value | Value |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| Value | Value |
+| Mute | Value → Value |
+| Insertion | Value → Value |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/bin-smoothing.md)

@@ -1,44 +1,33 @@
 # Glättung (Smoothing)
-
-## Übersicht
-
 Glättet steigende und fallende Werte exponentiell.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Audio | — | — | Inspektor |
-| Eingang (In) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
-| Anstieg (Rise) | [Wert](../../user/de/data-types.md#value) | 0–60 s | 0–60 s | 0.03 s | [s](../../user/de/units.md), [ms](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
-| Abfall (Fall) | [Wert](../../user/de/data-types.md#value) | 0–60 s | 0–60 s | 0.03 s | [s](../../user/de/units.md), [ms](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Rate | Auto, Audio, Control; Standard: Audio | Editor; Inspektor |
+| Eingang (In) | ±∞; Standard: 0 | Wert; ±∞; Auto |
+| Anstieg (Rise) | 0–60 s; Standard: 0.03 s; s, ms, smp | Wert; 0–60 s; Auto |
+| Abfall (Fall) | 0–60 s; Standard: 0.03 s; s, ms, smp | Wert; 0–60 s; Auto |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Ausgang (Out) | Wert; ±∞ |
 
 ## Verhalten
-
 Für die Zeitkonstante τ gilt `y += (1 − exp(−dt/τ)) × (x − y)`, bei Anstieg mit Rise, bei Abfall mit Fall. Eine τ erreicht etwa 63% eines Sprungs, drei τ etwa 95%. Null folgt sofort. Der erste gültige Wert initialisiert direkt. Audio glättet Control-Sprünge sampleweise; Control aktualisiert blockweise. Dies ist keine lineare Rampe fester Dauer.
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | Eingang (In) | Ausgang (Out) |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| Eingang (In) | Ausgang (Out) |
+| Mute | Eingang (In) → Ausgang (Out) |
+| Einfügen | Eingang (In) → Ausgang (Out) |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Nicht unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/smoothing.md)

@@ -1,51 +1,41 @@
 # Documentation consolidation
 
-The bilingual references under `docs/nodes/` own node ports, settings, ranges,
-units, rates and routing. Shared semantics live under `docs/user/en/` and `de/`.
-Older pages are reviewed by content, not deleted just because a matching node
-reference exists. Original texts replaced below are preserved under
-`history/node-reference-migration/`; their historical links are not maintained.
+The user manual now has twelve paired German/English chapters, owned by
+`docs/user/<language>/index.md`. Shared definitions are explained once; individual
+node pages retain compact authored controls, outputs, behavior and routing.
+Technical developer guides and historical audits are not part of user navigation.
 
-## Replaced references
+## Completed 2026-11-11
 
-| Previous page | Current source | Disposition |
-| --- | --- | --- |
-| `FILTER.md` | `nodes/en/filter.md`, `nodes/de/filter.md` | Archive original; retain forwarding page. Preserve compensation timing and feedback implications in both new pages. |
-| `Level-Analysis.md` | `nodes/en/level-detector.md`, `nodes/de/level-detector.md` | Archive original; retain forwarding page. |
-| `Step-Switch.md` | `nodes/en/step-switch.md`, `nodes/de/step-switch.md` | Archive original; retain forwarding page. Previous transient-selection and numeric-only descriptions are obsolete. |
-| `PORT-UNITS.md` | `user/en/units.md`, `user/de/units.md` | Archive original; retain forwarding page. Group-boundary and vector rules are in the shared reference. |
-| `OSCILLATOR-RESET.md` | Oscillator and Additive Oscillator references | Archive implementation/test history; retain forwarding page. |
-| `user/nodes.md` | Bilingual node indices and shared fundamentals | Archive duplicated node tables; keep a compact navigation page with its previous section anchors. |
+- Replaced scattered workflow guides with twelve concise chapters per language.
+- Condensed all cataloged node references from eight-column input tables and
+  separate routing sections to three-/two-column tables and one routing summary.
+  Existing technical values and special behavior were retained, not generated.
+- Replaced legacy user guides and shared term pages with short forwarding pages;
+  preserved their old heading/term anchors for incoming links.
+- Kept stable catalog IDs, filenames and saved document contracts. Standardized
+  visible English naming on Instance Group; German uses Instanzgruppe.
+- Help opens the selected-language manual directly. The former English-only
+  handbook remains a compatibility entry point rather than a second manual.
 
-## Retained guides and technical material
+Earlier FILTER, Level-Analysis, Step-Switch, PORT-UNITS, OSCILLATOR-RESET and old
+node tables remain archived under `history/node-reference-migration/`.
+Those are historical developer sources, not maintained public alternatives.
 
-| Pages | Why retained |
-| --- | --- |
-| `user/*.md` except the replaced `nodes.md` tables | Task-based handbook: workspace, devices, groups, drivers, interpolation, recovery and limitations. Node index is linked instead of replacing these workflows with tables. |
-| `Analysis-Inspection.md` | Measurement cursors, export schemas, freeze and scientific interpretation beyond individual node settings. |
-| `FFT.md`, `SPECTRUM-ANALYSIS.md`, `SPECTRAL-GROUPS.md`, `GROUPS-SPECTRAL.md`, `INSTANCE-SPECTRAL.md`, `MULTIPLE-GROUPS.md` | Cross-node execution/timing, group examples and technical history; partially superseded parameter lists are not promoted to current node references. Consolidate these into a spectral workflow guide separately. |
-| `FORMULA-GROUP.md`, `SPECTRAL-FORMULA.md` | Language syntax and per-bin formula examples; the Formula Group page cannot replace a language manual. |
-| `WAVEFORMS.md` | Drawing and FFT-capture workflows. |
-| `Audio-File-Player.md` | File region editing, zero snapping, audition and Buffer Reader workflows. |
-| `TRIGGER-COUNTER.md`, `TRIGGER-DELAY.md`, `TRIGGER-TIMER.md` | Multi-node trigger/feedback/tempo examples. Parameter definitions belong in the new references; examples need later tutorial consolidation. |
-| `SPECTRAL-HOLD.md`, `SPECTRUM-BLUR.md`, `SPECTRAL-PERFORMANCE.md`, `SAMPLE-FEEDBACK.md`, `SPATIAL-AUDIO.md`, `HARMONIZER.md` | Multi-node constructions, spectral synthesis/timing and performance guidance that is not duplicated by one node page. |
-| Build, distribution, license, DSP architecture and development documents | Developer or release responsibilities; not replaced by user node references. |
+## Maintenance
 
-Runtime help exports only Markdown reachable from the handbook and bilingual node
-indices. It never follows links into `development/`, source files, host filesystem
-paths or network URLs. Archives and comparison drafts are not runtime help pages.
-Legacy forwarding paths remain valid so existing references do not become dead links.
+Follow [documentation maintenance](NODE-DOCUMENTATION.md). Add concepts to the
+owning chapter, node exceptions to its paired short reference, and implementation
+history to developer documentation. Preserve useful legacy links with forwarding
+pages rather than keeping duplicate instructions.
 
-## Follow-up — 2026-11-11
+## Validation
 
-The spectrum workflow now links to the canonical FFT reference instead of keeping
-a stale window-size range. The spectral inspection guide links to the bilingual
-Spectral Features definitions instead of repeating their equations/output table;
-its comparison examples and inspection/export workflows remain. Value Viewer
-limits/defaults are linked rather than copied. The retained technical spectral
-and trigger tutorials above still need their separate cross-node consolidation;
-this is not a claim that every historical overlap has been removed.
-
-Runtime help has an independent persisted language selector, English fallback
-and language-aware reference/index/history navigation. Workflow pages without a
-translation remain English and are identified in the viewer's status line.
+All 214 cataloged language references retain their original input/output names.
+Reference Markdown is 49.5% shorter; rendered-text word count is 32.2% lower.
+Each language manual has approximately 3,000 words across twelve chapters.
+The preview checks all user-facing legacy forwarding pages as well as current
+chapters and references. Targeted native documentation tests cover language,
+navigation, rendering, bundled coverage and both chapter directories.
+The existing first-development product version covers this documentation/UI
+change; no document format, plugin ABI, audio protocol or Core version changes.

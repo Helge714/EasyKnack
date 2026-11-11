@@ -1,48 +1,36 @@
 # Binkontext (Bin Context)
-
-## Übersicht
-
 Stellt den aktuellen Bin einer Spectral Group bereit.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Spektrum (Spectrum) | — | Spectrum-Ressource; Control |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Realteil (Real) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Imaginärteil (Imaginary) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Betrag (Magnitude) | [Wert](../../user/de/data-types.md#value) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Phase | [Wert](../../user/de/data-types.md#value) | ±π rad | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0–fs/2 Hz | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Binindex (Bin index) | [Wert](../../user/de/data-types.md#value) | 0–N/2 | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Position | [Wert](../../user/de/data-types.md#value) | 0–1 | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Framezeit (Frame time) | [Wert](../../user/de/data-types.md#value) | ±∞ s | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Realteil (Real) | Wert; ±∞; Audio (Bin/Frame) |
+| Imaginärteil (Imaginary) | Wert; ±∞; Audio (Bin/Frame) |
+| Betrag (Magnitude) | Wert; 0–∞; Audio (Bin/Frame) |
+| Phase | Wert; ±π rad; Audio (Bin/Frame) |
+| Frequenz (Frequency) | Wert; 0–fs/2 Hz; Audio (Bin/Frame) |
+| Binindex (Bin index) | Wert; 0–N/2; Audio (Bin/Frame) |
+| Position | Wert; 0–1; Audio (Bin/Frame) |
+| Framezeit (Frame time) | Wert; ±∞ s; Audio (Bin/Frame) |
 
 ## Verhalten
-
 Nur innerhalb einer [Spectral Group](spectral-group.md) gültig. Bei FFT-Größe N hat Bin k die Frequenz `k × fs/N` und Position `k/(N/2)`. Real/Imaginary und Magnitude sind rohe komplexe FFT-Koeffizienten, keine normierten Amplituden. Framezeit bezeichnet den Fensterbeginn und kann anfangs durch Nullauffüllung negativ sein. Die angezeigte Audiorate bezeichnet hier einen je Frame ausgewerteten Binvektor, kein zeitliches Audio.
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Nein | — | — |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| — | — |
+| Mute | Nicht schaltbar |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Nicht unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/bin-context.md)

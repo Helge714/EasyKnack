@@ -1,45 +1,35 @@
 # Trigger Counter
-
-## Overview
-
 Counts incoming triggers and exposes their zero-based index.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Trigger | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
-| Reset | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
-| Wrap | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
-| Count | [Value](../../user/en/data-types.md#value) | 1–16 777 216, integer | 1–16 777 216, rounded | 16 | — | [Control](../../user/en/rates.md#control) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Trigger | Button | Trigger; Trigger |
+| Reset | Button | Trigger; Trigger |
+| Wrap | Off / On; Default: Off | Editor |
+| Count | 1–16 777 216, integer; Default: 16 | Value; 1–16 777 216, rounded; Control |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Index | [Value](../../user/en/data-types.md#value) | 0–16 777 215 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
-| Trigger | [Trigger](../../user/en/data-types.md#trigger) | — | [Trigger](../../user/en/rates.md#trigger) | [Auto](../../user/en/data-types.md#channels) |
-
-## Behavior
-
-The first trigger outputs Index 0; subsequent triggers increment it. Index is held between events. Wrap cycles through 0…Count−1; without Wrap the counter saturates at 16 777 215. Reset prepares Index 0; a simultaneous Trigger is still counted as the first event. The Trigger output forwards counted events.
-
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | Trigger | Trigger |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| Output | Signal |
 | --- | --- |
+| Index | Value; 0–16 777 215; Audio |
 | Trigger | Trigger |
 
-## Delayable
+## Behavior
+The first trigger outputs Index 0; subsequent triggers increment it. Index is held between events. Wrap cycles through 0…Count−1; without Wrap the counter saturates at 16 777 215. Reset prepares Index 0; a simultaneous Trigger is still counted as the first event. The Trigger output forwards counted events.
 
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Supported |
+## Routing
+| Function | Behavior |
+| --- | --- |
+| Mute | Trigger → Trigger |
+| Insertion | Trigger → Trigger |
+| Sample feedback | Supported |
+
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/trigger-counter.md)

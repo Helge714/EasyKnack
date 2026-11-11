@@ -832,9 +832,9 @@ final class WorkspaceController implements AutoCloseable {
         if(isSpectralContext())return;
         var asset=MultipleGroups.create();var descriptor=asset.compositeDescriptor();
         composites.registerAsset(asset);types.register(descriptor.nodeType());
-        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(descriptor.nodeType(),"Multiple Group",com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"instances"));
+        catalog.register(new com.vingame.glswing.node.model.GLNodeCatalogEntry(descriptor.nodeType(),"Instance Group",com.vin.easyknack.nodes.NodeCategory.ROUTING.path(),Map.of(),"instances"));
         workspace.includeEmbeddedAsset(asset.id());var target=workspace.currentGraph();var node=new GLGraphNode(GLNodeId.random(),descriptor.nodeTypeId(),Map.of());
-        history.perform("Add multiple group",()->target.edit("Add multiple group",e->e.addNode(node)),()->target.edit("Remove multiple group",e->e.removeNode(node.id())));
+        history.perform("Add instance group",()->target.edit("Add instance group",e->e.addNode(node)),()->target.edit("Remove instance group",e->e.removeNode(node.id())));
         for(var view:workspace.editor().getNodes())if(compositeColors.modelId(view).filter(node.id()::equals).isPresent()){view.setLocation(x,y);workspace.editor().setSelectedNode(view);break;}syncAudio();
     }
 

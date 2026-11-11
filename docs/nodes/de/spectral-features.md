@@ -1,34 +1,35 @@
 # Spektrale Merkmale (Spectral Features)
-
-## Übersicht
-
 Misst die Frequenzverteilung und ihre Änderung zwischen Frames.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Analysis-Ressource](../../user/de/data-types.md#analysis) | — | Spektrum- oder Analyseressource | — | — | [Control](../../user/de/rates.md#control) | Immer |
-| Frequenzskala (Frequency scale) | [Editor](../../user/de/reference-tables.md) | Linear / Logarithmisch | — | Linear | — | — | Inspektor |
-| Gewichtung (Weighting) | [Editor](../../user/de/reference-tables.md) | Power / Magnitude | — | Power | — | — | Immer |
-| Roll-off-Anteil (Roll-off fraction) | [Editor](../../user/de/reference-tables.md) | 0–1 | — | 0.85 | [Faktor](../../user/de/units.md), [%](../../user/de/units.md) | — | Immer |
-| Flux normieren (Normalize flux) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Ein | — | — | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Spektrum (Spectrum) | — | Analysis-Ressource; Spektrum- oder Analyseressource; Control |
+| Frequenzskala (Frequency scale) | Linear / Logarithmisch; Standard: Linear | Editor; Inspektor |
+| Gewichtung (Weighting) | Power / Magnitude; Standard: Power | Editor |
+| Roll-off-Anteil (Roll-off fraction) | 0–1; Standard: 0.85; Faktor, % | Editor |
+| Flux normieren (Normalize flux) | Aus / Ein; Standard: Ein | Editor |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Zentrum (Centroid) | [Wert](../../user/de/data-types.md#value) | 0–Nyquist Hz | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Streuung (Spread) | [Wert](../../user/de/data-types.md#value) | ≥ 0 Hz / oct | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Schiefe (Skewness) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Kurtosis (Kurtosis) | [Wert](../../user/de/data-types.md#value) | ≥ 0 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Flux | [Wert](../../user/de/data-types.md#value) | ≥ 0 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Roll-off (Rolloff) | [Wert](../../user/de/data-types.md#value) | 0–Nyquist Hz | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Neigung (Slope) | [Wert](../../user/de/data-types.md#value) | ±∞ / Hz | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Flachheit (Flatness) | [Wert](../../user/de/data-types.md#value) | 0–1 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Zentrum (Centroid) | Wert; 0–Nyquist Hz; Control |
+| Streuung (Spread) | Wert; ≥ 0 Hz / oct; Control |
+| Schiefe (Skewness) | Wert; ±∞; Control |
+| Kurtosis (Kurtosis) | Wert; ≥ 0; Control |
+| Flux | Wert; ≥ 0; Control |
+| Roll-off (Rolloff) | Wert; 0–Nyquist Hz; Control |
+| Neigung (Slope) | Wert; ±∞ / Hz; Control |
+| Flachheit (Flatness) | Wert; 0–1; Control |
 
 ## Verhalten
 
+[Anleitung](../../user/de/analysis.md)
 Sei A[k] = abs(X[k])/Σw[n] und m[k] = 1 bei DC/Nyquist, sonst 2. Die Gewichtung ist W[k] = m[k]·A[k]² für Power oder m[k]·A[k] für Magnitude. Setze p[k] = W[k]/ΣW. Lineare Momente verwenden z[k] = f[k]; logarithmische Momente verwenden z[k] = log2(f[k]), ohne DC und mit neu normierten verbleibenden Gewichten.
 
 - Zentrum: μ = Σp·z; logarithmischer Ausgang ist 2^μ Hz.
@@ -42,22 +43,11 @@ Sei A[k] = abs(X[k])/Σw[n] und m[k] = 1 bei DC/Nyquist, sonst 2. Die Gewichtung
 
 Die logarithmische Skala verändert nur die vier Momente. Stille und undefinierte Momente bei Streuung null ergeben null. Ausgänge halten zwischen Frames. Die mittlere Flachheit einer einzelnen Rausch-FFT liegt unter 1; vorherige Leistungsmittelung verringert die Schätzstreuung.
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | — | — |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| — | — |
+| Mute | Kein Bypass |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Nicht unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/spectral-features.md)

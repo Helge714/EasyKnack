@@ -1,42 +1,32 @@
 # Gain
-
-## Overview
-
 Scales an audio signal by an amplitude factor.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Gain | [Value](../../user/en/data-types.md#value) | 0–1.995262 × | 0–1e6 × | 0.251189 × | [×](../../user/en/units.md), [%](../../user/en/units.md), [dB](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
-| Audio In | [Audio](../../user/en/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/en/rates.md#audio) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Gain | 0–1.995262 ×; Default: 0.251189 ×; ×, %, dB | Value; 0–1e6 ×; Auto |
+| Audio In | — | Audio; ±∞; Audio |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Audio Out | [Audio](../../user/en/data-types.md#audio) | ±∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Audio Out | Audio; ±∞ |
 
 ## Behavior
-
 `y = x × gain`, with `gain = 10^(dB/20)`. Manual −12 dB corresponds to about 0.251189×. Values at or below −160 dB mute the signal. Connected gain is limited to 120 dB; manual changes are smoothed. Gain does not limit the audio output.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | Audio In | Audio Out |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| Audio In | Audio Out |
+| Mute | Audio In → Audio Out |
+| Insertion | Audio In → Audio Out |
+| Sample feedback | Supported |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/gain.md)

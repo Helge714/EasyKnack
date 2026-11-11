@@ -28,6 +28,19 @@ class HelpDocumentsTest {
         assertTrue(HelpDocuments.resource("LICENSE").contains("GNU GENERAL PUBLIC LICENSE"));
         assertTrue(HelpDocuments.licenses().contains("JogAmp"));
     }
+    @Test void conciseManualHasTheSameTwelveChaptersInBothLanguages()throws Exception{
+        var chapters=java.util.List.of("start","signals","groups","instance-group","formula-group","spectral-group",
+                "partial-group","spectral-synthesis","analysis","channels","midi","buffers");
+        for(String language:java.util.List.of("de","en")){
+            String index=NodeDocumentation.read("user/"+language+"/index.md");
+            for(String chapter:chapters){
+                assertTrue(index.contains("]("+chapter+".md)"),language+" "+chapter);
+                String body=NodeDocumentation.read("user/"+language+"/"+chapter+".md");
+                assertTrue(body.startsWith("#"));assertTrue(body.contains("](index.md)"));
+                assertTrue(body.contains("](../"+(language.equals("de")?"en":"de")+"/"+chapter+".md)"));
+            }
+        }
+    }
     @Test void localLinksAndAnchorsWorkAndHtmlIsEscaped() {
         String html = HelpDocuments.html("# Formula Groups\n\n[Read](groups.md#formula-groups) <script>alert(1)</script>\n\n| A | B |\n|---|---|\n| 1 | 2 |\n");
         assertTrue(html.contains("href=\"groups.html#formula-groups\""));

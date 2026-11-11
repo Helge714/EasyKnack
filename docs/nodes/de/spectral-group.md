@@ -1,45 +1,36 @@
 # Spektralgruppe (Spectral Group)
-
-## Übersicht
-
 Verarbeitet jeden Bin eines eingehenden Spektrums.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
-| Frame-Eingänge (Frame inputs) | [Wert](../../user/de/data-types.md#value) | Schnittstellenabhängig | Audio / Control / Trigger | Schnittstellenabhängig | — | [Auto](../../user/de/rates.md#auto) | Immer |
-| Leere Bins überspringen (Skip empty bins) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | Aus | — | — | Inspektor |
-| Parallele Bins (Parallel bins) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | An | — | — | Inspektor |
-| Allgemein / IO / Editoren (General / IO / Editors) | [Editor](../../user/de/reference-tables.md) | Gruppendefiniert | — | — | — | — | Inspektor |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Spektrum (Spectrum) | — | Spectrum-Ressource; Control |
+| Frame-Eingänge (Frame inputs) | Schnittstellenabhängig; Standard: Schnittstellenabhängig | Wert; Audio / Control / Trigger; Auto |
+| Leere Bins überspringen (Skip empty bins) | Aus / An; Standard: Aus | Editor; Inspektor |
+| Parallele Bins (Parallel bins) | Aus / An; Standard: An | Editor; Inspektor |
+| Allgemein / IO / Editoren (General / IO / Editors) | Gruppendefiniert | Editor; Inspektor |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Ausgang (Out) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Ausgang (Out) | Spectrum-Ressource; Control |
 
 ## Verhalten
 
+[Anleitung](../../user/de/spectral-group.md)
 Ein Spectrum bestimmt Binanzahl und Framezeitpunkte. [Bin Context](bin-context.md) stellt komplexe Komponenten, Frequenz und Index bereit; [Bin Reader](bin-reader.md) liest andere Bins. [Bin Output](bin-output.md) schreibt unabhängige komplexe Ausgänge; die Anfangsverdrahtung reicht die komplexen Werte unverändert durch. Externe Frame-Werte werden am FFT-Fensterende abgetastet; asynchrone Pfade erhalten ihre zeitliche Zuordnung. Frame-Trigger wirken auf den zugehörigen Frame. Reine Frame-Verarbeitung läuft einmal je Bin/Frame, nicht je Audiosample. Oszillatoren/Rauschen erzeugen dauerndes Audio je Bin, reduziert über Instance Merge; Bin Output nimmt dieses Audio nicht an. Bin Discard läuft vor der Binberechnung und betrifft alle Spectrum-Ausgänge. Parallele Worker erhalten unabhängige Binzustände. [IFFT](ifft.md) rekonstruiert komplexe Spektren; eine Oszillatorbank ist keine phasengleiche IFFT.
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | Spektrum (Spectrum) | Ausgang (Out) |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| Spektrum (Spectrum) | Ausgang (Out) |
+| Mute | Spektrum (Spectrum) → Ausgang (Out) |
+| Einfügen | Spektrum (Spectrum) → Ausgang (Out) |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Nicht unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/spectral-group.md)

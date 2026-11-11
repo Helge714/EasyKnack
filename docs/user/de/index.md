@@ -1,20 +1,24 @@
-# Grundlagen
+# EasyKnack – Handbuch
 
-| Thema | Inhalt |
-| --- | --- |
-| [Gruppen verwalten](groups.md) | Verwendungsanzahl, Einbindungsorte und rückgängig machbares Löschen unbenutzter Definitionen |
-| [Raten](rates.md) | Audio, Control, Auto und Trigger; Abtastung und Ratenwechsel |
-| [Datentypen](data-types.md) | Zahlen, Trigger, MIDI, Vektoren und Ressourcen; Kanäle |
-| [Einheiten](units.md) | Darstellung, Interpretation verbundener Werte und Umrechnung |
-| [Mute](muting.md) | Durchreichen, ignorierte Verbindungen und Nullsignale |
-| [Referenztabellen](reference-tables.md) | Reglerbereich, Signalbereich und weitere Tabellenüberschriften |
+Zwölf kurze Kapitel erklären die Bedienung und die wichtigsten Verarbeitungskonzepte. Node-Kurzreferenzen ergänzen besondere Parameter und Grenzen.
 
-[English](../en/index.md)
+| Kapitel |
+| --- |
+| 1. [Einstieg und Bedienung](start.md) |
+| 2. [Signale und Verarbeitung](signals.md) |
+| 3. [Gruppen und Gruppeneinstellungen](groups.md) |
+| 4. [Instance Group – Instanzgruppe](instance-group.md) |
+| 5. [Formula Group – Formeln](formula-group.md) |
+| 6. [Spectral Group – Bins bearbeiten](spectral-group.md) |
+| 7. [Partial Group – Teiltöne bearbeiten](partial-group.md) |
+| 8. [Spektrale Synthese und Bearbeitung](spectral-synthesis.md) |
+| 9. [Analyse und Messung](analysis.md) |
+| 10. [Channel und Stimmen](channels.md) |
+| 11. [MIDI und Steuerung](midi.md) |
+| 12. [Buffer und Aufnahme](buffers.md) |
 
-## Experimentelle Funktionen
+[Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/index.md)
 
-Über **Dokumenteinstellungen → Experimentelle Funktionen aktivieren** werden als **Experimentell** markierte Nodes und Beispiele angeboten. Die Option gilt für das jeweilige Dokument und ist bei neuen gewöhnlichen Dokumenten aus. Alte Dateien aktivieren sie automatisch, wenn sie experimentelle Nodes enthalten; ein ausdrücklich gespeichertes Aus bleibt erhalten. Beim Ausschalten wird eine Bestätigung verlangt, solange experimentelle Nodes im Dokument vorhanden sind. Gruppen und neu exportierte Plugins übernehmen den Status ihrer Abhängigkeiten. Vorhandene Dokumente bleiben auch bei ausgeschalteter Option ladbar und behalten ihre Nodes. Kamerabewegungen oder Fenstergrößenänderungen allein lösen keine Speicherabfrage aus; beim Speichern wird die aktuelle Kamera weiterhin mitgesichert. Derzeit benötigen Pitch Hold und davon abhängige Beispiele diese Freigabe.
-
-## Dokumentationssprache
-
-In der Dokuansicht lässt sich unter **Dokumentationssprache** zwischen **Wie Anwendung**, **Deutsch** und **English** wählen. Die Auswahl wird unabhängig von der Programmsprache gespeichert und für Node-Hilfe, Verzeichnis und lokale Navigation verwendet. Fehlende Übersetzungen werden auf Englisch angezeigt, ohne die Auswahl zu ändern; die Statuszeile kennzeichnet nicht übersetzte Workflow-Anleitungen.
+<a id="dokumentationssprache"></a>
+<a id="experimentelle-funktionen"></a>
+<a id="grundlagen"></a>

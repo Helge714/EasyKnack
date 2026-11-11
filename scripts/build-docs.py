@@ -59,20 +59,15 @@ def validate_catalog(data):
             if f']({slug}.md)' not in index_text:
                 raise ValueError(f'Node missing from {language} index: {slug}')
             text = page.read_text(encoding='utf-8')
-            required = (['Overview', 'Inputs', 'Outputs', 'Behavior', 'Mute', 'Insertion', 'Delayable']
-                        if language == 'en' else
-                        ['Übersicht', 'Eingänge', 'Ausgänge', 'Verhalten', 'Mute', 'Einfügen', 'Delayable'])
+            required = (['Controls', 'Outputs', 'Behavior', 'Routing'] if language == 'en' else
+                        ['Bedienung', 'Ausgänge', 'Verhalten', 'Routing'])
             headings = re.findall(r'^## (.+)$', text, flags=re.MULTILINE)
             if headings != required:
                 raise ValueError(f'Unexpected node reference sections: {page}: {headings}')
-            expected = ([['Name', 'Data type', 'Editor range', 'Signal range', 'Default', 'Unit', 'Rate', 'Visibility'],
-                         ['Name', 'Data type', 'Range', 'Rate', 'Channel'],
-                         ['Mutable', 'Input', 'Output'], ['Input', 'Output'], ['Sample-wise feedback']]
+            expected = ([['Parameter', 'Setting', 'Signal / condition'], ['Output', 'Signal'], ['Function', 'Behavior']]
                         if language == 'en' else
-                        [['Bezeichnung', 'Datentyp', 'Reglerbereich', 'Signalbereich', 'Standardwert', 'Einheit', 'Rate', 'Sichtbarkeit'],
-                         ['Bezeichnung', 'Datentyp', 'Wertebereich', 'Rate', 'Kanal'],
-                         ['Mutable', 'Eingang', 'Ausgang'], ['Eingang', 'Ausgang'], ['Sampleweises Feedback']])
-            for heading, columns in zip([required[i] for i in (1, 2, 4, 5, 6)], expected):
+                        [['Parameter', 'Einstellung', 'Signal / Bedingung'], ['Ausgang', 'Signal'], ['Funktion', 'Verhalten']])
+            for heading, columns in zip([required[i] for i in (0, 1, 3)], expected):
                 section = re.search(r'^## ' + re.escape(heading) + r'\n(.*?)(?=^## |\Z)', text,
                                     flags=re.MULTILINE | re.DOTALL)[1]
                 rows = [line.strip().strip('|').split('|') for line in section.splitlines() if line.startswith('|')]
@@ -106,6 +101,8 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     sources = set((DOCS / 'user/de').glob('*.md')) | set((DOCS / 'user/en').glob('*.md'))
+    sources.update((DOCS / 'user').glob('*.md'))
+    sources.add(DOCS / 'README.md')
     catalog = DOCS / 'nodes/catalog.json'
     if catalog.is_file():
         data = json.loads(catalog.read_text(encoding='utf-8'))

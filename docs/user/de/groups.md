@@ -1,35 +1,36 @@
-# Gruppen im Dokument verwalten
+# Gruppen und Gruppeneinstellungen
 
-Öffne **Einstellungen → Dokumenteneinstellungen → Gruppen verwalten**.
+Markiere Nodes und erstelle eine Gruppe. Öffne sie zum Bearbeiten; Input und Output verbinden ihren inneren Graphen mit der öffentlichen Schnittstelle. Eine Definition kann mehrfach verwendet werden: Änderungen am Aufbau gelten für ihre Instanzen, deren Parameterwerte bleiben individuell.
 
-Links stehen alle eingebetteten Gruppendefinitionen mit der Anzahl ihrer direkten
-Instanzen. Rechts erscheinen die enthaltenden Graphen und die einzelnen Instanzen
-der ausgewählten Gruppe. Gezählt werden auch ausgeblendete Nodes und Instanzen
-in unbenutzten Gruppendefinitionen. Ein Instance-Group-Node zählt als eine gesetzte
-Instanz; seine aktive Stimmenanzahl vervielfacht die angezeigte Anzahl nicht.
+## Einstellungen
 
-Wähle eine unbenutzte Gruppe und **Unbenutzte Gruppe löschen**. Das entfernt ihre
-Definition aus diesem Dokument und dem Add-Menü. Es wird keine Datei auf dem
-Datenträger gelöscht. Undo stellt Definition und Menüeintrag wieder her; Redo
-entfernt sie erneut.
+| Bereich | Bedeutung |
+| --- | --- |
+| Allgemein | Name, Node-Typ/Titelfarbe und Add-Menükategorie bestimmen Darstellung und Auffindbarkeit. |
+| Einfügen | Wähle Eingang und Ausgang für das Einsetzen in eine vorhandene Verbindung. |
+| Mute-Bypass | Wähle den Eingang und Ausgang, die bei Mute verbunden werden sollen. |
+| IO | Eingänge/Ausgänge anlegen, benennen, sortieren, verbinden und entfernen; Datentyp, Rate und Einheiten passend zum inneren Ziel wählen. |
+| Sichtbarkeit | Ein öffentlicher Eingang kann nur einen Editor zeigen; sein innerer Port und seine Verdrahtung bleiben bestehen. |
+| Editoren | Kein Editor, Slider, Checkbox, Button, Combobox oder Copy Editor. Checkbox liefert 0/1; Button löst Trigger aus. |
+| Slider | Minimum/Maximum, Standardwert, Ganzzahligkeit, Balken-/Buttondarstellung, erlaubte Einheiten und Standardeinheit. Leere Grenzen erlauben unbeschränkte Werte. |
+| Combobox | Dokumentvorlage mit Bezeichnungen und Zahlenwerten sowie Standardauswahl. Vorlagen werden im Editoren-Bereich verwaltet. |
+| Spezialgruppen | Instance: Maximum und Mix; Spectral: leere Bins überspringen und Parallelverarbeitung; Formula: Verarbeitungsrate und Code-Bezeichner. Details stehen im jeweiligen Kapitel. |
 
-Eine Gruppe lässt sich nicht löschen, solange sie irgendeine Instanz besitzt,
-auch innerhalb einer unbenutzten übergeordneten Gruppe, oder zum aktuell geöffneten
-Gruppen-Navigationspfad gehört. Entferne zuerst ihre Instanzen oder unbenutzte
-übergeordnete Definitionen und verlasse die Gruppe vor dem Löschen. Beim Löschen
-einer zuvor besuchten Gruppe wird die alte Vorwärts-Navigation entfernt, damit
-sie darüber nicht wieder auftaucht.
+Ziehen einer Verbindung auf einen Grenz-Node legt schnell einen Port an. Prüfe danach Typ, Rate, Editor und Routing. Die erlaubten Einheiten müssen die Standardeinheit enthalten. Ein verbundener Eingang hat Vorrang vor seinem manuellen Wert.
 
-Diese ausdrücklichen Löschungen wirken sofort und lassen sich nach dem Schließen
-des Dialogs rückgängig machen. Die separate Dokumentenoption zum Erhalten
-unbenutzter Gruppen steuert das Speichern; sie umgeht die Löschprüfung nicht.
+## Copy Editor
 
-Mit **Gruppen importieren** lassen sich mehrere Definitionen aus einem anderen Dokument auswählen. **Alle Gruppen auswählen** wählt die Definitionen ohne die getrennte Option für den gesamten Graphen. Die Definitionen sind nach ihrer ursprünglichen Menükategorie geordnet; diese bleibt beim Import erhalten. Gemeinsame Abhängigkeiten werden einmal kopiert; die Instanzen werden gemeinsam eingefügt und lassen sich gemeinsam rückgängig machen.
+Copy Editor übernimmt einen passenden inneren Editor mit Typ, Grenzen und Einheiten. Auch öffentliche Editoren verschachtelter Gruppen können Quellen sein. Bei unterstützten Editoren ohne eigenen Port wählst du das zu steuernde Ziel ausdrücklich aus. Gekoppelte Originale erscheinen deaktiviert; ein Ziel kann nicht gleichzeitig von mehreren öffentlichen Editoren gesteuert werden. Nicht jeder Spezialeditor ist kopierbar. Änderungen an der Schnittstelle können unbrauchbare Verknüpfungen entfernen; prüfe danach deine Verdrahtung.
 
-Undo/Redo wirkt auf den gerade geöffneten Graphen. Gruppenverläufe bleiben beim Verlassen und erneuten Öffnen einer Definition erhalten. Speichern gilt für alle Graphen. **N** schaltet den Inspektor außerhalb von Texteingaben um. **Esc** schließt den fokussierten Inspektor; eine aktive Textbearbeitung oder ein Popup behandelt zunächst das erste Esc.
+## Verwalten und Weitergeben
 
-## Aktuellen Graphen anordnen
+Unter **Dokumenteneinstellungen → Gruppen verwalten** siehst du Definitionen, direkte Verwendungen und ihre Orte. Nur unbenutzte, nicht gerade geöffnete Definitionen lassen sich löschen; Undo stellt sie wieder her. Count einer Instance Group vervielfacht diese Verwendungszahl nicht. Die Option zum Erhalten unbenutzter Gruppen betrifft das Speichern.
 
-Mit **Alle Nodes anordnen** im Menü oder **Strg+Umschalt+L** wird der aktuelle Graph angeordnet. Verbundene Ports werden ausgerichtet, unabhängige Zweige kompakt gepackt und Feedback-Bereiche zusammengehalten. Innerhalb einer Gruppe bleibt Input links und Output rechts, auch bei unverbundenen Gruppenports. Theme-Abstände und Node-Größen bleiben erhalten. Ein Undo stellt die vorherige Anordnung wieder her; Kamera und Zoom bleiben unverändert.
+Import kopiert ausgewählte Definitionen samt Abhängigkeiten und Editorvorlagen, ohne Live-Verknüpfung zur Quelldatei. **Ungroup** entpackt eine gewöhnliche Instanz; Spezialgruppen behalten ihren Ausführungskontext und lassen sich nicht entsprechend entpacken.
 
-[English](../en/groups.md) · [Gruppenreferenz](../../nodes/de/node-group.md)
+**Bake** kompiliert lokal und lässt den Graphen bearbeitbar. Interne Rechenänderungen können Neukompilation erfordern; Bake garantiert keinen Geschwindigkeitsgewinn. Der lokale Binärcache ist nicht im Dokument. Gruppenexport erzeugt ein Source-Plugin; Installation kompiliert es. Export gekoppelter standalone Slider, Checkboxen und Trigger ist eingeschränkt. Prüfe die Oberfläche vor Weitergabe; externe Medien bleiben externe Dateien.
+
+[Handbuch](index.md) · [Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/groups.md)
+
+<a id="aktuellen-graphen-anordnen"></a>
+<a id="gruppen-im-dokument-verwalten"></a>

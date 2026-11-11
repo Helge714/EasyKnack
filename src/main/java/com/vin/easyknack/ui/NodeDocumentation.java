@@ -151,8 +151,8 @@ final class NodeDocumentation {
             String html=HelpDocuments.html(entry.getValue(),lang,link->resolveLink(source,link,pages.keySet()));
             Path parent=Path.of(source).getParent();if(parent==null)parent=Path.of("");
             String index=parent.relativize(Path.of("nodes/"+lang+"/index.html")).toString().replace('\\','/');
-            String manual=parent.relativize(Path.of("user/README.html")).toString().replace('\\','/');
-            html=html.replace("<body>","<body><nav><a href=\""+index+"\">"+(lang.equals("de")?"Node-Verzeichnis":"Node index")+"</a><a href=\""+manual+"\">"+(lang.equals("de")?"Handbuch (Englisch)":"User guide")+"</a></nav>");
+            String manual=parent.relativize(Path.of("user/"+lang+"/index.html")).toString().replace('\\','/');
+            html=html.replace("<body>","<body><nav><a href=\""+index+"\">"+(lang.equals("de")?"Node-Verzeichnis":"Node index")+"</a><a href=\""+manual+"\">"+(lang.equals("de")?"Handbuch":"User guide")+"</a></nav>");
             Files.createDirectories(output.getParent());
             Path temp=Files.createTempFile(output.getParent(),"help-",".tmp");
             try{Files.writeString(temp,html,StandardCharsets.UTF_8);Files.move(temp,output,StandardCopyOption.REPLACE_EXISTING);}

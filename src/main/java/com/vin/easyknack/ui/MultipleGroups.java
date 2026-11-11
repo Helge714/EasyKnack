@@ -95,9 +95,9 @@ final class MultipleGroups {
             nestedRegistry.registerAsset(candidate);
         }
         for(var descriptor:registry.composites())if(nestedRegistry.findComposite(descriptor.nodeTypeId()).isEmpty())nestedRegistry.registerComposite(descriptor);
-        var flat=SpectralGroups.flatten(new GroupCompiler.Prepared(root,nestedRegistry),limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid Multiple Group: ")+flat.diagnostics());
+        var flat=SpectralGroups.flatten(new GroupCompiler.Prepared(root,nestedRegistry),limits);if(!flat.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Invalid Instance Group: ")+flat.diagnostics());
         var source=flat.graph().orElseThrow();
-        for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported node inside Multiple Group: ")+n.typeId());
+        for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported node inside Instance Group: ")+n.typeId());
         var contracts=NodeRegistry.executionContracts();var types=contracts.types();var definitions=contracts.definitions();
         source=com.vingame.glswing.node.execution.GLMutedGraphResolver.resolve(definitions.normalize(source),types);
         // An empty public boundary has no runtime consumer. Do not schedule orphaned

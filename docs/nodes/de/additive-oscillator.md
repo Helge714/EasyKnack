@@ -1,29 +1,28 @@
 # Additiver Oszillator (Additive Oscillator)
-
-## Übersicht
-
 Der **Additive Oscillator** erzeugt einen Klang aus bis zu 144 Teiltönen.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Wellenform (Waveform) | [Wavetable-Ressource](../../user/de/data-types.md#wavetable) | Sinus, Dreieck, Sägezahn, Rechteck | — | Sinus | — | [Control](../../user/de/rates.md#control) | Immer |
-| Teiltöne (Partials) | [Wert](../../user/de/data-types.md#value) | 1–144, ganzzahlig | 1–144, abgerundet | 1 | — | [Control](../../user/de/rates.md#control) | Immer |
-| Abfall (Falloff) | [Wert](../../user/de/data-types.md#value) | 0–4 | 0–4 | 1 | — | [Auto](../../user/de/rates.md#auto) | Teiltöne > 1 oder Teiltöne verbunden |
-| Streckung (Stretch) | [Wert](../../user/de/data-types.md#value) | 0–4 | 0–4 | 1 | — | [Auto](../../user/de/rates.md#auto) | Teiltöne > 1 oder Teiltöne verbunden |
-| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0,00001–20.000 Hz | 0–20.000 Hz | 440 Hz | [Hz](../../user/de/units.md#frequency), [kHz](../../user/de/units.md#frequency) | [Auto](../../user/de/rates.md#auto) | Immer |
-| Phase | [Wert](../../user/de/data-types.md#value) | 0–1 turn | ±∞ turn | 0 turn | [turn](../../user/de/units.md#angle), [°](../../user/de/units.md#angle), [rad](../../user/de/units.md#angle) | [Auto](../../user/de/rates.md#auto) | Immer |
-| Zurücksetzen (Reset) | [Trigger](../../user/de/data-types.md#trigger) | — | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Wellenform (Waveform) | Sinus, Dreieck, Sägezahn, Rechteck; Standard: Sinus | Wavetable-Ressource; Control |
+| Teiltöne (Partials) | 1–144, ganzzahlig; Standard: 1 | Wert; 1–144, abgerundet; Control |
+| Abfall (Falloff) | 0–4; Standard: 1 | Wert; 0–4; Auto; Teiltöne > 1 oder Teiltöne verbunden |
+| Streckung (Stretch) | 0–4; Standard: 1 | Wert; 0–4; Auto; Teiltöne > 1 oder Teiltöne verbunden |
+| Frequenz (Frequency) | 0,00001–20.000 Hz; Standard: 440 Hz; Hz, kHz | Wert; 0–20.000 Hz; Auto |
+| Phase | 0–1 turn; Standard: 0 turn; turn, °, rad | Wert; ±∞ turn; Auto |
+| Zurücksetzen (Reset) | — | Trigger; Trigger |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Audioausgang (Audio Out) | [Audio](../../user/de/data-types.md#audio) | ±1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Audioausgang (Audio Out) | Audio; ±1 |
 
 ## Verhalten
-
 ### Teiltöne = 1
 
 Entspricht dem normalen [Oszillator](oscillator.md).
@@ -55,22 +54,12 @@ periodische Wellenform; `wrap(x) = x − floor(x)`. Für eine leere Menge `I` is
 
 Die übrigen Funktionen entsprechen dem normalen [Oszillator](oscillator.md).
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | — | — |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| — | — |
+| Mute | Kein Bypass |
+| Sample-Feedback | Unterstützt |
 
-## Delayable
-
-| [Sampleweises Feedback](../../development/features/SAMPLE-FEEDBACK.md) |
-| --- |
-| Unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/additive-oscillator.md)

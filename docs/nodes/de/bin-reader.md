@@ -1,48 +1,36 @@
 # Binleser (Bin Reader)
-
-## Übersicht
-
 Liest einen indizierten Bin des ursprünglichen Eingangsspektrums.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Spektrum (Spectrum) | [Spectrum-Ressource](../../user/de/data-types.md#spectrum) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
-| Binindex (Bin index) | [Wert](../../user/de/data-types.md#value) | ±∞ | Randmodusabhängig | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
-| Außerhalb des Spektrums (Outside spectrum) | [Editor](../../user/de/reference-tables.md) | Null, Begrenzen, Wrap | — | Null | — | — | Immer |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| Spektrum (Spectrum) | — | Spectrum-Ressource; Control |
+| Binindex (Bin index) | ±∞; Standard: 0 | Wert; Randmodusabhängig; Auto |
+| Außerhalb des Spektrums (Outside spectrum) | Null, Begrenzen, Wrap; Standard: Null | Editor |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Realteil (Real) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Imaginärteil (Imaginary) | [Wert](../../user/de/data-types.md#value) | ±∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Betrag (Magnitude) | [Wert](../../user/de/data-types.md#value) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Phase | [Wert](../../user/de/data-types.md#value) | ±π rad | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Amplitude | [Wert](../../user/de/data-types.md#value) | 0–∞ | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
-| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0–fs/2 Hz | [Audio (Bin/Frame)](../../user/de/rates.md) | [Auto](../../user/de/data-types.md#channels) |
+| Ausgang | Signal |
+| --- | --- |
+| Realteil (Real) | Wert; ±∞; Audio (Bin/Frame) |
+| Imaginärteil (Imaginary) | Wert; ±∞; Audio (Bin/Frame) |
+| Betrag (Magnitude) | Wert; 0–∞; Audio (Bin/Frame) |
+| Phase | Wert; ±π rad; Audio (Bin/Frame) |
+| Amplitude | Wert; 0–∞; Audio (Bin/Frame) |
+| Frequenz (Frequency) | Wert; 0–fs/2 Hz; Audio (Bin/Frame) |
 
 ## Verhalten
-
 In einer [Spectral Group](spectral-group.md) interpolieren gebrochene Indizes benachbarte komplexe Bins. Gelesen wird immer der ursprüngliche Quellframe, unabhängig von anderen Binschreibvorgängen. Zero liefert außerhalb des einseitigen Spektrums null, Clamp hält den Rand, Wrap wiederholt 0…N/2. Ohne Spectrum werden Nullen ausgegeben. Amplitude teilt den Rohbetrag durch die Analysefenstersumme und verdoppelt Bins außer DC/Nyquist; sie eignet sich für Oszillatorgewichte. Phase ist in Radiant.
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | — | — |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| — | — |
+| Mute | Kein Bypass |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Nicht unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/bin-reader.md)

@@ -11,7 +11,7 @@ final class HelpMenu {
     static GLPopupMenu create(WorkspaceView owner) {
         var menu = new GLPopupMenu();
         menu.addItem(AppText.text("help.manual"), e -> {
-            NodeDocumentation.open(owner,"user/README.md");
+            NodeDocumentation.open(owner,HelpDocuments.manualPage());
         });
         menu.addItem(AppText.text("help.nodeReference"),e->NodeDocumentation.openActive(owner,owner.activeNode()));
         menu.addItem(AppText.text("help.referenceIndex"),e->NodeDocumentation.openIndex(owner));

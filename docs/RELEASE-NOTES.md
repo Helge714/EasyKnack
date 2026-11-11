@@ -1,7 +1,9 @@
 # Release notes
 
-
 ## Unreleased
+
+- Consolidate the user manual into twelve concise German/English chapters and shorten every cataloged node reference; keep old guide links through forwarding pages. Help now opens the independently selected manual language.
+- Standardize visible Multiple Group naming as Instance Group (Instanzgruppe); saved document identifiers and plugin/audio contracts remain unchanged.
 
 - Add a persisted documentation-language selector in the native help viewer (Same as application, Deutsch, English). Local links, reference/index actions and reopened help follow this preference independently of the UI language; untranslated pages use a visible English fallback.
 - Consolidate repeated spectral definitions and viewer limits into canonical node references, retaining workflow examples and correcting the stale FFT-window range in the guide. Covered by the current first-development version.

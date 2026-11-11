@@ -1,44 +1,33 @@
 # Smoothing
-
-## Overview
-
 Smooths rising and falling values exponentially.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Audio | — | — | Inspector |
-| In | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Rise | [Value](../../user/en/data-types.md#value) | 0–60 s | 0–60 s | 0.03 s | [s](../../user/en/units.md), [ms](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
-| Fall | [Value](../../user/en/data-types.md#value) | 0–60 s | 0–60 s | 0.03 s | [s](../../user/en/units.md), [ms](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Rate | Auto, Audio, Control; Default: Audio | Editor; Inspector |
+| In | ±∞; Default: 0 | Value; ±∞; Auto |
+| Rise | 0–60 s; Default: 0.03 s; s, ms, smp | Value; 0–60 s; Auto |
+| Fall | 0–60 s; Default: 0.03 s; s, ms, smp | Value; 0–60 s; Auto |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md#value) | ±∞ | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Out | Value; ±∞ |
 
 ## Behavior
-
 For time constant τ, `y += (1 − exp(−dt/τ)) × (x − y)`, using Rise when increasing and Fall when decreasing. One τ reaches about 63% of a step, three τ about 95%. Zero follows immediately. The first valid value initializes directly. Audio output smooths Control steps samplewise; Control output advances once per block. This is not a fixed-duration linear ramp.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | In | Out |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| In | Out |
+| Mute | In → Out |
+| Insertion | In → Out |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/smoothing.md)

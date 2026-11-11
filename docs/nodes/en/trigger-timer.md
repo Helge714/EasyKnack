@@ -1,44 +1,33 @@
 # Trigger Timer
-
-## Overview
-
 Measures elapsed time and intervals between triggers.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Trigger | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
-| Smoothing | [Value](../../user/en/data-types.md#value) | 0–1 | 0–1 | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Unit | [Editor](../../user/en/reference-tables.md) | s, ms, smp | — | s | — | — | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Trigger | Button | Trigger; Trigger |
+| Smoothing | 0–1; Default: 0 | Value; 0–1; Auto |
+| Unit | s, ms, smp; Default: s | Editor |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Elapsed | [Value](../../user/en/data-types.md#value) | 0–∞, selected unit | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
-| Interval | [Value](../../user/en/data-types.md#value) | 0–∞, selected unit | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Elapsed | Value; 0–∞, selected unit; Audio |
+| Interval | Value; 0–∞, selected unit; Audio |
 
 ## Behavior
-
 Elapsed starts at 0 on the first Trigger and resets at each subsequent Trigger. Interval remains 0 until two triggers have arrived, then holds their distance. Smoothing s retains the previous interval: `I = s × Iold + (1−s) × Inew`; the first measured interval initializes directly. Both outputs share the selected unit.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | — | — |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| — | — |
+| Mute | No bypass |
+| Sample feedback | Supported |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/trigger-timer.md)

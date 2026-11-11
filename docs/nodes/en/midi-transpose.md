@@ -1,42 +1,31 @@
 # MIDI Transpose
-
-## Overview
-
 MIDI Transpose processes MIDI events.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| MIDI | [MIDI](../../user/en/data-types.md#midi) | — | MIDI events | — | — | [MIDI](../../user/en/rates.md) | Always |
-| Transpose | [Editor](../../user/en/reference-tables.md) | −48–48 st | — | 0 st | [cent](../../user/en/units.md), [st](../../user/en/units.md), [oct](../../user/en/units.md), [Factor](../../user/en/units.md) | — | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| MIDI | — | MIDI; MIDI events; MIDI |
+| Transpose | −48–48 st; Default: 0 st; cent, st, oct, Factor | Editor |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| MIDI | [MIDI](../../user/en/data-types.md#midi) | MIDI events | [MIDI](../../user/en/rates.md) | — |
+| Output | Signal |
+| --- | --- |
+| MIDI | MIDI; MIDI events |
 
 ## Behavior
-
 Adds a pitch offset to new notes, including fractional semitones. Existing held notes retain their original offset; note-off matching is preserved.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | MIDI | MIDI |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| MIDI | MIDI |
+| Mute | MIDI → MIDI |
+| Insertion | MIDI → MIDI |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/midi-transpose.md)

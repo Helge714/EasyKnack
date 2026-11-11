@@ -1,46 +1,34 @@
 # Buffer Reader (Position)
-
-## Overview
-
 Reads a buffer at an externally supplied position.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Wrap | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Always |
-| Buffer | [Buffer resource](../../user/en/data-types.md#buffer) | — | Buffer resource | — | — | [Control](../../user/en/rates.md#control) | Always |
-| Position | [Value](../../user/en/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Offset | [Value](../../user/en/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Wrap | Off / On; Default: On | Editor |
+| Buffer | — | Buffer resource; Buffer resource; Control |
+| Position | 0–1; Default: 0 | Value; ±∞; Auto |
+| Offset | 0–1; Default: 0 | Value; ±∞; Auto |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Out | [Audio](../../user/en/data-types.md#audio) | ±∞ | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
-| Distance | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
-| Read position | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Out | Audio; ±∞ |
+| Distance | Value; 0–1; Audio |
+| Read position | Value; 0–1; Audio |
 
 ## Behavior
-
 Position is an absolute fraction of the buffer; Offset is subtracted from it. Connect another reader’s Read position and use Offset = 0.5 for a synchronized second head. This reader has no internal playback clock.
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | — | — |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| — | — |
+| Mute | No bypass |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Not supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/buffer-reader-position.md)

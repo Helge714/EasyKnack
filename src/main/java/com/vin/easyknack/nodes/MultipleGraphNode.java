@@ -1,5 +1,5 @@
 package com.vin.easyknack.nodes;
-@RegisterNode(id="easyknack.multiple.compiled",title="Multiple Group",category=NodeCategory.ROUTING,kind=NodeKind.AUDIO)
+@RegisterNode(id="easyknack.multiple.compiled",title="Instance Group",category=NodeCategory.ROUTING,kind=NodeKind.AUDIO)
 public final class MultipleGraphNode extends BasicNode {
     public static final int DEFAULT_INPUTS=8;
     public static int inputCount(NodeState state){return ParameterContract.inputCount(state,"inputs",DEFAULT_INPUTS);}

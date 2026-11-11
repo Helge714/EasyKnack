@@ -1,44 +1,32 @@
 # Kontexteingang (Context Input)
-
-## Übersicht
-
 Stellt Kanal-, Zeit- und Blockkontext bereit.
+<a id="ubersicht"></a>
+<a id="eingange"></a>
+<a id="mute"></a>
+<a id="einfugen"></a>
+<a id="delayable"></a>
 
-## Eingänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| — | — | — | — | — | — | — | — |
+## Bedienung
+| Parameter | Einstellung | Signal / Bedingung |
+| --- | --- | --- |
+| — | — | — |
 
 ## Ausgänge
-
-| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Kanal (Channel) | [Wert](../../user/de/data-types.md#value) | ±1 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Sample-Rate (Sample Rate) | [Wert](../../user/de/data-types.md#value) | 48 000 Hz | [Control](../../user/de/rates.md#control) | Mono |
-| Blockgröße (Block Size) | [Wert](../../user/de/data-types.md#value) | 1–256 smp | [Control](../../user/de/rates.md#control) | Mono |
-| Zeit (Time) | [Wert](../../user/de/data-types.md#value) | 0–∞ s | [Audio](../../user/de/rates.md#audio) | Mono |
+| Ausgang | Signal |
+| --- | --- |
+| Kanal (Channel) | Wert; ±1; Control |
+| Sample-Rate (Sample Rate) | Wert; 48 000 Hz; Control; Mono |
+| Blockgröße (Block Size) | Wert; 1–256 smp; Control; Mono |
+| Zeit (Time) | Wert; 0–∞ s; Audio; Mono |
 
 ## Verhalten
-
 Channel ist links −1 und rechts +1. Sample Rate bezeichnet die DSP-Rate des Hosts; Block Size die tatsächlichen Frames pro Kanal, nicht die gesamte Routinglatenz. Time steigt pro berechnetem Sample, solange der Node aktiv ist, und bleibt bei Graphänderungen erhalten. Channel ermöglicht ausdrücklich unterschiedliche Kanalpfade.
 
-## Mute
-
-| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Ja | — | — |
-
-## Einfügen
-
-| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+## Routing
+| Funktion | Verhalten |
 | --- | --- |
-| — | — |
+| Mute | Kein Bypass |
 
-## Delayable
-
-| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
-| --- |
-| Nicht unterstützt |
+[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
 
 [Node-Verzeichnis](index.md) · [English](../en/context-input.md)

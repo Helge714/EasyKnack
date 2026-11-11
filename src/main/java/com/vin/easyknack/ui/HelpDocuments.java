@@ -44,7 +44,8 @@ final class HelpDocuments {
         return List.copyOf(documents);
     }
 
-    static Path manual() throws IOException { return NodeDocumentation.page("user/README.md"); }
+    static String manualPage() { return NodeDocumentation.localizedPage("user/en/index.md",ApplicationSettings.documentationLocale()); }
+    static Path manual() throws IOException { return NodeDocumentation.page(manualPage()); }
 
     static String html(String markdown) {
         return html(markdown,"en",link -> {

@@ -1,46 +1,35 @@
 # Digital Noise
-
-## Overview
-
 Generates cycle-based random frequency modulation.
+<a id="overview"></a>
+<a id="inputs"></a>
+<a id="mute"></a>
+<a id="insertion"></a>
+<a id="delayable"></a>
 
-## Inputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Frequency | [Value](../../user/en/data-types.md#value) | 1e-5–20 000 Hz | 0–20 000 Hz | 440 Hz | [Hz](../../user/en/units.md#frequency), [kHz](../../user/en/units.md#frequency) | [Auto](../../user/en/rates.md#auto) | Always |
-| Strength | [Value](../../user/en/data-types.md#value) | 0–1 | 0–1 | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
-| Distribution | [Editor](../../user/en/reference-tables.md) | Uniform, Gaussian | — | Uniform | — | — | Always |
-| Seed | [Value](../../user/en/data-types.md#value) | −1–16 777 215 | −1–16 777 215, rounded | −1 | — | [Control](../../user/en/rates.md#control) | Always |
+## Controls
+| Parameter | Setting | Signal / condition |
+| --- | --- | --- |
+| Frequency | 1e-5–20 000 Hz; Default: 440 Hz; Hz, kHz | Value; 0–20 000 Hz; Auto |
+| Strength | 0–1; Default: 0 | Value; 0–1; Auto |
+| Distribution | Uniform, Gaussian; Default: Uniform | Editor |
+| Seed | −1–16 777 215; Default: −1 | Value; −1–16 777 215, rounded; Control |
 
 ## Outputs
-
-| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
-| --- | --- | --- | --- | --- |
-| Factor | [Value](../../user/en/data-types.md#value) | 2^(−s)–2^s | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
-| Trigger | [Trigger](../../user/en/data-types.md#trigger) | — | [Trigger](../../user/en/rates.md#trigger) | [Auto](../../user/en/data-types.md#channels) |
-| Frequency | [Value](../../user/en/data-types.md#value) | f × Factor | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Output | Signal |
+| --- | --- |
+| Factor | Value; 2^(−s)–2^s; Audio |
+| Trigger | Trigger |
+| Frequency | Value; f × Factor; Audio |
 
 ## Behavior
-
 Factor is held for a self-modulated cycle; Frequency outputs `f × Factor`. Strength `s` bounds octave deviation to `±s`. Gaussian uses standard deviation `s/3`, truncated at `±s`. Drawing compensates for cycle duration so time-weighted octave deviations are symmetric. This does not preserve the arithmetic mean in Hz. Strength 0 gives Factor 1 and passes Frequency unchanged. Trigger marks a new draw. Seed follows [Noise](noise.md).
 
-## Mute
-
-| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
-| --- | --- | --- |
-| Yes | — | — |
-
-## Insertion
-
-| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+## Routing
+| Function | Behavior |
 | --- | --- |
-| — | — |
+| Mute | No bypass |
+| Sample feedback | Supported |
 
-## Delayable
-
-| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
-| --- |
-| Supported |
+[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
 
 [Node index](index.md) · [Deutsch](../de/digital-noise.md)
