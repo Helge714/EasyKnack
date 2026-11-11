@@ -3,22 +3,22 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <optional>
+#include <memory>
 // Included by the generated test after ExportChain, LegacyChain and BlockChain.
 namespace easyknack {
 // A manually written one-node implementation, with no internal graph at render
 // time. Configuration borrows the generated parser, not its processing kernel.
 struct HandwrittenChain:NodeProcessor {
-    std::optional<OscillatorNode> osc;
-    std::optional<MathNode> gain;
-    std::optional<FilterNode> filter;
+    std::unique_ptr<OscillatorNode> osc;
+    std::unique_ptr<MathNode> gain;
+    std::unique_ptr<FilterNode> filter;
     std::array<float,256> a{},b{};
     void configure(std::istream& input)override{
         ExportChain definition;definition.configure(input);
         auto& nodes=definition.runtime->graph.nodes;
-        osc.emplace(static_cast<OscillatorNode&>(*nodes[0].processor));
-        gain.emplace(static_cast<MathNode&>(*nodes[1].processor));
-        filter.emplace(static_cast<FilterNode&>(*nodes[2].processor));
+        osc.reset(static_cast<OscillatorNode*>(nodes[0].processor.release()));
+        gain.reset(static_cast<MathNode*>(nodes[1].processor.release()));
+        filter.reset(static_cast<FilterNode*>(nodes[2].processor.release()));
     }
     bool canShareChannels()const noexcept override{return true;}
     void inheritState(const NodeProcessor& old)noexcept override{

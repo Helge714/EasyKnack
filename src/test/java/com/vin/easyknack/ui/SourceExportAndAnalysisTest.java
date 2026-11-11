@@ -46,7 +46,10 @@ class SourceExportAndAnalysisTest {
             host.start(com.vin.easyknack.audio.AudioHostClient.defaultExecutable(),true);
             for(var definition:NodeRegistry.definitionsList()){
                 var graph=new GLNodeGraph();graph.edit("Contract",e->e.addNode(new GLGraphNode(GLNodeId.random(),definition.registration().id(),definition.defaults())));
-                if(definition.requiresSpectralContext()){
+                if(definition.requiresPartialContext()){
+                    var failure=assertThrows(IllegalArgumentException.class,()->com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()),definition.registration().id());
+                    assertTrue(failure.getMessage().contains("Partial Group"));
+                }else if(definition.requiresSpectralContext()){
                     var failure=assertThrows(IllegalArgumentException.class,()->com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()),definition.registration().id());
                     assertTrue(failure.getMessage().contains(definition.title()));
                 }else assertEquals("OK",assertDoesNotThrow(()->host.command(com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot())),definition.registration().id()),definition.title());
@@ -102,19 +105,19 @@ class SourceExportAndAnalysisTest {
                     ProcessContext a{nullptr,0,actual.data(),256,48000,silence.data(),256};
                     auto b=a;b.output=reference.data();
                     for(int block=0;block<40;block++){baked.process(a);expected.process(b);for(int i=0;i<256;i++)assert(std::abs(actual[i]-reference[i])<.0001f);}
-                    AutocorrelationNode correlation;std::istringstream cp("%s");correlation.configure(cp);correlation.bindIdentity("correlation");
+                    auto correlationStorage=std::make_unique<AutocorrelationNode>();auto& correlation=*correlationStorage;std::istringstream cp("%s");correlation.configure(cp);correlation.bindIdentity("correlation");
                     OscilloscopeNode scope;std::istringstream sp("%s");scope.configure(sp);scope.bindIdentity("scope");
                     std::array<float,256> hz{},confidence{},through{};const float* input[]={reference.data()};float* outputs[]={hz.data(),confidence.data()};
                     ProcessContext c{input,1,hz.data(),1,48000,silence.data(),256,nullptr,0,outputs,2};
                     auto sc=c;sc.output=through.data();sc.bufferSize=256;sc.outputs=nullptr;sc.outputCount=1;
                     for(int block=0;block<32;block++){expected.process(b);correlation.process(c);scope.process(sc);}
                     assert(std::abs(hz[0]-440)<1);assert(confidence[0]>.98f);
-                    AnalysisFrame frame;assert(analysisMailbox("scope")->latest(frame));assert(frame.span>0);
+                    auto frameStorage=std::make_unique<AnalysisFrame>();auto& frame=*frameStorage;assert(analysisMailbox("scope")->latest(frame));assert(frame.span>0);
                     assert(analysisMailbox("correlation")->latest(frame));assert(std::abs(frame.frequency-440)<1);
                     reference.fill(0);for(int block=0;block<32;block++)correlation.process(c);
                     assert(hz[0]==0&&confidence[0]==0);
                     // Right-channel selection must analyze the sum of all voice buffers.
-                    AutocorrelationNode rightCorrelation;rightCorrelation.right=true;rightCorrelation.bindIdentity("right-correlation");
+                    auto rightStorage=std::make_unique<AutocorrelationNode>();auto& rightCorrelation=*rightStorage;rightCorrelation.right=true;rightCorrelation.bindIdentity("right-correlation");
                     OscilloscopeNode rightScope;rightScope.right=true;rightScope.bindIdentity("right-scope");
                     assert(rightScope.mergesVoices()&&rightScope.separatesChannels());
                     assert(rightCorrelation.mergesVoices()&&rightCorrelation.separatesChannels());

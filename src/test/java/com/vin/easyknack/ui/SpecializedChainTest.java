@@ -35,7 +35,7 @@ class SpecializedChainTest {
             AdvancedSourceExportTest.quote(ReferenceProjects.original(p))+","+AdvancedSourceExportTest.quote(baked)+","+
             AdvancedSourceExportTest.quote(export.definition().processor().id())+",argc>1?argv[1]:\"results.csv\");}catch(const std::exception& e){std::cerr<<e.what();return 1;}}";
         Files.writeString(dir.resolve("comparison.cpp"),cpp);
-        RateConverterTest.run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O3","-ffp-contract=off","-static","-I",dir.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),dir.resolve("comparison.cpp").toString(),"-o",dir.resolve("comparison.exe").toString()));
+        RateConverterTest.run(List.of(System.getProperty("easyknack.test.cxx"),"-std=c++17","-O3","-ffp-contract=off","-static","-I",dir.toString(),"-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),"-I",Path.of("target/native/generated").toAbsolutePath().toString(),dir.resolve("comparison.cpp").toString(),Path.of("native/audio-host/src/nodes/LorisLibrary.cpp").toAbsolutePath().toString(),"-o",dir.resolve("comparison.exe").toString()));
         RateConverterTest.run(List.of(dir.resolve("comparison.exe").toString(),dir.resolve("results.csv").toString()));
     }
 }
