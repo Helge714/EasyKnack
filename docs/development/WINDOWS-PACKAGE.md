@@ -54,7 +54,7 @@ lets users independently enable the Start Menu and Desktop shortcuts; `.knack`
 opening is registered for the current user. Windows retains control over the
 user's default-app choice. The final page offers to check Java and start EasyKnack.
 The EXE wraps the MSI in a WiX bootstrapper; neither contains a Java installer.
-Signing, a custom icon and clean-machine upgrade/uninstall testing remain separate.
+Signing and clean-machine upgrade/uninstall testing remain separate.
 
 At first launch (including the installer finish action), a small .NET Framework
 launcher invokes the packaged Windows PowerShell 5.1 script. It finds JDK 25 x64
@@ -105,12 +105,9 @@ dependency licenses, and arrange any required corresponding sources and notices.
 Copying license files alone is not a completed redistribution audit. EasyKnack uses GPL-3.0-only; see the [licensing checklist](LICENSING.md). External virtual audio drivers are not
 included. These local unsigned images are for validation, not published releases.
 
-Current external-JDK validation: Maven and functional package tests pass, and the
-real launcher opens the workspace. Automated graceful close remains unverified:
-the initial document is marked modified and opens a save confirmation. JDK
-download/setup and installer upgrade/uninstall still need clean-machine testing.
+Current external-JDK candidate `866d426`: Maven, packaged functional tests and the real EXE launcher pass. The workspace opens and closes without a false initial save prompt; repeated image captures retain their text. JDK setup/download and installer upgrade/uninstall still need clean-machine testing. See [the current candidate report](source-audit/CANDIDATE-2026-11-11.md).
 
 The reviewed Windows installer toolchain is pinned to WiX 3.14.1 by component
 hashes in scripts/sources.lock.json. Replacing it requires reviewing its source
 archive/license and updating the lock. Current candidate evidence and outstanding
-clean-machine checks are recorded in development/source-audit/RELEASE-CANDIDATE.md.
+clean-machine checks are recorded in development/source-audit/CANDIDATE-2026-11-11.md.

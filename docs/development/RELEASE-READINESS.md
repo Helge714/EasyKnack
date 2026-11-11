@@ -12,6 +12,8 @@ Follow-up on 2026-11-11: the four nonexperimental failures are fixed and verifie
 Pitch Hold is explicitly experimental and opt-in. See [fixes and remaining acceptance](source-audit/RELEASE-FIXES-2026-11-11.md).
 The original findings below retain the hashes observed at the initial audit.
 
+Latest candidate: [2026-11-11 automated results and remaining acceptance](source-audit/CANDIDATE-2026-11-11.md). A fresh installer and paired sources now exist; the older findings below are historical.
+
 ## Current state
 
 - EasyKnack: `0.0.1-SNAPSHOT`; external GLSwing: `0.2.0-SNAPSHOT` in `pom.xml`.

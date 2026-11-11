@@ -1,0 +1,139 @@
+{
+  "artifactAudit": {
+    "candidateCommit": "866d426df8e23953ca51c59b0f267a8831c83155",
+    "coreCommit": "fc1261bbb03fe5d6c90cfd912439822c08b8cce5",
+    "version": "0.0.1-SNAPSHOT",
+    "officialRelease": false,
+    "inventoryFilesVerified": 9332,
+    "sourceFilesVerified": 1526,
+    "upstreamArchivesVerified": 13,
+    "externalDocumentationPages": 268,
+    "externalDocumentationLinks": 7881,
+    "sourceReviewComplete": true,
+    "pendingDistributionChecks": [
+      "Clean Windows installation without Java, including interactive JDK installation/cancellation/offline handling.",
+      "Installer upgrade and uninstall on a clean test system; verify shortcuts, file association and installed notices.",
+      "Publish matching source-material downloads alongside the binary; no publication has been performed."
+    ],
+    "releaseReady": false,
+    "buildIdentity": "#Generated package identity; not a source version\r\n#Wed Nov 11 18:02:48 CET 2026\r\nartifact=easy-knack\r\nbuild.id=local-20261111T170248.973029Z-2e7d159c\r\nbuild.kind=local\r\nbuild.time=2026-11-11T17\\:02\\:48.973029Z\r\ngit.commit=866d426df8e23953ca51c59b0f267a8831c83155\r\ngit.dirty=false\r\nversion=0.0.1-SNAPSHOT\r\n",
+    "artifacts": [
+      {
+        "file": "EasyKnack-0.0.1.exe",
+        "bytes": 158192901,
+        "sha256": "0856708368588ba3f75e8caaf49d865131c5857919a7cb077cebb83e9542b444"
+      },
+      {
+        "file": "EasyKnack-project-sources.zip",
+        "bytes": 3875346,
+        "sha256": "9df4fed5af686c2f9fb7acb6e3164a496a73630f011c8faafa50469b0d1a1c45"
+      },
+      {
+        "file": "EasyKnack-source-materials.zip",
+        "bytes": 424766279,
+        "sha256": "caa4538fa8bc4118cffbec0d5125a80483e89439c9906935513ca77b54a5194a"
+      }
+    ]
+  },
+  "baselineFullRun": {
+    "commit": "775160d",
+    "coreCommit": "2f5ed7c",
+    "totals": {
+      "tests": 733,
+      "failures": 1,
+      "errors": 1,
+      "skipped": 8
+    },
+    "nonPassingCases": [
+      {
+        "suite": "com.vin.easyknack.audio.AudioHostClientTest",
+        "test": "systemAndApplicationCopyCaptureOpenWithoutOutputOrRoutingChanges",
+        "result": "skipped",
+        "message": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.audio.AudioHostClientTest",
+        "test": "defaultOutputOpensAndClosesWhileSilent",
+        "result": "skipped",
+        "message": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.audio.AudioHostClientTest",
+        "test": "availableAsioDriverRunsSilentGraphAndReturnsToWasapi",
+        "result": "skipped",
+        "message": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.audio.AudioHostClientTest",
+        "test": "discoversWindowsMidiDevicesWithoutOpeningThem",
+        "result": "skipped",
+        "message": "System property [easyknack.test.device] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.ui.AdvancedSourceExportTest",
+        "test": "exportedChannelsMidiDelayInternalAndExternalVoicesMatchTheirOriginalGraphs",
+        "result": "failure",
+        "message": "Native test timed out ==> expected: <true> but was: <false>"
+      },
+      {
+        "suite": "com.vin.easyknack.ui.HarmonizerTest",
+        "test": "exampleAndExportRunWithAnalysisAndStatefulNodes",
+        "result": "skipped",
+        "message": "@EnabledIf(\"experimentalAudio\") evaluated to false"
+      },
+      {
+        "suite": "com.vin.easyknack.ui.InstanceFalloffDocumentTest",
+        "test": "convert",
+        "result": "skipped",
+        "message": "System property [easyknack.test.falloffDocument] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.ui.InstancePerformanceTest",
+        "test": "generate",
+        "result": "skipped",
+        "message": "System property [easyknack.test.benchmark] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.ui.LoadedSliderRenderingTest",
+        "test": "loadedSlidersRender",
+        "result": "skipped",
+        "message": "System property [easyknack.test.document] does not exist"
+      },
+      {
+        "suite": "com.vin.easyknack.ui.ReferenceConnectionRenderingTest",
+        "test": "referenceCablesHaveRealGapsInBothCurvePaths",
+        "result": "error",
+        "message": "Error making temp context current: 0x0x80002, werr: 0"
+      }
+    ]
+  },
+  "finalCoreTests": {
+    "tests": 172,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "affectedConsumerFollowUp": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "packageDefaultTests": {
+    "tests": 728,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 175
+  },
+  "nativeProgramsPassed": [
+    "WindowsAudioBackendTest",
+    "AsioBackendTest",
+    "AudioGraphTest",
+    "SharedAudioTransportTest",
+    "DriverBridgeTest"
+  ],
+  "nativeParameterContractsSha256": "8022d4fbb88d256c6e90cef6d5f6919c1e3c9a2539b79a37fe8a0c5151cb6df9",
+  "freshFullNativeRunAfterFixes": false,
+  "installerSignature": "NotSigned",
+  "publicReleaseApproved": false
+}
