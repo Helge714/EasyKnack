@@ -13,6 +13,17 @@ import com.vingame.glswing.ui.*;
 
 /** A themed GL dialog with local links and independent read-only browsing history. */
 final class DocumentationViewer extends GLContainer implements GLKeyPressCaptureTarget {
+    enum Language {
+        APPLICATION("application"),GERMAN("de"),ENGLISH("en");
+        final String id;Language(String id){this.id=id;}
+        public String toString(){return this==APPLICATION?AppText.text("help.language.application"):this==GERMAN?"Deutsch":"English";}
+        static Language read(String id){return Arrays.stream(values()).filter(v->v.id.equals(id)).findFirst().orElse(APPLICATION);}
+    }
+    final GLLabel languageLabel=new GLLabel(AppText.text("help.language"));
+    final GLComboBox<Language> language=new GLComboBox<>(List.of(Language.values()));
+    private Language selectedLanguage=Language.read(ApplicationSettings.documentationLanguage());
+    private boolean selectingLanguage;
+    private Locale contentLocale(){return selectedLanguage==Language.APPLICATION?ApplicationSettings.locale():Locale.forLanguageTag(selectedLanguage.id);}
     record Position(String page,String anchor,float x,float y){}
     DocumentationPage content=new DocumentationPage(this::follow);
     final GLScrollPane scroll=new GLScrollPane(content);
@@ -28,10 +39,12 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
     private boolean loading;
     DocumentationViewer(Runnable onClose){
         this.onClose=onClose;
-        for(var child:List.of(back,forward,index,manual,copy,close,status,scroll))addGL(child);
+        for(var child:List.of(back,forward,index,manual,copy,languageLabel,language,close,status,scroll))addGL(child);
+        language.setSelectedItem(selectedLanguage);
+        language.addActionListener(e->{if(!selectingLanguage&&language.getSelectedItem()!=null)chooseLanguage(language.getSelectedItem());});
         status.setSelectable(true);
         back.addActionListener(e->back());forward.addActionListener(e->forward());
-        index.addActionListener(e->openPage("nodes/"+NodeDocumentation.language(ApplicationSettings.locale())+"/index.md"));
+        index.addActionListener(e->openPage("nodes/"+NodeDocumentation.language(contentLocale())+"/index.md"));
         manual.addActionListener(e->openPage("user/README.md"));
         copy.addActionListener(e->java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(content.document().plain()),null));
         close.addActionListener(e->onClose.run());setBounds(0,0,1100,740);buttons();
@@ -44,23 +57,35 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
         dialog[0].setSize(width,height);dialog[0].closedFuture().whenComplete((v,e)->panel.disposed=true);
         dialog[0].show(owner);panel.openPage(page);
     }
+    CompletableFuture<Void> chooseLanguage(Language next){
+        try{ApplicationSettings.saveDocumentationLanguage(next.id);}
+        catch(Exception failure){selectingLanguage=true;try{language.setSelectedItem(selectedLanguage);}finally{selectingLanguage=false;}status.setText(failure.getMessage());return CompletableFuture.failedFuture(failure);}
+        selectedLanguage=next;selectingLanguage=true;try{language.setSelectedItem(next);}finally{selectingLanguage=false;}
+        return current==null?CompletableFuture.completedFuture(null):navigate(new Position(current.page(),current.anchor(),0,0),false);
+    }
+    private String pageStatus(DocumentationPage.Document document,String page){
+        return document.title()+(contentLocale().getLanguage().equals("de")&&!page.contains("/de/")?" — "+AppText.text("help.englishFallback"):"");
+    }
     Position position(){return current==null?null:new Position(current.page(),"",scroll.getHorizontalScrollOffset(),scroll.getVerticalScrollOffset());}
     CompletableFuture<Void> openPage(String page){return navigate(new Position(page,"",0,0),true);}
     CompletableFuture<Void> follow(String link){
         if(current==null)return CompletableFuture.completedFuture(null);
         String target=NodeDocumentation.target(current.page(),link);String anchor=link.contains("#")?link.substring(link.indexOf('#')+1):"";
         if(target==null||!anchor.matches("[a-z0-9-]*")||!NodeDocumentation.exists(target))return CompletableFuture.completedFuture(null);
+        if(!target.equals(current.page())&&target.replace("/de/","/en/").equals(current.page().replace("/de/","/en/")))
+            return chooseLanguage(target.contains("/de/")?Language.GERMAN:Language.ENGLISH);
         return navigate(new Position(target,anchor,0,0),true);
     }
     CompletableFuture<Void> back(){if(past.isEmpty()||loading)return CompletableFuture.completedFuture(null);future.push(position());return navigate(past.pop(),false);}
     CompletableFuture<Void> forward(){if(future.isEmpty()||loading)return CompletableFuture.completedFuture(null);past.push(position());return navigate(future.pop(),false);}
-    private CompletableFuture<Void> navigate(Position next,boolean remember){
+    private CompletableFuture<Void> navigate(Position requested,boolean remember){
+        var next=new Position(NodeDocumentation.localizedPage(requested.page(),contentLocale()),requested.anchor(),requested.x(),requested.y());
         var finished=new CompletableFuture<Void>();
         if(NodeDocumentation.target(next.page(),"")==null||!NodeDocumentation.exists(next.page())){finished.completeExceptionally(new IOException("Unknown help page: "+next.page()));return finished;}
         if(remember&&current!=null){past.push(position());future.clear();}
         boolean same=current!=null&&current.page().equals(next.page())&&!loading;
         current=next;int request=++revision;
-        if(same){scroll.setScrollOffset(next.x(),next.anchor().isEmpty()?next.y():content.anchor(next.anchor()));buttons();finished.complete(null);return finished;}
+        if(same){status.setText(pageStatus(content.document(),next.page()));scroll.setScrollOffset(next.x(),next.anchor().isEmpty()?next.y():content.anchor(next.anchor()));buttons();finished.complete(null);return finished;}
         loading=true;status.setText(AppText.text("help.loading"));content.show(new DocumentationPage.Document("",List.of()));scroll.setScrollOffset(0,0);buttons();
         CompletableFuture.supplyAsync(()->{
             try{return DocumentationPreparation.document(next.page());}
@@ -70,7 +95,7 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
             loading=false;
             if(error!=null){status.setText(error.getCause()==null?error.toString():error.getCause().getMessage());buttons();finished.completeExceptionally(error);return;}
             content=new DocumentationPage(this::follow);content.reflow(Math.max(240,getWidth()-64));content.show(document);
-            scroll.setContent(content);status.setText(document.title());
+            scroll.setContent(content);status.setText(pageStatus(document,next.page()));
             scroll.setScrollOffset(next.x(),next.anchor().isEmpty()?next.y():content.anchor(next.anchor()));buttons();finished.complete(null);
         }));
         return finished;
@@ -85,7 +110,13 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
     @Override protected void resized(float width,float height){
         if(scroll==null)return;boolean compact=width<850;float buttonWidth=Math.max(50,(width-40)/(compact?3:5));
         var tools=List.of(back,forward,index,manual,copy);for(int i=0;i<tools.size();i++)tools.get(i).setBounds(16+(i%(compact?3:5))*(buttonWidth+2),12+(compact&&i>=3?34:0),buttonWidth,28);
-        float top=compact?84:50;scroll.setBounds(16,top,Math.max(1,width-32),Math.max(1,height-top-62));
+        float languageY=compact?80:46;
+        boolean narrow=width<500;
+        float labelWidth=narrow?Math.max(1,width-32):150;
+        languageLabel.setBounds(16,languageY,labelWidth,28);
+        float languageX=narrow?16:176;
+        language.setBounds(languageX,languageY+(narrow?32:0),Math.max(1,Math.min(230,width-languageX-16)),28);
+        float top=languageY+(narrow?68:38);scroll.setBounds(16,top,Math.max(1,width-32),Math.max(1,height-top-62));
         content.reflow(Math.max(240,width-64));status.setBounds(16,Math.max(0,height-44),Math.max(1,width-152),28);close.setBounds(Math.max(0,width-120),Math.max(0,height-44),104,28);
     }
     @Override protected void record(GLContext2D c){c.fillRect(0,0,getWidth(),getHeight(),getGLTheme().menuBarStyle().background());}

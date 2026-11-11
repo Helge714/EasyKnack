@@ -9,12 +9,17 @@ same menu.
 
 Choose **Help → Node reference** for the active node's page, or right-click a node
 and choose **Documentation**. With no active node, Node reference opens the index.
-**Help → Node index** always opens the full directory in the selected application
+**Help → Node index** always opens the full directory in the selected documentation
 language.
 References open in a themed EasyKnack dialog and work offline. Group instances open the matching
 ordinary, Instance, Spectral or Formula Group reference. The Documentation action
-is disabled when no reference is available. Use a reference's language link to
-switch between English and German.
+is disabled when no reference is available. In the documentation window choose
+**Documentation language → Same as application / Deutsch / English**. This choice
+is saved independently of the application language and applies to references,
+indices and local links when help is opened again. The English workflow handbook
+and other untranslated pages remain in English; the status line identifies this
+fallback without changing your preferred language. A reference's language link
+also selects and remembers that language.
 Follow inline links within the dialog; Back/Forward (Alt+Left/Right) restore the
 previous page and scroll position. Wide tables scroll horizontally. Copy text
 copies the page's text, and Escape closes the dialog.

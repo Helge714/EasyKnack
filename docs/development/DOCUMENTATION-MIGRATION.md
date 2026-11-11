@@ -35,3 +35,17 @@ Runtime help exports only Markdown reachable from the handbook and bilingual nod
 indices. It never follows links into `development/`, source files, host filesystem
 paths or network URLs. Archives and comparison drafts are not runtime help pages.
 Legacy forwarding paths remain valid so existing references do not become dead links.
+
+## Follow-up — 2026-11-11
+
+The spectrum workflow now links to the canonical FFT reference instead of keeping
+a stale window-size range. The spectral inspection guide links to the bilingual
+Spectral Features definitions instead of repeating their equations/output table;
+its comparison examples and inspection/export workflows remain. Value Viewer
+limits/defaults are linked rather than copied. The retained technical spectral
+and trigger tutorials above still need their separate cross-node consolidation;
+this is not a claim that every historical overlap has been removed.
+
+Runtime help has an independent persisted language selector, English fallback
+and language-aware reference/index/history navigation. Workflow pages without a
+translation remain English and are identified in the viewer's status line.

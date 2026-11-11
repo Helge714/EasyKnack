@@ -7,6 +7,9 @@ public final class ApplicationSettings {
     private ApplicationSettings(){}
     static void previewLocale(Locale locale){com.vin.easyknack.app.ApplicationSettings.previewLocale(locale);}
     public static Locale locale(){return com.vin.easyknack.app.ApplicationSettings.locale();}
+    public static String documentationLanguage(){return com.vin.easyknack.app.ApplicationSettings.documentationLanguage();}
+    public static Locale documentationLocale(){return com.vin.easyknack.app.ApplicationSettings.documentationLocale();}
+    public static void saveDocumentationLanguage(String language)throws java.util.prefs.BackingStoreException{com.vin.easyknack.app.ApplicationSettings.saveDocumentationLanguage(language);}
     public static String theme(){return com.vin.easyknack.app.ApplicationSettings.theme();}
     public static void save(String language,String theme)throws Exception{com.vin.easyknack.app.ApplicationSettings.save(language,theme);}
     public static int autosaveSeconds(){return com.vin.easyknack.app.ApplicationSettings.autosaveSeconds();}

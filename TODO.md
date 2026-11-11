@@ -116,7 +116,7 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   language policy remain in EasyKnack.
 - [ ] Harden the shared Markdown viewer with read-only text selection, bounded
   shared caching and theme-driven metrics; track generic control work in Core.
-- [ ] Add a persisted documentation-language preference independent of the UI:
+- [x] Add a persisted documentation-language preference independent of the UI:
   Same as application (default), English or Deutsch. Apply it consistently to node
   references, the index and help navigation, including reopening the viewer.
   Allow German documentation with an English interface; use English fallback for

@@ -197,7 +197,8 @@ section or imply that support itself makes an undelayed feedback loop valid.
 ## Application integration and remaining work
 
 The node-context action resolves stable built-in/group identities in the current
-language with English fallback. Help exposes the localized index. Maven packages
+documentation language with English fallback. The viewer offers Same as application,
+English or Deutsch and remembers the choice independently. Help exposes the localized index. Maven packages
 Markdown. `DocumentationViewer` loads and parses only the selected page on a worker;
 `DocumentationPage` presents the escaped HTML subset using themed GLSwing text,
 table layout and link hit testing in a native scroll pane. History retains viewport
@@ -217,16 +218,14 @@ Older page dispositions are recorded in [the consolidation review](DOCUMENTATION
 Retain workflow guides until their extra content has a replacement; preserve
 forwarding pages at old paths.
 
+Implemented integration:
+- Shared Markdown presentation is implemented through GLSwing Core; EasyKnack
+  retains reference identities, resource lookup and language/navigation policy.
+  Further generic control work (text selection, bounded shared caches and metrics)
+  is tracked separately; it is not a reason to duplicate node descriptions.
+- Independent documentation language is implemented in the viewer and preferences,
+  with English fallback that preserves the selected language.
 Remaining work:
-- Replace `DocumentationPage` and its application-specific presentation with the
-  future standardized GLSwing Core Markdown viewer. The generic control owns
-  themed formatting, tables, inline links/anchors, selection/copy and efficient
-  cached layout/rendering. EasyKnack retains reference IDs, resource resolution
-  and navigation/language policy; Core must not depend on EasyKnack or audio.
-- Add an independent, persisted documentation-language setting: Same as
-  application (default), English or Deutsch. It controls reference content,
-  indices and help navigation without switching the application UI. Missing
-  translations fall back to English while retaining the user's preference.
 - Allow plugins to ship references by node ID and language using the same format.
   Missing documentation must not prevent installation; disable the documentation
   action when no page exists. Define manifest paths and safe local resource

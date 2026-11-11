@@ -66,6 +66,8 @@ class DocumentationViewerTest {
     }
 
     @Test void navigationFollowsLocalAnchorsAndRestoresScrollWithoutLeavingTheApp()throws Exception{
+        String override=System.getProperty("easyknack.documentation.language");System.setProperty("easyknack.documentation.language","en");
+        try{
         var holder=new AtomicReference<DocumentationViewer>();var closed=new AtomicBoolean();
         SwingUtilities.invokeAndWait(()->{var panel=new DocumentationViewer(()->closed.set(true));panel.setBounds(0,0,800,320);holder.set(panel);});
         var panel=holder.get();await(()->panel.openPage("nodes/en/oscillator.md"));
@@ -78,6 +80,7 @@ class DocumentationViewerTest {
         await(panel::forward);
         await(()->panel.follow("file:///private.md"));
         SwingUtilities.invokeAndWait(()->{assertEquals("user/en/rates.md",panel.position().page());var key=new com.vingame.glswing.input.GLKeyEvent(new java.awt.event.KeyEvent(new java.awt.Canvas(),java.awt.event.KeyEvent.KEY_PRESSED,0,0,java.awt.event.KeyEvent.VK_ESCAPE,'\u001b'));assertTrue(panel.capturesKeyPress(key));assertTrue(closed.get());});
+        }finally{if(override==null)System.clearProperty("easyknack.documentation.language");else System.setProperty("easyknack.documentation.language",override);}
     }
     private static void await(java.util.function.Supplier<CompletableFuture<Void>> action)throws Exception{
         var pending=new AtomicReference<CompletableFuture<Void>>();SwingUtilities.invokeAndWait(()->pending.set(action.get()));pending.get().get(30,TimeUnit.SECONDS);

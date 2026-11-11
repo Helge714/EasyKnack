@@ -3,6 +3,10 @@
 
 ## Unreleased
 
+- Add a persisted documentation-language selector in the native help viewer (Same as application, Deutsch, English). Local links, reference/index actions and reopened help follow this preference independently of the UI language; untranslated pages use a visible English fallback.
+- Consolidate repeated spectral definitions and viewer limits into canonical node references, retaining workflow examples and correcting the stale FFT-window range in the guide. Covered by the current first-development version.
+
+
 - Store experimental-feature availability per document. Infer it for legacy files containing experimental nodes, retain explicit saved decisions, and confirm disabling while experimental nodes remain. Remove the global settings control. Existing nodes keep their execution.
 - Ignore viewport camera-only changes in unsaved-content checks, while retaining cameras in saved files and preserving dirty detection for model edits, node movement and resizing. No document schema or audio protocol change; current first-development version covers this follow-up.
 

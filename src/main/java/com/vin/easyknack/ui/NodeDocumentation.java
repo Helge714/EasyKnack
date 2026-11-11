@@ -21,6 +21,16 @@ final class NodeDocumentation {
     private NodeDocumentation(){}
 
     static String language(Locale locale){return locale.getLanguage().equals("de")?"de":"en";}
+    static String localizedPage(String page,Locale locale){return localizedPage(page,locale,NodeDocumentation::exists);}
+    static String localizedPage(String page,Locale locale,java.util.function.Predicate<String> exists){
+        for(String prefix:List.of("nodes/","user/")){
+            if(!(page.startsWith(prefix+"de/")||page.startsWith(prefix+"en/")))continue;
+            String suffix=page.substring(prefix.length()+3),translated=prefix+language(locale)+"/"+suffix;
+            if(exists.test(translated))return translated;
+            String english=prefix+"en/"+suffix;return exists.test(english)?english:page;
+        }
+        return page;
+    }
     static synchronized Map<String,String> catalog()throws IOException{
         if(slugs==null){
             var found=new LinkedHashMap<String,String>();var match=ENTRY.matcher(read("nodes/catalog.json"));
@@ -40,19 +50,19 @@ final class NodeDocumentation {
         identities.put(node,id);
         var menu=node.getContextMenu();menu.addSeparator();
         var item=menu.addItem(AppText.text("help.nodeDocumentation"),event->{
-            try{String page=reference(id,ApplicationSettings.locale());if(page!=null)open(node,page);}
+            try{String page=reference(id,ApplicationSettings.documentationLocale());if(page!=null)open(node,page);}
             catch(IOException failure){HelpMenu.show(node,"help.nodeDocumentation",failure.getMessage());}
         });
-        try{item.setEnabled(reference(id,ApplicationSettings.locale())!=null);}
+        try{item.setEnabled(reference(id,ApplicationSettings.documentationLocale())!=null);}
         catch(IOException failure){item.setEnabled(false);}
     }
-    static void openIndex(GLContainer owner){open(owner,"nodes/"+language(ApplicationSettings.locale())+"/index.md");}
+    static void openIndex(GLContainer owner){open(owner,"nodes/"+language(ApplicationSettings.documentationLocale())+"/index.md");}
     static String activeReference(GLNode active,Locale locale)throws IOException{
         if(active==null)return "nodes/"+language(locale)+"/index.md";
         String id=identities.get(active);return id==null?null:reference(id,locale);
     }
     static void openActive(GLContainer owner,GLNode active){
-        try{String page=activeReference(active,ApplicationSettings.locale());
+        try{String page=activeReference(active,ApplicationSettings.documentationLocale());
             if(page==null)HelpMenu.show(owner,"help.nodeDocumentation",AppText.text("help.noNodeReference"));
             else open(owner,page);
         }catch(IOException failure){HelpMenu.show(owner,"help.nodeDocumentation",failure.getMessage());}

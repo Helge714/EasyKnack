@@ -11,6 +11,15 @@ public final class ApplicationSettings {
     private static volatile Locale previewLocale;
     public static void previewLocale(Locale locale){previewLocale=locale;}
     public static Locale locale(){if(previewLocale!=null)return previewLocale;return Locale.forLanguageTag(System.getProperty("easyknack.language",PREFS.get("language",Locale.getDefault().getLanguage().equals("de")?"de":"en")));}
+    public static String documentationLanguage(){
+        String language=System.getProperty("easyknack.documentation.language",PREFS.get("documentationLanguage","application"));
+        return Set.of("application","de","en").contains(language)?language:"application";
+    }
+    public static Locale documentationLocale(){var language=documentationLanguage();return language.equals("application")?locale():Locale.forLanguageTag(language);}
+    public static void saveDocumentationLanguage(String language)throws java.util.prefs.BackingStoreException{
+        if(!Set.of("application","de","en").contains(language))throw new IllegalArgumentException("Unsupported documentation language");
+        PREFS.put("documentationLanguage",language);PREFS.flush();
+    }
     public static String theme(){return System.getProperty("easyknack.theme",PREFS.get("theme",""));}
     public static void save(String language,String theme)throws Exception{PREFS.put("language",language);PREFS.put("theme",theme);PREFS.flush();}
     public static int autosaveSeconds(){return Math.max(5,Math.min(3600,PREFS.getInt("autosaveSeconds",30)));}

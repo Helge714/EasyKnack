@@ -8,41 +8,10 @@ FFT is needed. Both synchronous and background FFTs are supported.
 
 ## Spectral Features
 
-The node has eight Control outputs. Each incoming spectrum is evaluated once;
-the latest result is held until another frame arrives. If multiple synchronous
-frames arrive within a block, Flux includes each successive comparison and the
-outputs hold the last frame's descriptors. Background FFTs may skip frames: Flux
-then compares the available frames, rather than inventing missing observations.
-
-Choose **Power** (default) or **Magnitude** weighting. With bin frequency `f[k]`,
-raw complex coefficient `X[k]` and analysis-window sum `W`, the one-sided weights
-are `w[k] = 2 * |X[k]/W|²` for Power and `2 * |X[k]/W|` for Magnitude. DC and
-Nyquist use a multiplier of 1. Use the same weighting, window, FFT resolution and
-hop when comparing measurements. This energy convention differs from simply
-squaring a doubled one-sided amplitude at every bin.
-
-Define `p[k] = w[k] / sum(w)`, `mu = sum(p[k] * f[k])`, and
-`m[r] = sum(p[k] * (f[k] - mu)^r)` over DC through Nyquist:
-
-| Output | Definition | Unit |
-|---|---|---|
-| Centroid | `mu` | Hz |
-| Spread | `sqrt(m[2])` | Hz |
-| Skewness | `m[3] / m[2]^(3/2)` | dimensionless |
-| Kurtosis | `m[4] / m[2]²` (ordinary; Gaussian = 3) | dimensionless |
-| Flux | Euclidean distance from the previous spectral weights | dimensionless when normalized |
-| Roll-off | First bin frequency whose cumulative weight reaches the selected fraction | Hz |
-| Slope | Linear regression slope of `p[k]` against `f[k]` | 1/Hz |
-| Flatness | Geometric mean of weights divided by their arithmetic mean | 0–1 |
-
-In the inspector, **Frequency scale** selects the coordinates for Centroid,
-Spread, Skewness and Kurtosis. **Linear** is the default and uses the definitions
-above. **Logarithmic** uses `x[k] = log2(f[k] / 1 Hz)` for positive-frequency bins;
-DC is excluded and the remaining weights are normalized again for these four
-moments. Centroid is `2^mean(x)` Hz, Spread is the standard deviation of `x` in
-octaves (also selectable as semitones or cents). Skewness and Kurtosis use the
-central moments of `x` and remain dimensionless. A DC-only spectrum has zero for
-all four moments.
+Use the [Spectral Features reference](../nodes/en/spectral-features.md)
+([Deutsch](../nodes/de/spectral-features.md)) for output definitions, weighting,
+frequency-scale settings, units and edge cases. For comparable measurements,
+keep the weighting, analysis window, FFT resolution and hop the same.
 
 For equal weights at 220 and 880 Hz, Linear gives Centroid 550 Hz and Spread
 330 Hz; Logarithmic gives Centroid 440 Hz and Spread 1 octave. Transposing the
@@ -76,7 +45,9 @@ not reach that value.
 
 ## Value Viewer
 
-Set **Inputs** to add up to eight numeric inputs. In Properties, give each trace
+Use the [Value Viewer reference](../nodes/en/value-viewer.md)
+([Deutsch](../nodes/de/value-viewer.md)) for input limits, controls and defaults.
+Set **Inputs** to add the traces you need. In Properties, give each trace
 a name and display unit. Units are labels: they do not convert the incoming
 number. Use Unit Converter when a conversion is required. Choose Left, Right or
 Mix for stereo inputs; Mix is the arithmetic mean of both channels.
