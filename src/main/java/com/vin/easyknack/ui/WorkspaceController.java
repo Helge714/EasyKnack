@@ -404,6 +404,7 @@ final class WorkspaceController implements AutoCloseable {
     }
 
     boolean preserveUnusedGroups;
+    boolean experimentalFeatures;
     ControlInterpolationSettings controlInterpolation=ControlInterpolationSettings.DEFAULT;
     void controlSettingsChanged(){history.markExternalChange();syncAudio();}
     List<DocumentGroups.Group> documentGroups(){return DocumentGroups.inspect(captureDocument(),workspace.openAssetIds());}
@@ -463,7 +464,7 @@ final class WorkspaceController implements AutoCloseable {
         }
 
         var root = assets.remove(source.root().id());
-        var rootMetadata=new HashMap<>(root.metadata());rootMetadata.put(ControlInterpolationSettings.KEY,controlInterpolation.value());rootMetadata.put(DocumentSettings.PRESERVE,com.vingame.glswing.node.model.GLNodeValue.of(preserveUnusedGroups));if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
+        var rootMetadata=new HashMap<>(root.metadata());rootMetadata.put(ControlInterpolationSettings.KEY,controlInterpolation.value());rootMetadata.put(DocumentSettings.PRESERVE,com.vingame.glswing.node.model.GLNodeValue.of(preserveUnusedGroups));rootMetadata.put(DocumentSettings.EXPERIMENTAL,com.vingame.glswing.node.model.GLNodeValue.of(experimentalFeatures));if(!editorTemplates.all().isEmpty())rootMetadata.put(EditorTemplates.KEY,editorTemplates.snapshot());else rootMetadata.remove(EditorTemplates.KEY);
         root=new GLNodeGraphAsset(root.id(),root.version(),root.kind(),root.graph(),root.viewState(),rootMetadata,root.compositeDescriptor());
         return new com.vingame.glswing.node.document.GLNodeGraphDocument(root, assets, source.externalAssets());
     }
@@ -479,6 +480,7 @@ final class WorkspaceController implements AutoCloseable {
     void openDocument(String title, com.vingame.glswing.node.document.GLNodeGraphDocument input) {
         var document = NodeDocuments.prepare(input); // Validate with isolated registries before changing the editor.
         preserveUnusedGroups=DocumentSettings.preserve(document);
+        experimentalFeatures=DocumentSettings.experimental(document);
         controlInterpolation=ControlInterpolationSettings.read(document.root().metadata().get(ControlInterpolationSettings.KEY));
         editorTemplates.load(document.root().metadata().get(EditorTemplates.KEY));
         if(midiDrivers!=null)midiDrivers.documentChanged();
@@ -784,7 +786,7 @@ final class WorkspaceController implements AutoCloseable {
     boolean isPartialContext(){return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(PartialGroups::partial).orElse(false));}
     boolean isMultipleContext(){return workspace.openAssetIds().stream().anyMatch(id->composites.findAsset(id).map(MultipleGroups::multiple).orElse(false));}
     private boolean nodeAllowedInContext(com.vingame.glswing.node.model.GLNodeCatalogEntry entry){
-        if(!ApplicationSettings.experimentalFeatures()&&ExperimentalFeatures.requiresOptIn(entry.type().id(),composites.assets()))return false;
+        if(!experimentalFeatures&&ExperimentalFeatures.requiresOptIn(entry.type().id(),composites.assets()))return false;
         if(workspace.currentAssetId()!=null&&composites.findAsset(workspace.currentAssetId()).map(FormulaGroups::isFormula).orElse(false))return false;
         var definition=NodeRegistry.find(entry.type().id()).orElse(null);
         if(isPartialContext())return entry.type().id().equals(FormulaGroups.CREATE)||PartialGroups.supports(definition)||definition==null&&composites.findComposite(entry.type().id()).flatMap(d->composites.findAsset(d.assetId())).map(a->!PartialGroups.partial(a)&&!SpectralGroups.spectral(a)&&!MultipleGroups.multiple(a)).orElse(false);

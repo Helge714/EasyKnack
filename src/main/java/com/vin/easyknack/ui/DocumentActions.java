@@ -65,7 +65,7 @@ final class DocumentActions implements AutoCloseable {
             var initialized = new com.vingame.glswing.node.document.GLNodeGraphAsset(
                     previous.id(), previous.version(), previous.kind(), previous.graph(),
                     current.viewState(), previous.metadata(), previous.compositeDescriptor());
-            checkpoint = new GLNodeGraphDocument(initialized, saved.embeddedAssets(), saved.externalAssets());
+            checkpoint = NodeDocuments.comparable(new GLNodeGraphDocument(initialized, saved.embeddedAssets(), saved.externalAssets()));
             updateTitle();
         });
     }
@@ -195,7 +195,7 @@ final class DocumentActions implements AutoCloseable {
     void exampleFolder(){try{java.nio.file.Files.createDirectories(ApplicationSettings.examples());java.awt.Desktop.getDesktop().open(ApplicationSettings.examples().toFile());}catch(Exception e){error(GLDocumentOperation.OPEN,null,e);}}
     void populateExamples(GLPopupMenu menu,Runnable beforeOpen){
         menu.removeAllItems();
-        try{addExamples(menu,ExampleLibrary.scan(ApplicationSettings.examples()),beforeOpen);}catch(Exception e){menu.addItem(AppText.text("examples.failed"),event->error(GLDocumentOperation.OPEN,ApplicationSettings.examples(),e));}
+        try{addExamples(menu,ExampleLibrary.scan(ApplicationSettings.examples(),controller.experimentalFeatures),beforeOpen);}catch(Exception e){menu.addItem(AppText.text("examples.failed"),event->error(GLDocumentOperation.OPEN,ApplicationSettings.examples(),e));}
         menu.addSeparator();menu.addItem(AppText.text("examples.refresh"),e->populateExamples(menu,beforeOpen));menu.addItem(AppText.text("examples.folder"),e->exampleFolder());
     }
     private void addExamples(GLPopupMenu menu,java.util.List<ExampleLibrary.Entry> entries,Runnable beforeOpen){

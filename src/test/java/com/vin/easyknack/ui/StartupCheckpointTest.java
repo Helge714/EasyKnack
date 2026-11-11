@@ -31,6 +31,32 @@ class StartupCheckpointTest {
         check(false, true);
     }
 
+    @Test void loadingAndResizingDoNotPromptButNodeAndModelEditsRemainDirty()throws Exception{
+        var source=directory.resolve("ordinary.knack");
+        try(var out=java.nio.file.Files.newOutputStream(source)){new com.vin.easyknack.document.KnackDocumentCodec().write(StarterDocument.create(),out);}
+        var c=new WorkspaceController[1];var documents=new DocumentActions[1];var frame=new JFrame[1];
+        try{
+            SwingUtilities.invokeAndWait(()->{
+                frame[0]=new JFrame();c[0]=new WorkspaceController();
+                var owner=new GLContainer(){protected void record(com.vingame.glswing.rendering.GLContext2D context){}};
+                documents[0]=new DocumentActions(c[0],owner,frame[0],s->{},directory.resolve("recovery"));
+                owner.setGLTheme(ApplicationTheme.current().theme());owner.addGL(c[0].workspace());
+                c[0].workspace().setBounds(0,0,1280,734);documents[0].initializeViewCheckpoint();
+            });
+            SwingUtilities.invokeAndWait(()->{try{
+                documents[0].openInitial(source);c[0].workspace().setBounds(0,0,900,600);
+                c[0].workspace().editor().setZoom(.7f);
+                assertNotNull(c[0].captureDocument().root().viewState().camera(),"Camera still persists on save");
+                assertFalse(modified(documents[0]));
+                assertTrue(documents[0].requestClose().toCompletableFuture().getNow(false),"No unsaved-changes dialog");
+                var node=c[0].workspace().editor().getNodes().get(0);node.setLocation(node.getX()+20,node.getY());
+                assertTrue(modified(documents[0]),"Actual node movement must remain unsaved");
+                documents[0].openInitial(source);assertFalse(modified(documents[0]));
+                changeFrequency(c[0]);assertTrue(modified(documents[0]),"Actual parameter edits must remain unsaved");
+            }catch(Exception failure){throw new AssertionError(failure);}});
+        }finally{SwingUtilities.invokeAndWait(()->{if(documents[0]!=null)documents[0].close();if(c[0]!=null)c[0].close();if(frame[0]!=null)frame[0].dispose();});}
+    }
+
     private void check(boolean edit, boolean recovered) throws Exception {
         var controller = new WorkspaceController[1];
         var documents = new DocumentActions[1];

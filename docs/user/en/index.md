@@ -13,4 +13,4 @@
 
 ## Experimental features
 
-Enable **Settings → Enable experimental features** to show nodes and examples marked **Experimental**. The setting is off by default. Groups and newly exported plugins inherit the status of their dependencies. Existing documents remain loadable and retain their nodes when the option is off. Pitch Hold and examples that depend on it currently require this opt-in.
+Enable **Document settings → Enable experimental features** to show nodes and examples marked **Experimental**. The setting belongs to each document and is off for new ordinary documents. Older files automatically enable it if they contain experimental nodes; an explicitly saved off decision is retained. Disabling it asks for confirmation while experimental nodes remain in the document. Groups and newly exported plugins inherit the status of their dependencies. Existing documents remain loadable and retain their nodes when the option is off. Camera movement or window resizing alone does not trigger an unsaved-changes prompt; the current camera is still stored on save. Pitch Hold and examples that depend on it currently require this opt-in.

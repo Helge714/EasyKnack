@@ -3,6 +3,10 @@
 
 ## Unreleased
 
+- Store experimental-feature availability per document. Infer it for legacy files containing experimental nodes, retain explicit saved decisions, and confirm disabling while experimental nodes remain. Remove the global settings control. Existing nodes keep their execution.
+- Ignore viewport camera-only changes in unsaved-content checks, while retaining cameras in saved files and preserving dirty detection for model edits, node movement and resizing. No document schema or audio protocol change; current first-development version covers this follow-up.
+
+
 - Preserve stored internal numeric fallbacks at socket-only group boundaries when feedback wires are ignored. Keep explicit public editor defaults.
 - Add an opt-in Experimental features setting (off by default), including dependent groups, examples and newly exported plugins. Mark Pitch Hold experimental; existing documents retain their nodes and execution. No document/audio protocol change; covered by the current first-development version.
 

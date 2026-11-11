@@ -108,16 +108,16 @@ final class NodeDocuments implements AutoCloseable {
         for(var asset:assets(result))if(asset.compositeDescriptor()!=null)choices.put(asset.compositeDescriptor().nodeTypeId(),GroupChoices.choices(asset,composites));
         for(var asset:assets(result))for(var node:asset.graph().nodes())for(var choice:choices.getOrDefault(node.typeId(),List.of()))
             choice.editor().validate(node.properties().getOrDefault(choice.id(),choice.editor().defaultValue()));
-        return result;
+        return DocumentSettings.initializeExperimental(result);
     }
-    /** Revisions describe edit history, not persistent content; undo can return to the saved state. */
+    /** History revisions and viewport cameras do not make content unsaved; cameras still persist on explicit save. */
     static GLNodeGraphDocument comparable(GLNodeGraphDocument document) {
         Map<String, GLNodeGraphAsset> assets = new LinkedHashMap<>();
         for (var asset : assets(document)) {
             var graph = asset.graph();
             assets.put(asset.id(), new GLNodeGraphAsset(asset.id(), asset.version(), asset.kind(),
                     new GLNodeGraphSnapshot(graph.graphId(), 0, graph.nodes(), graph.connections()),
-                    asset.viewState(), asset.metadata(), asset.compositeDescriptor()));
+                    new com.vingame.glswing.node.binding.GLNodeEditorViewState(asset.viewState().nodes(),asset.viewState().auxiliaryNodes()), asset.metadata(), asset.compositeDescriptor()));
         }
         var root = assets.remove(document.root().id());
         return new GLNodeGraphDocument(root, assets, document.externalAssets());

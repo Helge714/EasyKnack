@@ -2,7 +2,7 @@
 
 ## Overview
 
-Experimental: enable **Settings → Enable experimental features** to add this node or open dependent examples from the Examples menu. Pitch detection/acceptance is not yet reliable in all tested cases. Existing projects keep their nodes when the setting is off.
+Experimental: enable **Document settings → Enable experimental features** to add this node or open dependent examples from the Examples menu. Pitch detection/acceptance is not yet reliable in all tested cases. Existing projects keep their nodes when the setting is off.
 
 Holds the last sufficiently confident frequency.
 

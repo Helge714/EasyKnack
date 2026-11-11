@@ -13,7 +13,8 @@ public final class ApplicationSettings {
     public static int recoveryDays(){return com.vin.easyknack.app.ApplicationSettings.recoveryDays();}
     public static double connectionCurvature(){return com.vin.easyknack.app.ApplicationSettings.connectionCurvature();}
     public static void save(String language,String theme,int seconds,int days,double curvature)throws Exception{com.vin.easyknack.app.ApplicationSettings.save(language,theme,seconds,days,curvature);}
-    public static boolean experimentalFeatures(){return com.vin.easyknack.app.ApplicationSettings.experimentalFeatures();}
-    public static void save(String language,String theme,int seconds,int days,double curvature,boolean experimental)throws Exception{com.vin.easyknack.app.ApplicationSettings.save(language,theme,seconds,days,curvature,experimental);}
+    /** Legacy application preference; document settings now own feature availability. */
+    @Deprecated public static boolean experimentalFeatures(){return com.vin.easyknack.app.ApplicationSettings.experimentalFeatures();}
+    @Deprecated public static void save(String language,String theme,int seconds,int days,double curvature,boolean experimental)throws Exception{com.vin.easyknack.app.ApplicationSettings.save(language,theme,seconds,days,curvature,experimental);}
     public static Path examples(){return com.vin.easyknack.app.ApplicationSettings.examples();}
 }

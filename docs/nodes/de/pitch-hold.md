@@ -2,7 +2,7 @@
 
 ## Übersicht
 
-Experimentell: Zum Hinzufügen dieses Nodes und zum Anzeigen abhängiger Beispiele im Beispiele-Menü **Einstellungen → Experimentelle Funktionen aktivieren** einschalten. Tonhöhenerkennung und Übernahme funktionieren noch nicht in allen geprüften Fällen zuverlässig. Vorhandene Projekte behalten ihre Nodes auch bei ausgeschalteter Option.
+Experimentell: Zum Hinzufügen dieses Nodes und zum Anzeigen abhängiger Beispiele im Beispiele-Menü **Dokumenteinstellungen → Experimentelle Funktionen aktivieren** einschalten. Tonhöhenerkennung und Übernahme funktionieren noch nicht in allen geprüften Fällen zuverlässig. Vorhandene Projekte behalten ihre Nodes auch bei ausgeschalteter Option.
 
 Hält die letzte ausreichend sichere Frequenz.
 

@@ -25,5 +25,9 @@ final class ExperimentalFeatures {
         }
         return false;
     }
+    static boolean usedInDocument(GLNodeGraphDocument document){
+        return NodeDocuments.assets(document).stream().flatMap(a->a.graph().nodes().stream())
+            .anyMatch(n->NodeRegistry.find(n.typeId()).map(d->d.isExperimental()).orElse(false));
+    }
     static String label(String title){return title+" ["+AppText.text("experimental")+"]";}
 }

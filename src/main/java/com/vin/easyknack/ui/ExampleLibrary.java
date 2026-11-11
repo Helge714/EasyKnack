@@ -47,18 +47,19 @@ public final class ExampleLibrary {
         var path=root.resolve("Buffer/Sampler.knack");Files.createDirectories(path.getParent());
         if(!Files.exists(path))try(var out=Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)){new KnackDocumentCodec().write(SamplerExample.create(),out);}
         Files.writeString(marker,"Sampler example installed; user edits are preserved.\n",StandardOpenOption.CREATE_NEW);
-    }    static List<Entry> scan(Path folder)throws IOException{return scan(folder,0);}
-    private static List<Entry> scan(Path folder,int depth)throws IOException{
+    }    static List<Entry> scan(Path folder)throws IOException{return scan(folder,false);}
+    static List<Entry> scan(Path folder,boolean experimentalEnabled)throws IOException{return scan(folder,0,experimentalEnabled); }
+    private static List<Entry> scan(Path folder,int depth,boolean experimentalEnabled)throws IOException{
         if(depth>12||!Files.isDirectory(folder,LinkOption.NOFOLLOW_LINKS))return List.of();
         var result=new ArrayList<Entry>();
         try(var entries=Files.list(folder)){
             for(var path:entries.sorted(Comparator.comparing(p->p.getFileName().toString(),String.CASE_INSENSITIVE_ORDER)).toList()){
                 if(Files.isSymbolicLink(path))continue;
                 var name=path.getFileName().toString();
-                if(Files.isDirectory(path)){var children=scan(path,depth+1);if(!children.isEmpty())result.add(new Entry(name,path,children));}
+                if(Files.isDirectory(path)){var children=scan(path,depth+1,experimentalEnabled);if(!children.isEmpty())result.add(new Entry(name,path,children));}
                 else if(name.toLowerCase(Locale.ROOT).endsWith(".knack")){
                     boolean experimental=experimental(path);
-                    if(!experimental||ApplicationSettings.experimentalFeatures()){
+                    if(!experimental||experimentalEnabled){
                         String title=name.substring(0,name.length()-6);
                         result.add(new Entry(experimental?ExperimentalFeatures.label(title):title,path,null));
                     }

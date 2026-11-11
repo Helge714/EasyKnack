@@ -20,8 +20,9 @@ public final class ApplicationSettings {
         if(seconds<5||seconds>3600||days<1||days>365||!Double.isFinite(curvature)||curvature<0||curvature>1)throw new IllegalArgumentException("Invalid application settings");
         PREFS.putInt("autosaveSeconds",seconds);PREFS.putInt("recoveryDays",days);PREFS.putDouble("connectionCurvature",curvature);save(language,theme);
     }
-    public static boolean experimentalFeatures(){return Boolean.parseBoolean(System.getProperty("easyknack.experimental",Boolean.toString(PREFS.getBoolean("experimentalFeatures",false))));}
-    public static void save(String language,String theme,int seconds,int days,double curvature,boolean experimental)throws Exception{
+    /** Legacy application preference; document settings now own feature availability. */
+    @Deprecated public static boolean experimentalFeatures(){return Boolean.parseBoolean(System.getProperty("easyknack.experimental",Boolean.toString(PREFS.getBoolean("experimentalFeatures",false))));}
+    @Deprecated public static void save(String language,String theme,int seconds,int days,double curvature,boolean experimental)throws Exception{
         save(language,theme,seconds,days,curvature);PREFS.putBoolean("experimentalFeatures",experimental);PREFS.flush();
     }
     public static Path examples(){return Path.of(System.getProperty("easyknack.examples",Path.of(System.getProperty("user.home"),"Documents","EasyKnack","Beispiele").toString()));}
