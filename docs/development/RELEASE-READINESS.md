@@ -8,6 +8,8 @@ Follow-up: Core source correspondence is now complete for the frozen November
 candidate; see [the reviewed reconstruction](source-audit/GLSWING-2026-11-10.md).
 The full automated regression run is now complete with five unresolved cases;
 see [results and release blockers](source-audit/REGRESSION-2026-11-10.md).
+Follow-up on 2026-11-11: the four nonexperimental failures are fixed and verified;
+Pitch Hold is explicitly experimental and opt-in. See [fixes and remaining acceptance](source-audit/RELEASE-FIXES-2026-11-11.md).
 The original findings below retain the hashes observed at the initial audit.
 
 ## Current state

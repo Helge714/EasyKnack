@@ -1,0 +1,119 @@
+{
+  "date": "2026-11-11",
+  "productionCommit": "111f70c5fc29870012100413c40a3b8a21e7fe0c",
+  "scope": "Focused follow-up to five release findings; not a repeated complete suite or installer acceptance",
+  "totals": {
+    "tests": 56,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "suites": [
+    {
+      "suite": "com.vin.easyknack.ui.ApplicationThemeTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.ExperimentalFeaturesTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.FeedbackWarningAudioTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.GroupAuthoringTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.GroupCompilerReachabilityTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.GroupInputFallbackTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.GroupUnitsTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.HarmonizerTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "suite": "com.vin.easyknack.ui.MultipleGroupsTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.NodeDocumentationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.NodePresentationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.SourceExportAndAnalysisTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.SpecializedChainTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.vin.easyknack.ui.SpectralPaletteTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "skippedCases": [
+    {
+      "case": "com.vin.easyknack.ui.HarmonizerTest.exampleAndExportRunWithAnalysisAndStatefulNodes",
+      "reason": "@EnabledIf(\"experimentalAudio\") evaluated to false"
+    }
+  ],
+  "knownExperimentalLimitation": "Harmonizer Pitch Hold accuracy remains unverified/unreliable; opt-in feature and explicit easyknack.test.experimental audio test gate.",
+  "parameterContractsSha256": "8022d4fbb88d256c6e90cef6d5f6919c1e3c9a2539b79a37fe8a0c5151cb6df9"
+}
