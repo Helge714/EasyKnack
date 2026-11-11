@@ -8,7 +8,7 @@ import com.vingame.glswing.node.model.*;
 /** Inserts unit adapters at public input boundaries before the Core flattens groups. */
 final class GroupCompiler {
     record Prepared(GLNodeGraphAsset root,GLCompositeGraphRegistry registry){}
-    private record Adapter(GLCompositePortMapping port,UnitFormat base,String valueKey,String unitKey){}
+    private record Adapter(GLCompositePortMapping port,UnitFormat base,String valueKey,String unitKey,double fallback){}
     static Prepared prepare(GLNodeGraphAsset root,GLCompositeGraphRegistry original){
         return prepare(root,original,true);
     }
@@ -42,7 +42,7 @@ final class GroupCompiler {
                     properties.removeIf(v->v.id().equals(key)||v.id().equals(unit));
                     properties.add(new GLCompositePropertyDescriptor(key,"number",GLCompositeValueKind.DECIMAL,GLNodeValue.of(8.)));
                     properties.add(new GLCompositePropertyDescriptor(unit,"text",GLCompositeValueKind.TEXT,GLNodeValue.of("factor")));
-                    bindings.add(new Adapter(p,UnitFormat.FACTOR,key,unit));ports.add(p.withEndpoints(List.of()));continue;
+                    bindings.add(new Adapter(p,UnitFormat.FACTOR,key,unit,new NodeState(p.presentation().editorOptions()).number("default",0)));ports.add(p.withEndpoints(List.of()));continue;
                 }
                 if(p.publicPort().direction()==GLPortDirection.OUTPUT && p.isBound() && GroupUnits.numeric(p)) {
                     var base=GroupUnits.base(original,d,p);var sourceUnit=GroupUnits.target(original,d,p);
@@ -59,7 +59,7 @@ final class GroupCompiler {
                     properties.removeIf(property->property.id().equals(ukey));
                     properties.add(new GLCompositePropertyDescriptor(ukey,"text",GLCompositeValueKind.TEXT,GLNodeValue.of(base.id())));
                     mappings.add(new GLCompositePropertyMapping(ukey,id,"to"));
-                    bindings.add(new Adapter(p,base,"",ukey));continue;
+                    bindings.add(new Adapter(p,base,"",ukey,0));continue;
                 }
                 // Unbound inputs still own their editor values (including pending Formula ports).
                 // Declare them without creating DSP adapters until an internal target exists.
@@ -103,7 +103,7 @@ final class GroupCompiler {
                 if(p.publicPort().direction()!=GLPortDirection.INPUT||!p.isBound()||!GroupUnits.numeric(p)||!(p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.SLIDER)||p.presentation().inputEditorId().equals(GLNodeInputEditorRegistry.NONE))){ports.add(p);continue;}
                 String key=GroupUnits.key(p.publicPort().id()),ukey=GroupUnits.unitKey(p.publicPort().id());
                 var base=GroupUnits.base(original,d,p);
-                double fallback=new NodeState(p.presentation().editorOptions()).number("default",0);
+                double fallback=GroupUnits.inputDefault(original,d,p);
                 var adapterEndpoints=new ArrayList<GLNodeEndpoint>();
                 for(var endpoint:p.internalEndpoints()) {
                 var target=GroupInputSettings.checkbox(p)?UnitFormat.FACTOR:GroupUnits.targetOrBase(original,d,p.withEndpoints(List.of(endpoint)),base);
@@ -123,7 +123,7 @@ final class GroupCompiler {
                 ports.add(p.withEndpoints(adapterEndpoints));
                 properties.add(new GLCompositePropertyDescriptor(key,"number",GLCompositeValueKind.DECIMAL,GLNodeValue.of(fallback)));
                 properties.add(new GLCompositePropertyDescriptor(ukey,"text",GLCompositeValueKind.TEXT,GLNodeValue.of(base.id())));
-                bindings.add(new Adapter(p,base,key,ukey));
+                bindings.add(new Adapter(p,base,key,ukey,fallback));
             }
             adapters.put(d.nodeTypeId(),bindings);
             var descriptor=new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),ports,properties,mappings);
@@ -147,7 +147,7 @@ final class GroupCompiler {
                 var selected=GroupUnits.selected(node,binding.port,binding.base);
                 if(binding.port.publicPort().direction()==GLPortDirection.OUTPUT){values.put(binding.unitKey,GLNodeValue.of(selected.id()));continue;}
 
-                double fallback=new NodeState(binding.port.presentation().editorOptions()).number("default",0);
+                double fallback=binding.fallback;
                 double value=new NodeState(node.properties()).number(binding.valueKey,MultipleGroups.countPort(binding.port)?new NodeState(node.properties()).number(MultipleGroups.COUNT_PROPERTY,fallback):fallback);
                 if(GroupInputSettings.checkbox(binding.port))value=value==0?0:1;
                 values.put(binding.valueKey,GLNodeValue.of(binding.base.convert(value,selected)));values.put(binding.unitKey,GLNodeValue.of(selected.id()));

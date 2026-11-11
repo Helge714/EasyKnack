@@ -43,6 +43,32 @@ final class GroupUnits {
             .filter(r->r.id().equals(port.internalEndpoint().portId())&&r.formats()!=null)
             .map(r->r.unit()).findFirst().orElse(UnitFormat.FACTOR)).orElse(UnitFormat.FACTOR);
     }
+    /** Socket-only extracted inputs retain the internal editor fallback when a wire is cut. */
+    static double inputDefault(GLCompositeGraphRegistry registry,GLCompositeNodeDescriptor descriptor,GLCompositePortMapping port){
+        return inputDefault(registry,descriptor,port,new HashSet<>());
+    }
+    private static double inputDefault(GLCompositeGraphRegistry registry,GLCompositeNodeDescriptor descriptor,GLCompositePortMapping port,Set<String> path){
+        var explicit=port.presentation().editorOptions().get("default");
+        if(explicit!=null)return new NodeState(port.presentation().editorOptions()).number("default",0);
+        if(!port.isBound()||!path.add(descriptor.assetId()+"/"+port.publicPort().id()))return 0;
+        var node=registry.findAsset(descriptor.assetId()).orElseThrow().graph().findNode(port.internalEndpoint().nodeId()).orElse(null);
+        if(node==null)return 0;
+        var nested=registry.findComposite(node.typeId()).orElse(null);
+        if(nested!=null){
+            var inner=nested.portMappings().stream().filter(p->p.publicPort().id().equals(port.internalEndpoint().portId())).findFirst().orElse(null);
+            if(inner==null)return 0;
+            return new NodeState(node.properties()).number(key(inner.publicPort().id()),inputDefault(registry,nested,inner,path));
+        }
+        var definition=NodeRegistry.find(node.typeId()).orElse(null);
+        if(definition==null)return 0;
+        var row=definition.layout(new NodeState(node.properties())).rows().stream().filter(r->r.id().equals(port.internalEndpoint().portId())).findFirst().orElse(null);
+        if(row==null)return 0;
+        var value=node.properties().get(row.id());
+        if(value==null&&row.editor()!=null)value=row.editor().defaultValue();
+        if(value==null)return 0;
+        Object raw=value.toJavaValue();double number=raw instanceof Number n?n.doubleValue():Boolean.TRUE.equals(raw)?1:0;
+        return row.formats()==null?number:row.formats().stored().convert(number,base(registry,descriptor,port));
+    }
     static boolean numeric(GLCompositePortMapping port){
         return java.util.Set.of(PortDataType.SIGNAL.id(),SignalCategory.VALUE.valueTypeId()).contains(port.publicPort().valueTypeId());
     }
