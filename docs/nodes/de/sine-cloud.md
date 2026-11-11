@@ -1,43 +1,56 @@
 # Sinuswolke (Sine Cloud)
-Erzeugt einen Forschungsstimulus aus bis zu zehn Millionen gleich lauten, gleichmäßig oder gaußförmig verteilten Sinussen mit optional zufälligen Startphasen.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Anzahl (Count) | 1–10.000.000; Standard: 10.000 | Wert; 1–10.000.000, gerundet; Control |
-| Minimale Frequenz (Min Frequency) | 0,00001 Hz–halbe DSP-Samplerate; Standard: 20 Hz; Hz, kHz | Wert; 0,00001 Hz–halbe Samplerate; Control |
-| Maximale Frequenz (Max Frequency) | 0,00001 Hz–halbe DSP-Samplerate; Standard: 20.000 Hz; Hz, kHz | Wert; 0,00001 Hz–halbe Samplerate; Control |
-| Seed (Seed) | 0–16.777.215; Standard: 0 | Wert; 0–16.777.215, gerundet; Control |
-| Gaußverteilung (Gaussian) | Aus, Ein; Standard: Aus | Editor |
-| Zufallsphasen (Randomize phases) | Aus, Ein; Standard: Ein | Editor |
+## Übersicht
+
+Erzeugt einen Forschungsstimulus aus bis zu zehn Millionen gleich lauten, gleichmäßig oder gaußförmig verteilten Sinussen mit optional zufälligen Startphasen.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Anzahl (Count) | [Wert](../../user/de/data-types.md#value) | 1–10.000.000 | 1–10.000.000, gerundet | 10.000 | — | [Control](../../user/de/rates.md#control) | Immer |
+| Minimale Frequenz (Min Frequency) | [Wert](../../user/de/data-types.md#value) | 0,00001 Hz–halbe DSP-Samplerate | 0,00001 Hz–halbe Samplerate | 20 Hz | [Hz, kHz](../../user/de/units.md#frequency) | [Control](../../user/de/rates.md#control) | Immer |
+| Maximale Frequenz (Max Frequency) | [Wert](../../user/de/data-types.md#value) | 0,00001 Hz–halbe DSP-Samplerate | 0,00001 Hz–halbe Samplerate | 20.000 Hz | [Hz, kHz](../../user/de/units.md#frequency) | [Control](../../user/de/rates.md#control) | Immer |
+| Seed (Seed) | [Wert](../../user/de/data-types.md#value) | 0–16.777.215 | 0–16.777.215, gerundet | 0 | — | [Control](../../user/de/rates.md#control) | Immer |
+| Gaußverteilung (Gaussian) | [Editor](../../user/de/reference-tables.md) | Aus, Ein | — | Aus | — | — | Immer |
+| Zufallsphasen (Randomize phases) | [Editor](../../user/de/reference-tables.md) | Aus, Ein | — | Ein | — | — | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Audioausgang (Audio Out) | Audio; ±1 |
-| Tatsächliche Anzahl (Actual count) | Wert; 0–10.000.000; Control |
-| Periodenlänge (Period) | Wert; 0 oder N / Samplerate; Control |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Audioausgang (Audio Out) | [Audio](../../user/de/data-types.md#audio) | ±1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Tatsächliche Anzahl (Actual count) | [Wert](../../user/de/data-types.md#value) | 0–10.000.000 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Periodenlänge (Period) | [Wert](../../user/de/data-types.md#value) | 0 oder N / Samplerate | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
-Gleiche Parameter und Samplerate erzeugen denselben periodischen Buffer. Jede enthaltene Sinusschwingung hat gleiche Amplitude; die Gesamttabelle ist auf Peak 1 normiert, nicht auf RMS. Zufallsphasen werden einmal aus Seed gezogen. Ohne diese Option starten alle Sinusse bei Phase 0 und Seed ist wirkungslos. Bei unveränderten Parametern läuft die Schleife exakt, ohne neue Zufallswerte oder Kaschierung von Periodik und Schwebungen.
+Bei eingeschalteten Zufallsphasen (Standard) werden die Startphasen einmal aus Seed ausgelost und bleiben in der periodischen Tabelle erhalten. Ausgeschaltet starten alle Sinusse mit Phase 0; Seed ist wirkungslos und seine Änderung erzeugt keine neue Tabelle. Die Auswahl ist unabhängig von der Gaußverteilung der Frequenzen. Bei unveränderter Wiedergabe wird die Tabelle exakt geloopt: keine neuen Ziehungen, Überblendungen an der Schleifengrenze, Dekorrelation oder Unterdrückung von Schwebungen und Periodiken. Gleiche Parameter und Samplerate ergeben dieselbe Tabelle. Alle enthaltenen Sinusse haben gleiche Amplitude; die gesamte Tabelle wird auf einen Spitzenbetrag von 1 normiert. Dies ist keine RMS-Normalisierung: Der mittlere Pegel hängt vom Seed und der Tonanzahl ab. Kanal-Kopien mit gleichen Parametern spielen denselben Stimulus.
 
-Gaussian verändert die Frequenzdichte, nicht die Einzelamplituden: Normalverteilung in linearen Hz um die Intervallmitte, Standardabweichung `(Max-Min)/6`, begrenzt auf ±3σ. Seed verändert nur Phasen. Frequenzen liegen auf verschiedenen inneren IFFT-Bins; DC und die exakte Nyquist-Frequenz sind ausgeschlossen. Bei zu wenig Rasterplätzen sinkt Actual count. Vertauschte Grenzen werden sortiert; gleiche Grenzen ergeben einen Ton am nächsten darstellbaren Bin.
+Bei ausgeschalteter Gaußverteilung werden die Frequenzen möglichst gleichmäßig auf verschiedene positive IFFT-Bins verteilt. Bei eingeschalteter Gaußverteilung folgen deterministische Quantile einer Normalverteilung in linearen Hz, zentriert zwischen Min/Max, mit Standardabweichung (Max − Min) / 6 und Begrenzung auf ±3σ. Alle Sinusse bleiben gleich laut; zur Mitte steigt ihre Frequenzdichte. Seed steuert die Phasen, nicht die Frequenzpositionen. Gauß reserviert ein feineres Raster für verschiedene Töne; bei unzureichender Auflösung sinkt Actual count, statt Töne zusammenzufassen. Die Tabelle enthält 65.536–67.108.864 Samples; die Größe wächst mit dem benötigten Frequenzraster. Der Abstand beträgt Samplerate / Tabellengröße. Gewünschte Frequenzen werden daher angenähert; benachbarte Abstände können um einen Bin variieren. Die Frequenzregler verwenden die halbe DSP-Samplerate der Anwendung als Obergrenze (derzeit 24.000 Hz bei 48 kHz). Die native Erzeugung begrenzt auch angeschlossene Werte auf ihre tatsächliche Nyquist-Grenze. DC und der exakte Nyquist-Bin werden nicht belegt; der höchste erzeugte Ton liegt auf dem letzten inneren Bin unter Nyquist. Vertauschte Frequenzgrenzen werden sortiert. Gleiche Grenzen ergeben einen einzelnen Ton am nächsten darstellbaren Bin. Falls in einem sehr engen Bereich kein Bin liegt, wird ebenfalls der nächste Bin zur Bereichsmitte verwendet.
 
-Period meldet die vollständige aktive Bufferlänge in Sekunden, vor der ersten Tabelle 0. Bei Neuberechnung bleibt die alte Tabelle aktiv; mit Beginn des 20-ms-Übergangs gilt die neue Periode. Sie muss nicht die kürzeste mathematische Klangperiode sein. Schnelle Parameteränderungen werden zusammengefasst; Fehler erhalten die alte Tabelle.
+Bei zu wenigen Rasterplätzen sinkt die tatsächliche Anzahl. Actual count meldet die Anzahl der neu aktiven Tabelle, anfangs 0. Bei 48 kHz ermöglicht 20–20.000 Hz zehn Millionen unterschiedliche Sinusse in beiden Verteilungen. Gleichmäßig benötigt diese Einstellung 33.554.432 Samples, Gauß 67.108.864. Eine enge Bandbreite kann diese Anzahl unterschreiten. Die längste Tabelle wiederholt sich bei 48 kHz nach etwa 1.398,1 Sekunden (23,3 Minuten).
 
-Große Tabellen brauchen erhebliche Aufbauzeit und Speicher: bis zu 67.108.864 Samples (256 MiB) plus 1 GiB IFFT-Arbeitsspeicher; höchstens drei Tabellen pro Node. Enge Frequenzintervalle können trotz großer Tabelle die gewünschte Anzahl nicht erreichen.
+Periodenlänge gibt die aktive Tabellenschleife N / Samplerate in Sekunden aus; im Einheitenmenü sind auch Millisekunden und Samples verfügbar. Vor der ersten verfügbaren Tabelle ist der Wert 0. Während eine neue Tabelle berechnet wird, gilt die alte Länge; beim Beginn der Überblendung die neue. Dies ist die vollständige gespeicherte Schleifenlänge, nicht zwingend die kürzeste mathematische Periode einer besonderen Tonkombination.
 
-## Routing
-| Funktion | Verhalten |
+Eingänge werden am Anfang jedes Verarbeitungsaufrufs ausgewertet. Änderungen erzeugen im Hintergrund eine neue Tabelle; schnelle Änderungen werden zusammengefasst. Bis zur Fertigstellung läuft die alte Tabelle weiter, beim ersten Start herrscht Stille. Der Wechsel startet die neue Tabelle an ihrem Anfang und blendet 20 ms lang linear über. Währenddessen gelten gleiche Einzelamplituden nur innerhalb der jeweiligen Tabelle. Falls eine Erzeugung scheitert, bleibt die bisherige Tabelle aktiv. Die Erstellung kostet Rechenzeit und temporären Speicher: Die größte Tabelle benötigt 256 MiB, der komplexe IFFT-Arbeitsspeicher zusätzlich 1 GiB. Pro Node werden höchstens drei Tabellen gehalten.
+
+## Mute
+
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | — | — |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
 | --- | --- |
-| Mute | Kein Bypass |
+| — | — |
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
 
 [Node-Index](index.md) · [English](../en/sine-cloud.md)

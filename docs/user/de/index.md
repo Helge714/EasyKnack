@@ -1,6 +1,6 @@
 # EasyKnack – Handbuch
 
-Zwölf kurze Kapitel erklären die Bedienung und die wichtigsten Verarbeitungskonzepte. Node-Kurzreferenzen ergänzen besondere Parameter und Grenzen.
+Zwölf kurze Kapitel erklären die Bedienung und die wichtigsten Verarbeitungskonzepte. Die ausführlichen Node-Referenzen dokumentieren Ports, Parameter und Grenzen.
 
 | Kapitel |
 | --- |

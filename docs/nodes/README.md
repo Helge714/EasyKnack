@@ -2,7 +2,7 @@
 
 Start with the [English index](en/index.md) or [German index](de/index.md).
 Each node has one maintained Markdown page per language. The references include
-inspector-only settings in compact Controls tables; shared explanations live in the twelve-chapter manual.
+inspector-only settings in their Inputs tables, marked **Inspector / Inspektor**.
 
 Run `python scripts/build-docs.py` from the repository root to render and validate
 the HTML preview under `target/docs/`. Open `target/docs/nodes/en/index.html` or
@@ -25,7 +25,7 @@ processors are deliberately excluded, rather than advertised as usable nodes.
 The preview builder audits registration IDs without executing the application.
 It rejects undocumented registrations, exclusions of public nodes, duplicate
 IDs/slugs, missing translations/index links, wrong section sequences and broken
-local links or anchors. Compact technical tables and explanations remain manual; changing
+local links or anchors. Technical tables and explanations remain manual; changing
 a registration does not regenerate them or prove their accuracy.
 
 Follow the [documentation work order](../development/NODE-DOCUMENTATION.md) when

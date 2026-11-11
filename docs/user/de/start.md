@@ -16,6 +16,6 @@ Audiodateien und Plugins werden nicht in `.knack` eingebettet. Prüfe sie nach d
 
 Programmeinstellungen betreffen Sprache und Darstellung. Dokumenteneinstellungen betreffen unter anderem Steuerungsglättung, unbenutzte Gruppen und experimentelle Funktionen. Alte Dokumente mit experimentellen Nodes aktivieren die Freigabe automatisch, sofern kein ausdrückliches Aus gespeichert ist. Ausschalten bei vorhandenen experimentellen Nodes verlangt eine Warnungsbestätigung; vorhandene Nodes bleiben erhalten.
 
-Die Dokuansicht speichert **Wie Anwendung / Deutsch / English** unabhängig von der Programmsprache. Node-Kontextmenü und Hilfe öffnen die passende Kurzreferenz; Zurück/Vorwärts folgt lokalen Links.
+Die Dokuansicht speichert **Wie Anwendung / Deutsch / English** unabhängig von der Programmsprache. Node-Kontextmenü und Hilfe öffnen die passende Node-Referenz; Zurück/Vorwärts folgt lokalen Links.
 
 [Handbuch](index.md) · [Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/start.md)

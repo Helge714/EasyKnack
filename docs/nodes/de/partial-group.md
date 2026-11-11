@@ -1,34 +1,45 @@
 # Teilton-Gruppe
-Bearbeitet jeden erkannten Teilton einmal pro Analyseframe.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Teiltöne (Partials) | — | Partials; Control |
+## Übersicht
+
+Bearbeitet jeden erkannten Teilton einmal pro Analyseframe.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Teiltöne (Partials) | Partials; Control |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
-[Anleitung](../../user/de/partial-group.md)
 Standardaufbau: `Partial Analysis → Partial Group → Partials to Spectrum → Spectrum Math (Add) → IFFT`; den Rest der Analyse mit dem zweiten Math-Eingang verbinden. Im Inneren `Partial Context → Math / Formula Group → Partial Output` verwenden. Frequenz, Amplitude und Phase bleiben unabhängige Werte. Zustände sind pro ID getrennt und werden bei einer neuen ID zurückgesetzt. Maximal 64 numerische Prozessoren; gewöhnliche verschachtelte Gruppen und numerische Formula Groups werden aufgelöst. Keine Audio-Oszillatorbank, Buffer oder Triggerprogramme. Externe numerische Werte werden am Fensterende aus dem aktuellen Veröffentlichungsblock abgetastet; asynchrone historische Modulationswerte sind nicht gepuffert.
 
 Für unabhängige Zufallsmodulation pro Teilton [Partial Noise](partial-noise.md) verwenden. Der Node berücksichtigt stabile IDs automatisch; für eine symmetrische Abweichung den Ausgang mit `2 * random - 1` umrechnen.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Teiltöne (Partials) → Partials |
-| Einfügen | Teiltöne (Partials) → Partials |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
+
+[Teiltonanalyse](partial-analysis.md) · [Teiltöne zu Spektrum](partials-to-spectrum.md) · [Spektrummathematik](spectrum-math.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md)
 
 [English](../en/partial-group.md)

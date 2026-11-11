@@ -1,6 +1,6 @@
 # Node index
 
-[Manual](../../user/en/index.md) · [Deutsch](../de/index.md)
+[Fundamentals](../../user/en/index.md) · [Deutsch](../de/index.md)
 
 ## Inputs
 

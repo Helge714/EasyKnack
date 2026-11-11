@@ -32,8 +32,8 @@ class DocumentationViewerTest {
         assertTrue(document.title().contains("Additive Oscillator"));
         assertTrue(document.plain().contains("±∞"));assertTrue(document.plain().contains("Σ"));
         var tables=document.blocks().stream().filter(b->b instanceof DocumentationPage.Table).map(b->(DocumentationPage.Table)b).toList();
-        assertEquals(3,tables.get(0).rows.get(0).size());assertEquals(2,tables.get(1).rows.get(0).size());
-        assertTrue(document.blocks().stream().anyMatch(b->b instanceof DocumentationPage.Text t&&t.plain().contains("Handbuch")));
+        assertEquals(8,tables.get(0).rows.get(0).size());assertEquals(5,tables.get(1).rows.get(0).size());
+        assertTrue(tables.get(0).rows.stream().flatMap(List::stream).flatMap(c->c.spans.stream()).anyMatch(s->s.link()!=null&&s.link().contains("#control")));
         assertTrue(document.blocks().stream().anyMatch(b->b instanceof DocumentationPage.Text t&&t.pre&&t.plain().contains("\n")));
     }
 

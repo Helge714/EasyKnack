@@ -1,6 +1,6 @@
 # EasyKnack manual
 
-Twelve short chapters cover operation and essential processing concepts. Node short references add specific controls and limits.
+Twelve short chapters cover operation and essential processing concepts. Detailed node references document ports, controls and limits.
 
 | Chapter |
 | --- |

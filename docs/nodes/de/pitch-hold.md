@@ -1,37 +1,48 @@
 # Tonhöhe halten (Pitch Hold)
+
+## Übersicht
+
 Experimentell: Zum Hinzufügen dieses Nodes und zum Anzeigen abhängiger Beispiele im Beispiele-Menü **Dokumenteinstellungen → Experimentelle Funktionen aktivieren** einschalten. Tonhöhenerkennung und Übernahme funktionieren noch nicht in allen geprüften Fällen zuverlässig. Vorhandene Projekte behalten ihre Nodes auch bei ausgeschalteter Option.
 
 Hält die letzte ausreichend sichere Frequenz.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Frequenz (Frequency) | 0–20000 Hz; Standard: 440 Hz; Hz, kHz | Wert; ≥ 0 Hz; Auto |
-| Konfidenz (Confidence) | 0–1; Standard: 1 | Wert; ±∞; Auto |
-| Minimale Konfidenz (Minimum confidence) | 0–1; Standard: 0.8 | Wert; ±∞; Auto |
-| Rate | Auto / Audio / Control; Standard: Auto | Editor; Inspektor |
-| Anfangsfrequenz (Initial frequency) | 1–20000 Hz; Standard: 440 Hz; Hz, kHz | Editor; Inspektor |
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 0–20000 Hz | ≥ 0 Hz | 440 Hz | [Hz](../../user/de/units.md#frequency), [kHz](../../user/de/units.md#frequency) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Konfidenz (Confidence) | [Wert](../../user/de/data-types.md#value) | 0–1 | ±∞ | 1 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Minimale Konfidenz (Minimum confidence) | [Wert](../../user/de/data-types.md#value) | 0–1 | ±∞ | 0.8 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Rate | [Editor](../../user/de/reference-tables.md) | Auto / Audio / Control | — | Auto | — | — | Inspektor |
+| Anfangsfrequenz (Initial frequency) | [Editor](../../user/de/reference-tables.md) | 1–20000 Hz | — | 440 Hz | [Hz](../../user/de/units.md#frequency), [kHz](../../user/de/units.md#frequency) | — | Inspektor |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Frequenz [Hz] (Frequency [Hz]) | Wert; > 0 Hz |
-| Gültig (Valid) | Wert; 0–1 |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Frequenz [Hz] (Frequency [Hz]) | [Wert](../../user/de/data-types.md#value) | > 0 Hz | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
+| Gültig (Valid) | [Wert](../../user/de/data-types.md#value) | 0–1 | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
+
 Akzeptiert positive endliche Frequenz bei Konfidenz ≥ minimale Konfidenz. Sonst bleibt der zuletzt akzeptierte Wert stehen; davor gilt Anfangsfrequenz. Gültig beschreibt den aktuellen Eingang, auch während der Ausgang hält. Es gibt keine automatische Überblendung oder Glättung.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Frequenz (Frequency) → Frequenz [Hz] (Frequency [Hz]) |
-| Einfügen | Frequenz (Frequency) → Frequenz [Hz] (Frequency [Hz]) |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | Frequenz (Frequency) | Frequenz [Hz] (Frequency [Hz]) |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| Frequenz (Frequency) | Frequenz [Hz] (Frequency [Hz]) |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/pitch-hold.md)

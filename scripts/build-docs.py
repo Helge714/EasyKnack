@@ -59,15 +59,20 @@ def validate_catalog(data):
             if f']({slug}.md)' not in index_text:
                 raise ValueError(f'Node missing from {language} index: {slug}')
             text = page.read_text(encoding='utf-8')
-            required = (['Controls', 'Outputs', 'Behavior', 'Routing'] if language == 'en' else
-                        ['Bedienung', 'Ausgänge', 'Verhalten', 'Routing'])
+            required = (['Overview', 'Inputs', 'Outputs', 'Behavior', 'Mute', 'Insertion', 'Delayable']
+                        if language == 'en' else
+                        ['Übersicht', 'Eingänge', 'Ausgänge', 'Verhalten', 'Mute', 'Einfügen', 'Delayable'])
             headings = re.findall(r'^## (.+)$', text, flags=re.MULTILINE)
             if headings != required:
                 raise ValueError(f'Unexpected node reference sections: {page}: {headings}')
-            expected = ([['Parameter', 'Setting', 'Signal / condition'], ['Output', 'Signal'], ['Function', 'Behavior']]
+            expected = ([['Name', 'Data type', 'Editor range', 'Signal range', 'Default', 'Unit', 'Rate', 'Visibility'],
+                         ['Name', 'Data type', 'Range', 'Rate', 'Channel'],
+                         ['Mutable', 'Input', 'Output'], ['Input', 'Output'], ['Sample-wise feedback']]
                         if language == 'en' else
-                        [['Parameter', 'Einstellung', 'Signal / Bedingung'], ['Ausgang', 'Signal'], ['Funktion', 'Verhalten']])
-            for heading, columns in zip([required[i] for i in (0, 1, 3)], expected):
+                        [['Bezeichnung', 'Datentyp', 'Reglerbereich', 'Signalbereich', 'Standardwert', 'Einheit', 'Rate', 'Sichtbarkeit'],
+                         ['Bezeichnung', 'Datentyp', 'Wertebereich', 'Rate', 'Kanal'],
+                         ['Mutable', 'Eingang', 'Ausgang'], ['Eingang', 'Ausgang'], ['Sampleweises Feedback']])
+            for heading, columns in zip([required[i] for i in (1, 2, 4, 5, 6)], expected):
                 section = re.search(r'^## ' + re.escape(heading) + r'\n(.*?)(?=^## |\Z)', text,
                                     flags=re.MULTILINE | re.DOTALL)[1]
                 rows = [line.strip().strip('|').split('|') for line in section.splitlines() if line.startswith('|')]

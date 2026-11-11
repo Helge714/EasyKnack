@@ -18,6 +18,6 @@ Mute follows the node: effects may bypass, generators become silent, resources m
 
 Feedback requires a protecting delay and supported processors. Very short delays increase work. Bypassing the only delay can disable the return connection with a warning.
 
-Editor bounds do not automatically constrain connected signals. In short references, ±∞ means arbitrary finite values, not acceptance of Infinity or NaN. An omitted insertion or sample-feedback routing row means that feature is unsupported.
+Editor bounds do not automatically constrain connected signals. In node references, ±∞ means arbitrary finite values, not acceptance of Infinity or NaN.
 
 [Manual](index.md) · [Node index](../../nodes/en/index.md) · [Deutsch](../de/signals.md)

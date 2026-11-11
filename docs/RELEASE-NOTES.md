@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Consolidate the user manual into twelve concise German/English chapters and shorten every cataloged node reference; keep old guide links through forwarding pages. Help now opens the independently selected manual language.
+- Consolidate workflow guides into twelve concise German/English chapters; retain the detailed bilingual node tables and keep old workflow links through forwarding pages. Help now opens the independently selected manual language.
 - Standardize visible Multiple Group naming as Instance Group (Instanzgruppe); saved document identifiers and plugin/audio contracts remain unchanged.
 
 - Add a persisted documentation-language selector in the native help viewer (Same as application, Deutsch, English). Local links, reference/index actions and reopened help follow this preference independently of the UI language; untranslated pages use a visible English fallback.

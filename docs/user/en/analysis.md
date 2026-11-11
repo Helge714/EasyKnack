@@ -19,6 +19,6 @@ Export offers CSV and images from a captured snapshot. CSV contains measurement 
 
 ## Finite measurements
 
-**Value Average** averages numbers; **Analysis Average** spectra or autocorrelation. Start triggers a finite measurement window, Finished marks completion, and the result stays held. Spectral averaging uses power rather than averaging arbitrary phases. **Measurement Recorder** collects series for export. Node short references explain the individual measurement modes and limits.
+**Value Average** averages numbers; **Analysis Average** spectra or autocorrelation. Start triggers a finite measurement window, Finished marks completion, and the result stays held. Spectral averaging uses power rather than averaging arbitrary phases. **Measurement Recorder** collects series for export. Node references explain the individual measurement modes and limits.
 
 [Manual](index.md) · [Node index](../../nodes/en/index.md) · [Deutsch](../de/analysis.md)

@@ -1,38 +1,48 @@
 # Kurvenabbildung (Curve Mapping)
-Bildet Werte durch eine editierbare Kurve ab.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Kurve (Curve) | Kurveneditor; Standard: Identität | Editor |
-| Außerhalb des Bereichs (Outside range) | Begrenzen, Linear fortsetzen; Standard: Begrenzen | Editor |
-| Rate | Auto, Audio, Control; Standard: Auto | Editor; Inspektor |
-| Wert (Value) | ±1 000 000; Standard: 0 | Wert; ±∞; Auto |
-| Eingangsminimum (Input min) | ±1 000 000; Standard: 0 | Wert |
-| Eingangsmaximum (Input max) | ±1 000 000; Standard: 1 | Wert |
-| Ausgangsminimum (Output min) | ±1 000 000; Standard: 0 | Wert |
-| Ausgangsmaximum (Output max) | ±1 000 000; Standard: 1 | Wert |
+## Übersicht
+
+Bildet Werte durch eine editierbare Kurve ab.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Kurve (Curve) | [Editor](../../user/de/reference-tables.md) | Kurveneditor | — | Identität | — | — | Immer |
+| Außerhalb des Bereichs (Outside range) | [Editor](../../user/de/reference-tables.md) | Begrenzen, Linear fortsetzen | — | Begrenzen | — | — | Immer |
+| Rate | [Editor](../../user/de/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspektor |
+| Wert (Value) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | ±∞ | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Eingangsminimum (Input min) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 0 | — | — | Immer |
+| Eingangsmaximum (Input max) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 1 | — | — | Immer |
+| Ausgangsminimum (Output min) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 0 | — | — | Immer |
+| Ausgangsmaximum (Output max) | [Wert](../../user/de/data-types.md#value) | ±1 000 000 | — | 1 | — | — | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Ausgang (Out) | Wert; ±1e12 |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Ausgang (Out) | [Wert](../../user/de/data-types.md#value) | ±1e12 | [Auto](../../user/de/rates.md#auto) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
+
 Normiert den Eingang anhand Input min/max, liest die Kurve und skaliert auf Output min/max. Clamp hält außerhalb des Quellbereichs die Kurvenendwerte; Linear extension setzt die Randsteigungen fort. Ein Quellbereich der Breite null liefert Output min. Unterstützt Bézier-Kontrollpunkte und die direkte Verwendung in Spectral Groups.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Wert (Value) → Ausgang (Out) |
-| Einfügen | Wert (Value) → Ausgang (Out) |
-| Sample-Feedback | Unterstützt |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | Wert (Value) | Ausgang (Out) |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| Wert (Value) | Ausgang (Out) |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/curve-mapping.md)

@@ -106,8 +106,8 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   help from node/group context menus and Help. Verify portable HTML links, anchors,
   escaping and public-node coverage. Consolidate six replaced legacy references,
   keeping forwarding paths and archived originals; retain workflow guides.
-- [x] Consolidate user documentation into twelve bilingual chapters and compact
-  node references; retain legacy links and use Instance Group consistently.
+- [x] Consolidate workflow documentation into twelve bilingual chapters; preserve
+  detailed node references, retain legacy links and use Instance Group consistently.
 - [ ] Add plugin documentation discovery/manifest paths and validation. Retain
   manual tables; consolidate overlapping spectral workflow guides separately.
 - [x] Preload parsed documentation and prepare its theme-dependent font atlases

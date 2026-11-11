@@ -1,35 +1,47 @@
 # Hüllkurve (Envelope)
-Erzeugt eine kurvenförmige Hüllkurve aus Gate und Trigger.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Hüllkurve (Envelope) | Kurveneditor; Standard: ADSR | Editor |
-| Gate | 0–1; Standard: 0 | Wert; ±∞; Audio |
-| Trigger | Button | Trigger; Trigger |
-| Attack + Decay | 0–60 000 ms; Standard: 300 ms; ms, s, smp | Wert; 0–60 000 ms; Auto |
-| Ausklingen (Release) | 0–60 000 ms; Standard: 300 ms; ms, s, smp | Wert; 0–60 000 ms; Auto |
-| Halteposition (Sustain position) | 0.01–0.99; Standard: 0.5 | Wert; 0.01–0.99; Auto |
-| Halten (Hold) | Aus / An; Standard: An | Editor |
+## Übersicht
+
+Erzeugt eine kurvenförmige Hüllkurve aus Gate und Trigger.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hüllkurve (Envelope) | [Editor](../../user/de/reference-tables.md) | Kurveneditor | — | ADSR | — | — | Immer |
+| Gate | [Wert](../../user/de/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
+| Trigger | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
+| Attack + Decay | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Ausklingen (Release) | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Halteposition (Sustain position) | [Wert](../../user/de/data-types.md#value) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Halten (Hold) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | An | — | — | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Hüllkurve (Envelope) | Wert; 0–1; Audio |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Hüllkurve (Envelope) | [Wert](../../user/de/data-types.md#value) | 0–1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
+
 Ein Gate-Anstieg über 0 oder ein Trigger startet Attack/Decay. Die Halteposition teilt die Kurve in Attack/Decay und Release. Bei Hold hält ein positives Gate den Sustainwert; das Loslassen startet Release vom aktuellen Pegel. Ohne Hold folgt Release automatisch auf Attack/Decay. Retrigger beginnen beim aktuellen Hüllkurvenpegel. Das Ergebnis ist auf 0–1 begrenzt.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Kein Bypass |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | — | — |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/envelope.md)

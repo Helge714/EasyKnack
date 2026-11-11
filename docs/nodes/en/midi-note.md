@@ -1,35 +1,47 @@
 # MIDI Note
-Converts MIDI notes into per-voice frequency, gate, velocity and triggers.
-<a id="overview"></a>
-<a id="inputs"></a>
-<a id="mute"></a>
-<a id="insertion"></a>
-<a id="delayable"></a>
 
-## Controls
-| Parameter | Setting | Signal / condition |
-| --- | --- | --- |
-| MIDI | — | MIDI; MIDI events; MIDI |
-| Channel (0 = all) | 0–16; Default: 0 | Editor |
-| Voices | 1–32; Default: 1 | Editor |
-| Pitch bend | 0–48 st; Default: 2 st; cent, st, oct, Factor | Editor |
+## Overview
+
+Converts MIDI notes into per-voice frequency, gate, velocity and triggers.
+
+## Inputs
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| MIDI | [MIDI](../../user/en/data-types.md#midi) | — | MIDI events | — | — | [MIDI](../../user/en/rates.md) | Always |
+| Channel (0 = all) | [Editor](../../user/en/reference-tables.md) | 0–16 | — | 0 | — | — | Always |
+| Voices | [Editor](../../user/en/reference-tables.md) | 1–32 | — | 1 | — | — | Always |
+| Pitch bend | [Editor](../../user/en/reference-tables.md) | 0–48 st | — | 2 st | [cent](../../user/en/units.md), [st](../../user/en/units.md), [oct](../../user/en/units.md), [Factor](../../user/en/units.md) | — | Always |
 
 ## Outputs
-| Output | Signal |
-| --- | --- |
-| Frequency | Value; > 0 Hz; Audio |
-| Gate | Value; 0–1; Audio |
-| Trigger | Trigger |
-| Velocity | Value; 0–1; Audio |
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Frequency | [Value](../../user/en/data-types.md#value) | > 0 Hz | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Gate | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Trigger | [Trigger](../../user/en/data-types.md#trigger) | — | [Trigger](../../user/en/rates.md#trigger) | [Auto](../../user/en/data-types.md#channels) |
+| Velocity | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
+
 Frequency = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate is 1 while a note is held, including sustain. Velocity is note-on velocity/127 and becomes 0 on release. Frequency retains the last pitch on release. Each note-on emits a Trigger. One voice uses last-note priority with held-note fallback; polyphony assigns separate voices and steals the oldest held voice when full. Use [Voice Merge](voice-merge.md) to combine them before shared effects; an Audio Output also merges voices.
 
-## Routing
-| Function | Behavior |
-| --- | --- |
-| Mute | No bypass |
+## Mute
 
-[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
+| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Yes | — | — |
+
+## Insertion
+
+| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
+| --- |
+| Not supported |
 
 [Node index](index.md) · [Deutsch](../de/midi-note.md)

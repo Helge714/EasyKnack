@@ -1,29 +1,43 @@
 # Teiltöne zu Spektrum
-Erzeugt aus Teiltönen ein komplexes Spektrum für IFFT.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Teiltöne (Partials) | — | Partials; Control |
+## Übersicht
+
+Erzeugt aus Teiltönen ein komplexes Spektrum für IFFT.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Teiltöne (Partials) | [Partials](../../user/de/data-types.md#partials) | — | — | — | — | [Control](../../user/de/rates.md#control) | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Spektrum (Spectrum) | Spectrum; Control |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Spektrum (Spectrum) | [Spectrum](../../user/de/data-types.md#spectrum) | — | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
+
 Rekonstruiert positive und negative Frequenzanteile mit der Fensterfunktion der Analyse. Frequenzänderungen werden zwischen Frames in eine kontinuierliche Phasenkorrektur integriert. Frequenzen außerhalb 0–Nyquist und nichtpositive Amplituden werden verworfen. Unveränderte Teiltöne und der zugehörige Rest ergeben wieder das ursprüngliche Spektrum. Die Keulenberechnung ist auf acht Fenster-Bins je Seite begrenzt; verbleibende Originalausläufer liegen im Rest.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Kein Bypass |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | — | — |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
+
+[Teiltonanalyse](partial-analysis.md) · [Spektrummathematik](spectrum-math.md) · [Teilton-Kontext](partial-context.md) · [Teilton-Ausgang](partial-output.md) · [Teilton-Gruppe](partial-group.md)
 
 [English](../en/partials-to-spectrum.md)

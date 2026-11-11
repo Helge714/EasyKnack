@@ -1,6 +1,6 @@
 # Node-Verzeichnis
 
-[Handbuch](../../user/de/index.md) · [English](../en/index.md)
+[Grundlagen](../../user/de/index.md) · [English](../en/index.md)
 
 ## Eingänge
 

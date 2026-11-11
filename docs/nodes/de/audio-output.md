@@ -1,35 +1,47 @@
 # Audio-Ausgang (Audio Output)
-Sendet Audio an ein Ausgabegerät.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Audio-Eingang (Audio In) | — | Audio; ±∞; Audio |
-| Gerät (Device) | Verfügbare Ausgabegeräte; Standard: Standardgerät | Editor |
-| Gerätelautstärke (Device volume) | 0–100 %; Standard: Aktuelle Windows-Lautstärke; % | Editor; Windows-Ausgang |
-| Lautstärketasten koppeln (Link volume keys) | Aus / Ein; Standard: Aus | Editor; Windows-Ausgang |
-| Signal | Pegelanzeige | Editor; Windows-Ausgang |
+## Übersicht
+
+Sendet Audio an ein Ausgabegerät.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Audio-Eingang (Audio In) | [Audio](../../user/de/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/de/rates.md#audio) | Immer |
+| Gerät (Device) | [Editor](../../user/de/reference-tables.md) | Verfügbare Ausgabegeräte | — | Standardgerät | — | — | Immer |
+| Gerätelautstärke (Device volume) | [Editor](../../user/de/reference-tables.md) | 0–100 % | — | Aktuelle Windows-Lautstärke | [%](../../user/de/units.md) | — | Windows-Ausgang |
+| Lautstärketasten koppeln (Link volume keys) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Windows-Ausgang |
+| Signal | [Editor](../../user/de/reference-tables.md) | Pegelanzeige | — | — | — | — | Windows-Ausgang |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| — | — |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| — | — | — | — | — |
 
 ## Verhalten
+
 MIDI-Stimmen werden automatisch summiert. Gerätelautstärke steuert den Windows-Endpunkt und übernimmt externe Änderungen; sie ist kein zusätzlicher Signal-Gain. Gekoppelte Lautstärketasten verändern die gewählten Endpunkte proportional. Mute unterdrückt das EasyKnack-Signal, ohne das Windows-Gerät stummzuschalten.
 
 Gekoppelte Lautstärketasten zeigen kurz eine Einblendung auf dem Desktop, auch über anderen Programmen. Bei mehreren gekoppelten Ausgängen entspricht die Prozentanzeige dem höchsten Ausgangspegel; die relativen Lautstärkeverhältnisse bleiben erhalten.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Kein Bypass |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | — | — |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/audio-output.md)

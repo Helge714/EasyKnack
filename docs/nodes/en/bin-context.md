@@ -1,36 +1,48 @@
 # Bin Context
-Exposes the current bin of a Spectral Group.
-<a id="overview"></a>
-<a id="inputs"></a>
-<a id="mute"></a>
-<a id="insertion"></a>
-<a id="delayable"></a>
 
-## Controls
-| Parameter | Setting | Signal / condition |
-| --- | --- | --- |
-| Spectrum | — | Spectrum resource; Control |
+## Overview
+
+Exposes the current bin of a Spectral Group.
+
+## Inputs
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Spectrum | [Spectrum resource](../../user/en/data-types.md#spectrum) | — | — | — | — | [Control](../../user/en/rates.md#control) | Always |
 
 ## Outputs
-| Output | Signal |
-| --- | --- |
-| Real | Value; ±∞; Audio (bin/frame) |
-| Imaginary | Value; ±∞; Audio (bin/frame) |
-| Magnitude | Value; 0–∞; Audio (bin/frame) |
-| Phase | Value; ±π rad; Audio (bin/frame) |
-| Frequency | Value; 0–fs/2 Hz; Audio (bin/frame) |
-| Bin index | Value; 0–N/2; Audio (bin/frame) |
-| Position | Value; 0–1; Audio (bin/frame) |
-| Frame time | Value; ±∞ s; Audio (bin/frame) |
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Real | [Value](../../user/en/data-types.md#value) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Imaginary | [Value](../../user/en/data-types.md#value) | ±∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Magnitude | [Value](../../user/en/data-types.md#value) | 0–∞ | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Phase | [Value](../../user/en/data-types.md#value) | ±π rad | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Frequency | [Value](../../user/en/data-types.md#value) | 0–fs/2 Hz | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Bin index | [Value](../../user/en/data-types.md#value) | 0–N/2 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Position | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
+| Frame time | [Value](../../user/en/data-types.md#value) | ±∞ s | [Audio (bin/frame)](../../user/en/rates.md) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
+
 Only valid inside a [Spectral Group](spectral-group.md). For FFT size N, bin k has frequency `k × fs/N` and Position `k/(N/2)`. Real/Imaginary and Magnitude are raw complex FFT coefficients, not normalized amplitudes. Frame time is the window start, which can initially be negative due to zero padding. The displayed Audio rate denotes a bin vector evaluated per frame here, not temporal audio.
 
-## Routing
-| Function | Behavior |
-| --- | --- |
-| Mute | Not mutable |
+## Mute
 
-[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
+| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- | --- |
+| No | — | — |
+
+## Insertion
+
+| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
+| --- |
+| Not supported |
 
 [Node index](index.md) · [Deutsch](../de/bin-context.md)

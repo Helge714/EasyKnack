@@ -1,35 +1,46 @@
 # Digital Noise (Digital Noise)
-Erzeugt zyklusbasierte zufällige Frequenzmodulation.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Frequenz (Frequency) | 1e-5–20 000 Hz; Standard: 440 Hz; Hz, kHz | Wert; 0–20 000 Hz; Auto |
-| Stärke (Strength) | 0–1; Standard: 0 | Wert; 0–1; Auto |
-| Verteilung (Distribution) | Gleichverteilt, Gauß; Standard: Gleichverteilt | Editor |
-| Startwert (Seed) | −1–16 777 215; Standard: −1 | Wert; −1–16 777 215, gerundet; Control |
+## Übersicht
+
+Erzeugt zyklusbasierte zufällige Frequenzmodulation.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | 1e-5–20 000 Hz | 0–20 000 Hz | 440 Hz | [Hz](../../user/de/units.md#frequency), [kHz](../../user/de/units.md#frequency) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Stärke (Strength) | [Wert](../../user/de/data-types.md#value) | 0–1 | 0–1 | 0 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Verteilung (Distribution) | [Editor](../../user/de/reference-tables.md) | Gleichverteilt, Gauß | — | Gleichverteilt | — | — | Immer |
+| Startwert (Seed) | [Wert](../../user/de/data-types.md#value) | −1–16 777 215 | −1–16 777 215, gerundet | −1 | — | [Control](../../user/de/rates.md#control) | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Faktor (Factor) | Wert; 2^(−s)–2^s; Audio |
-| Trigger | Trigger |
-| Frequenz (Frequency) | Wert; f × Factor; Audio |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Faktor (Factor) | [Wert](../../user/de/data-types.md#value) | 2^(−s)–2^s | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Trigger | [Trigger](../../user/de/data-types.md#trigger) | — | [Trigger](../../user/de/rates.md#trigger) | [Auto](../../user/de/data-types.md#channels) |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | f × Factor | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
+
 Factor wird über einen selbstmodulierten Zyklus gehalten; Frequency liefert `f × Factor`. Stärke `s` begrenzt die Oktavabweichung auf `±s`. Gauß verwendet die Standardabweichung `s/3`, begrenzt auf `±s`. Die Ziehung berücksichtigt die Zyklusdauer, damit zeitgewichtete Oktavabweichungen symmetrisch sind. Der arithmetische Hz-Mittelwert bleibt dadurch nicht konstant. Stärke 0 ergibt Faktor 1 und reicht Frequency unverändert durch. Trigger markiert eine neue Ziehung. Seed entspricht [Rauschen](noise.md).
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Kein Bypass |
-| Sample-Feedback | Unterstützt |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | — | — |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/digital-noise.md)

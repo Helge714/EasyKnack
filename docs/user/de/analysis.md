@@ -19,6 +19,6 @@ Export bietet CSV und Bilder aus einem festgehaltenen Snapshot. CSV enthält Mes
 
 ## Endliche Messungen
 
-**Value Average** mittelt Zahlen; **Analysis Average** Spektren oder Autokorrelation. Start triggert ein endliches Messfenster, Finished meldet das Ende, das Ergebnis bleibt stehen. Spektrale Mittelung erfolgt auf Leistung, nicht durch Mittelung beliebiger Phasen. **Measurement Recorder** sammelt Messreihen zum Export. Die Node-Kurzreferenzen erklären die jeweiligen Messmodi und Grenzen.
+**Value Average** mittelt Zahlen; **Analysis Average** Spektren oder Autokorrelation. Start triggert ein endliches Messfenster, Finished meldet das Ende, das Ergebnis bleibt stehen. Spektrale Mittelung erfolgt auf Leistung, nicht durch Mittelung beliebiger Phasen. **Measurement Recorder** sammelt Messreihen zum Export. Die Node-Referenzen erklären die jeweiligen Messmodi und Grenzen.
 
 [Handbuch](index.md) · [Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/analysis.md)

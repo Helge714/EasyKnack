@@ -1,30 +1,31 @@
 # Audioaufnahme (Audio Recorder)
-Nimmt triggergesteuerte Audiodurchläufe als WAV- oder MP3-Dateien auf.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Aufnahmedatei (Recording file) | WAV- / MP3-Ziel; Standard: Keines | Editor |
-| Aufnahmestatus (Recording status) | Bereit / Aufnahme / Gespeichert / Fehler; Standard: Bereit; s | Editor |
-| Kanäle (Channels) | Mono / Stereo; Standard: Stereo | Editor |
-| Überschreiben (Overwrite) | Aus / Ein; Standard: Aus | Editor |
-| Indexstellen (Index digits) | 1–12; Standard: 4 | Editor; Inspektor; bei Überschreiben deaktiviert |
-| Aufnahme speichern unter (Save recording as) | Speicherdialog; Standard: Deaktiviert | Editor; Inspektor; abgeschlossene Aufnahme erforderlich |
-| Audioeingang (Audio In) | Standard: 0 | Audio; ±∞; Audio |
-| Start (Start) | Button | Trigger; Trigger; Trigger |
-| Stopp (Stop) | Button | Trigger; Trigger; Trigger |
+## Übersicht
+
+Nimmt triggergesteuerte Audiodurchläufe als WAV- oder MP3-Dateien auf.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Aufnahmedatei (Recording file) | [Editor](../../user/de/reference-tables.md) | WAV- / MP3-Ziel | — | Keines | — | — | Immer |
+| Aufnahmestatus (Recording status) | [Editor](../../user/de/reference-tables.md) | Bereit / Aufnahme / Gespeichert / Fehler | — | Bereit | s | — | Immer |
+| Kanäle (Channels) | [Editor](../../user/de/reference-tables.md) | Mono / Stereo | — | Stereo | — | — | Immer |
+| Überschreiben (Overwrite) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Immer |
+| Indexstellen (Index digits) | [Editor](../../user/de/reference-tables.md) | 1–12 | — | 4 | — | — | Inspektor; bei Überschreiben deaktiviert |
+| Aufnahme speichern unter (Save recording as) | [Editor](../../user/de/reference-tables.md) | Speicherdialog | — | Deaktiviert | — | — | Inspektor; abgeschlossene Aufnahme erforderlich |
+| Audioeingang (Audio In) | [Audio](../../user/de/data-types.md#audio) | — | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
+| Start (Start) | [Trigger](../../user/de/data-types.md#trigger) | Button | Trigger | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
+| Stopp (Stop) | [Trigger](../../user/de/data-types.md#trigger) | Button | Trigger | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| — | — |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| — | — | — | — | — |
 
 ## Verhalten
+
 Start nimmt das auslösende Sample bereits auf; Stopp beendet die Aufnahme vor diesem Sample. Weitere Start-Trigger während der Aufnahme werden ignoriert. Bei gleichzeitigen Triggern hat Stopp Vorrang. Der Audiohost muss laufen. Host-Stopp und Entfernen des Nodes schließen die Aufnahme ab.
 
 WAV speichert 32-Bit-Fließkommawerte mit der Host-Samplerate. Stereo erhält beide Kanäle, Mono mittelt links und rechts. Polyphone Stimmen werden addiert. Ohne Überschreiben erzeugt `Take.wav` die Datei `Take_0001.wav`, danach den nächsten freien Index. Indexstellen legt nur die Mindestbreite fest; größere Indizes bleiben möglich. Überschreiben ersetzt bei jeder neuen Aufnahme die gewählte Datei.
@@ -33,11 +34,22 @@ Ein Hintergrundthread schreibt aus einer begrenzten Warteschlange. Ist der Daten
 
 Aufnahme speichern unter exportiert eine abgeschlossene Aufnahme im aufgenommenen Format. Das automatische Aufnahmeziel bleibt erhalten. Ohne fertiggestellte Audiodaten ist der Button deaktiviert. Änderungen an Aufnahmeziel, Format oder Kanälen schließen den aktuellen Durchlauf ab.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Kein Bypass |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | — | — |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| — | — |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/audio-recorder.md)

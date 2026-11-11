@@ -1,37 +1,47 @@
 # Mix
-Crossfades between two numeric signals.
-<a id="overview"></a>
-<a id="inputs"></a>
-<a id="mute"></a>
-<a id="insertion"></a>
-<a id="delayable"></a>
 
-## Controls
-| Parameter | Setting | Signal / condition |
-| --- | --- | --- |
-| Mode | Linear, Equal Power; Default: Linear | Editor |
-| Factor | 0–1 ×; Default: 0.5 ×; ×, % | Value; 0–1 ×; Auto |
-| A | ±∞; Default: 0 | Value; ±∞; Auto |
-| B | ±∞; Default: 0 | Value; ±∞; Auto |
-| Rate | Auto, Audio, Control; Default: Auto | Editor; Inspector |
+## Overview
+
+Crossfades between two numeric signals.
+
+## Inputs
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Mode | [Editor](../../user/en/reference-tables.md) | Linear, Equal Power | — | Linear | — | — | Always |
+| Factor | [Value](../../user/en/data-types.md#value) | 0–1 × | 0–1 × | 0.5 × | [×](../../user/en/units.md), [%](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+| A | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+| B | [Value](../../user/en/data-types.md#value) | ±∞ | ±∞ | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+| Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
 
 ## Outputs
-| Output | Signal |
-| --- | --- |
-| Out | Value; ±∞ |
+
+| [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Out | [Value](../../user/en/data-types.md#value) | ±∞ | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
+
 Connecting a new wire to occupied A or B moves the previous wire to the other input when it is free and compatible. Otherwise the previous wire is replaced.
 
 Linear: `y = (1−t)A + tB`. Equal Power: `y = cos(πt/2)A + sin(πt/2)B`, with t clamped to 0–1. Equal Power preserves expected power for uncorrelated signals; identical inputs can gain about 3 dB at the midpoint. Linear preserves identical-input level.
 
-## Routing
-| Function | Behavior |
-| --- | --- |
-| Mute | A → Out |
-| Insertion | A → Out |
-| Sample feedback | Supported |
+## Mute
 
-[Signals and Mute](../../user/en/signals.md) · [Manual](../../user/en/index.md)
+| [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Yes | A | Out |
+
+## Insertion
+
+| [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
+| --- | --- |
+| A | Out |
+
+## Delayable
+
+| [Sample-wise feedback](../../user/en/reference-tables.md#feedback) |
+| --- |
+| Supported |
 
 [Node index](index.md) · [Deutsch](../de/mix.md)

@@ -1,37 +1,46 @@
 # Instanzgruppe (Instance Group)
-Führt einen internen Graphen für mehrere unabhängige Instanzen aus.
-<a id="ubersicht"></a>
-<a id="eingange"></a>
-<a id="mute"></a>
-<a id="einfugen"></a>
-<a id="delayable"></a>
 
-## Bedienung
-| Parameter | Einstellung | Signal / Bedingung |
-| --- | --- | --- |
-| Anzahl (Count) | 0–256, ganzzahlig; Standard: 8 | Wert; 0–Maximum, abgerundet; Control |
-| Frequenz (Frequency) | ±∞; Standard: 220 | Wert; ±∞; Auto |
-| Maximum (Maximum) | 1–256; Standard: 16 | Wert; Inspektor |
-| Allgemein / IO / Editoren (General / IO / Editors) | Gruppendefiniert | Editor; Inspektor |
+## Übersicht
+
+Führt einen internen Graphen für mehrere unabhängige Instanzen aus.
+
+## Eingänge
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Anzahl (Count) | [Wert](../../user/de/data-types.md#value) | 0–256, ganzzahlig | 0–Maximum, abgerundet | 8 | — | [Control](../../user/de/rates.md#control) | Immer |
+| Frequenz (Frequency) | [Wert](../../user/de/data-types.md#value) | ±∞ | ±∞ | 220 | — | [Auto](../../user/de/rates.md#auto) | Immer |
+| Maximum (Maximum) | [Wert](../../user/de/data-types.md#value) | 1–256 | — | 16 | — | — | Inspektor |
+| Allgemein / IO / Editoren (General / IO / Editors) | [Editor](../../user/de/reference-tables.md) | Gruppendefiniert | — | — | — | — | Inspektor |
 
 ## Ausgänge
-| Ausgang | Signal |
-| --- | --- |
-| Ausgang (Out) | Audio; ±∞ |
+
+| [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Wertebereich](../../user/de/reference-tables.md#range) | [Rate](../../user/de/rates.md) | [Kanal](../../user/de/data-types.md#channels) |
+| --- | --- | --- | --- | --- |
+| Ausgang (Out) | [Audio](../../user/de/data-types.md#audio) | ±∞ | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
-[Anleitung](../../user/de/instance-group.md)
 Count kann über einen kopierten Slider-Editor an einer umschließenden normalen Gruppe bereitgestellt werden. Der äußere Port bleibt ein gewöhnlicher, bearbeitbarer Gruppeneingang; die feste Count-Sonderrolle gehört zur Instance Group selbst.
 
 Der Anfangsgraph erzeugt harmonische Oszillatoren und einen [Instance Merge](instance-merge.md); Frequency ist sein anfänglicher öffentlicher Parameter, kein dauerhaft vorgeschriebener Port. Jede Instanz besitzt eigenen DSP-Zustand. [Instance Context](instance-context.md) liefert Index, Count, Position und Seed. Maximum reserviert Zustand/Speicher; Count wählt die aktive Anzahl und ist kein gewöhnlicher Group-IO-Port. Mehrere Merge-Zweige und gemeinsame Verarbeitung danach sind möglich. Verschachtelte Instanz-/Spektralgruppen werden unterstützt. Öffentliche Eingänge erlauben Zahlen, Buffer, Vector, Wavetable und Spectrum; Ausgänge derzeit Zahlen oder Spectrum. MIDI und andere Ressourcengrenzen werden nicht unterstützt. Beide Buffer Reader werden unterstützt. Externe Buffer werden gemeinsam gelesen; jede Instanz behält ihren eigenen Wiedergabezustand. Interne Live-Buffer besitzen pro Instanz eigenen Speicher. Gleiche Generatoren können Arbeit teilen, solange Kontext und Verlauf gleich bleiben.
 
-## Routing
-| Funktion | Verhalten |
-| --- | --- |
-| Mute | Gewählter Gruppeneingang (Configured group input) → Gewählter Gruppenausgang (Configured group output) |
-| Einfügen | Gewählter Gruppeneingang (Configured group input) → Gewählter Gruppenausgang (Configured group output) |
+## Mute
 
-[Grundlagen und Mute](../../user/de/signals.md) · [Handbuch](../../user/de/index.md)
+| [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- | --- |
+| Ja | Gewählter Gruppeneingang (Configured group input) | Gewählter Gruppenausgang (Configured group output) |
+
+## Einfügen
+
+| [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
+| --- | --- |
+| Gewählter Gruppeneingang (Configured group input) | Gewählter Gruppenausgang (Configured group output) |
+
+## Delayable
+
+| [Sampleweises Feedback](../../user/de/reference-tables.md#feedback) |
+| --- |
+| Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/instance-group.md)

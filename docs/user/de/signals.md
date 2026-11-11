@@ -18,6 +18,6 @@ Mute folgt dem Node: Effekte können durchreichen, Generatoren verstummen, Resso
 
 Feedback braucht einen schützenden Delay und unterstützte Prozessoren. Sehr kurze Delays erhöhen den Aufwand. Wird der einzige Delay umgangen, kann die Rückverbindung mit einer Warnung deaktiviert werden.
 
-Reglergrenzen sind nicht automatisch Grenzen verbundener Signale. In Kurzreferenzen bedeutet ±∞ beliebige endliche Werte, nicht die Annahme von Infinity oder NaN. Fehlt im Routing eine Einfüge- oder Sample-Feedback-Zeile, wird diese Funktion nicht unterstützt.
+Reglergrenzen sind nicht automatisch Grenzen verbundener Signale. In Node-Referenzen bedeutet ±∞ beliebige endliche Werte, nicht die Annahme von Infinity oder NaN.
 
 [Handbuch](index.md) · [Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/signals.md)
