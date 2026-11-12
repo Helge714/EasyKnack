@@ -1,6 +1,27 @@
 # Release notes
 
-## Unreleased — 0.1.0 planned
+## 0.1.0 - 2026-11-12
+
+First Windows x64 release. Requires a separately installed Windows x64 JDK 25
+(including javac); setup checks it and offers assistance. The installer is
+unsigned. Build identifiers explicitly identify this as a local, manually built
+release, not an official CI run.
+
+- Visual audio graphs with Instance, Spectral and Partial Groups, Formula,
+  spectral analysis/synthesis, MIDI and native Bake/source-plugin workflows.
+- Bilingual offline manuals and detailed node references, with independent
+  documentation language selection.
+- Background startup preparation, one setup window, compiler archive installation
+  and repair/uninstall support.
+- Experimental algorithms remain opt-in per document; Pitch Hold accuracy is
+  not guaranteed. Real-device and clean-machine acceptance limits accompany
+  the downloadable validation report.
+
+Compatibility: this first 0.x release includes earlier pre-release contract and
+Complex Oscillator stretch changes described below. Preserve old documents and
+rebuild/re-export older Bakes and source plugins with the matching application.
+
+### Changes included in this first release
 
 - Package the installer compiler as one verified archive, with build-time disk
   costing, repair and transactional publication. Prepare extraction before
@@ -26,7 +47,7 @@
 - Unify the Windows EXE installer into one setup window for license, options,
   progress, repair/removal and application launch. Hide the nested MSI wizard and
   its Apps entry; retain standalone MSI UI. Preserve shortcut/folder choices and
-  close setup when launching EasyKnack. Slow MSI file costing remains unchanged.
+  close setup when launching EasyKnack. Compiler archive packaging reduces MSI costing.
 
 - Show a nonblocking loading state when help or Formula is opened before
   background preparation completes, then reveal the requested content automatically.

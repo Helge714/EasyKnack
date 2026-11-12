@@ -2,11 +2,13 @@
 
 ## Version baseline
 
-On 2026-11-12 the first intended EasyKnack release was explicitly set to `0.1.0`.
-Development now uses `0.1.0-SNAPSHOT` in Maven; this is a planned release baseline,
-not a published release or an invented history of intermediate versions. It covers
-the accumulated features and intentional pre-release compatibility changes in the
-Unreleased notes. GLSwing remains independently versioned at `0.2.0-SNAPSHOT`.
+The first EasyKnack release is frozen as `0.1.0` on 2026-11-12. It covers the
+accumulated features and intentional pre-release compatibility changes recorded
+in the release notes. GLSwing remains independently versioned at `0.2.0-SNAPSHOT`;
+the package pins and includes its exact reviewed runtime and corresponding sources.
+After freezing this release, ordinary development continues at `0.1.1-SNAPSHOT`.
+The release is manually built with an explicitly local identity; official release
+CI remains future work. Publication status is recorded in the release report.
 
 Assess subsequent changes against the selected release scope: compatible fixes
 require patch releases, compatible features minor releases, and breaking changes

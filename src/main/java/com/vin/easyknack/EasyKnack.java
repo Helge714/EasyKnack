@@ -22,7 +22,7 @@ public final class EasyKnack {
         Runtime.getRuntime().addShutdownHook(new Thread(launches::close, "EasyKnack instance cleanup"));
         GLApplication.builder()
                 .locale(com.vin.easyknack.app.ApplicationSettings.locale())
-                .title(com.vin.easyknack.i18n.AppText.literal("EasyKnack — Audio Workspace"))
+                .title(com.vin.easyknack.i18n.AppText.literal("EasyKnack"))
                 .backend(GLBackend.CANVAS)
                 .splash(splash -> splash.size(560, 392).padding(40))
                 .splashView(ApplicationArtwork::splash)
