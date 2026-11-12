@@ -1,6 +1,12 @@
 # Release notes
 
-## Unreleased
+## Unreleased — 0.1.0 planned
+
+- Establish `0.1.0-SNAPSHOT` as the development version targeting the first
+  EasyKnack release `0.1.0`, covering the accumulated features and compatibility
+  changes below. GLSwing stays independently versioned at `0.2.0-SNAPSHOT`.
+  This version decision does not publish or tag a release; older artifacts retain
+  their original identities.
 
 - Show the current Maven product version for IDE launches alongside `IDE / unpackaged`,
   without reusing stale package identities or allocating a build number.

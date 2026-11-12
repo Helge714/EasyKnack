@@ -1,5 +1,19 @@
 # Build identity (developer reference)
 
+## Version baseline
+
+On 2026-11-12 the first intended EasyKnack release was explicitly set to `0.1.0`.
+Development now uses `0.1.0-SNAPSHOT` in Maven; this is a planned release baseline,
+not a published release or an invented history of intermediate versions. It covers
+the accumulated features and intentional pre-release compatibility changes in the
+Unreleased notes. GLSwing remains independently versioned at `0.2.0-SNAPSHOT`.
+
+Assess subsequent changes against the selected release scope: compatible fixes
+require patch releases, compatible features minor releases, and breaking changes
+minor releases during 0.x development. Changes already covered by the current
+planned version do not trigger another increment per edit or build. Release tags,
+publication and removal of SNAPSHOT remain deliberate release steps.
+
 `mvn package` (also `install` / `deploy`) generates
 `META-INF/easyknack/build.properties` during `prepare-package`. GLSwing independently
 generates `META-INF/glswing/build.properties`. Source versions remain in Maven.

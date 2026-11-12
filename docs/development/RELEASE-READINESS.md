@@ -16,11 +16,12 @@ Latest candidate: [2026-11-11 automated results and remaining acceptance](source
 
 ## Current state
 
-- EasyKnack: `0.0.1-SNAPSHOT`; external GLSwing: `0.2.0-SNAPSHOT` in `pom.xml`.
-  No EasyKnack release tags exist in this local checkout. Retain development
-  versions until the first release baseline is deliberately selected; the absence
-  of local tags does not establish remote publication history. Do not declare 1.0
-  or synchronize the two products' version numbers.
+- EasyKnack: `0.1.0-SNAPSHOT`; external GLSwing: `0.2.0-SNAPSHOT` in `pom.xml`.
+  On 2026-11-12 the first intended EasyKnack release was explicitly set to `0.1.0`.
+  This selects a development/release target, not a publication or tag. The older
+  `0.0.1-SNAPSHOT` candidate evidence remains historical and unchanged; a fresh
+  candidate must be built for the current sources and version. See
+  [version policy](BUILD-IDENTITY.md#version-baseline).
 - Package identity generation and About/diagnostic display already exist. Official
   CI/publication is still pending; there is no `.github` workflow directory.
   An official CI pipeline is required for CI-labelled builds, not for an honestly
@@ -39,7 +40,7 @@ Latest candidate: [2026-11-11 automated results and remaining acceptance](source
 
 | Gate | Evidence / gap | Completion criterion |
 | --- | --- | --- |
-| Freeze scope and identity | Release notes remain Unreleased; no first-release baseline recorded. | Select Windows x64 scope, first version and candidate identity; commit final release notes and exact dependency selection. Preserve every earlier candidate artifact. |
+| Freeze scope and identity | First target `0.1.0` selected on 2026-11-12; development is `0.1.0-SNAPSHOT`. Release notes remain Unreleased. | Freeze Windows x64 scope and candidate identity for `0.1.0`; commit final release notes and exact dependency selection. Preserve every earlier candidate artifact. |
 | Refresh exact Core source evidence | `scripts/sources.lock.json` pins GLSwing runtime SHA-256 `82c0dbbc4561e155fa4c14b227c314a1c22de41a40493c9ac104201383c7766d`; current local Maven JAR is `98b732eff27ff161c48214bc59fe39e4985bd5ee71aeb098096ec46b1bc8e5e4`. October source review is historical evidence. | Capture matching current Core sources, parent/build inputs and runtime; rebuild/compare classes and resources, review changes, then update source/runtime locks. Do not merely replace hashes to pass packaging. Freeze exact candidate bytes even while development uses SNAPSHOT. |
 | Full application/native regression | `package-windows.ps1` runs plain Maven package (`easyknack.test.audio=false`) and builds the host with `-SkipTests`. It does not establish native test coverage. Recent focused UI checks are not a full candidate test run. | Run the Java suite with audio tests enabled against matching host/contracts and compiler, native test executables, and Core tests with OpenGL enabled; record failures, skips, environment and logs. Device-gated tests remain separate. |
 | Fresh package smoke | Existing installers predate this baseline. | Build a fresh EXE and paired source archives; run `test-windows-package.ps1`, including real launcher checks, against that exact image. Check Help/About, examples, offline help, Formula, plugins, Bake, media and null audio. |
