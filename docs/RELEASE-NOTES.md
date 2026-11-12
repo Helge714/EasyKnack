@@ -2,6 +2,12 @@
 
 ## Unreleased — 0.1.0 planned
 
+- Bundle a tested Windows x64 LLVM-MinGW runtime compiler profile instead of the
+  complete multi-architecture/debugger distribution. Keep shared C/C++ headers,
+  x64 libraries, compiler configuration, runtime dependencies and license notices;
+  omit ARM/32-bit targets and Python/LLDB. Formula, Bake and source plugins retain
+  their native x64 compilation path. Covered by 0.1.0 development.
+
 - Wait for forced audio-host termination before releasing its process reference,
   avoiding a Windows directory-lock race when publishing freshly validated Bakes
   and plugins. Covered by the current 0.1.0 development scope.

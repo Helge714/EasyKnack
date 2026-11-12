@@ -146,3 +146,21 @@ The reviewed Windows installer toolchain is pinned to WiX 3.14.1 by component
 hashes in scripts/sources.lock.json. Replacing it requires reviewing its source
 archive/license and updating the lock. Current candidate evidence and outstanding
 clean-machine checks are recorded in development/source-audit/CANDIDATE-2026-11-11.md.
+
+## Packaged compiler profile
+
+`PackageFiles.CopyCompiler` stages a Windows x64 runtime compiler subset of the
+reviewed LLVM-MinGW toolchain. It retains the C/C++ drivers, linker, archive/strip
+utilities, their runtime DLLs, the two Clang target/default configuration files,
+complete shared C/C++ headers, Clang resources, x64 target libraries and vendor
+notices. Source toolchains are never modified. ARM/32-bit targets, Python/LLDB and
+unrelated analysis tools are omitted; the installed toolchain is not a full
+cross-platform development/debugger distribution.
+
+`test-compiler-profile.ps1` checks retention, exclusion and source preservation.
+Formula DLL generation, a real exported plugin and native Bake execution were
+checked against the staged compiler. The installer comparison uses isolated
+products and a no-op application, with equal `MSIFASTINSTALL=7` settings for full
+and reduced packages; install/repair/removal results are recorded separately.
+`measure-installer-toolchain.ps1` reproduces this comparison without modifying the
+installed EasyKnack product. Results and limits: [compiler profile measurement](source-audit/COMPILER-PROFILE-2026-11-12.md).

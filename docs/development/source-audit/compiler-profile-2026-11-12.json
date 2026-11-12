@@ -1,0 +1,215 @@
+{
+  "method": "Single local run, full then reduced; same no-op application and MSIFASTINSTALL=7; clean install then repair then removal. No existing EasyKnack product is modified.",
+  "profiles": [
+    {
+      "profile": "full",
+      "files": 9015,
+      "bytes": 617092086.0,
+      "msiBytes": 145833875,
+      "msiSha256": "183b91bc3e377f1ef2f681862a3f4e2890fc201f9287d58b76b46fef446c5c70"
+    },
+    {
+      "profile": "reduced",
+      "files": 5586,
+      "bytes": 353553895.0,
+      "msiBytes": 81739852,
+      "msiSha256": "93773d3da50c8b309a05ba81d9c9ff660469e2e9292c2cf30f2f21d5465cfdcd"
+    }
+  ],
+  "runs": [
+    {
+      "profile": "full",
+      "operation": "install",
+      "seconds": 40.086,
+      "log": "full/install.log.gz",
+      "costFinalizeMilliseconds": 391,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "InstallFiles",
+          "milliseconds": 4352
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 2155
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 1650
+        },
+        {
+          "action": "CheckJavaBeforeInstall",
+          "milliseconds": 1378
+        },
+        {
+          "action": "CostFinalize",
+          "milliseconds": 391
+        }
+      ]
+    },
+    {
+      "profile": "full",
+      "operation": "repair",
+      "seconds": 127.922,
+      "log": "full/repair.log.gz",
+      "costFinalizeMilliseconds": 85140,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "CostFinalize",
+          "milliseconds": 85140
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 12968
+        },
+        {
+          "action": "InstallFiles",
+          "milliseconds": 7716
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 1378
+        },
+        {
+          "action": "CheckJavaBeforeInstall",
+          "milliseconds": 935
+        }
+      ]
+    },
+    {
+      "profile": "full",
+      "operation": "uninstall",
+      "seconds": 74.704,
+      "log": "full/uninstall.log.gz",
+      "costFinalizeMilliseconds": 4989,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "CostFinalize",
+          "milliseconds": 4989
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 2771
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 1775
+        },
+        {
+          "action": "RemoveFiles",
+          "milliseconds": 947
+        },
+        {
+          "action": "InstallFiles",
+          "milliseconds": 505
+        }
+      ]
+    },
+    {
+      "profile": "reduced",
+      "operation": "install",
+      "seconds": 23.95,
+      "log": "reduced/install.log.gz",
+      "costFinalizeMilliseconds": 228,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "InstallFiles",
+          "milliseconds": 2215
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 1253
+        },
+        {
+          "action": "CheckJavaBeforeInstall",
+          "milliseconds": 1083
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 882
+        },
+        {
+          "action": "CostFinalize",
+          "milliseconds": 228
+        }
+      ]
+    },
+    {
+      "profile": "reduced",
+      "operation": "repair",
+      "seconds": 92.145,
+      "log": "reduced/repair.log.gz",
+      "costFinalizeMilliseconds": 66857,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "CostFinalize",
+          "milliseconds": 66857
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 8952
+        },
+        {
+          "action": "InstallFiles",
+          "milliseconds": 4130
+        },
+        {
+          "action": "CheckJavaBeforeInstall",
+          "milliseconds": 976
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 894
+        }
+      ]
+    },
+    {
+      "profile": "reduced",
+      "operation": "uninstall",
+      "seconds": 47.453,
+      "log": "reduced/uninstall.log.gz",
+      "costFinalizeMilliseconds": 3031,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "CostFinalize",
+          "milliseconds": 3031
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 1660
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 1087
+        },
+        {
+          "action": "RemoveFiles",
+          "milliseconds": 574
+        },
+        {
+          "action": "InstallFiles",
+          "milliseconds": 336
+        }
+      ]
+    }
+  ],
+  "platform": "Windows-11-10.0.26200-SP0",
+  "validation": {
+    "formulaNativeCompiler": "passed",
+    "sourcePluginIntegration": "passed",
+    "initialBakeTest": "Compilation/link/host validation passed; cache publication hit forced-termination race before fix 37951e8. The complete forced-rebuild test was not rerun.",
+    "bakePublicationFollowUp": "Same compiled Bake host validated, immediately moved, loaded and executed with PLAY/STOP after shutdown fix; passed.",
+    "shutdownTests": {
+      "passed": 2,
+      "failed": 0
+    },
+    "profileSelectionChecks": "required files/configuration retained; other targets/debugger omitted; source content preserved; overwrite and nested destination rejected.",
+    "relocation": "Passed after moving the complete reduced profile to a different directory containing spaces; static C++ program using standard library, threads, filesystem, complex numbers and Windows API compiled and ran."
+  },
+  "copyPolicySha256": "95e17c7a0ca8ebf1218d27d19fb3cf0affac6156078f15bbd22a496fc7a7e9d7"
+}

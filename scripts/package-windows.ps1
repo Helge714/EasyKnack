@@ -65,8 +65,8 @@ try {
             Copy-Item -LiteralPath "$root/target/$relative" -Destination "$inputDir/lib"
         }
     } finally { $application.Dispose() }
-    Write-Host 'Bundling compiler, headers, libraries and license notices...'
-    [EasyKnackPackageFiles]::CopyTree($Toolchain, "$inputDir/tools/llvm-mingw")
+    Write-Host 'Bundling the native Windows x64 compiler profile, headers, libraries and license notices...'
+    [EasyKnackPackageFiles]::CopyCompiler($Toolchain, "$inputDir/tools/llvm-mingw")
     # Local LLDB/Python runs can leave bytecode caches in the compiler directory.
     # Remove only generated files inside the newly staged copy, never the source toolchain.
     Remove-CompilerBytecodeCaches "$inputDir/tools/llvm-mingw"
