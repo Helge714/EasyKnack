@@ -32,6 +32,8 @@ Hyperbolische Funktionen: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.
 Definitionsbereiche und nichtendliche Ergebnisse; Oversampling erfolgt nicht automatisch.
 
 
+Beim Öffnen während der laufenden Hintergrundvorbereitung erscheint eine Ladeanzeige; der Formeleditor wird anschließend automatisch angezeigt.
+
 ### Sprache
 
 - Typen: `bool`, `int`, `uint` (`unsigned int`), `long`, `ulong` (`unsigned long`), `float`, `double`; Casts wie `(double) value`.

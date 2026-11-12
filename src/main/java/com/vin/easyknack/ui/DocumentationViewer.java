@@ -33,12 +33,14 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
     final GLLabel status=new GLLabel("");
     private final Deque<Position> past=new ArrayDeque<>(),future=new ArrayDeque<>();
     private final Runnable onClose;
+    private final java.util.concurrent.CompletionStage<Void> readiness;
     private Position current;
     private int revision;
     private volatile boolean disposed;
     private boolean loading;
-    DocumentationViewer(Runnable onClose){
-        this.onClose=onClose;
+    DocumentationViewer(Runnable onClose){this(onClose,BackgroundPreparation.documentationReady());}
+    DocumentationViewer(Runnable onClose,java.util.concurrent.CompletionStage<Void> readiness){
+        this.onClose=onClose;this.readiness=readiness;
         for(var child:List.of(back,forward,index,manual,copy,languageLabel,language,close,status,scroll))addGL(child);
         language.setSelectedItem(selectedLanguage);
         language.addActionListener(e->{if(!selectingLanguage&&language.getSelectedItem()!=null)chooseLanguage(language.getSelectedItem());});
@@ -87,10 +89,10 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
         current=next;int request=++revision;
         if(same){status.setText(pageStatus(content.document(),next.page()));scroll.setScrollOffset(next.x(),next.anchor().isEmpty()?next.y():content.anchor(next.anchor()));buttons();finished.complete(null);return finished;}
         loading=true;status.setText(AppText.text("help.loading"));content.show(new DocumentationPage.Document("",List.of()));scroll.setScrollOffset(0,0);buttons();
-        CompletableFuture.supplyAsync(()->{
+        readiness.thenCompose(ignored->CompletableFuture.supplyAsync(()->{
             try{return DocumentationPreparation.document(next.page());}
             catch(IOException failure){throw new java.util.concurrent.CompletionException(failure);}
-        }).whenComplete((document,error)->EventQueue.invokeLater(()->{
+        })).whenComplete((document,error)->EventQueue.invokeLater(()->{
             if(disposed||request!=revision){finished.complete(null);return;}
             loading=false;
             if(error!=null){status.setText(error.getCause()==null?error.toString():error.getCause().getMessage());buttons();finished.completeExceptionally(error);return;}

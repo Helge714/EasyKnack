@@ -32,6 +32,8 @@ Hyperbolic functions: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.
 and nonfinite results; no oversampling is applied automatically.
 
 
+Opening Formula while background preparation is still running shows a loading message; the editor appears automatically when ready.
+
 ### Language
 
 - Types: `bool`, `int`, `uint` (`unsigned int`), `long`, `ulong` (`unsigned long`), `float`, `double`; casts such as `(double) value`.

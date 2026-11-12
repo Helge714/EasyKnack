@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.1.0 planned
 
+- Show a nonblocking loading state when help or Formula is opened before
+  background preparation completes, then reveal the requested content automatically.
+  Closed editors stay closed; preparation failures end the loading state.
+
 - Shorten the blocking startup path: automatically prepare both help languages,
   Formula/parser and font caches in the background after the workspace is visible;
   examples generate/scan on a separate low-priority worker. Font warming owns an
