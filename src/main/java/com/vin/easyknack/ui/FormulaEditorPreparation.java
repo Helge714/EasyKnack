@@ -6,7 +6,7 @@ import com.vin.easyknack.formula.FormulaLanguage;
 import com.vingame.glswing.ui.GLCodeEditor;
 import com.vingame.glswing.ui.GLTextDocument;
 
-/** Creates Formula editors on demand on the UI thread, with optional explicit warmup. */
+/** Prepares the first Formula editor after background font/parser warmup; transfers ownership on the UI thread. */
 public final class FormulaEditorPreparation {
     private static GLCodeEditor prepared;
     private FormulaEditorPreparation() { }
@@ -23,7 +23,7 @@ public final class FormulaEditorPreparation {
         return editor == null ? create() : editor;
     }
 
-    /** Populate the shared CPU atlas cache on the startup GL context. */
+    /** Populate the shared CPU atlas cache on the background worker GL context. */
     public static void prepareFont(com.jogamp.opengl.GL3 gl) {
         var style = ApplicationTheme.current().theme().textEditorStyle();
         var font = new com.vingame.glswing.rendering.GLFont(

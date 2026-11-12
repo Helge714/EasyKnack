@@ -2,10 +2,12 @@
 
 ## Unreleased — 0.1.0 planned
 
-- Shorten the blocking startup path: load help pages and Formula editors on demand,
-  and generate/scan examples on a low-priority background worker after the workspace
-  is visible. Installed plugin registration still precedes document loading.
-  No document, plugin ABI or audio protocol change; covered by 0.1.0 development.
+- Shorten the blocking startup path: automatically prepare both help languages,
+  Formula/parser and font caches in the background after the workspace is visible;
+  examples generate/scan on a separate low-priority worker. Font warming owns an
+  offscreen GL context and avoids blocking the shared font cache during rasterization.
+  Installed plugins still register before document loading. No document, plugin ABI
+  or audio protocol change; covered by 0.1.0 development.
 
 - Name Windows installers `EasyKnack-Setup-<version>-x64` to distinguish setup
   from the application launcher. Clarify the preparation message and document

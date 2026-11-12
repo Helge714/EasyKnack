@@ -15,6 +15,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     private double displayedCurvature=ApplicationSettings.connectionCurvature();
     private boolean openingExternal, examplesStarted;
     private final GLPopupMenu examples = new GLPopupMenu();
+    private final BackgroundPreparation backgroundPreparation = new BackgroundPreparation();
     public void acceptLaunches(com.vin.easyknack.DocumentLaunch launches, JFrame window) {
         var pending = new java.util.ArrayDeque<java.nio.file.Path>();
         // Consume the first startup document before showing the default workspace.
@@ -32,7 +33,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         }
         launchTimer = new javax.swing.Timer(300, event -> {
             if (!window.isShowing())return;
-            if (!examplesStarted) { examplesStarted = true; documents.populateExamples(examples, this::closeAnalysis); }
+            if (!examplesStarted) { examplesStarted = true; documents.populateExamples(examples, this::closeAnalysis); backgroundPreparation.start(); }
             documents.checkRecoveryOnStartup();
             if (openingExternal || !documents.canOpenExternal()) return;
             try {
@@ -280,5 +281,5 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
     @Override public boolean preservesKeyboardFocusOnPress(){return analysisFocus.isVisible();}
 
     public java.util.concurrent.CompletionStage<Boolean> requestClose() { return documents.requestClose(); }
-    @Override public void close() { if (launchTimer != null) launchTimer.stop(); volumeOverlay.close(); com.vin.easyknack.audio.FileAudition.stop(); documents.close(); pluginActivity.close(); controller.close(); }
+    @Override public void close() { backgroundPreparation.close(); if (launchTimer != null) launchTimer.stop(); volumeOverlay.close(); com.vin.easyknack.audio.FileAudition.stop(); documents.close(); pluginActivity.close(); controller.close(); }
 }

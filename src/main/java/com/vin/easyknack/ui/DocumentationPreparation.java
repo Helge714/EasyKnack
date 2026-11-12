@@ -35,6 +35,7 @@ public final class DocumentationPreparation {
         try{
             var pages=NodeDocumentation.documents();int completed=0;
             for(var page:pages.entrySet()){
+                if(Thread.currentThread().isInterrupted())return;
                 var doc=CACHE.document(page.getKey(),page.getValue());detail.accept(doc.title());progress.accept(++completed,pages.size());
             }
         }catch(IOException failure){
@@ -42,10 +43,11 @@ public final class DocumentationPreparation {
             System.err.println("Documentation preload unavailable: "+failure.getMessage());
         }
     }
-    /** Fill Core's shared CPU atlas cache using the splash's current GL context. */
+    /** Fill Core's shared CPU atlas cache using the background worker's own GL context. */
     public static void prepareFonts(GL3 gl,BiConsumer<Integer,Integer> progress){
         var specifications=CACHE.fonts(ApplicationTheme.current().theme().labelStyle().font());int completed=0;
         for(var specification:specifications){
+            if(Thread.currentThread().isInterrupted())return;
             var font=specification.createFont();
             try{font.initialize(gl);}
             finally{font.dispose(gl);}
