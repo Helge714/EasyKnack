@@ -27,27 +27,34 @@ public final class ExampleLibrary {
         examples.put("Harmonizer.knack",HarmonizerExample::create);
         examples.put("Spectral/Processing.knack",SpectralExample::create);
         examples.put("Spectral/Resynthesis.knack",SpectralResynthesisExample::create);
-        var codec=new KnackDocumentCodec();
         for(var entry:examples.entrySet()){
             var path=root.resolve(entry.getKey());Files.createDirectories(path.getParent());
             if(Files.exists(path))continue;
-            try(var out=Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)){codec.write(entry.getValue().get(),out);}
+            install(path,entry.getValue());
         }
         Files.writeString(marker,"Built-in examples copied once; user files are never replaced.\n",StandardOpenOption.CREATE_NEW);
     }
     static void installStochasticBinWidth(Path root)throws IOException{
         var path=root.resolve("Spectral/Stochastic Bin Width.knack");
         Files.createDirectories(path.getParent());
-        if(!Files.exists(path))try(var out=Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)){
-            new KnackDocumentCodec().write(StochasticBinWidthExample.create(),out);
-        }
+        install(path,StochasticBinWidthExample::create);
     }
     private static void installSampler(Path root)throws IOException{
         var marker=root.resolve(".easyknack-sampler-v1");if(Files.exists(marker))return;
         var path=root.resolve("Buffer/Sampler.knack");Files.createDirectories(path.getParent());
-        if(!Files.exists(path))try(var out=Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)){new KnackDocumentCodec().write(SamplerExample.create(),out);}
+        install(path,SamplerExample::create);
         Files.writeString(marker,"Sampler example installed; user edits are preserved.\n",StandardOpenOption.CREATE_NEW);
-    }    static List<Entry> scan(Path folder)throws IOException{return scan(folder,false);}
+    }
+    private static void install(Path path,java.util.function.Supplier<GLNodeGraphDocument> example)throws IOException{
+        if(Files.exists(path))return;
+        var temporary=Files.createTempFile(path.getParent(),".easyknack-example-",".tmp");
+        try{
+            try(var out=Files.newOutputStream(temporary)){new KnackDocumentCodec().write(example.get(),out);}
+            // Publish only complete files; closing during background preparation must not leave a broken .knack.
+            try{Files.move(temporary,path);}catch(FileAlreadyExistsException existing){/* Preserve user/concurrent files. */}
+        }finally{Files.deleteIfExists(temporary);}
+    }
+    static List<Entry> scan(Path folder)throws IOException{return scan(folder,false);}
     static List<Entry> scan(Path folder,boolean experimentalEnabled)throws IOException{return scan(folder,0,experimentalEnabled); }
     private static List<Entry> scan(Path folder,int depth,boolean experimentalEnabled)throws IOException{
         if(depth>12||!Files.isDirectory(folder,LinkOption.NOFOLLOW_LINKS))return List.of();

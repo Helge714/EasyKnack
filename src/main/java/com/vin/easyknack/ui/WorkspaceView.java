@@ -13,7 +13,8 @@ import com.vingame.glswing.ui.GLPopupMenu;
 public final class WorkspaceView extends GLContainer implements AutoCloseable, com.vingame.glswing.input.GLKeyTarget, com.vingame.glswing.input.GLKeyPressCaptureTarget, com.vin.easyknack.nodes.AnalysisEditor.Host {
     private javax.swing.Timer launchTimer;
     private double displayedCurvature=ApplicationSettings.connectionCurvature();
-    private boolean openingExternal;
+    private boolean openingExternal, examplesStarted;
+    private final GLPopupMenu examples = new GLPopupMenu();
     public void acceptLaunches(com.vin.easyknack.DocumentLaunch launches, JFrame window) {
         var pending = new java.util.ArrayDeque<java.nio.file.Path>();
         // Consume the first startup document before showing the default workspace.
@@ -31,6 +32,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         }
         launchTimer = new javax.swing.Timer(300, event -> {
             if (!window.isShowing())return;
+            if (!examplesStarted) { examplesStarted = true; documents.populateExamples(examples, this::closeAnalysis); }
             documents.checkRecoveryOnStartup();
             if (openingExternal || !documents.canOpenExternal()) return;
             try {
@@ -89,7 +91,7 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         file.addItem(AppText.text("open"), event -> {closeAnalysis();documents.open();}).setAcceleratorText(shortcut("Ctrl+O"));
         file.addItem(AppText.text("save"), event -> documents.save(false)).setAcceleratorText(shortcut("Ctrl+S"));
         file.addItem(AppText.text("saveAs"), event -> documents.save(true)).setAcceleratorText(shortcut("Ctrl+Shift+S"));
-        var examples=new GLPopupMenu();documents.populateExamples(examples,this::closeAnalysis);
+        examples.addItem(AppText.text("examples.loading"), event -> documents.populateExamples(examples, this::closeAnalysis));
         file.addSubMenu(AppText.text("examples"),examples);
         file.addSeparator();
         file.addItem(AppText.text("image.export"),event->GraphImageExport.show(controller,this));

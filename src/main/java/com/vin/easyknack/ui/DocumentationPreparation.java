@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import com.jogamp.opengl.GL3;
 import com.vingame.glswing.ui.GLFontSpec;
 
-/** Startup-only warming plus shared parsed pages; viewer instances retain their own layout and history. */
+/** Optional warming plus shared parsed pages; viewer instances retain their own layout and history. */
 public final class DocumentationPreparation {
     private static final Cache CACHE=new Cache();
     private DocumentationPreparation(){}

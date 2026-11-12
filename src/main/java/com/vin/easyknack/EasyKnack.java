@@ -38,24 +38,8 @@ public final class EasyKnack {
                             var build=plugins.startup(task::detail);
                             if(build!=null)plugins.activate(build);
                             return null;
-                        })
-                        .background(com.vin.easyknack.i18n.AppText.literal("Preparing examples"), task -> {com.vin.easyknack.ui.ExampleLibrary.initialize();return null;})
-                        .background(com.vin.easyknack.i18n.AppText.text("startup.documentation"), task -> {
-                            com.vin.easyknack.ui.DocumentationPreparation.prepare(task::detail,task::progress);
-                            return null;
-                        })
-                        .awt(com.vin.easyknack.i18n.AppText.text("startup.formulaEditor"), task -> {
-                            com.vin.easyknack.ui.FormulaEditorPreparation.prepare();
-                            return null;
-                        })
-                        .gl(com.vin.easyknack.i18n.AppText.text("startup.formulaFont"), task -> {
-                            com.vin.easyknack.ui.FormulaEditorPreparation.prepareFont(task.requireGL());
-                            return null;
-                        })
-                        .gl(com.vin.easyknack.i18n.AppText.text("startup.documentationFonts"), task -> {
-                            com.vin.easyknack.ui.DocumentationPreparation.prepareFonts(task.requireGL(),task::progress);
-                            return null;
                         }))
+
                 .surface(context -> {
                     ApplicationArtwork.icon(context.window());
                     context.parent().setGLTheme(ApplicationTheme.current().theme());

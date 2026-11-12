@@ -34,6 +34,10 @@ final class DocumentActions implements AutoCloseable {
     private boolean initialViewCheckpointScheduled;
     private Path path;
     private boolean busy, closed;
+    private long examplesGeneration;
+    private final ExecutorService examplesWorker=Executors.newSingleThreadExecutor(r->{
+        var thread=new Thread(r,"EasyKnack examples");thread.setDaemon(true);thread.setPriority(Thread.MIN_PRIORITY);return thread;
+    });
     private String activity="";
     private final java.util.function.Consumer<String> pluginActivity;
     private CompletableFuture<Boolean> closeDecision;
@@ -194,9 +198,25 @@ final class DocumentActions implements AutoCloseable {
     }
     void exampleFolder(){try{java.nio.file.Files.createDirectories(ApplicationSettings.examples());java.awt.Desktop.getDesktop().open(ApplicationSettings.examples().toFile());}catch(Exception e){error(GLDocumentOperation.OPEN,null,e);}}
     void populateExamples(GLPopupMenu menu,Runnable beforeOpen){
-        menu.removeAllItems();
-        try{addExamples(menu,ExampleLibrary.scan(ApplicationSettings.examples(),controller.experimentalFeatures),beforeOpen);}catch(Exception e){menu.addItem(AppText.text("examples.failed"),event->error(GLDocumentOperation.OPEN,ApplicationSettings.examples(),e));}
-        menu.addSeparator();menu.addItem(AppText.text("examples.refresh"),e->populateExamples(menu,beforeOpen));menu.addItem(AppText.text("examples.folder"),e->exampleFolder());
+        if(closed)return;
+        long generation=++examplesGeneration;
+        boolean experimental=controller.experimentalFeatures;
+        menu.removeAllItems();menu.addItem(AppText.text("examples.loading"),event->{}).setEnabled(false);
+        onUi(CompletableFuture.supplyAsync(()->{
+            try{
+                ExampleLibrary.initialize();
+                return ExampleLibrary.scan(ApplicationSettings.examples(),experimental);
+            }catch(Exception failure){throw new CompletionException(failure);}
+        },examplesWorker),(entries,failure)->{
+            if(generation!=examplesGeneration)return;
+            if(experimental!=controller.experimentalFeatures){populateExamples(menu,beforeOpen);return;}
+            menu.removeAllItems();
+            if(failure==null)addExamples(menu,entries,beforeOpen);
+            else menu.addItem(AppText.text("examples.failed"),event->error(GLDocumentOperation.OPEN,ApplicationSettings.examples(),failure));
+            menu.addSeparator();
+            menu.addItem(AppText.text("examples.refresh"),event->populateExamples(menu,beforeOpen));
+            menu.addItem(AppText.text("examples.folder"),event->exampleFolder());
+        });
     }
     private void addExamples(GLPopupMenu menu,java.util.List<ExampleLibrary.Entry> entries,Runnable beforeOpen){
         for(var entry:entries)if(entry.directory()){var child=new GLPopupMenu();addExamples(child,entry.children(),beforeOpen);menu.addSubMenu(entry.name(),child);}else menu.addItem(entry.name(),e->{beforeOpen.run();openExample(entry.path());});
@@ -421,7 +441,7 @@ final class DocumentActions implements AutoCloseable {
     private <T> void onUi(CompletionStage<T> stage, BiConsumer<T, Throwable> action) {
         stage.whenComplete((value, failure) -> EventQueue.invokeLater(() -> { if (!closed) action.accept(value, failure); }));
     }
-    @Override public void close() { closed = true; titleTimer.stop();recoveryTimer.stop(); dialogs.close(); files.close();
+    @Override public void close() { closed = true; examplesWorker.shutdownNow(); titleTimer.stop();recoveryTimer.stop(); dialogs.close(); files.close();
         recoveryWorker.submit(()->{try{recoveryStore.join().close();}catch(Exception e){e.printStackTrace();}});
         recoveryWorker.shutdown();try{recoveryWorker.awaitTermination(3,TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();} }
 }

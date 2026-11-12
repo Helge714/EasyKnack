@@ -6,7 +6,7 @@ import com.vin.easyknack.formula.FormulaLanguage;
 import com.vingame.glswing.ui.GLCodeEditor;
 import com.vingame.glswing.ui.GLTextDocument;
 
-/** Prepares the first editor on the UI thread while the startup screen is visible. */
+/** Creates Formula editors on demand on the UI thread, with optional explicit warmup. */
 public final class FormulaEditorPreparation {
     private static GLCodeEditor prepared;
     private FormulaEditorPreparation() { }
