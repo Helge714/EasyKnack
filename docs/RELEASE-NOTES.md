@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.1.0 planned
 
+- Wait for forced audio-host termination before releasing its process reference,
+  avoiding a Windows directory-lock race when publishing freshly validated Bakes
+  and plugins. Covered by the current 0.1.0 development scope.
+
 - Validate Windows x64 JDK 25 and its compiler before EXE/MSI installation copies
   files. Reuse launcher discovery and explicit selection/installation choices;
   unattended setup fails without a compatible JDK and never downloads one.

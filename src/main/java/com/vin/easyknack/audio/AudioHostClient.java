@@ -65,7 +65,12 @@ public final class AudioHostClient implements AutoCloseable {
         try { if (socket != null) socket.close(); } catch (IOException ignored) { }
         if (process != null) {
             try {
-                if (!process.waitFor(500, TimeUnit.MILLISECONDS)) process.destroyForcibly();
+                if (!process.waitFor(500, TimeUnit.MILLISECONDS)) {
+                    process.destroyForcibly();
+                    // TerminateProcess is asynchronous on Windows; keep the executable/CWD
+                    // alive until termination completes before callers publish a build directory.
+                    process.waitFor(2, TimeUnit.SECONDS);
+                }
             } catch (InterruptedException interrupted) {
                 process.destroyForcibly(); Thread.currentThread().interrupt();
             }
