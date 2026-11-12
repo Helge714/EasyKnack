@@ -41,7 +41,11 @@
 - [x] Autoformatierung scheint schon besser zu sein, es gibt aber die Tendenz aufsteigender Graphen, kannst du leicht verlängerte Verbindungen akzeptieren, wenn sie eine mehr horizontale Ausrichtung der Nodes erlaubt, also dass Eingang und Ausgang ungefähr auf einer Ebene liegen?
 - [x] es scheint mehrere Example-Ordner im Projekt zu geben, außerdem ist target enorm groß angewachsen mit irgendwelchen Bakes, ist das nötig? — [Ordner und sichere Bereinigung](docs/development/BUILD-STORAGE.md); bestehende Dateien bleiben erhalten.
 - [x] der Seed-Eingang bei Multiplegroup randoms wie partial und spectral group sollte einen Port bekommen
-
+- [x] Formula-Groups bieten `buffer.writepos` als Alias der absoluten `buffer.writePosition` an; Vorschau und native Generierung bleiben identisch.
+- [x] Core-Arbeitsbaum am 2026-11-12 geprüft: sauber; generierte und ignorierte Build-Ausgaben sind keine uncommitteten Quelldateien.
+- [x] README auf die primären Node-Referenzen und das ergänzende zweisprachige Handbuch ausgerichtet; alte Links bleiben Weiterleitungen. Externe JDK-Voraussetzung korrigiert.
+- [x] Sprachreferenz auf beiden Formula-Node-Seiten listet Typen, Anweisungen, Operatoren, Konstanten, Kontext, Eingangsmitglieder und sämtliche Mathematikfunktionen.
+- [x] Build-Sprachen geprüft und in der Entwicklerübersicht erklärt: PowerShell/C#/Python bleiben aktive Werkzeuge; Assembly liegt als archivierte Compiler-Auswertung vor.
 
 # EasyKnack backlog
 

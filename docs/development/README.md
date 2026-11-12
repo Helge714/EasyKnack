@@ -10,3 +10,12 @@
 `features/` retains technical feature references; current public behavior is
 specified in the bilingual node and user references. `history/` preserves dated
 plans and investigations and is not an implementation contract.
+
+## Build languages
+
+PowerShell orchestrates Windows/native builds, packaging and JDK selection. C#
+implements the small Windows launcher and packaging file helper. Python renders
+and validates documentation and runs source/reference audits. These are active
+build tools, separate from the Java application and C++ audio engine. Assembly
+files under `native/audio-host/benchmarks/archive` retain compiler-output evidence;
+they are not additional application implementations or build inputs.

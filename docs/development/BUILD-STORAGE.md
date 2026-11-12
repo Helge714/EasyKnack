@@ -39,3 +39,30 @@ runtime caches and user documents are excluded.
 
 These folders have different owners and purposes. Keep source fixtures and user
 examples separate; they account for little of the packaging storage.
+
+## Generated test runs
+
+Java tests leave isolated `target/<prefix><random digits>` directories for failure
+diagnosis. Stop tests, then use PowerShell 7:
+
+```powershell
+./scripts/clean-test-output.ps1
+./scripts/clean-test-output.ps1 -Remove -WhatIf
+./scripts/clean-test-output.ps1 -Remove
+```
+
+The default reports candidates older than one day. `-OlderThanDays 0` also includes
+recent completed runs. Prefixes come from literal temporary-directory declarations
+in the current Java tests; other folders are excluded. The cleaner refuses linked
+contents and Git repositories. It preserves normal Maven outputs, source archives,
+packages, toolchains and named investigations. Do not run it concurrently with tests.
+
+The November 12 inventory found 5.45 GiB in 2,999 target subdirectories: about
+674 MiB belonged to 2,839 generated test runs. Larger retained items include old
+packages (`distribution`, 1.33 GiB), release audits/source checkouts, reference
+measurements and source-material downloads. They are not all disposable test junk.
+
+The first cleanup removed 2,818 runs older than one day, freeing 673.9 MiB.
+Recent runs and all named audit/research/package directories were preserved.
+A fixture verified removal of ordinary generated output and preservation of a
+Git marker, unknown directory and junction target.

@@ -7,8 +7,9 @@ signals as they run, and save your work as `.knack` documents.
 ## Get started
 
 Use the Windows x64 installer or portable application folder. Packaged builds
-include Java, the audio host and the tools used by Formula, Bake and source plugins.
-You do not need a development environment to use them.
+require an external Windows x64 JDK 25, including `javac`. They include the audio
+host and native tools used by Formula, Bake and source plugins. See the quick start
+for JDK selection and installation.
 
 1. Start EasyKnack and choose **File → New**.
 2. Select your speakers or headphones in **Audio Output** and use a low device volume.
@@ -20,12 +21,11 @@ first-use troubleshooting, or open the [user guide](docs/user/README.md).
 
 ## User documentation
 
-- [Workspace and documents](docs/user/workspace.md): editing, shortcuts, examples and export.
-- [Audio and routing](docs/user/audio.md): devices, system audio, levels and diagnostics.
-- [Node reference](docs/user/nodes.md): choosing nodes, signal rates and units.
-- [Groups, Formula and plugins](docs/user/groups.md): reusable interfaces and custom processing.
-- [Spectrum and analysis](docs/user/analysis.md): FFT/IFFT, measurement and data export.
-- [Known limitations](docs/user/limitations.md): portability and current feature boundaries.
+- Node references are the primary documentation: [Deutsch](docs/nodes/de/index.md) · [English](docs/nodes/en/index.md).
+- The supplementary handbook explains workflows and concepts: [Deutsch](docs/user/de/index.md) · [English](docs/user/en/index.md).
+
+Older guide URLs forward to these maintained pages. They are retained for existing
+links rather than maintained as parallel manuals.
 
 EasyKnack is in development. Windows x64 packaging is available; a clean-machine
 installation/update/uninstall acceptance test is still pending. There is no
