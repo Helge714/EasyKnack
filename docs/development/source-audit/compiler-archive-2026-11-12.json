@@ -1,0 +1,130 @@
+{
+  "runs": [
+    {
+      "profile": "archive",
+      "operation": "install",
+      "seconds": 15.3438886,
+      "log": "optimized/install.log",
+      "costFinalizeMilliseconds": 4,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "InstallExecute",
+          "milliseconds": 13339
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 199
+        },
+        {
+          "action": "InstallValidate",
+          "milliseconds": 86
+        },
+        {
+          "action": "InstallInitialize",
+          "milliseconds": 19
+        },
+        {
+          "action": "PublishCompiler",
+          "milliseconds": 12
+        }
+      ]
+    },
+    {
+      "profile": "archive",
+      "operation": "repair",
+      "seconds": 19.7490719,
+      "log": "optimized/repair.log",
+      "costFinalizeMilliseconds": 44,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "InstallValidate",
+          "milliseconds": 356
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 199
+        },
+        {
+          "action": "CostFinalize",
+          "milliseconds": 44
+        },
+        {
+          "action": "InstallInitialize",
+          "milliseconds": 25
+        },
+        {
+          "action": "InstallFiles",
+          "milliseconds": 9
+        }
+      ]
+    },
+    {
+      "profile": "archive",
+      "operation": "uninstall",
+      "seconds": 3.5453773,
+      "log": "optimized/uninstall.log",
+      "costFinalizeMilliseconds": 7,
+      "costFinalizeCalls": 1,
+      "longestActions": [
+        {
+          "action": "InstallValidate",
+          "milliseconds": 30
+        },
+        {
+          "action": "InstallInitialize",
+          "milliseconds": 20
+        },
+        {
+          "action": "CostFinalize",
+          "milliseconds": 7
+        },
+        {
+          "action": "ProcessComponents",
+          "milliseconds": 3
+        },
+        {
+          "action": "RemoveRegistryValues",
+          "milliseconds": 3
+        }
+      ]
+    }
+  ],
+  "compilerFiles": 5586,
+  "compilerBytes": 353553895,
+  "msiBytes": 85204992,
+  "archiveBytes": 85893185,
+  "format": 1,
+  "date": "2026-11-12",
+  "msiTableRows": {
+    "File": 5,
+    "Component": 8,
+    "ReserveCost": 2
+  },
+  "validation": [
+    "legacy per-file migration",
+    "damaged extracted compiler repair",
+    "prepared major-upgrade failure preserves previous installation",
+    "fresh install failure cleanup",
+    "compiler publication and removal rollback",
+    "corrupted archive rejected",
+    "unknown compiler files preserved",
+    "successful archive major upgrade",
+    "uninstall leaves no product files",
+    "real reduced compiler compiles and runs a static C++20 thread/filesystem probe",
+    "EXE bundle compiles with archive actions",
+    "Java prerequisite regression: EXE/MSI reject missing JDK, accept JDK 25, uninstall without Java",
+    "Earlier failed-fixture MSI components removed through ordinary reinstall/uninstall; no orphaned test clients remain"
+  ],
+  "limits": [
+    "Separate local single runs, not averages or a full application/Java setup benchmark.",
+    "Earlier per-file baseline used MSIFASTINSTALL=7; archive uses 5 to retain ReserveCost.",
+    "Optimized MSI reuses the identical verified archive and generated fixture XML with the current helper binary."
+  ],
+  "sourceHashes": {
+    "scripts/package-installer.ps1": "43182b7f9b4413cd522167543bea85fc3e2fa89ebdf55d187c9db063b310203f",
+    "scripts/windows/CompilerSetup.cs": "5c16930835341501cf15ac9cc0cd9b9a1095950e21a34a6ebaaeaf80111ce006",
+    "scripts/test-compiler-installer.ps1": "b030891001a126d43df705d0bd843f52eae60ec8118e9ba0074e332ec4f24a89"
+  }
+}

@@ -4,7 +4,8 @@ param(
     [string]$JdkHome, # Retained as a deprecated build-script argument; never bundled.
     [string]$WixDirectory,
     [ValidateSet('exe','msi')][string]$Type = 'exe',
-    [string]$Destination
+    [string]$Destination,
+    [ValidateSet('Archive','Files')][string]$CompilerLayout = 'Archive'
 )
 $ErrorActionPreference = 'Stop'
 $Image = (Resolve-Path -LiteralPath $Image).Path
@@ -39,6 +40,39 @@ function Id([string]$prefix,[string]$path) {
     $hash = [Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($path.ToLowerInvariant()))
     $prefix + [Convert]::ToHexString($hash).Substring(0,24)
 }
+$compiler = [IO.Path]::GetFullPath((Join-Path $Image 'app/tools/llvm-mingw'))
+$archiveCompiler = $CompilerLayout -eq 'Archive' -and (Test-Path -LiteralPath $compiler -PathType Container)
+$compilerActions = ''
+if ($archiveCompiler) {
+    . "$PSScriptRoot/SourcePackage.ps1"
+    $inventory = [EasyKnackPackageFiles]::Inventory($compiler)
+    $entries = [ordered]@{}
+    $manifest = [Text.StringBuilder]::new("EasyKnack compiler archive v1`n")
+    [long]$allocated = 0
+    foreach ($item in $inventory) {
+        $relative = $item.path.Replace('\','/')
+        $entries[$relative] = Join-Path $compiler $item.path
+        [void]$manifest.Append("$($item.sha256)`t$($item.bytes)`t$relative`n")
+        # Conservative 64 KiB allocation allowance, including per-file metadata.
+        $allocated += ([long][Math]::Ceiling($item.bytes / 65536.0) + 1) * 65536
+    }
+    $entries['.easyknack-compiler.manifest'] = [Text.Encoding]::UTF8.GetBytes($manifest.ToString())
+    $compilerZip = Join-Path $work 'llvm-mingw.zip'
+    Write-DeterministicZip $compilerZip $entries
+    $compilerHash = Join-Path $work 'compiler.sha256'
+    [IO.File]::WriteAllText($compilerHash,(Get-FileHash -LiteralPath $compilerZip -Algorithm SHA256).Hash)
+    # ReserveCost uses bytes, independently of MSI's archive-file cost. Split large
+    # totals into signed-32-bit rows. Covers extracted files plus transaction staging.
+    $reserveXml = ''
+    [long]$remaining = 2 * $allocated + 4MB
+    $reserveIndex = 0
+    while ($remaining -gt 0) {
+        [long]$chunk = [Math]::Min($remaining, 2000000000)
+        $reserveXml += "<ReserveCost Id='CompilerSpace$reserveIndex' Directory='INSTALLDIR' RunLocal='$chunk' RunFromSource='0'/>"
+        $reserveIndex++
+        $remaining -= $chunk
+    }
+}
 $components = [Collections.Generic.List[string]]::new()
 function DirectoryXml([string]$folder) {
     $builder = [Text.StringBuilder]::new()
@@ -48,7 +82,12 @@ function DirectoryXml([string]$folder) {
         $components.Add($component)
         [void]$builder.Append("<Component Id='$component' Guid='*' Win64='yes'><File Id='$fileId' Source='$(Xml $file.FullName)' KeyPath='yes' /></Component>")
     }
+    if ($archiveCompiler -and [IO.Path]::GetRelativePath($Image,$folder).Replace('\','/') -eq 'app/tools') {
+        $components.Add('CompilerArchive')
+        [void]$builder.Append("<Component Id='CompilerArchive' Guid='*' Win64='yes'><File Id='CompilerArchiveFile' Name='llvm-mingw.zip' Source='$(Xml $compilerZip)' KeyPath='yes'/>$reserveXml</Component>")
+    }
     foreach ($child in Get-ChildItem -LiteralPath $folder -Directory | Sort-Object Name) {
+        if ($archiveCompiler -and $child.FullName -eq $compiler) { continue }
         [void]$builder.Append("<Directory Id='$(Id 'D' ([IO.Path]::GetRelativePath($Image,$child.FullName)))' Name='$(Xml $child.Name)'>$(DirectoryXml $child.FullName)</Directory>")
     }
     $builder.ToString()
@@ -67,12 +106,35 @@ $javaSetupLog = Join-Path $work 'java-prerequisite-build.log'
     (Resolve-Path "$PSScriptRoot/windows/JavaSetup.cs").Path *> $javaSetupLog
 if ($LASTEXITCODE -ne 0) { throw "Java prerequisite build failed: $javaSetupLog" }
 
+if ($archiveCompiler) {
+    $compilerSetup = Join-Path $work 'CompilerSetup.exe'
+    $compilerSetupLog = Join-Path $work 'compiler-setup-build.log'
+    & $csc /nologo /target:winexe /platform:x64 /reference:System.IO.Compression.dll /reference:System.IO.Compression.FileSystem.dll "/out:$compilerSetup" "/resource:$compilerHash,compiler.sha256" (Resolve-Path "$PSScriptRoot/windows/CompilerSetup.cs").Path *> $compilerSetupLog
+    if ($LASTEXITCODE -ne 0) { throw "Compiler setup build failed: $compilerSetupLog" }
+    $compilerActions = @"
+<Binary Id='CompilerSetup' SourceFile='$(Xml $compilerSetup)'/>
+<CustomAction Id='RollbackCompiler' BinaryKey='CompilerSetup' ExeCommand='rollback &quot;[INSTALLDIR].&quot;' Execute='rollback' Impersonate='yes' Return='check'/>
+<CustomAction Id='RemoveCompiler' BinaryKey='CompilerSetup' ExeCommand='remove &quot;[INSTALLDIR].&quot;' Execute='deferred' Impersonate='yes' Return='check'/>
+<CustomAction Id='InstallCompiler' BinaryKey='CompilerSetup' ExeCommand='install &quot;[INSTALLDIR].&quot;' Execute='deferred' Impersonate='yes' Return='check'/>
+<CustomAction Id='PublishCompiler' BinaryKey='CompilerSetup' ExeCommand='publish &quot;[INSTALLDIR].&quot;' Execute='deferred' Impersonate='yes' Return='check'/>
+<CustomAction Id='CommitCompiler' BinaryKey='CompilerSetup' ExeCommand='commit &quot;[INSTALLDIR].&quot;' Execute='commit' Impersonate='yes' Return='ignore'/>
+<InstallExecuteSequence>
+<Custom Action='RollbackCompiler' Before='RemoveFiles'>NOT UPGRADINGPRODUCTCODE</Custom>
+<Custom Action='RemoveCompiler' After='RollbackCompiler'>REMOVE~="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
+<Custom Action='InstallCompiler' After='InstallFiles'>NOT (REMOVE~="ALL") AND NOT UPGRADINGPRODUCTCODE</Custom>
+<Custom Action='PublishCompiler' After='RemoveExistingProducts'>NOT (REMOVE~="ALL") AND NOT UPGRADINGPRODUCTCODE</Custom>
+<Custom Action='CommitCompiler' Before='InstallFinalize'>NOT UPGRADINGPRODUCTCODE</Custom>
+</InstallExecuteSequence>
+<UI><ProgressText Action='InstallCompiler'>Preparing the C++ compiler</ProgressText><ProgressText Action='RemoveCompiler'>Removing the C++ compiler</ProgressText></UI>
+"@
+}
+
 # Separate optional features provide persistent, independent shortcut choices.
 $xml = @"
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 <Product Id='*' Name='EasyKnack' Language='1033' Version='$version' Manufacturer='EasyKnack' UpgradeCode='50cf4639-3e07-4dd7-8ccf-14eb8df748c6'>
 <Package InstallerVersion='500' Compressed='yes' InstallScope='perUser' Platform='x64'/>
-<MajorUpgrade AllowSameVersionUpgrades='yes' DowngradeErrorMessage='A newer EasyKnack version is already installed.'/>
+<MajorUpgrade Schedule='afterInstallExecute' AllowSameVersionUpgrades='yes' DowngradeErrorMessage='A newer EasyKnack version is already installed.'/>
 <MediaTemplate EmbedCab='yes'/>
 <Icon Id='EasyKnackIcon' SourceFile='$(Xml $icon)'/><Property Id='ARPPRODUCTICON' Value='EasyKnackIcon'/>
 <Condition Message='EasyKnack requires 64-bit Windows.'>VersionNT64</Condition>
@@ -101,6 +163,7 @@ $xml = @"
 
 <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT' Value='Check Java prerequisites and start EasyKnack'/>
 <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOX' Value='1'/>
+$compilerActions
 <Binary Id='JavaPrerequisite' SourceFile='$(Xml $javaSetup)'/>
 <CustomAction Id='CheckJavaBeforeInstall' BinaryKey='JavaPrerequisite' ExeCommand='/ui [UILevel]' Execute='immediate' Impersonate='yes' Return='check'/>
 <InstallExecuteSequence><Custom Action='CheckJavaBeforeInstall' Before='InstallValidate'>NOT (REMOVE~="ALL") AND NOT EK_BUNDLE</Custom></InstallExecuteSequence>
@@ -145,6 +208,7 @@ if ($Type -eq 'exe') {
  InstallCommand='/ui [WixBundleUILevel]' RepairCommand='/ui [WixBundleUILevel]' DetectCondition='0'
  PerMachine='no' Permanent='yes' Vital='yes' Cache='no'/>
 <MsiPackage SourceFile='$(Xml $msi)' DisplayInternalUI='no' Visible='no'>
+<MsiProperty Name='MSIFASTINSTALL' Value='5'/>
 <MsiProperty Name='INSTALLDIR' Value='[InstallFolder]'/><MsiProperty Name='EK_BUNDLE' Value='1'/>
 <MsiProperty Name='EK_STARTMENU' Value='[StartMenuShortcut]'/><MsiProperty Name='EK_DESKTOP' Value='[DesktopShortcut]'/>
 </MsiPackage></Chain>

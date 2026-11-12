@@ -32,7 +32,7 @@ try {
         $script=$script.Replace('50cf4639-3e07-4dd7-8ccf-14eb8df748c6',[guid]::NewGuid().ToString()).Replace('e393418e-2805-43c3-b492-e32794465778',[guid]::NewGuid().ToString()).Replace("Name='EasyKnack'","Name='$name'").Replace('Software\EasyKnack\Installer',"Software\EKCompilerBench$id$($case.Id)\Installer").Replace('EasyKnack.Document',"EKCompilerBench.$id.$($case.Id)").Replace('Classes\.knack',"Classes\.ekcb$id$($case.Id)").Replace('[LocalAppDataFolder]Programs\EasyKnack',"[LocalAppDataFolder]Programs\$name")
         [IO.File]::WriteAllText("$folder/scripts/package-installer.ps1",$script)
         Write-Host "Building $($case.Id) fixture..."
-        & "$folder/scripts/package-installer.ps1" -Image "$folder/image" -WixDirectory $WixDirectory -Destination "$folder/output" -Type msi
+        & "$folder/scripts/package-installer.ps1" -Image "$folder/image" -WixDirectory $WixDirectory -Destination "$folder/output" -Type msi -CompilerLayout Files
         $case.Msi=(Get-ChildItem -LiteralPath "$folder/output" -File -Filter '*.msi').FullName
     }
     foreach ($case in $cases) {

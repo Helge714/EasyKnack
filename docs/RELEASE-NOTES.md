@@ -2,6 +2,11 @@
 
 ## Unreleased — 0.1.0 planned
 
+- Package the installer compiler as one verified archive, with build-time disk
+  costing, repair and transactional publication. Prepare extraction before
+  removing an older installation; portable images stay extracted and startup
+  performs no unpacking. Retain the archive locally for repair. Covered by 0.1.0.
+
 - Bundle a tested Windows x64 LLVM-MinGW runtime compiler profile instead of the
   complete multi-architecture/debugger distribution. Keep shared C/C++ headers,
   x64 libraries, compiler configuration, runtime dependencies and license notices;

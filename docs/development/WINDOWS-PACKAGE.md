@@ -65,9 +65,9 @@ are maintained under `scripts/windows/InstallerTheme*`.
 
 Installer outputs are named `EasyKnack-Setup-<version>-x64.exe` (or `.msi`),
 distinct from the installed `EasyKnack.exe`. The standalone MSI preparation page uses `scripts/windows/Installer.en-us.wxl`.
-The EXE keeps setup progress visible throughout MSI execution, including slow
-space/file validation; the progress page explains that an existing installation
-can take several minutes to check. This UI change does not eliminate MSI costing.
+The EXE keeps setup progress visible throughout MSI execution. Compiler files are
+represented by one archive, avoiding thousands of MSI component/file checks.
+The remaining application files still use normal MSI costing.
 
 The EXE registers its uninstall/maintenance entry in Windows Installed apps;
 reopening that setup also offers removal. Standalone MSI packages use Windows
@@ -164,3 +164,38 @@ products and a no-op application, with equal `MSIFASTINSTALL=7` settings for ful
 and reduced packages; install/repair/removal results are recorded separately.
 `measure-installer-toolchain.ps1` reproduces this comparison without modifying the
 installed EasyKnack product. Results and limits: [compiler profile measurement](source-audit/COMPILER-PROFILE-2026-11-12.md).
+
+## Compiler archive in installers
+
+`package-installer.ps1` packages the staged `app/tools/llvm-mingw` tree as one
+MSI-owned `llvm-mingw.zip`. Portable images remain extracted. The installer
+prepares and checks the entire archive before removing an older product, then
+publishes the prepared compiler directory. Formula, Bake and plugin compilation
+continue to use the same extracted path; application startup does no unpacking.
+
+The archive SHA-256 is embedded in `windows/CompilerSetup.cs`'s per-build helper;
+a versioned manifest checks every extracted file. Paths, duplicates and reparse
+points are rejected. Deferred install/remove, rollback and commit actions retain
+the previous compiler until success. Major upgrades remove the older MSI after
+`InstallExecute`; validation/extraction failures therefore occur before its
+removal. Subsequent operations recover unfinished extraction/publication using a local
+transaction journal.
+Locked backup cleanup is logged and retried on the next operation. Unexpected
+files are preserved in a uniquely named `.ek-compiler-backup-*` directory;
+manifest-owned compiler files are replaced/removed during repair/uninstall.
+
+The archive stays installed for repairs, adding roughly the compressed toolchain
+size to disk use. Build-time allocation estimates (64 KiB cluster allowance,
+metadata and transaction workspace) populate MSI `ReserveCost` rows. This is a
+conservative space check, not physical preallocation or a guarantee against
+another process filling the disk. The EXE sets `MSIFASTINSTALL=5` so these extra
+costs remain enabled. See Microsoft's [ReserveCost table](https://learn.microsoft.com/en-us/windows/win32/msi/reservecost-table).
+
+`test-compiler-installer.ps1` uses uniquely identified no-op products to test
+migration, repair, a failed prepared upgrade, directory rollback, successful
+upgrade and removal. `-CompilerSource <reviewed LLVM-MinGW directory>` measures
+the complete reduced compiler. `-CompilerLayout Files` is a diagnostic packaging
+option retained for the historical full/reduced per-file benchmark; normal
+installers default to `Archive`.
+
+Measured installation, repair and removal timings: [compiler archive validation](source-audit/COMPILER-ARCHIVE-2026-11-12.md).
