@@ -29,7 +29,7 @@ foreach ($file in $reviewedTools.files) {
 $line = @(Get-Content -LiteralPath "$Image/app/installation.properties" | Where-Object { $_ -like 'product.version=*' })
 if ($line.Count -ne 1) { throw 'Missing or ambiguous packaged product version.' }
 $version = ($line[0].Substring('product.version='.Length)) -replace '-.*$', ''
-$expected = Join-Path $Destination "EasyKnack-$version.$Type"
+$expected = Join-Path $Destination "EasyKnack-Setup-$version-x64.$Type"
 if (Test-Path -LiteralPath $expected) { throw "Refusing to replace existing installer: $expected" }
 New-Item -ItemType Directory -Force -Path $Destination | Out-Null
 $work = Join-Path $Destination ('installer-work-' + [guid]::NewGuid().ToString('N'))
@@ -102,7 +102,7 @@ $log = "$Destination/installer-$Type.log"
 & "$WixDirectory/candle.exe" -nologo -arch x64 -out "$work/product.wixobj" "$work/product.wxs" *> $log
 if ($LASTEXITCODE -ne 0) { throw "WiX compile failed: $log" }
 $msi = if ($Type -eq 'msi') { $expected } else { "$work/EasyKnack-$version.msi" }
-& "$WixDirectory/light.exe" -nologo -ext "$WixDirectory/WixUIExtension.dll" -sice:ICE38 -sice:ICE64 -out $msi "$work/product.wixobj" *>> $log
+& "$WixDirectory/light.exe" -nologo -ext "$WixDirectory/WixUIExtension.dll" -sice:ICE38 -sice:ICE64 -cultures:en-us -loc "$PSScriptRoot/windows/Installer.en-us.wxl" -out $msi "$work/product.wixobj" *>> $log
 # ICE38/64 expect HKCU keypaths/removal rows for each per-user file directory;
 # our file components use their installed files, and MSI removes those directories.
 if ($LASTEXITCODE -ne 0) { throw "WiX link failed: $log" }

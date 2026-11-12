@@ -1,5 +1,9 @@
 # Getting started
 
+## Installation and removal
+
+Use `EasyKnack-Setup-<version>-x64.exe` to install; `EasyKnack.exe` starts the application. Windows x64 and an external x64 JDK 25 including `javac` are required. To remove EasyKnack, close it and choose **Settings → Apps → Installed apps → EasyKnack → Uninstall**, or reopen the setup and choose removal. No separate uninstall EXE is needed. Your documents and separately installed JDK remain.
+
 Choose **File → New**, select your device and a low volume on **Audio Output**, then start audio. The initial graph connects an Oscillator to the output. Use Audio Input for a microphone or external signal.
 
 Add nodes from the Add menu. Drag an output to a compatible input; warnings explain rejected connections. The Inspector shows the selection's settings. **N** toggles it; **Ctrl+Shift+L** arranges the current graph. Menus show other shortcuts. Hiding reduces clutter but does not stop processing.

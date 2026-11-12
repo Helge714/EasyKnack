@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.1.0 planned
 
+- Name Windows installers `EasyKnack-Setup-<version>-x64` to distinguish setup
+  from the application launcher. Clarify the preparation message and document
+  Windows uninstall/maintenance access; installation identity is unchanged.
+
 - Establish `0.1.0-SNAPSHOT` as the development version targeting the first
   EasyKnack release `0.1.0`, covering the accumulated features and compatibility
   changes below. GLSwing stays independently versioned at `0.2.0-SNAPSHOT`.

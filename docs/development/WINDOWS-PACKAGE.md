@@ -54,6 +54,16 @@ lets users independently enable the Start Menu and Desktop shortcuts; `.knack`
 opening is registered for the current user. Windows retains control over the
 user's default-app choice. The final page offers to check Java and start EasyKnack.
 The EXE wraps the MSI in a WiX bootstrapper; neither contains a Java installer.
+Installer outputs are named `EasyKnack-Setup-<version>-x64.exe` (or `.msi`),
+distinct from the installed `EasyKnack.exe`. The preparation page describes
+installation checks rather than claiming to build a wizard. Its English text
+is maintained in `scripts/windows/Installer.en-us.wxl`.
+
+The EXE registers its uninstall/maintenance entry in Windows Installed apps;
+reopening that setup also offers removal. Standalone MSI packages use Windows
+Installer's uninstall entry. No separate `uninstall.exe` is shipped. The external
+JDK has its own installation lifecycle. User documents and external media are not
+installer-owned files.
 Signing and clean-machine upgrade/uninstall testing remain separate.
 
 At first launch (including the installer finish action), a small .NET Framework
