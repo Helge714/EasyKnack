@@ -2,6 +2,17 @@
 
 ## Unreleased — 0.1.0 planned
 
+- Validate Windows x64 JDK 25 and its compiler before EXE/MSI installation copies
+  files. Reuse launcher discovery and explicit selection/installation choices;
+  unattended setup fails without a compatible JDK and never downloads one.
+  Cancelling stops setup; uninstall does not require Java. Existing launcher
+  checks remain. Covered by the current 0.1.0 development scope.
+
+- Unify the Windows EXE installer into one setup window for license, options,
+  progress, repair/removal and application launch. Hide the nested MSI wizard and
+  its Apps entry; retain standalone MSI UI. Preserve shortcut/folder choices and
+  close setup when launching EasyKnack. Slow MSI file costing remains unchanged.
+
 - Show a nonblocking loading state when help or Formula is opened before
   background preparation completes, then reveal the requested content automatically.
   Closed editors stay closed; preparation failures end the loading state.

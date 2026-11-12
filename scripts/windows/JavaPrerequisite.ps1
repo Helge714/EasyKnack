@@ -54,3 +54,44 @@ function ConvertTo-EasyKnackArgument([string]$Value) {
     # Windows CommandLineToArgvW quoting, including trailing backslashes.
     return '"' + ([regex]::Replace([regex]::Replace($Value, '(\\*)"', '$1$1\"'), '(\\+)$', '$1$1')) + '"'
 }
+
+# Shared interactive prerequisite flow for the installer and application launcher.
+# Noninteractive setup never downloads Java or displays selection dialogs.
+function Resolve-EasyKnackJdk([switch]$NonInteractive) {
+    $jdk = Find-EasyKnackJdk
+    if ($jdk -or $NonInteractive) { return $jdk }
+    Add-Type -AssemblyName System.Windows.Forms
+    while (!$jdk) {
+        $choice = [Windows.Forms.MessageBox]::Show(
+            "EasyKnack needs a 64-bit JDK 25, including the Java compiler.`n`nYes: install Microsoft OpenJDK 25 using Windows Package Manager (Internet required; the provider's installation and license prompts remain visible).`nNo: select an existing JDK folder.`nCancel: exit.`n`nJava is installed separately and is not removed when EasyKnack is uninstalled.",
+            'EasyKnack - Java setup', 'YesNoCancel', 'Information')
+        if ($choice -eq 'Cancel') { return $null }
+        if ($choice -eq 'No') {
+            $picker = New-Object Windows.Forms.FolderBrowserDialog
+            $picker.Description = 'Select a Windows x64 JDK 25 folder (containing bin and release).'
+            try {
+                if ($picker.ShowDialog() -eq 'OK' -and (Test-EasyKnackJdk $picker.SelectedPath)) {
+                    $jdk = $picker.SelectedPath
+                    # Remember the user's explicit choice, without changing system JAVA_HOME.
+                    $settings = Join-Path $env:LOCALAPPDATA 'EasyKnack'
+                    New-Item -ItemType Directory -Force -Path $settings | Out-Null
+                    $jdk | Set-Content -LiteralPath "$settings/jdk-path.txt" -Encoding UTF8
+                }
+            } finally { $picker.Dispose() }
+        } else {
+            $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
+            if (!$winget) {
+                Start-Process 'https://learn.microsoft.com/java/openjdk/install'
+                [Windows.Forms.MessageBox]::Show('Install the Windows x64 JDK 25 from the official instructions, then return and select its folder.', 'EasyKnack') | Out-Null
+            } else {
+                # Interactive on purpose: do not silently accept package/source agreements.
+                $install = Start-Process -FilePath $winget.Source -ArgumentList 'install --id Microsoft.OpenJDK.25 --exact --source winget --architecture x64 --interactive' -PassThru -Wait
+                if ($install.ExitCode -ne 0) {
+                    [Windows.Forms.MessageBox]::Show("Java installation did not complete (exit $($install.ExitCode)). You can retry or select an installed JDK.", 'EasyKnack') | Out-Null
+                }
+            }
+            $jdk = Find-EasyKnackJdk
+        }
+    }
+    return $jdk
+}

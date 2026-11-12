@@ -16,7 +16,7 @@ if (!$WixDirectory) {
     if ($candle) { $WixDirectory = Split-Path -Parent $candle.Source }
     else { $WixDirectory = Get-ChildItem "$PSScriptRoot/../.local/tools" -Directory -Filter 'wix*' | Sort-Object Name -Descending | Select-Object -First 1 -ExpandProperty FullName }
 }
-foreach ($name in @('candle.exe','light.exe','WixUIExtension.dll','WixBalExtension.dll')) {
+foreach ($name in @('candle.exe','light.exe','WixUIExtension.dll','WixBalExtension.dll','WixUtilExtension.dll')) {
     if (!(Test-Path -LiteralPath "$WixDirectory/$name")) { throw "WiX 3 is required: missing $name" }
 }
 $reviewedTools = (Get-Content -LiteralPath "$PSScriptRoot/sources.lock.json" -Raw | ConvertFrom-Json).installerTools
@@ -58,6 +58,15 @@ $refs = ($components | ForEach-Object { "<ComponentRef Id='$_'/>" }) -join ''
 $icon = Join-Path $Image 'app/EKIcon.ico'
 if (!(Test-Path -LiteralPath $icon)) { throw "Missing packaged application icon: $icon" }
 $launcher = Id 'F' 'EasyKnack.exe'
+$csc = "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/csc.exe"
+$javaSetup = Join-Path $work 'JavaSetup.exe'
+$javaSetupLog = Join-Path $work 'java-prerequisite-build.log'
+& $csc /nologo /target:winexe /platform:x64 /reference:System.Windows.Forms.dll "/out:$javaSetup" `
+    "/resource:$((Resolve-Path "$PSScriptRoot/windows/JavaPrerequisite.ps1").Path),JavaPrerequisite.ps1" `
+    "/resource:$((Resolve-Path "$PSScriptRoot/windows/JavaSetup.ps1").Path),JavaSetup.ps1" `
+    (Resolve-Path "$PSScriptRoot/windows/JavaSetup.cs").Path *> $javaSetupLog
+if ($LASTEXITCODE -ne 0) { throw "Java prerequisite build failed: $javaSetupLog" }
+
 # Separate optional features provide persistent, independent shortcut choices.
 $xml = @"
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
@@ -70,6 +79,7 @@ $xml = @"
 <Directory Id='TARGETDIR' Name='SourceDir'>
 <Directory Id='LocalAppDataFolder'><Directory Id='ProgramsFolder' Name='Programs'><Directory Id='INSTALLDIR' Name='EasyKnack'>$tree
 <Component Id='FileAssociation' Guid='*' Win64='yes'>
+<RegistryValue Root='HKCU' Key='Software\EasyKnack\Installer' Name='InstallPath' Value='[INSTALLDIR]' Type='string'/>
 <RegistryValue Root='HKCU' Key='Software\Classes\.knack' Value='EasyKnack.Document' Type='string' KeyPath='yes'/>
 <RegistryValue Root='HKCU' Key='Software\Classes\EasyKnack.Document' Value='EasyKnack document' Type='string'/>
 <RegistryValue Root='HKCU' Key='Software\Classes\EasyKnack.Document\DefaultIcon' Value='&quot;[INSTALLDIR]EasyKnack.exe&quot;,0' Type='string'/>
@@ -82,12 +92,18 @@ $xml = @"
 <Directory Id='DesktopFolder'><Component Id='DesktopShortcut' Guid='*' Win64='yes'><Shortcut Id='DesktopLink' Name='EasyKnack' Target='[INSTALLDIR]EasyKnack.exe' WorkingDirectory='INSTALLDIR' Icon='EasyKnackIcon' IconIndex='0'/><RegistryValue Root='HKCU' Key='Software\EasyKnack\Installer' Name='Desktop' Type='integer' Value='1' KeyPath='yes'/></Component></Directory>
 </Directory>
 <Feature Id='Application' Title='EasyKnack and C++ compiler' Description='Required application files and LLVM-MinGW for Bake and plugins. Java is installed separately.' Level='1' Absent='disallow' ConfigurableDirectory='INSTALLDIR'>$refs<ComponentRef Id='FileAssociation'/>
-<Feature Id='StartMenu' Title='Start Menu shortcut' Level='1'><ComponentRef Id='MenuShortcut'/></Feature>
-<Feature Id='Desktop' Title='Desktop shortcut' Level='2'><ComponentRef Id='DesktopShortcut'/></Feature>
+<Feature Id='StartMenu' Title='Start Menu shortcut' Level='1'><Condition Level='0'>EK_BUNDLE=1 AND EK_STARTMENU=0</Condition><Condition Level='1'>EK_BUNDLE=1 AND EK_STARTMENU=1</Condition><ComponentRef Id='MenuShortcut'/></Feature>
+<Feature Id='Desktop' Title='Desktop shortcut' Level='2'><Condition Level='0'>EK_BUNDLE=1 AND EK_DESKTOP=0</Condition><Condition Level='1'>EK_BUNDLE=1 AND EK_DESKTOP=1</Condition><ComponentRef Id='DesktopShortcut'/></Feature>
 </Feature>
 <Property Id='INSTALLLEVEL' Value='1'/>
+<Property Id='EK_BUNDLE' Secure='yes'/><Property Id='EK_STARTMENU' Secure='yes'/><Property Id='EK_DESKTOP' Secure='yes'/>
+<Property Id='ARPNOMODIFY' Value='1'/><Property Id='ARPINSTALLLOCATION' Value='[INSTALLDIR]'/>
+
 <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT' Value='Check Java prerequisites and start EasyKnack'/>
 <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOX' Value='1'/>
+<Binary Id='JavaPrerequisite' SourceFile='$(Xml $javaSetup)'/>
+<CustomAction Id='CheckJavaBeforeInstall' BinaryKey='JavaPrerequisite' ExeCommand='/ui [UILevel]' Execute='immediate' Impersonate='yes' Return='check'/>
+<InstallExecuteSequence><Custom Action='CheckJavaBeforeInstall' Before='InstallValidate'>NOT (REMOVE~="ALL") AND NOT EK_BUNDLE</Custom></InstallExecuteSequence>
 <CustomAction Id='LaunchEasyKnack' FileKey='$launcher' ExeCommand='' Execute='immediate' Impersonate='yes' Return='asyncNoWait'/>
 <UIRef Id='WixUI_FeatureTree'/>
 <UI><Publish Dialog='ExitDialog' Control='Finish' Event='DoAction' Value='LaunchEasyKnack'>WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed</Publish></UI>
@@ -108,15 +124,35 @@ $msi = if ($Type -eq 'msi') { $expected } else { "$work/EasyKnack-$version.msi" 
 if ($LASTEXITCODE -ne 0) { throw "WiX link failed: $log" }
 if ($Type -eq 'exe') {
     @"
-<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:bal='http://schemas.microsoft.com/wix/BalExtension'>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:bal='http://schemas.microsoft.com/wix/BalExtension' xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
 <Bundle IconSourceFile='$(Xml $icon)' Name='EasyKnack' Version='$version' Manufacturer='EasyKnack' UpgradeCode='e393418e-2805-43c3-b492-e32794465778'>
-<BootstrapperApplicationRef Id='WixStandardBootstrapperApplication.HyperlinkLicense'><bal:WixStandardBootstrapperApplication LicenseUrl='' SuppressOptionsUI='yes'/></BootstrapperApplicationRef>
-<Chain><MsiPackage SourceFile='$(Xml $msi)' DisplayInternalUI='yes' /></Chain>
+<Variable Name='InstallFolder' Type='string' Value='[LocalAppDataFolder]Programs\EasyKnack' Persisted='yes'/>
+<Variable Name='StartMenuShortcut' Type='numeric' Value='1' Persisted='yes'/>
+<Variable Name='DesktopShortcut' Type='numeric' Value='0' Persisted='yes'/>
+<util:RegistrySearch Id='HasInstalledFolder' Variable='HasInstalledFolder' Root='HKCU' Key='Software\EasyKnack\Installer' Value='InstallPath' Result='exists' Win64='yes'/>
+<util:RegistrySearch Id='InstalledFolder' Variable='InstallFolder' Root='HKCU' Key='Software\EasyKnack\Installer' Value='InstallPath' Result='value' Win64='yes' After='HasInstalledFolder' Condition='HasInstalledFolder'/>
+<util:RegistrySearch Id='HasInstalledStartMenu' Variable='HasInstalledStartMenu' Root='HKCU' Key='Software\EasyKnack\Installer' Value='StartMenu' Result='exists' Win64='yes'/>
+<util:RegistrySearch Id='InstalledStartMenu' Variable='StartMenuShortcut' Root='HKCU' Key='Software\EasyKnack\Installer' Value='StartMenu' Result='value' Win64='yes' After='HasInstalledStartMenu' Condition='HasInstalledStartMenu'/>
+<util:RegistrySearch Id='HasInstalledDesktop' Variable='HasInstalledDesktop' Root='HKCU' Key='Software\EasyKnack\Installer' Value='Desktop' Result='exists' Win64='yes'/>
+<util:RegistrySearch Id='InstalledDesktop' Variable='DesktopShortcut' Root='HKCU' Key='Software\EasyKnack\Installer' Value='Desktop' Result='value' Win64='yes' After='HasInstalledDesktop' Condition='HasInstalledDesktop'/>
+<BootstrapperApplicationRef Id='WixStandardBootstrapperApplication.RtfLicense'>
+<bal:WixStandardBootstrapperApplication LicenseFile='$(Xml "$work/license.rtf")'
+ ThemeFile='$(Xml "$PSScriptRoot/windows/InstallerTheme.xml")' LocalizationFile='$(Xml "$PSScriptRoot/windows/InstallerTheme.en-us.wxl")'
+ LaunchTarget='[InstallFolder]\EasyKnack.exe' LaunchWorkingFolder='[InstallFolder]' LaunchHidden='yes'/>
+</BootstrapperApplicationRef>
+<Chain>
+<ExePackage Id='JavaPrerequisite' SourceFile='$(Xml $javaSetup)' DisplayName='Checking Java 25 (64-bit JDK)'
+ InstallCommand='/ui [WixBundleUILevel]' RepairCommand='/ui [WixBundleUILevel]' DetectCondition='0'
+ PerMachine='no' Permanent='yes' Vital='yes' Cache='no'/>
+<MsiPackage SourceFile='$(Xml $msi)' DisplayInternalUI='no' Visible='no'>
+<MsiProperty Name='INSTALLDIR' Value='[InstallFolder]'/><MsiProperty Name='EK_BUNDLE' Value='1'/>
+<MsiProperty Name='EK_STARTMENU' Value='[StartMenuShortcut]'/><MsiProperty Name='EK_DESKTOP' Value='[DesktopShortcut]'/>
+</MsiPackage></Chain>
 </Bundle></Wix>
 "@ | Set-Content -LiteralPath "$work/bundle.wxs" -Encoding utf8
-    & "$WixDirectory/candle.exe" -nologo -ext "$WixDirectory/WixBalExtension.dll" -out "$work/bundle.wixobj" "$work/bundle.wxs" *>> $log
+    & "$WixDirectory/candle.exe" -nologo -ext "$WixDirectory/WixBalExtension.dll" -ext "$WixDirectory/WixUtilExtension.dll" -out "$work/bundle.wixobj" "$work/bundle.wxs" *>> $log
     if ($LASTEXITCODE -ne 0) { throw "Bundle compile failed: $log" }
-    & "$WixDirectory/light.exe" -nologo -ext "$WixDirectory/WixBalExtension.dll" -out $expected "$work/bundle.wixobj" *>> $log
+    & "$WixDirectory/light.exe" -nologo -ext "$WixDirectory/WixBalExtension.dll" -ext "$WixDirectory/WixUtilExtension.dll" -out $expected "$work/bundle.wixobj" *>> $log
     if ($LASTEXITCODE -ne 0) { throw "Bundle link failed: $log" }
 }
 Write-Host "Installer: $expected"

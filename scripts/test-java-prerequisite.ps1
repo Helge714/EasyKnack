@@ -5,6 +5,21 @@ if (!$JdkHome) { $JdkHome = Find-EasyKnackJdk }
 if (!(Test-EasyKnackJdk $JdkHome)) { throw 'Tests require a working x64 JDK 25.' }
 $work = Join-Path "$PSScriptRoot/../target" ('jdk-test-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path "$work/fake/bin", "$work/image space/app", "$work/classes" | Out-Null
+
+$invalid=Join-Path $work 'invalid-jdk'
+New-Item -ItemType Directory -Force -Path "$invalid/bin" | Out-Null
+foreach ($part in @('java.exe','javaw.exe','javac.exe')) { [IO.File]::WriteAllBytes("$invalid/bin/$part",[byte[]]@()) }
+foreach ($case in @(
+    @('JAVA_VERSION="24.0.1"','OS_ARCH="amd64"','OS_NAME="Windows"'),
+    @('JAVA_VERSION="25.0.1"','OS_ARCH="aarch64"','OS_NAME="Windows"'),
+    @('JAVA_VERSION="25.0.1"','OS_ARCH="amd64"','OS_NAME="Linux"'),
+    @('JAVA_VERSION="25.0.1"','OS_ARCH="amd64"','OS_NAME="Windows"')
+)) {
+    $case | Set-Content -LiteralPath "$invalid/release" -Encoding ascii
+    if (Test-EasyKnackJdk $invalid) { throw 'Incompatible metadata or a broken compiler was accepted.' }
+}
+Remove-Item -LiteralPath "$invalid/bin/javac.exe"
+if (Test-EasyKnackJdk $invalid) { throw 'A JRE without javac was accepted.' }
 foreach ($file in @('java.exe','javaw.exe','javac.exe')) { New-Item -ItemType File -Path "$work/fake/bin/$file" | Out-Null }
 foreach ($metadata in @('JAVA_VERSION="17.0.1"', 'JAVA_VERSION="25.0.1"', 'JAVA_VERSION="26"')) {
     "$metadata`nOS_ARCH=`"aarch64`"`nOS_NAME=`"Windows`"" | Set-Content "$work/fake/release"

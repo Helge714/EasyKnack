@@ -101,7 +101,7 @@ Paths below are relative to `native/audio-host/src/`.
 - `pom.xml`: dependencies, product version and Maven build steps.
 - `src/main/java/com/vin/easyknack/LegalDocuments.java`: packaged legal resources and source-checkout fallback after incremental resource cleanup.
 - `scripts/build-audio-host.ps1`, `scripts/generate-native-nodes.ps1`: native build and generation.
-- `Build-Installer.bat`, `scripts/build-installer.ps1`, `scripts/package-windows.ps1`: Windows packaging entry points.
+- `Build-Installer.bat`, `scripts/build-installer.ps1`, `scripts/package-windows.ps1`: Windows packaging entry points. `package-installer.ps1` uses the adapted `scripts/windows/InstallerTheme*` for a single Burn window; the nested MSI is silent, while standalone MSI retains its feature tree. `windows/JavaSetup.*` embeds the shared prerequisite flow before copying files; `test-installer-prerequisite.ps1` covers rejection, valid installation and Java-independent removal.
 - `src/test/java/com/vin/easyknack/`: Java tests, generally mirroring packages/features.
 - `native/audio-host/tests/`, `native/audio-host/benchmarks/`: native validation and performance cases.
 - `docs/user/`: user instructions; `docs/development/`: contributor references.

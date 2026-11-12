@@ -49,15 +49,25 @@ user's example library without replacing existing files. An empty plugin library
 does not trigger compilation at startup. Existing source plugins may need a
 one-time rebuild after upgrading the application or relocating its compiler.
 
-`-Type exe` or `-Type msi` builds a per-user WiX 3 installer. Its feature tree
-lets users independently enable the Start Menu and Desktop shortcuts; `.knack`
-opening is registered for the current user. Windows retains control over the
-user's default-app choice. The final page offers to check Java and start EasyKnack.
-The EXE wraps the MSI in a WiX bootstrapper; neither contains a Java installer.
+`-Type exe` builds one WiX Burn setup window with embedded license text,
+installation-folder and independent Start Menu/Desktop options, progress/action
+messages, maintenance and a final Start EasyKnack button. The MSI runs without
+its own wizard or separate Apps entry. Starting the application closes setup.
+`-Type msi` retains the standalone feature-tree wizard. Both install for the
+current user and register `.knack`; Windows retains the default-app choice.
+Neither contains a Java installer.
+
+The EXE persists options and reads installed choices from the application's HKCU
+installer key. Missing registry values retain fresh-install defaults. Bundle-only
+MSI properties select optional shortcut features; standalone MSI choices remain
+available. The adapted WiX RTF theme/localization and their separate MS-RL notice
+are maintained under `scripts/windows/InstallerTheme*`.
+
 Installer outputs are named `EasyKnack-Setup-<version>-x64.exe` (or `.msi`),
-distinct from the installed `EasyKnack.exe`. The preparation page describes
-installation checks rather than claiming to build a wizard. Its English text
-is maintained in `scripts/windows/Installer.en-us.wxl`.
+distinct from the installed `EasyKnack.exe`. The standalone MSI preparation page uses `scripts/windows/Installer.en-us.wxl`.
+The EXE keeps setup progress visible throughout MSI execution, including slow
+space/file validation; the progress page explains that an existing installation
+can take several minutes to check. This UI change does not eliminate MSI costing.
 
 The EXE registers its uninstall/maintenance entry in Windows Installed apps;
 reopening that setup also offers removal. Standalone MSI packages use Windows
@@ -65,6 +75,21 @@ Installer's uninstall entry. No separate `uninstall.exe` is shipped. The externa
 JDK has its own installation lifecycle. User documents and external media are not
 installer-owned files.
 Signing and clean-machine upgrade/uninstall testing remain separate.
+
+Before copying application files, EXE setup runs an embedded Java prerequisite
+helper; standalone MSI runs the same helper before `InstallValidate` (and before removal of an older product). Both share
+`JavaPrerequisite.ps1` with the application launcher: Windows x64 JDK 25, compiler
+presence and successful `javac -version` validation. A missing compatible JDK offers
+folder selection or an explicitly approved external JDK installation; cancellation
+stops setup before file installation. Quiet/passive installation never prompts or
+downloads Java and fails if no compatible JDK is found. Removal skips the check.
+The JDK remains separately installed and is never removed with EasyKnack.
+
+`test-installer-prerequisite.ps1` builds an isolated product with a harmless launcher
+and restricted candidate discovery, leaving the user's Java/EasyKnack installation
+untouched. It verifies EXE/MSI rejection with no Java, successful installation with
+a compatible JDK, and uninstall without Java. `test-java-prerequisite.ps1` also
+checks incompatible metadata, JRE/broken compiler rejection and launcher arguments.
 
 At first launch (including the installer finish action), a small .NET Framework
 launcher invokes the packaged Windows PowerShell 5.1 script. It finds JDK 25 x64

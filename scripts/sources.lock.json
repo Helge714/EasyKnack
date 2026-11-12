@@ -157,6 +157,10 @@
       {
         "path": "x86/burn.exe",
         "sha256": "07daef9f80ad388b1a97041b8a0693d145eaaea27b0023b12111e72ef78d93ef"
+      },
+      {
+        "path": "WixUtilExtension.dll",
+        "sha256": "bf55a3072b449d0e99a9f9af48bba7f07689833935024c90b2f8a13e167c9e0a"
       }
     ]
   }

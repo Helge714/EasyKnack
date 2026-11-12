@@ -66,5 +66,7 @@ The EXE installer embeds WiX 3.14.1 Burn/WixStdBA under the Microsoft Reciprocal
 License (MS-RL). Its original notice is under licenses/upstream and its complete
 release-tag sources are included in the matching source-material download. This
 installer code retains its own license, separate from the EasyKnack application.
+The adapted RTF setup theme and localization in `scripts/windows/InstallerTheme*`
+also retain MS-RL; their notice is `scripts/windows/InstallerTheme-LICENSE.txt`.
 EKSplash and EKIcon are original author-provided assets distributed under
 GPL-3.0-only with the author's permission.
