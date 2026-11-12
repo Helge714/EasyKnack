@@ -55,7 +55,8 @@ public final class ApplicationArtwork {
         // Match Core's standard splash recipe, with transparent content over the artwork.
         status.add(context.title());
         status.add(Box.createVerticalStrut(4));
-        status.add(context.subtitle(BuildInfo.application().version()));
+        var identity = BuildInfo.application();
+        status.add(context.subtitle(identity.build().equals("IDE / unpackaged") ? identity.display() : identity.version()));
         status.add(Box.createVerticalStrut(22));
         status.add(context.currentTask());
         status.add(Box.createVerticalStrut(8));

@@ -27,8 +27,11 @@ ID. This identifies a CI run, not proof of an approved release. Other CI systems
 currently use a local-style ID. Published release versions/tags remain deliberate.
 
 `BuildInfo.application()` and `BuildInfo.core()` expose packaged identities to
-diagnostics. Class-directory launches explicitly show `IDE / unpackaged` rather
-than old metadata left behind by a previous package build. Missing metadata in an
+diagnostics. Class-directory launches read the product version from their owning checkout's
+Maven POM and show `<version> — IDE / unpackaged`. This lookup is anchored to the
+loaded class directory, including isolated validation output; it never uses the
+process working directory or old package metadata. A missing version is reported
+as `unknown`. IDE launches do not allocate build IDs. Missing metadata in an
 older dependency is reported as unavailable. The audio diagnostics CSV includes
 both identities. Help → About EasyKnack shows both identities in a selectable text
 view. Installer versions use the numeric Maven product version; CI release identity

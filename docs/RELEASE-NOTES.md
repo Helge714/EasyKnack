@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Show the current Maven product version for IDE launches alongside `IDE / unpackaged`,
+  without reusing stale package identities or allocating a build number.
+
 - Accept `buffer.writepos` in Formula Groups as a compatible alias of the absolute
   `buffer.writePosition` sample position; complete both Formula language references.
   Existing documents, buffer semantics and protocol versions are unchanged. Covered
