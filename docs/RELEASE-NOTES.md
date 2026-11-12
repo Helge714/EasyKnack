@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Accept `buffer.writepos` in Formula Groups as a compatible alias of the absolute
+  `buffer.writePosition` sample position; complete both Formula language references.
+  Existing documents, buffer semantics and protocol versions are unchanged. Covered
+  by the current development version before the first release.
+
 - Fix missing text on repeated graph image exports with context-owned capture fonts in the external GLSwing dependency; verify the repeated capture in the packaged application smoke test.
 
 - Include both offline manuals and full node references beside the Windows application; correct the external quick-start links and check bundled help during package smoke validation.

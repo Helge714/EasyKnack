@@ -12,6 +12,17 @@ class FormulaEditorHelpTest {
     private List<GLCodeCompletion> complete(String source,int offset){var d=doc(source);try(var s=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){return s.complete(d,offset,null).toCompletableFuture().join();}}
     private String hover(String source,int offset){var d=doc(source);try(var s=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){return s.hover(d,offset).toCompletableFuture().join().map(GLCodeHover::contents).orElse("");}}
     private List<GLCodeSignature> signature(String source){var d=doc(source);try(var s=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){return s.signatureHelp(d,source.length(),',').toCompletableFuture().join();}}
+    @Test void writeposAliasMatchesExistingBufferPositionAcrossLanguageVersions(){
+        for(int version:List.of(1,2,3)){
+            var expected=FormulaCompiler.compile("result=buffer.writePosition;",ports,version);
+            var actual=FormulaCompiler.compile("result=buffer.writepos;",ports,version);
+            assertEquals(expected.bytecode(),actual.bytecode());
+            assertEquals(expected.cpp(),actual.cpp());
+            assertTrue(actual.sampleContext());
+        }
+        assertTrue(complete("buffer.",7).stream().anyMatch(c->c.label().equals("writepos")));
+        assertTrue(hover("result=buffer.writepos;",17).contains("absolute"));
+    }
     @Test void localsRespectBlocksBranchesAndDeclarationOrder(){
         String source="state double phase=0; unsigned long count=1; if(clock){float inner=1; result=inner;} if(clock) float branchOnly=2; result=phase; float future=0;";
         var inner=complete(source,source.indexOf("result=inner"));assertTrue(inner.stream().anyMatch(c->c.label().equals("inner")));

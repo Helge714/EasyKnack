@@ -31,6 +31,31 @@ Hyperbolische Funktionen: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.
 `expm1` und `log1p` erhalten die Genauigkeit nahe null. Die Funktionshilfe nennt
 Definitionsbereiche und nichtendliche Ergebnisse; Oversampling erfolgt nicht automatisch.
 
+
+### Sprache
+
+- Typen: `bool`, `int`, `uint` (`unsigned int`), `long`, `ulong` (`unsigned long`), `float`, `double`; Casts wie `(double) value`.
+- Anweisungen: lokale Deklarationen, `state` Deklarationen vor anderen Anweisungen, Zuweisungen, `+=`, `-=`, `*=`, `/=`, `if` / `else`, Blöcke `{ }`, Kommentare `//`.
+- Operatoren: `+`, `-`, `*`, `/`, `%`, unäres `+` / `-` / `!`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`; Klammern bestimmen die Reihenfolge. Keine Schleifen, Pointer oder beliebigen C++-Aufrufe.
+- Konstanten: `true`, `false`, `pi`, `tau`, `Audio`, `Control`, `Clamp`, `Wrap`, `Zero`, `Linear`, `Nearest`.
+- Kontext: `sampleRate` (Hz), `blockSize` (Samples), `sampleIndex` (innerhalb des Blocks), `samplePosition` (absolute Sampleanzahl). Vergangene Sekunden: `samplePosition / sampleRate`.
+- Numerische Eingänge: `.value`, `.rate`; Triggereingänge: `.active`.
+- Buffer-Eingänge: `.size`, `.begin`, `.end`, `.writePosition`, `.writepos`, `.sampleRate`, `.read(position[, mode[, interpolation]])`. Positionen sind absolute Samplepositionen; `writepos` ist ein Alias von `writePosition`. Der normierte 0–1-Ausgang des Buffer-Nodes ist davon unabhängig. Dateibuffer halten die Schreibposition bei `.end`. Lesevorgaben: `Clamp`, `Linear`; alternativ `Wrap` oder `Zero` und `Nearest`. Alte Version-1-Lesezugriffe behalten physische Indizes.
+
+| Funktionen | Argumente |
+| --- | --- |
+| `abs`, `sign`, `sqrt`, `exp`, `expm1`, `log`, `log2`, `log10`, `log1p`, `floor`, `ceil`, `round` | `(value)` |
+| `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh` | `(value)`; Winkel in Radiant |
+| `sineWave` | `(phase)`; Phase in Perioden |
+| `atan2` | `(y, x)` |
+| `pow` | `(base, exponent)` |
+| `min`, `max` | `(a, b)` |
+| `clamp` | `(value, minimum, maximum)` |
+| `mix` | `(a, b, factor)` |
+| `rand` | `(minimum, maximum[, seed])` |
+
+Vervollständigung, Hover- und Signaturhilfe erklären Definitionsbereiche und Argumentdetails.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |

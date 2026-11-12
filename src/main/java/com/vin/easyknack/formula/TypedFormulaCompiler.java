@@ -119,7 +119,7 @@ final class TypedFormulaCompiler {
             String name=identifier().text();
             if(v.kind()!=K.BUFFER){if(name.equals(v.kind()==K.BOOL?"active":"value"))return new E(v.kind(),v.cpp(),v.reg());if(name.equals("rate")&&v.kind()==K.FLOAT)return operation(K.FLOAT,K.FLOAT,"context.rate("+slot+")","inputRate",0,0,0,""+slot);throw fail("Invalid input property");}
             if(name.equals("size"))return operation(K.FLOAT,K.FLOAT,"context.size("+slot+")","bufferSize",0,0,0,""+slot);
-            int field=List.of("begin","end","writePosition","sampleRate").indexOf(name);if(field>=0){contextual|=field!=3;return operation(K.FLOAT,K.FLOAT,"context.info("+slot+", "+field+")","bufferInfo",0,0,0,""+(slot*4+field));}
+            int field=List.of("begin","end","writePosition","sampleRate").indexOf(name.equals("writepos")?"writePosition":name);if(field>=0){contextual|=field!=3;return operation(K.FLOAT,K.FLOAT,"context.info("+slot+", "+field+")","bufferInfo",0,0,0,""+(slot*4+field));}
             if(!name.equals("read"))throw fail("Unknown Buffer property");expect("(");E pos=cast(expression(0),K.DOUBLE);contextual=true;
             if(version>=2&&peek(")")||peek(",")&&at+1<ts.size()&&Set.of("Clamp","Wrap","Zero").contains(ts.get(at+1).text())){
                 int mode=0,linear=1;if(take(",")){mode=List.of("Clamp","Wrap","Zero").indexOf(now().text());if(mode<0)throw fail("Expected read mode");at++;if(take(",")){linear=List.of("Nearest","Linear").indexOf(now().text());if(linear<0)throw fail("Expected interpolation mode");at++;}}expect(")");return operation(K.FLOAT,K.FLOAT,"context.readTimeline("+slot+", "+pos.cpp()+", "+mode+", "+linear+")","bufferTimeline",pos.reg(),0,0,""+(slot*8+mode*2+linear));

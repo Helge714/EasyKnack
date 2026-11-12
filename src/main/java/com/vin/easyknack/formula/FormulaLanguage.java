@@ -105,7 +105,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
     };}
     private Map<String,String> members(String owner){
         var names=new LinkedHashMap<String,String>();for(var p:ports)if(!p.output()&&p.name().equals(owner))switch(p.type()){
-            case BUFFER->{names.put("read",FormulaEditorHelp.read(version).description());names.put("size","float — capacity in samples; zero for an empty buffer.");names.put("begin","float — oldest available absolute sample position.");names.put("end","float — position after the newest available sample.");names.put("writePosition","float — next write position; fixed at end for file buffers.");names.put("sampleRate","float — buffer sample rate in Hz.");}
+            case BUFFER->{names.put("read",FormulaEditorHelp.read(version).description());names.put("size","float — capacity in samples; zero for an empty buffer.");names.put("begin","float — oldest available absolute sample position.");names.put("end","float — position after the newest available sample.");names.put("writePosition","float — next write position; fixed at end for file buffers.");names.put("writepos","float — alias of writePosition; absolute next write sample position.");names.put("sampleRate","float — buffer sample rate in Hz.");}
             case NUMBER->{names.put("value","float — current sample or held Control value.");names.put("rate","float — Audio (1) or Control (0).");}
             case BOOLEAN->names.put("active","bool — trigger at the current sample.");
         }return names;

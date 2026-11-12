@@ -31,6 +31,31 @@ Hyperbolic functions: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`.
 `expm1` and `log1p` preserve accuracy near zero. Function help describes domains
 and nonfinite results; no oversampling is applied automatically.
 
+
+### Language
+
+- Types: `bool`, `int`, `uint` (`unsigned int`), `long`, `ulong` (`unsigned long`), `float`, `double`; casts such as `(double) value`.
+- Statements: local declarations, `state` declarations before other statements, assignments, `+=`, `-=`, `*=`, `/=`, `if` / `else`, blocks `{ }`, comments `//`.
+- Operators: `+`, `-`, `*`, `/`, `%`, unary `+` / `-` / `!`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`; parentheses control precedence. No loops, pointers or arbitrary C++ calls.
+- Constants: `true`, `false`, `pi`, `tau`, `Audio`, `Control`, `Clamp`, `Wrap`, `Zero`, `Linear`, `Nearest`.
+- Context: `sampleRate` (Hz), `blockSize` (samples), `sampleIndex` (within the block), `samplePosition` (absolute sample count). Elapsed seconds: `samplePosition / sampleRate`.
+- Numeric inputs: `.value`, `.rate`; Trigger inputs: `.active`.
+- Buffer inputs: `.size`, `.begin`, `.end`, `.writePosition`, `.writepos`, `.sampleRate`, `.read(position[, mode[, interpolation]])`. Positions are absolute sample positions; `writepos` aliases `writePosition`, rather than the Buffer node's normalized 0–1 output. File buffers hold the write position at `.end`. Read defaults: `Clamp`, `Linear`; use `Wrap` or `Zero`, and `Nearest` as needed. Legacy version-1 reads retain physical-index semantics.
+
+| Functions | Arguments |
+| --- | --- |
+| `abs`, `sign`, `sqrt`, `exp`, `expm1`, `log`, `log2`, `log10`, `log1p`, `floor`, `ceil`, `round` | `(value)` |
+| `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh` | `(value)`; angles in radians |
+| `sineWave` | `(phase)`; phase in cycles |
+| `atan2` | `(y, x)` |
+| `pow` | `(base, exponent)` |
+| `min`, `max` | `(a, b)` |
+| `clamp` | `(value, minimum, maximum)` |
+| `mix` | `(a, b, factor)` |
+| `rand` | `(minimum, maximum[, seed])` |
+
+Completion, hover and signature help describe function domains and argument details.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

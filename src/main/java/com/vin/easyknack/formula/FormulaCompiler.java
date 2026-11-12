@@ -172,9 +172,9 @@ public final class FormulaCompiler {
                 used.add(buffer.port().id());int slot=0;for(var p:ports){if(p.id().equals(buffer.port().id()))break;if(!p.output())slot++;}
                 expect(".");Token member=current();cursor++;
                 if(member.text().equals("size"))return operation(Type.NUMBER,"context.size("+slot+")","bufferSize",0,0,0,slot);
-                int info=List.of("begin","end","writePosition","sampleRate").indexOf(member.text());
+                int info=List.of("begin","end","writePosition","sampleRate").indexOf(member.text().equals("writepos")?"writePosition":member.text());
                 if(info>=0)return operation(Type.NUMBER,"context.info("+slot+", "+info+")","bufferInfo",0,0,0,slot*4+info);
-                if(!member.text().equals("read"))throw new Failure(member,"Buffer exposes size, begin, end, writePosition, sampleRate and read(position[, mode[, interpolation]])");
+                if(!member.text().equals("read"))throw new Failure(member,"Buffer exposes size, begin, end, writePosition (writepos), sampleRate and read(position[, mode[, interpolation]])");
                 expect("(");var position=expression(0);require(position,Type.NUMBER);
                 if(version>=2&&peek(")")||peek(",")&&cursor+1<tokens.size()&&Set.of("Clamp","Wrap","Zero").contains(tokens.get(cursor+1).text())){
                     int mode=0,interpolation=1;
