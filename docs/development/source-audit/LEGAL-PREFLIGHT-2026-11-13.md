@@ -106,11 +106,13 @@ Legal references: [UrhG section 69a](https://www.gesetze-im-internet.de/urhg/__6
 
 ## Visual and legal limits
 
-The historical application images inspected were `target/export-Selected nodes.png`
-(2026-11-11), `target/new-group-import.png` (2026-11-07) and the current product
-icon. A fresh live release-window capture was not completed: the Computer Use app
-approval timed out. Official Blender manual image endpoints were unavailable to
-the browsing tool. No current full-screen/pixel side-by-side comparison is claimed.
+The initial preflight used historical application images and could not complete
+live capture. That limitation has now been followed up by a
+[live EasyKnack 0.1.0 / Blender 4.3.2 comparison](GUI-COMPARISON-2026-11-13.md).
+The release identity was confirmed in About, representative windows/controls were
+inspected and three screenshots retained locally. This replaces the earlier
+live-capture gap for the states actually listed in that report; it is not
+exhaustive editor/theme coverage or a pixel-similarity/legal-clearance test.
 
 For a binding publication assessment, an IP/software lawyer should review the
 actual release screens, this dependency/source record and the installer license

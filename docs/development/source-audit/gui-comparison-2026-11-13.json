@@ -1,0 +1,52 @@
+{
+  "format": 1,
+  "date": "2026-11-13",
+  "method": "Live Windows UI inspection using computer-use sky APIs; qualitative comparison, no similarity scoring.",
+  "easyknack": {
+    "version": "0.1.0",
+    "commit": "fcf85a5",
+    "identityVerifiedInAbout": true,
+    "theme": "EasyKnack (default)"
+  },
+  "blender": {
+    "version": "4.3.2",
+    "workspace": "Shading / Shader Editor"
+  },
+  "images": [
+    {
+      "file": "easyknack-workspace.jpg",
+      "bytes": 95093,
+      "sha256": "1f9652b49c80447dc97ffeeafcd813cf3332ad42c91b971bd99ed83e9c16b655"
+    },
+    {
+      "file": "blender-shader-workspace.jpg",
+      "bytes": 118705,
+      "sha256": "59d90c81db7d05280a2f932a5178ba5c66c7bea5e988b9814e3b54ac7ea13ddf"
+    },
+    {
+      "file": "blender-color-popover.jpg",
+      "bytes": 125359,
+      "sha256": "c7e286f248dcf9befc805aaf3ca58675b26fa152f0b6114beb80b562e733a9a4"
+    }
+  ],
+  "observedViews": [
+    "EasyKnack complete start workspace",
+    "EasyKnack About build identity",
+    "EasyKnack gain numeric entry",
+    "EasyKnack node context menu",
+    "EasyKnack language/theme settings",
+    "EasyKnack File / Examples menus",
+    "Blender complete Shading workspace",
+    "Blender Principled BSDF numeric entry",
+    "Blender base-color popover"
+  ],
+  "conclusion": "Recognizably Blender-inspired detail styling, especially numeric fields/sliders and nodes; distinct observed overall composition and branding. Not legal clearance.",
+  "limits": [
+    "No exhaustive theme/node/editor coverage",
+    "No paired live EasyKnack color or curve editor inspection",
+    "Different zoom/window dimensions; no quantitative similarity claim",
+    "No legal overall-impression or trademark/design-register determination"
+  ],
+  "projectFilesSaved": false,
+  "audioStarted": false
+}

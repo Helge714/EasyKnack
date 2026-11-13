@@ -182,8 +182,9 @@
     "historicalNodeExport": "target/export-Selected nodes.png (2026-11-11)",
     "historicalDialog": "target/new-group-import.png (2026-11-07)",
     "branding": "src/main/resources/branding/EKIcon.png",
-    "liveReleaseCapture": "Not completed: Computer Use app approval timed out. No approval bypass attempted.",
-    "blenderManualImages": "Official manual image endpoints were not accessible through the browsing tool; no pixel-comparison result is claimed."
+    "liveReleaseCapture": "Completed in follow-up: EasyKnack 0.1.0 fcf85a5 and Blender 4.3.2 directly inspected.",
+    "blenderManualImages": "Official manual image endpoints were not accessible through the browsing tool; no pixel-comparison result is claimed.",
+    "followUpReport": "GUI-COMPARISON-2026-11-13.md"
   },
   "historyPathScreen": {
     "executablesAndArchives": [
