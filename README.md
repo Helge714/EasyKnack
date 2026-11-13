@@ -6,6 +6,9 @@ signals as they run, and save your work as `.knack` documents.
 
 ## Get started
 
+Download the [Windows x64 release](https://github.com/Helge97/EasyKnack/releases/latest)
+with its matching sources and checksums. The installer is unsigned.
+
 Use the Windows x64 installer or portable application folder. Packaged builds
 require an external Windows x64 JDK 25, including `javac`. They include the audio
 host and native tools used by Formula, Bake and source plugins. See the quick start

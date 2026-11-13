@@ -1,0 +1,124 @@
+{
+  "format": 1,
+  "version": "0.1.0",
+  "releaseUrl": "https://github.com/Helge97/EasyKnack/releases/tag/v0.1.0",
+  "sourceCommit": "fcf85a5f61ccbe94045cf8393d4cf79c28228ca0",
+  "buildIdentity": {
+    "artifact": "easy-knack",
+    "build.id": "local-20261113T092120.954884100Z-e77291dd",
+    "build.kind": "local",
+    "build.time": "2026-11-13T09\\:21\\:20.954884100Z",
+    "git.commit": "fcf85a5f61ccbe94045cf8393d4cf79c28228ca0",
+    "git.dirty": "false",
+    "version": "0.1.0"
+  },
+  "platform": "Windows x64",
+  "java": "External Windows x64 JDK 25 including javac",
+  "installerSigned": false,
+  "automatedChecks": {
+    "javaSuite": {
+      "tests": 741,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 176,
+      "passed": 565
+    },
+    "documentation": {
+      "pages": 268,
+      "checkedLinks": 7882,
+      "passed": true
+    },
+    "packageSmoke": {
+      "passed": true,
+      "covers": [
+        "offline help",
+        "repeated image capture text",
+        "document round trip",
+        "null-audio playback",
+        "MP3 decode",
+        "Formula native compilation/cache",
+        "group export",
+        "Java/C++ plugin compilation",
+        "native parameter contracts",
+        "plugin restart cache",
+        "responsive real launcher window"
+      ]
+    },
+    "pluginPublication": {
+      "windowsDirectoryLockRegressionPassed": true,
+      "nativeHostPublicationRuns": 10
+    },
+    "installer": {
+      "isolatedMigrationRepairRollbackUninstallPassed": true,
+      "missingJavaRejected": true,
+      "java25Accepted": true,
+      "uninstallWithoutJavaPassed": true
+    }
+  },
+  "artifactVerification": {
+    "inventoryFiles": 5903,
+    "unexpectedImageFiles": 0,
+    "projectSources": 1552,
+    "upstreamArchivesVerified": 13,
+    "sourceReviewComplete": true,
+    "sourceMatchesBuild": true,
+    "projectSourcesSha256": "9521117dcc208bfd6d41f33d978354406adcba8b71c0e3ac308b6403239dbd7d"
+  },
+  "remainingManualAcceptance": [
+    "Clean Windows VM/test-user interactive Java selection, installation, cancellation and offline handling",
+    "Clean-system shortcuts, default file association and installed notices",
+    "Real WASAPI/ASIO/MIDI devices, extended playback, recording/routing",
+    "Representative older document copies, manual group/Copy Editor/Undo workflows and first-user walkthrough"
+  ],
+  "notes": [
+    "Manually built release with explicitly local identity; no official release CI or signature.",
+    "Embedded REVIEW.json records source/distribution status at build time; remaining manual acceptance is disclosed, not marked passed.",
+    "Initial d1d4503 candidate was rejected after packaged plugin-cache publication failed; this release includes the tested Windows lock fix."
+  ],
+  "publication": {
+    "id": 444047082,
+    "tag": "v0.1.0",
+    "url": "https://github.com/Helge97/EasyKnack/releases/tag/v0.1.0",
+    "publishedAt": "2026-11-13T09:44:13Z",
+    "assets": [
+      {
+        "name": "EasyKnack-project-sources.zip",
+        "size": 3932248,
+        "digest": "sha256:9521117dcc208bfd6d41f33d978354406adcba8b71c0e3ac308b6403239dbd7d",
+        "url": "https://github.com/Helge97/EasyKnack/releases/download/v0.1.0/EasyKnack-project-sources.zip"
+      },
+      {
+        "name": "EasyKnack-Setup-0.1.0-x64.exe",
+        "size": 98235354,
+        "digest": "sha256:b1a9468900d857e02bba1e6e8804d88aa2fc8eafa745a38ecdb4f062ccc28520",
+        "url": "https://github.com/Helge97/EasyKnack/releases/download/v0.1.0/EasyKnack-Setup-0.1.0-x64.exe"
+      },
+      {
+        "name": "EasyKnack-source-materials.zip",
+        "size": 424675447,
+        "digest": "sha256:ff11e7c011d2bbde025266b9e87a6300a5b3a4421aed91b5f63552e591432598",
+        "url": "https://github.com/Helge97/EasyKnack/releases/download/v0.1.0/EasyKnack-source-materials.zip"
+      },
+      {
+        "name": "RELEASE-NOTES.md",
+        "size": 1932,
+        "digest": "sha256:0ffc2979a34b86fda6c3ea6f8ab1c1240e1966df0fda007b3c976898f13515be",
+        "url": "https://github.com/Helge97/EasyKnack/releases/download/v0.1.0/RELEASE-NOTES.md"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "size": 454,
+        "digest": "sha256:a41cbb75ea0e3ba157ca018a89953937e62b081194de8c5b9b3abc7c12845b02",
+        "url": "https://github.com/Helge97/EasyKnack/releases/download/v0.1.0/SHA256SUMS.txt"
+      },
+      {
+        "name": "validation.json",
+        "size": 2825,
+        "digest": "sha256:10c67c31c9b7952af7bcbee130e9751e59cd660765a0519612c52a50cd113603",
+        "url": "https://github.com/Helge97/EasyKnack/releases/download/v0.1.0/validation.json"
+      }
+    ],
+    "repositoryVisibility": "private",
+    "visibilityDecision": "Explicit user choice: keep the repository private."
+  }
+}

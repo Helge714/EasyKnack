@@ -19,8 +19,8 @@ components retain their own licenses. See ../../THIRD-PARTY.md and the full text
   pairs the binary image with its exact source archive by hash.
 - [ ] Validate a clean Windows install with missing Java, upgrade and uninstall,
   and inspect file associations, shortcuts and the installed notices.
-- [ ] Publish required matching source downloads alongside the candidate that is
-  selected for release. No public upload/source offer has been made by these scripts.
+- [x] Publish matching project and dependency source downloads with release 0.1.0
+  on 2026-11-13; see [release evidence](source-audit/RELEASE-0.1.0.md).
 
 See [candidate evidence](source-audit/RELEASE-CANDIDATE.md). REVIEW.json separates
 source review from still-pending distribution tests; it is not a legal warranty.

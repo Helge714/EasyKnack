@@ -1,5 +1,12 @@
 # Release readiness audit — 2026-11-10
 
+Current release: [0.1.0 - published 2026-11-13](source-audit/RELEASE-0.1.0.md).
+The final clean source is `fcf85a5`; development continues at `0.1.1-SNAPSHOT`.
+This manual Windows x64 release includes matching sources/checksums and an exact
+automated validation report. Clean-machine and physical-device manual acceptance
+remain explicitly open; official CI and signing remain future work.
+The audit and candidate gates below are historical, not the final binary report.
+
 Audited application baseline: `ae41864`; paired local GLSwing change: `2f5ed7c`.
 This is a repository and packaging-readiness review, not acceptance of a release
 binary. No installer was rebuilt, installed or published during this audit.
@@ -14,7 +21,7 @@ The original findings below retain the hashes observed at the initial audit.
 
 Latest candidate: [2026-11-11 automated results and remaining acceptance](source-audit/CANDIDATE-2026-11-11.md). A fresh installer and paired sources now exist; the older findings below are historical.
 
-## Current state
+## Original audit state
 
 - EasyKnack: `0.1.0-SNAPSHOT`; external GLSwing: `0.2.0-SNAPSHOT` in `pom.xml`.
   On 2026-11-12 the first intended EasyKnack release was explicitly set to `0.1.0`.
@@ -36,7 +43,7 @@ Latest candidate: [2026-11-11 automated results and remaining acceptance](source
   at audit start. Keep these machine-specific changes out of release commits and
   source packages; do not discard them to manufacture a clean checkout.
 
-## Gates before public release
+## Original candidate gates
 
 | Gate | Evidence / gap | Completion criterion |
 | --- | --- | --- |

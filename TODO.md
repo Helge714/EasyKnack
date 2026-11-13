@@ -158,8 +158,10 @@ Repository audit and ordered candidate gates: [release readiness](docs/developme
 - [ ] Complete exact-artifact license/source/notice verification before publication;
   use the current legal/distribution documentation, not archived FFmpeg plans.
 - [ ] Perform a first-time-user walkthrough using only installed English user docs.
-- [ ] Establish the first release baseline and official CI/publication workflow.
-  Keep product versions in Maven and local build identities explicitly local.
+- [x] Publish the first release baseline, 0.1.0, with matching sources/checksums;
+  see [release evidence](docs/development/source-audit/RELEASE-0.1.0.md).
+- [ ] Establish an official CI release workflow. Keep product versions in Maven
+  and manual build identities explicitly local.
 - [ ] Bundled Temurin is optional future work, pending a complete redistribution
   inventory. Current distribution uses an external JDK.
 
