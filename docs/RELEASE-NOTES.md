@@ -1,5 +1,9 @@
 # Release notes
 
+## Unreleased - 0.1.1
+
+Development continues after the frozen 0.1.0 release. No additional changes yet.
+
 ## 0.1.0 - 2026-11-13
 
 First Windows x64 release. Requires a separately installed Windows x64 JDK 25
