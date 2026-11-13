@@ -1,6 +1,6 @@
 # Release notes
 
-## 0.1.0 - 2026-11-12
+## 0.1.0 - 2026-11-13
 
 First Windows x64 release. Requires a separately installed Windows x64 JDK 25
 (including javac); setup checks it and offers assistance. The installer is
@@ -22,6 +22,10 @@ Complex Oscillator stretch changes described below. Preserve old documents and
 rebuild/re-export older Bakes and source plugins with the matching application.
 
 ### Changes included in this first release
+
+- Retry transient Windows sharing/access locks when publishing compiled plugin
+  directories. Keep existing destinations intact and fail explicitly if a lock
+  persists; verified with a real child-process directory lock.
 
 - Package the installer compiler as one verified archive, with build-time disk
   costing, repair and transactional publication. Prepare extraction before

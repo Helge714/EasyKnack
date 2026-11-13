@@ -83,8 +83,8 @@ public final class PluginManager {
         // Working sources are separate from immutable cached classes/native artifacts.
         Files.createDirectories(sourcesDirectory());
         var destination = sourcesDirectory().resolve(manifest.id());
-        if (Files.exists(destination)) Files.move(destination, home.resolve("work").resolve("previous-" + UUID.randomUUID()));
-        Files.move(staging, destination);
+        if (Files.exists(destination)) publishDirectory(destination, home.resolve("work").resolve("previous-" + UUID.randomUUID()));
+        publishDirectory(staging, destination);
         publishState(result);
         return new Installation(result, requiresRestart(result));
     }
@@ -207,11 +207,29 @@ public final class PluginManager {
             hashes.forEach((id, value) -> info.setProperty("source." + id, value));
             write(work.resolve("build.properties"), info);
             Files.createDirectories(destination.getParent());
-            if (Files.exists(destination)) Files.move(destination, home.resolve("work").resolve("invalid-" + UUID.randomUUID()));
-            Files.move(work, destination);
+            if (Files.exists(destination)) publishDirectory(destination, home.resolve("work").resolve("invalid-" + UUID.randomUUID()));
+            publishDirectory(work, destination);
             progress.accept(com.vin.easyknack.i18n.AppText.literal("Plugin build complete")); return load(destination, false);
         } catch (Exception failure) {
             throw new IOException(com.vin.easyknack.i18n.AppText.literal("Plugin build failed: ") + failure.getMessage() + "\nBuild log: " + log, failure);
+        }
+    }
+    // Windows may briefly retain executable/scanner handles after host termination.
+    // Preserve the original build and failure if the lock does not clear; never copy
+    // a partially published directory or silently replace an existing destination.
+    static void publishDirectory(Path source, Path destination) throws IOException {
+        for (int attempt = 0; ; attempt++) {
+            try { Files.move(source, destination); return; }
+            catch (FileSystemException locked) {
+                if (attempt >= 24 || !System.getProperty("os.name", "").startsWith("Windows")
+                        || !(locked instanceof AccessDeniedException || locked.getClass() == FileSystemException.class)) throw locked;
+                try { Thread.sleep(100); }
+                catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    var failure = new java.io.InterruptedIOException("Interrupted while publishing plugin build");
+                    failure.initCause(locked); throw failure;
+                }
+            }
         }
     }
     private static String compiler(Properties configuration) throws IOException {
