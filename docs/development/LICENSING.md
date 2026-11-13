@@ -26,6 +26,14 @@ See [candidate evidence](source-audit/RELEASE-CANDIDATE.md). REVIEW.json separat
 source review from still-pending distribution tests; it is not a legal warranty.
 The final candidate's external validation report records actual test results.
 
+## Release-specific legal preflight
+
+The [2026-11-13 preflight](source-audit/LEGAL-PREFLIGHT-2026-11-13.md) checks the
+actual 0.1.0 artifact hashes, notices and source availability and separates those
+checks from unresolved GUI originality, trademark/design and installer-aggregation
+assessments. It is not legal clearance. Give every binary recipient access to the
+matching source downloads; private release permissions must not exclude recipients.
+
 ## Historical / future bundled runtimes
 
 FFmpeg/JavaCPP are removed. Current images neither bundle Java nor its Microsoft

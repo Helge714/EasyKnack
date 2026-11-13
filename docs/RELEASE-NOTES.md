@@ -2,7 +2,9 @@
 
 ## Unreleased - 0.1.1
 
-Development continues after the frozen 0.1.0 release. No additional changes yet.
+- Clarify which compiler components are actually shipped and document recipient
+  source access, with a preliminary release-license and interface-origin review.
+  Documentation only; existing 0.1.0 downloads are unchanged.
 
 ## 0.1.0 - 2026-11-13
 

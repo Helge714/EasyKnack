@@ -20,8 +20,8 @@ that all corresponding-source obligations have already been fulfilled.
 | JogAmp JOGL / GlueGen and transitive JARs | Preserve the notices/licenses from each exact artifact; review bundled native components too. |
 | External JDK | New packages do not distribute Java. Users install a Windows x64 JDK 25 separately under its provider terms; the launcher can assist via winget. |
 | LLVM-MinGW toolchain | LLVM Apache-2.0 with LLVM exceptions plus separately licensed toolchain components; retain all supplied notices, not only the top-level LICENSE.TXT. |
-| GNU Make 4.4.1 and MinGW gendef (inside the compiler bundle) | GPL-3.0-or-later; matching source trees, build recipes and license notices are collected. |
-| Compiler's Python, libffi and LLDB-MI | Separate licenses; preserve their notices. Their pinned source archives are collected too. |
+| GNU Make 4.4.1 and MinGW gendef (older full compiler bundles) | GPL-3.0-or-later; omitted from the current reduced x64 profile. Their matching sources/recipes/notices remain in the provenance materials. |
+| Python, libffi and LLDB-MI (older full compiler bundles) | The Python/LLDB-MI programs and separate libffi runtime are omitted from the current reduced x64 profile; their pinned sources and notices remain in the provenance materials. |
 | Microsoft VC/UCRT DLLs included in older Temurin-bundled packages | Microsoft redistribution terms apply; these files are not relicensed as OpenJDK code. MSVC provides the three VC runtime DLLs; the Windows SDK provides UCRT/API-set DLLs. See the manual Microsoft runtime review before publication. |
 
 ## Where notices are installed
@@ -29,7 +29,7 @@ that all corresponding-source obligations have already been fulfilled.
 Windows packages place LICENSE and this file in the application's app directory.
 The licenses directory contains extracted runtime-JAR notices, native component
 notices. Its upstream subdirectory supplements missing JAR
-notices with the JogAmp and ANTLR release license documents. The complete compiler distribution retains its own notices. Application JARs also contain the project
+notices with the JogAmp and ANTLR release license documents. The selected compiler profile retains the applicable upstream notices. Application JARs also contain the project
 license and this overview under META-INF.
 
 ## Source availability before public distribution
@@ -48,6 +48,12 @@ New installer builds include project and upstream source-material archives with
 checksums and a REVIEW.json report. Remaining provenance checks are documented in
 `docs/development/SOURCE-PACKAGES.md`; review them before public distribution.
 The detailed native findings are in `docs/development/source-audit/NATIVE-RUNTIMES.md`.
+
+For download distribution, give binary recipients equivalent access to the matching
+project and dependency sources. An inaccessible private repository link does not
+provide that access. Recipients need only the installer to run EasyKnack, but
+source availability remains a separate distribution requirement. A shared folder
+containing the installer and both matching source archives is one practical route.
 
 ## Plugins and generated code
 

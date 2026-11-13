@@ -108,6 +108,7 @@ Paths below are relative to `native/audio-host/src/`.
 - `docs/releases/`: concise user-facing GitHub release descriptions.
 - `docs/RELEASE-NOTES.md`: product changes; `TODO.md`: pending work.
 - Release candidate gates and audit evidence: [RELEASE-READINESS.md](RELEASE-READINESS.md).
+- Release licensing evidence and preliminary GUI-origin assessment: [legal preflight](source-audit/LEGAL-PREFLIGHT-2026-11-13.md).
 - `target/`: generated/build artifacts and local diagnostic scripts; not authoritative source or permanent build instructions.
 
 For a small fix, locate the nearest existing regression test first. Run focused

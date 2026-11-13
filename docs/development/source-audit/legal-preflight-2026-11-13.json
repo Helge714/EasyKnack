@@ -1,0 +1,215 @@
+{
+  "format": 1,
+  "date": "2026-11-13",
+  "release": "0.1.0",
+  "releaseCommit": "fcf85a5f61ccbe94045cf8393d4cf79c28228ca0",
+  "scope": "Technical release-artifact and notice/source verification; not legal clearance.",
+  "artifactHashes": {
+    "EasyKnack-Setup-0.1.0-x64.exe": true,
+    "EasyKnack-project-sources.zip": true,
+    "EasyKnack-source-materials.zip": true,
+    "RELEASE-NOTES.md": true,
+    "validation.json": true
+  },
+  "jars": [
+    {
+      "file": "antlr-2.7.7.jar",
+      "sha256": "88fbda4b912596b9f56e8e12e580cc954bacfb51776ecfddd3e18fc1cf56dc4c",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    },
+    {
+      "file": "glswing-0.2.0-SNAPSHOT.jar",
+      "sha256": "07d223a840521cdd96f5465a9116720a27475e4f21a2de92faf58e82c8afa609",
+      "matchesReviewedLock": true,
+      "embeddedNotices": [
+        "META-INF/LICENSE"
+      ]
+    },
+    {
+      "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",
+      "sha256": "c7c9138606858fed0b1650a2444cc1bc96599cc635a8d879979a37646e8594b1",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    },
+    {
+      "file": "gluegen-rt-2.6.0.jar",
+      "sha256": "465bbc8d410b872a76b5b901cdb9c2c07905edd5e61a7120dc6a4d007880ec2f",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    },
+    {
+      "file": "gluegen-rt-main-2.6.0.jar",
+      "sha256": "cc114f4c0b29b2fe4d06a5c7931838814452a04cc9789e27b21ab05d3541c107",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    },
+    {
+      "file": "jogl-all-2.6.0-natives-windows-amd64.jar",
+      "sha256": "33081ebfac520d7d283830a614f458f728104bef4eff56b52f604ee8c5af90c8",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    },
+    {
+      "file": "jogl-all-2.6.0.jar",
+      "sha256": "34c919bc6073c2d9e73cbe7558c4e9de6b5c58146f3658e2bcc5f23ec3fccc9f",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    },
+    {
+      "file": "jogl-all-main-2.6.0.jar",
+      "sha256": "cc114f4c0b29b2fe4d06a5c7931838814452a04cc9789e27b21ab05d3541c107",
+      "matchesReviewedLock": true,
+      "embeddedNotices": []
+    }
+  ],
+  "noticePresence": {
+    "LICENSE": true,
+    "THIRD-PARTY.md": true,
+    "licenses/asio/LICENSE.txt": true,
+    "licenses/asio/COPYING": true,
+    "licenses/loris/COPYING": true,
+    "licenses/loris/AUTHORS": true,
+    "licenses/loris/PROVENANCE.md": true,
+    "licenses/loris/OOURA-LICENSE.txt": true,
+    "licenses/miniaudio/LICENSE.txt": true,
+    "licenses/dr_mp3/LICENSE.txt": true,
+    "licenses/upstream/wix-3.14.1-LICENSE.txt": true,
+    "licenses/upstream/jogl-2.6.0-LICENSE.txt": true,
+    "licenses/upstream/gluegen-2.6.0-LICENSE.txt": true,
+    "licenses/upstream/jogl-2.6.0-ubuntu-font-licence-1.0.txt": true,
+    "licenses/upstream/antlr-2.7.7-LICENSE.txt": true
+  },
+  "projectSourcePresence": {
+    "native/audio-host/third_party/miniaudio.h": true,
+    "native/audio-host/third_party/dr_mp3.h": true,
+    "native/audio-host/third_party/asio/LICENSE.txt": true,
+    "native/audio-host/third_party/asio/COPYING": true,
+    "native/audio-host/third_party/loris/COPYING": true,
+    "native/audio-host/third_party/loris/PROVENANCE.md": true,
+    "scripts/windows/InstallerTheme.xml": true,
+    "scripts/windows/InstallerTheme-LICENSE.txt": true
+  },
+  "upstreamArchives": [
+    "upstream/antlr-2.7.7.tar.gz",
+    "upstream/cpython-mingw-d21f60d.tar.gz",
+    "upstream/glswing-0.2.0-SNAPSHOT-build-inputs.zip",
+    "upstream/glswing-0.2.0-SNAPSHOT-sources.jar",
+    "upstream/gluegen-2.6.0.tar.gz",
+    "upstream/jogl-2.6.0.tar.gz",
+    "upstream/libffi-3.4.6.tar.gz",
+    "upstream/lldb-mi-2340ff2.tar.gz",
+    "upstream/llvm-mingw-20250305.tar.gz",
+    "upstream/llvm-project-20.1.0.tar.gz",
+    "upstream/make-4.4.1.tar.gz",
+    "upstream/mingw-w64-2be9e0f.tar.gz",
+    "upstream/wix3-wix3141rtm.tar.gz"
+  ],
+  "embeddedSourceReviewComplete": true,
+  "unreviewedBinaries": [],
+  "missingSources": [],
+  "bundledJavaRuntime": false,
+  "separateVcUcrtFfmpegJavaMatches": [],
+  "compilerBinaries": [
+    "ar.exe",
+    "c++.exe",
+    "cc.exe",
+    "clang++.exe",
+    "clang-20.exe",
+    "clang-target-wrapper.exe",
+    "clang.exe",
+    "g++.exe",
+    "gcc.exe",
+    "ld.lld.exe",
+    "libLLVM-20.dll",
+    "libc++.dll",
+    "libclang-cpp.dll",
+    "libclang_rt.asan_dynamic-x86_64.dll",
+    "libomp.dll",
+    "libunwind.dll",
+    "libwinpthread-1.dll",
+    "llvm-ar.exe",
+    "llvm-ranlib.exe",
+    "llvm-strip.exe",
+    "mingw32-common.cfg",
+    "ranlib.exe",
+    "strip.exe",
+    "x86_64-w64-mingw32-ar.exe",
+    "x86_64-w64-mingw32-c++.exe",
+    "x86_64-w64-mingw32-clang++.exe",
+    "x86_64-w64-mingw32-clang.exe",
+    "x86_64-w64-mingw32-g++.exe",
+    "x86_64-w64-mingw32-gcc.exe",
+    "x86_64-w64-mingw32-llvm-ar.exe",
+    "x86_64-w64-mingw32-llvm-ranlib.exe",
+    "x86_64-w64-mingw32-ranlib.exe",
+    "x86_64-w64-mingw32-strip.exe",
+    "x86_64-w64-windows-gnu.cfg"
+  ],
+  "bundledFontResources": [],
+  "coreSvgResources": [
+    "com/vingame/glswing/icons/eyedropper.svg",
+    "com/vingame/glswing/icons/filedialog_back.svg",
+    "com/vingame/glswing/icons/filedialog_file.svg",
+    "com/vingame/glswing/icons/filedialog_folder.svg",
+    "com/vingame/glswing/icons/filedialog_forward.svg",
+    "com/vingame/glswing/icons/filedialog_home.svg",
+    "com/vingame/glswing/icons/filedialog_new_folder.svg",
+    "com/vingame/glswing/icons/filedialog_refresh.svg",
+    "com/vingame/glswing/icons/filedialog_up.svg",
+    "com/vingame/glswing/icons/link_icon.svg",
+    "com/vingame/glswing/icons/search_close.svg",
+    "com/vingame/glswing/icons/search_expand.svg",
+    "com/vingame/glswing/icons/search_next.svg",
+    "com/vingame/glswing/icons/search_previous.svg",
+    "com/vingame/glswing/icons/test_icon.svg"
+  ],
+  "defaultFontFamily": [
+    "SansSerif\r"
+  ],
+  "applicationBlenderTextHits": [],
+  "userStatement": "User reports visual inspiration only, no Blender code/assets taken; slider/editor logic closely resembles Blender. Font resemblance may be coincidental.",
+  "openItems": [
+    "Actual UI artwork/originality and overall-impression legal assessment",
+    "No trademark/design/patent register clearance performed",
+    "Provide corresponding sources to EXE recipients; private repository alone does not provide access to nonmembers",
+    "Keep MS-RL installer/theme notices and modified sources separate from GPL application terms; aggregation boundary is a legal assessment",
+    "Some bundled overview text still describes components omitted by the reduced compiler profile"
+  ],
+  "standaloneFontFiles": [],
+  "applicationJarFontResources": [],
+  "visualEvidence": {
+    "historicalNodeExport": "target/export-Selected nodes.png (2026-11-11)",
+    "historicalDialog": "target/new-group-import.png (2026-11-07)",
+    "branding": "src/main/resources/branding/EKIcon.png",
+    "liveReleaseCapture": "Not completed: Computer Use app approval timed out. No approval bypass attempted.",
+    "blenderManualImages": "Official manual image endpoints were not accessible through the browsing tool; no pixel-comparison result is claimed."
+  },
+  "historyPathScreen": {
+    "executablesAndArchives": [
+      "native/audio-host/benchmarks/archive/reference-2026-09-18/routing.zip"
+    ],
+    "fonts": [],
+    "artworkAndMedia": [
+      "src/main/resources/branding/EKIcon.ico",
+      "src/main/resources/branding/EKIcon.png",
+      "src/main/resources/branding/EKSplash.png"
+    ]
+  },
+  "historyPathScreenLimit": "Filename-level screen of reachable Git objects only, not content/license/secret clearance of historical revisions.",
+  "historyArchiveEntries": [
+    {
+      "object": "63d5b4bbfcc845217eca5b15b40fc391f87fe31c",
+      "bytes": 155857,
+      "path": "native/audio-host/benchmarks/archive/reference-2026-09-18/routing.zip",
+      "entries": [
+        "live.csv",
+        "metadata.json",
+        "steady-1.csv",
+        "steady-2.csv",
+        "steady-3.csv",
+        "summary.json"
+      ]
+    }
+  ]
+}
