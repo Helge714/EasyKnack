@@ -9,6 +9,7 @@ import com.vingame.glswing.ui.GLThemeLoader;
 
 /** One standard GLSwing theme for both control geometry and application colors. */
 public final class ApplicationTheme {
+    public static final String DEFAULT_RESOURCE = "/easyknack-slider-mint.gltheme";
     public record TitleColors(Color light, Color dark) { }
     private final GLTheme theme;
     private final GLTheme defaults;
@@ -30,8 +31,8 @@ public final class ApplicationTheme {
     /** File themes are read afresh; missing application colors inherit the bundled palette. */
     public static ApplicationTheme load(Path file) {
         var defaults = GLThemeLoader.loadResource("/easyknack.gltheme");
-        var selected = file == null ? defaults : GLThemeLoader.load(file);
-        System.out.println("EasyKnack theme: " + (file == null ? "classpath:/easyknack.gltheme" : file.toAbsolutePath().normalize()));
+        var selected = file == null ? GLThemeLoader.loadResource(DEFAULT_RESOURCE) : GLThemeLoader.load(file);
+        System.out.println("EasyKnack theme: " + (file == null ? "classpath:" + DEFAULT_RESOURCE : file.toAbsolutePath().normalize()));
         return new ApplicationTheme(selected, defaults);
     }
     public GLTheme theme() { return theme; }

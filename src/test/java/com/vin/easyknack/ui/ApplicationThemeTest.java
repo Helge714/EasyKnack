@@ -12,8 +12,8 @@ class ApplicationThemeTest {
     @TempDir Path directory;
     @Test void variantsInheritCorePresetsAndShareApplicationGeometry(){
         var choices=BundledThemes.available();
-        assertEquals("EasyKnack",choices.get(0).toString());
-        assertTrue(choices.stream().map(Object::toString).toList().containsAll(java.util.List.of("EasyKnack","EasyKnack Blue","EasyKnack Dark Blue","EasyKnack Light")));
+        assertEquals("EasyKnack Mint",choices.get(0).toString());
+        assertTrue(choices.stream().map(Object::toString).toList().containsAll(java.util.List.of("EasyKnack Classic","EasyKnack Mint","EasyKnack Amber","EasyKnack Light Mint","EasyKnack Light Amber","EasyKnack Blue","EasyKnack Dark Blue","EasyKnack Light")));
         assertTrue(choices.stream().noneMatch(c->c.resource().startsWith("/easyknack/themes/")));
         var defaults=ApplicationTheme.load(null);
         for(var entry:java.util.Map.of("blue","blue","darkblue","darkblue","light","light").entrySet()){
@@ -23,7 +23,7 @@ class ApplicationThemeTest {
             assertEquals(base.values().getColor("palette.text"),variant.theme().labelStyle().textColor());
             for(String key:java.util.List.of("node.minimumWidth","node.cornerRadius","node.rowGap","curve.height","metrics.controlHeight"))
                 assertEquals(defaults.theme().values().getFloat(key,-1),variant.theme().values().getFloat(key,-2),key);
-            for(var signal:SignalCategory.values())assertEquals(defaults.signal(signal),variant.signal(signal));
+            for(var signal:SignalCategory.values())assertEquals(ApplicationTheme.loadSelection("classpath:/easyknack.gltheme").signal(signal),variant.signal(signal));
             for(var kind:NodeKind.values())assertNotEquals(Color.MAGENTA,variant.title(kind).dark());
         }
     }
@@ -32,6 +32,20 @@ class ApplicationThemeTest {
         assertTrue(contrast(theme.labelStyle().textColor(),theme.values().getColor("node.background"))>=7);
         assertTrue(contrast(theme.values().getColor("curve.line"),theme.values().getColor("curve.background"))>=3);
         assertNotEquals(0,theme.values().getColor("nodeEditor.gridMajor").getAlpha());
+    }
+    @Test void lightAccentThemesHaveLightHeadersAndReadableDarkText(){
+        var dark=ApplicationTheme.load(null);
+        for(String variant:java.util.List.of("mint","amber")){
+            var light=ApplicationTheme.loadSelection("classpath:/easyknack-light-"+variant+".gltheme");
+            for(var kind:NodeKind.values()){
+                assertTrue(luminance(light.title(kind).light())>luminance(dark.title(kind).light()),kind.name());
+                assertEquals(light.title(kind).light(),light.title(kind).dark());
+                assertTrue(contrast(light.color("node.title.text"),light.title(kind).light())>=4.5,kind.name());
+                assertTrue(contrast(light.signal(kind.signal()),light.theme().values().getColor("node.background"))>=3,kind.name());
+            }
+            assertTrue(contrast(light.theme().labelStyle().textColor(),light.theme().values().getColor("slider.progressLight"))>=4.5);
+            assertTrue(contrast(light.theme().values().getColor("curve.line"),light.theme().values().getColor("curve.background"))>=3);
+        }
     }
     @Test void pastelThemesKeepNeutralBodiesAndReadableTypeTitles(){
         var defaults=ApplicationTheme.load(null);
@@ -92,7 +106,7 @@ class ApplicationThemeTest {
             assertNotEquals(Color.MAGENTA, theme.title(kind).light());
             assertNotEquals(Color.MAGENTA, theme.title(kind).dark());
         }
-        var resource = GLThemeLoader.loadResource("/easyknack.gltheme");
+        var resource = GLThemeLoader.loadResource(ApplicationTheme.DEFAULT_RESOURCE);
         assertEquals(resource.sliderStyle(), theme.theme().sliderStyle());
         assertEquals(resource.values().asMap(), theme.theme().values().asMap());
         assertEquals(resource.values().getColor("easyknack.signal.AUDIO", Color.MAGENTA), theme.signal(SignalCategory.AUDIO));

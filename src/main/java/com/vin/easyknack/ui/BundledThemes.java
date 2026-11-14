@@ -23,7 +23,7 @@ final class BundledThemes {
             }
         }catch(Exception failure){throw new IllegalStateException("Cannot list bundled themes",failure);}
         return names.stream().map(BundledThemes::choice).flatMap(Optional::stream)
-                .sorted(Comparator.comparing((Choice c)->!c.resource().equals("/easyknack.gltheme"))
+                .sorted(Comparator.comparing((Choice c)->!c.resource().equals(ApplicationTheme.DEFAULT_RESOURCE))
                         .thenComparing(Choice::name,String.CASE_INSENSITIVE_ORDER).thenComparing(Choice::resource)).toList();
     }
     private static Optional<Choice> choice(String resource){

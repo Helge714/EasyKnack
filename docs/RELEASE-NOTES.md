@@ -2,7 +2,9 @@
 
 ## Unreleased - 0.2.0
 
-- Add optional Mint and Amber themes with coordinated control accents and
+- Make Mint the default theme; retain Amber and Classic as alternatives. Add
+  Light Mint and Light Amber with lighter type headers and dark title text.
+  Mint and Amber provide coordinated control accents and
   moderately saturated pastel type colors. Compact controls, Control-rate
   diamonds, wires, editor groups, popup menus and tooltips use borderless styling;
   titles and sliders have flat fills, with titles extending to the node edges.

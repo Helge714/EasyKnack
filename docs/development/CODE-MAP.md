@@ -95,7 +95,7 @@ Paths below are relative to `native/audio-host/src/`.
 - Context random Seed ports: `BinRandomNode`, `PartialNoiseNode`, native `PartialRandom.hpp`; tests `BinRandomTest`, `PartialsTest`.
 
 - `src/main/resources/easyknack*.gltheme`: selectable bundles over external Core presets.
-- Mint/Amber inherit neutral default geometry and share `themes/pastel.gltheme` for subdued signal/title colors and accent routing. The retired tinted-body study resolves to Mint.
+- Mint is the application default (`ApplicationTheme.DEFAULT_RESOURCE`); Classic remains explicit. Light Mint defines light type headers/dark signal colors and Light Amber inherits that palette. Mint/Amber inherit neutral default geometry and share `themes/pastel.gltheme` for subdued signal/title colors and accent routing. The retired tinted-body study resolves to Mint.
 - `src/main/resources/easyknack/themes/`: shared color and geometry fragments; fragments are not selectable themes.
 - `src/main/resources/application*.properties`, `nodes*.properties`: UI and node translations.
 - `src/processor/java/com/vin/easyknack/processor/NodeProcessor.java`: annotation processing; generated registrations are build output.

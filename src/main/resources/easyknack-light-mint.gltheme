@@ -1,0 +1,46 @@
+# Light Mint: light surfaces and genuinely light type headers, with dark text.
+theme.type=bundle
+theme.name=EasyKnack Light Mint
+theme.extends=/easyknack-light.gltheme
+theme.colors=/easyknack/themes/pastel.gltheme
+theme.metrics=/easyknack/themes/borderless.gltheme
+
+palette.accent=#BEDFD3
+palette.selection=#80BCA677
+@COLOR easyknack.accent.focus=#2E7161
+slider.progressLight=#BEDFD3
+slider.progressDark=#BEDFD3
+slider.focusProgressLight=#A7D3C3
+slider.focusProgressDark=#A7D3C3
+node.selectedBorder=${easyknack.accent.focus}
+@COLOR easyknack.node.title.text=${palette.text}
+@COLOR curve.handle=${easyknack.accent.focus}
+@COLOR easyknack.buffer.selection=${palette.selection}
+@COLOR easyknack.buffer.boundary=${easyknack.accent.focus}
+
+@COLOR easyknack.node.AUDIO.title.light=#D5BFE7
+@COLOR easyknack.signal.AUDIO=#79529A
+
+@COLOR easyknack.node.VALUE.title.light=#D9DDE0
+@COLOR easyknack.signal.VALUE=#62676D
+
+@COLOR easyknack.node.MIDI.title.light=#B8DBC9
+@COLOR easyknack.signal.MIDI=#36785B
+
+@COLOR easyknack.node.WAVETABLE.title.light=#BED0ED
+@COLOR easyknack.signal.WAVETABLE=#4767A2
+
+@COLOR easyknack.node.ANALYSIS.title.light=#E6D99D
+@COLOR easyknack.signal.ANALYSIS=#80672B
+
+@COLOR easyknack.node.VECTOR.title.light=#ABD7E2
+@COLOR easyknack.signal.VECTOR=#2C7488
+
+@COLOR easyknack.node.TRIGGER.title.light=#ECC9A8
+@COLOR easyknack.signal.TRIGGER=#986036
+
+@COLOR easyknack.node.HISTORY.title.light=#E2BCDA
+@COLOR easyknack.signal.HISTORY=#915180
+
+@COLOR easyknack.node.PARTIALS.title.light=#EDBFC4
+@COLOR easyknack.signal.PARTIALS=#A14B59

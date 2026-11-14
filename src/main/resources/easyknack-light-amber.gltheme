@@ -1,0 +1,11 @@
+# Share the light type palette and geometry, with warm Amber accents.
+theme.name=EasyKnack Light Amber
+theme.extends=/easyknack-light-mint.gltheme
+
+palette.accent=#E8D4AD
+palette.selection=#C8A46777
+@COLOR easyknack.accent.focus=#815D26
+slider.progressLight=#E8D4AD
+slider.progressDark=#E8D4AD
+slider.focusProgressLight=#DFC591
+slider.focusProgressDark=#DFC591
