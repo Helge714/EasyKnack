@@ -34,5 +34,23 @@ public final class ApplicationSettings {
     @Deprecated public static void save(String language,String theme,int seconds,int days,double curvature,boolean experimental)throws Exception{
         save(language,theme,seconds,days,curvature);PREFS.putBoolean("experimentalFeatures",experimental);PREFS.flush();
     }
-    public static Path examples(){return Path.of(System.getProperty("easyknack.examples",Path.of(System.getProperty("user.home"),"Documents","EasyKnack","Beispiele").toString()));}
+    public static Path documents(){
+        String override=System.getProperty("easyknack.documents");
+        return override!=null?Path.of(override):javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory().toPath().resolve("EasyKnack");
+    }
+    public static Path projects(){return documents().resolve("Projects");}
+    public static Path recordings(){return documents().resolve("Recordings");}
+    public static void prepareUserDirectories()throws java.io.IOException{
+        Files.createDirectories(projects());Files.createDirectories(recordings());
+    }
+    private static Path applicationLocation(){
+        try{return Path.of(ApplicationSettings.class.getProtectionDomain().getCodeSource().getLocation().toURI());}
+        catch(java.net.URISyntaxException failure){throw new IllegalStateException(failure);}
+    }
+    public static boolean bundledExamples(){return System.getProperty("easyknack.examples")==null&&!Files.isDirectory(applicationLocation());}
+    public static Path examples(){
+        String override=System.getProperty("easyknack.examples");
+        if(override!=null)return Path.of(override);
+        return applicationLocation().getParent().resolve("Examples");
+    }
 }

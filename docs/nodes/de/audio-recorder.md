@@ -8,7 +8,7 @@ Nimmt triggergesteuerte Audiodurchläufe als WAV- oder MP3-Dateien auf.
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Aufnahmedatei (Recording file) | [Editor](../../user/de/reference-tables.md) | WAV-/MP3-Name + Ordner | — | Keines | — | — | Immer |
+| Aufnahmedatei (Recording file) | [Editor](../../user/de/reference-tables.md) | WAV-/MP3-Name + Ordner | — | `Recordings/Recording.wav` | — | — | Immer |
 | Aufnahmestatus (Recording status) | [Editor](../../user/de/reference-tables.md) | Bereit / Aufnahme / Gespeichert / Fehler | — | Bereit | s | — | Immer |
 | Kanäle (Channels) | [Editor](../../user/de/reference-tables.md) | Mono / Stereo | — | Stereo | — | — | Immer |
 | Überschreiben (Overwrite) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Immer |
@@ -53,3 +53,5 @@ Aufnahme speichern unter exportiert eine abgeschlossene Aufnahme im aufgenommene
 | Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/audio-recorder.md)
+
+Neue Recorder verwenden standardmäßig `Dokumente/EasyKnack/Recordings/Recording.wav` im Dokumenteordner des Systems. Bestehende Zielpfade bleiben erhalten.

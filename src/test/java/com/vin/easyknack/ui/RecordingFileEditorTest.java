@@ -36,6 +36,9 @@ class RecordingFileEditorTest {
    }finally{host.destroy();}
   });
  }
+ @Test void newRecordersUseTheStandardRecordingFolder(){
+  assertEquals(com.vin.easyknack.app.ApplicationSettings.recordings().resolve("Recording.wav").toAbsolutePath().toString(),new RecordingFileEditor().defaultValue().toJavaValue());
+ }
  @Test void namesKeepTheirFormatAndCannotContainPaths(){
   assertEquals("Take.wav",RecordingFileEditor.filename("Take"));
   assertEquals("Take.MP3",RecordingFileEditor.filename("Take.MP3"));

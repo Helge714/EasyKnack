@@ -19,7 +19,16 @@ public final class ExampleLibrary {
     }
     record Entry(String name,Path path,List<Entry> children){boolean directory(){return children!=null;}}
     public static void initialize()throws IOException{
-        var root=ApplicationSettings.examples();Files.createDirectories(root);
+        if(com.vin.easyknack.app.ApplicationSettings.bundledExamples())return;
+        installExamples(ApplicationSettings.examples());
+    }
+    /** Build-time entry point: installed examples are read-only at runtime. */
+    public static void main(String[] args)throws IOException{
+        if(args.length!=1)throw new IllegalArgumentException("Expected example output directory");
+        installExamples(Path.of(args[0]));
+    }
+    private static void installExamples(Path root)throws IOException{
+        Files.createDirectories(root);
         installSampler(root);
         installStochasticBinWidth(root);
         var marker=root.resolve(".easyknack-examples-v1");if(Files.exists(marker))return;

@@ -30,6 +30,7 @@ public final class EasyKnack {
                 .minimumSize(900, 600)
                 .prepare(plan -> plan
                         .background(com.vin.easyknack.i18n.AppText.literal("Loading EasyKnack theme"), task -> {
+                            com.vin.easyknack.app.ApplicationSettings.prepareUserDirectories();
                             ApplicationTheme.current();
                             return null;
                         })

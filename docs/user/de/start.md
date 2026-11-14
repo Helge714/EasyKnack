@@ -25,3 +25,5 @@ Programmeinstellungen betreffen Sprache und Darstellung. Dokumenteneinstellungen
 Die Dokuansicht speichert **Wie Anwendung / Deutsch / English** unabhängig von der Programmsprache. Node-Kontextmenü und Hilfe öffnen die passende Node-Referenz; Zurück/Vorwärts folgt lokalen Links.
 
 [Handbuch](index.md) · [Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/start.md)
+
+Standardordner für Projekte ist `Dokumente/EasyKnack/Projects`, für Aufnahmen `Dokumente/EasyKnack/Recordings`. Mitgelieferte Beispiele liegen bei der Installation. Eigene Varianten speicherst du unter Projects. Früher im Dokumenteordner angelegte Beispielkopien bleiben unangetastet.

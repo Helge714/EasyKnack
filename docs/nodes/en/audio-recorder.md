@@ -8,7 +8,7 @@ Records triggered audio takes as WAV or MP3 files.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Recording file | [Editor](../../user/en/reference-tables.md) | WAV / MP3 name + folder | — | None | — | — | Always |
+| Recording file | [Editor](../../user/en/reference-tables.md) | WAV / MP3 name + folder | — | `Recordings/Recording.wav` | — | — | Always |
 | Recording status | [Editor](../../user/en/reference-tables.md) | Ready / Recording / Saved / Error | — | Ready | s | — | Always |
 | Channels | [Editor](../../user/en/reference-tables.md) | Mono / Stereo | — | Stereo | — | — | Always |
 | Overwrite | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Always |
@@ -53,3 +53,5 @@ Save recording as exports a completed take in its recorded format without ending
 | Not supported |
 
 [Node index](index.md) · [Deutsch](../de/audio-recorder.md)
+
+New recorders default to `Documents/EasyKnack/Recordings/Recording.wav` (the system Documents folder). Existing target paths are retained.

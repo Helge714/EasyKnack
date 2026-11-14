@@ -10,7 +10,7 @@ import java.nio.file.*;
 
 /** Inline recording name and directory selection; never imports or decodes audio. */
 public record RecordingFileEditor() implements Editor {
- public GLNodeValue defaultValue(){return GLNodeValue.of("");}
+ public GLNodeValue defaultValue(){return GLNodeValue.of(com.vin.easyknack.app.ApplicationSettings.recordings().resolve("Recording.wav").toAbsolutePath().toString());}
  public Control create(String label,java.util.function.Consumer<GLNodeValue> changed){
   var target=new Target(changed);return new Control(target,target::update);
  }

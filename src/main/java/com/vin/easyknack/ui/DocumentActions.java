@@ -196,7 +196,7 @@ final class DocumentActions implements AutoCloseable {
         if(busy||closed)return;busy=true;
         onUi(files.read(source),(document,failure)->{busy=false;if(failure!=null){error(GLDocumentOperation.OPEN,source,failure);return;}openExample(source.getFileName().toString(),()->document);});
     }
-    void exampleFolder(){try{java.nio.file.Files.createDirectories(ApplicationSettings.examples());java.awt.Desktop.getDesktop().open(ApplicationSettings.examples().toFile());}catch(Exception e){error(GLDocumentOperation.OPEN,null,e);}}
+    void exampleFolder(){try{ExampleLibrary.initialize();java.awt.Desktop.getDesktop().open(ApplicationSettings.examples().toFile());}catch(Exception e){error(GLDocumentOperation.OPEN,null,e);}}
     void populateExamples(GLPopupMenu menu,Runnable beforeOpen){
         if(closed)return;
         long generation=++examplesGeneration;
@@ -240,7 +240,7 @@ final class DocumentActions implements AutoCloseable {
         busy = true;
         var request = GLFileDialogRequest.open().title(com.vin.easyknack.i18n.AppText.literal("Node-Dokument öffnen"))
                 .filter(com.vin.easyknack.i18n.AppText.literal("EasyKnack (*.knack)"), "knack").filter(com.vin.easyknack.i18n.AppText.literal("Ältere Node-Dokumente (*.glgraph)"), "glgraph");
-        if (path != null) request.initialDirectory(path.getParent());
+        request.initialDirectory(path!=null?path.getParent():com.vin.easyknack.app.ApplicationSettings.projects());
         onUi(dialogs.show("document.open",request.build(), owner), (selection, failure) -> {
             if (failure != null) { busy = false; error(GLDocumentOperation.OPEN, null, failure); return; }
             if (!selection.approved()) { busy = false; return; }
@@ -267,7 +267,7 @@ final class DocumentActions implements AutoCloseable {
             var request = GLFileDialogRequest.save().title(com.vin.easyknack.i18n.AppText.literal("Node-Dokument speichern"))
                     .filter(com.vin.easyknack.i18n.AppText.literal("EasyKnack (*.knack)"), "knack")
                     .suggestedFileName(saveName(path));
-            if (path != null) request.initialDirectory(path.getParent());
+            request.initialDirectory(path!=null?path.getParent():com.vin.easyknack.app.ApplicationSettings.projects());
             onUi(dialogs.show("document.save",request.build(), owner), (selection, failure) -> {
                 if (failure != null || !selection.approved()) {
                     busy = false;

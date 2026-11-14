@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.3.0
 
+- Bundle examples with the installation instead of copying them into Documents.
+  Default new projects to EasyKnack/Projects and new recordings to
+  EasyKnack/Recordings in the system Documents folder. Preserve existing targets
+  and remembered dialog locations; leave previous user example copies untouched.
+
 - Add an inline recording filename field grouped with a folder button using
   the shared Core folder icon at a readable size. Enter accepts the filename and
   leaves the text field. Keep

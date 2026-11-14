@@ -25,3 +25,5 @@ Application preferences control language and appearance. Document settings inclu
 The documentation window remembers **Same as application / Deutsch / English** independently of application language. Node context menus and Help open the relevant node reference; Back/Forward follows local links.
 
 [Manual](index.md) · [Node index](../../nodes/en/index.md) · [Deutsch](../de/start.md)
+
+The default project folder is `Documents/EasyKnack/Projects`; recordings use `Documents/EasyKnack/Recordings`. Built-in examples are installed with EasyKnack. Save your own variations in Projects. Previously created example copies in Documents are left untouched.
