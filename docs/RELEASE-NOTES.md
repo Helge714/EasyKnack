@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Arrange preserves rough user rows and columns while resolving overlaps and
+  retaining signal flow, group boundaries and one-step Undo.
+
 - Let recorder Browse choose both folder and filename in a save dialog, while
   keeping direct filename editing. Selecting a target does not create a file.
 

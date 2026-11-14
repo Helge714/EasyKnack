@@ -5,6 +5,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AutoArrangeTest {
+    @Test void workspaceArrangeRetainsRoughRowsAndColumnsAndCanBeUndone()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var graph=new com.vingame.glswing.node.model.GLNodeGraph();var definition=new com.vin.easyknack.nodes.ValueNode();
+            graph.edit("Fixture",e->{for(int i=0;i<3;i++)e.addNode(new com.vingame.glswing.node.model.GLGraphNode(com.vingame.glswing.node.model.GLNodeId.random(),definition.registration().id(),definition.defaults()));});
+            c.openDocument("Rough layout",new com.vingame.glswing.node.document.GLNodeGraphDocument(new com.vingame.glswing.node.document.GLNodeGraphAsset("root",1,com.vingame.glswing.node.document.GLNodeGraphAssetKind.PROJECT,graph.snapshot(),com.vingame.glswing.node.binding.GLNodeEditorViewState.empty())));
+            var editor=c.workspace().editor();var nodes=editor.getNodes();
+            nodes.get(0).setLocation(900,30);nodes.get(1).setLocation(30,800);nodes.get(2).setLocation(20,20);
+            var before=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
+            c.workspace().arrangeAll();assertEquals(nodes.get(0).getY(),nodes.get(2).getY());assertTrue(nodes.get(2).getX()<nodes.get(0).getX());assertTrue(nodes.get(1).getY()>nodes.get(2).getY());
+            var after=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
+            c.workspace().arrangeAll();assertEquals(after,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+            assertTrue(c.history().undo());assertEquals(before,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+        }});
+    }
     @Test void realNodeGeometryCameraAndGraphSurviveArrangementAndUndo()throws Exception{
         var ref=new WorkspaceController[1];
         SwingUtilities.invokeAndWait(()->{

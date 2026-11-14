@@ -1,7 +1,7 @@
 # Compact graph layout
 
-Core `GLNodeAutoLayout` implements the current Arrange command. It snapshots node
-sizes and actual port anchors, then changes locations only. It has no audio-node
+Core `GLNodeAutoLayout` provides compact layout and the position-aware Arrange
+command. It snapshots node sizes and actual port anchors, then changes locations only. It has no audio-node
 name/type special cases or external solver dependency.
 
 1. **Stable flow direction.** Iterative graph traversals find strongly connected
@@ -27,8 +27,14 @@ name/type special cases or external solver dependency.
    large edge sets use a deterministic sample for crossing estimates. Skyline
    interval maxima use a sliding queue. This is a heuristic, not a globally optimal
    crossing or area solver.
-6. **Predictability.** Ties use stable editor node order, independent of the current
-   layout. Repeated Arrange is idempotent for unchanged geometry and viewport.
+6. **Rough arrangement.** Workspace Arrange uses `arrangePreservingOrder`. Nearby
+   original positions form row/column bands; long empty distances are removed.
+   Original rows order branches, and independent components retain their rough
+   rows and left-to-right order. Directed flow may advance a node to a later column;
+   feedback blocks and boundary lanes remain structural constraints. This favors
+   user placement over crossing minimization. `arrange` retains compact packing.
+7. **Predictability.** Ties use stable editor node order. Repeated Arrange is
+   idempotent for unchanged geometry and viewport.
    `GLNodeWorkspace` retains one Undo operation including boundary locations.
    Graph properties/wires, node sizes, camera and zoom remain unchanged.
 
@@ -38,5 +44,5 @@ and EasyKnack `AutoArrangeTest` (real application views, persistence, shortcut a
 Undo). Sources stay at the left of their consumers; this need not place every
 parameter source in the globally leftmost column.
 
-Only the balanced default is implemented. Compact/wide presets, pinned nodes and
+The default preserves rough placement. Pinned nodes, selectable packing presets and
 dedicated orthogonal feedback routes remain possible future extensions.
