@@ -2,10 +2,14 @@
 
 ## Unreleased - 0.2.0
 
-- Add optional Mint and Amber themes with coordinated control accents and subdued
-  pastel node-title and signal colors with distinct hues and moderate saturation. Compact controls, sockets, wires, editor groups, popup menus and tooltips use
-  borderless styling; node titles and sliders have flat fills. Node bodies remain neutral; the earlier
-  tinted-body study falls back to Mint. Theme geometry may change node dimensions; graph content and positions are preserved.
+- Add optional Mint and Amber themes with coordinated control accents and
+  moderately saturated pastel type colors. Compact controls, Control-rate
+  diamonds, wires, editor groups, popup menus and tooltips use borderless styling;
+  titles and sliders have flat fills. Audio-rate socket sizes and checkbox check
+  colors retain their original appearance. Connected port lists align flush with
+  adjacent buttons through updated GLSwing. Node bodies remain neutral; the
+  retired tinted-body study falls back to Mint. Theme geometry may change node
+  dimensions; graph content and positions are preserved.
 
 - Clarify which compiler components are actually shipped and document recipient
   source access, with a preliminary release-license and interface-origin review.

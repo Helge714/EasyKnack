@@ -38,6 +38,9 @@ class ApplicationThemeTest {
         for(String variant:java.util.List.of("mint","amber")){
             var selected=ApplicationTheme.loadSelection("classpath:/easyknack-slider-"+variant+".gltheme");
             var values=selected.theme().values();
+            assertEquals(defaults.theme().values().getFloat("node.portRadius",-1),values.getFloat("node.portRadius",-2));
+            assertEquals(.85f,values.getFloat("node.portDiamondScale",1));
+            assertEquals(values.getColor("palette.text"),values.getColor("checkBox.check"));
             assertEquals(defaults.theme().values().getColor("node.background"),values.getColor("node.background"));
             assertEquals(values.getColor("palette.accent"),values.getColor("tabbedPane.tabSelected"));
             for(var kind:NodeKind.values()){
