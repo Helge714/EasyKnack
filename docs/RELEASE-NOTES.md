@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.3.0
 
+- Prevent position-aware Arrange from spreading complex graphs into artificial
+  global rows and columns. Compact connected nodes by signal flow while retaining
+  branch order and rough placement of independent components.
+
 - Arrange preserves rough user rows and columns while resolving overlaps and
   retaining signal flow, group boundaries and one-step Undo.
 

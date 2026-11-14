@@ -19,6 +19,24 @@ class AutoArrangeTest {
             assertTrue(c.history().undo());assertEquals(before,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
         }});
     }
+    @Test void roughlyDiagonalRealSignalChainsDoNotExpandIntoEmptyRows()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var graph=new com.vingame.glswing.node.model.GLNodeGraph();var definition=new com.vin.easyknack.nodes.GainNode();
+            var ids=java.util.stream.IntStream.range(0,24).mapToObj(i->com.vingame.glswing.node.model.GLNodeId.random()).toList();
+            graph.edit("Fixture",e->{for(int i=0;i<ids.size();i++){
+                e.addNode(new com.vingame.glswing.node.model.GLGraphNode(ids.get(i),definition.registration().id(),definition.defaults()));
+                if(i>0)e.addConnection(new com.vingame.glswing.node.model.GLGraphConnection(com.vingame.glswing.node.model.GLNodeConnectionId.random(),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(i-1),"audio-out"),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(i),"audio-in")));
+            }});
+            c.openDocument("Compact chain",new com.vingame.glswing.node.document.GLNodeGraphDocument(new com.vingame.glswing.node.document.GLNodeGraphAsset("root",1,com.vingame.glswing.node.document.GLNodeGraphAssetKind.PROJECT,graph.snapshot(),com.vingame.glswing.node.binding.GLNodeEditorViewState.empty())));
+            var editor=c.workspace().editor();var nodes=editor.getNodes();for(int i=0;i<nodes.size();i++)nodes.get(i).setLocation(i*350,i*250);
+            var before=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
+            c.workspace().arrangeAll();double height=nodes.stream().mapToDouble(n->n.getY()+n.getHeight()).max().orElseThrow()-nodes.stream().mapToDouble(n->n.getY()).min().orElseThrow();
+            assertTrue(height<=2*nodes.stream().mapToDouble(n->n.getHeight()).max().orElseThrow());
+            var after=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
+            c.workspace().arrangeAll();assertEquals(after,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+            assertTrue(c.history().undo());assertEquals(before,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+        }});
+    }
     @Test void realNodeGeometryCameraAndGraphSurviveArrangementAndUndo()throws Exception{
         var ref=new WorkspaceController[1];
         SwingUtilities.invokeAndWait(()->{

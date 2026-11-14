@@ -27,12 +27,14 @@ name/type special cases or external solver dependency.
    large edge sets use a deterministic sample for crossing estimates. Skyline
    interval maxima use a sliding queue. This is a heuristic, not a globally optimal
    crossing or area solver.
-6. **Rough arrangement.** Workspace Arrange uses `arrangePreservingOrder`. Nearby
-   original positions form row/column bands; long empty distances are removed.
-   Original rows order branches, and independent components retain their rough
-   rows and left-to-right order. Directed flow may advance a node to a later column;
-   feedback blocks and boundary lanes remain structural constraints. This favors
-   user placement over crossing minimization. `arrange` retains compact packing.
+6. **Rough arrangement.** Workspace Arrange uses `arrangePreservingOrder`.
+   Original vertical order guides branches within each flow column. Columns come
+   from connections, not original X offsets; port-aware compaction reuses vertical
+   space between columns and moves short sources near consumers. Independent
+   components retain rough rows and left-to-right order. Feedback blocks and
+   boundary lanes remain structural constraints. This favors branch order over
+   crossing minimization without imposing a global grid. `arrange` retains fully
+   automatic crossing reduction and compact component packing.
 7. **Predictability.** Ties use stable editor node order. Repeated Arrange is
    idempotent for unchanged geometry and viewport.
    `GLNodeWorkspace` retains one Undo operation including boundary locations.

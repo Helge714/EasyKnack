@@ -28,4 +28,4 @@ Die Dokuansicht speichert **Wie Anwendung / Deutsch / English** unabhängig von 
 
 Standardordner für Projekte ist `Dokumente/EasyKnack/Projects`, für Aufnahmen `Dokumente/EasyKnack/Recordings`. Mitgelieferte Beispiele liegen bei der Installation. Eigene Varianten speicherst du unter Projects. Früher im Dokumenteordner angelegte Beispielkopien bleiben unangetastet.
 
-Anordnen (**Strg+Umschalt+L**) behält grobe Zeilen und Spalten bei und bereinigt Abstände und Überschneidungen. Platziere zusammengehörige Nodes vorher neben- oder übereinander; Signalfluss und Gruppenränder haben Vorrang. Undo stellt die vorherigen Positionen wieder her.
+Anordnen (**Strg+Umschalt+L**) berücksichtigt die grobe Anordnung und Zweigreihenfolge, rückt verbundene Nodes kompakt zusammen und bereinigt Überschneidungen. Platziere zusammengehörige Nodes vorher neben- oder übereinander; Signalfluss und Gruppenränder haben Vorrang. Undo stellt die vorherigen Positionen wieder her.
