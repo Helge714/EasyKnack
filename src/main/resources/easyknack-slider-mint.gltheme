@@ -1,0 +1,9 @@
+# Optional slider color study. Everything else inherits the normal application theme.
+theme.name=EasyKnack Slider Study - Mint
+theme.extends=/easyknack.gltheme
+
+slider.progressLight=#426B63
+slider.progressDark=#426B63
+slider.focusProgressLight=#527F75
+slider.focusProgressDark=#527F75
+slider.arrowPressed=#527F75

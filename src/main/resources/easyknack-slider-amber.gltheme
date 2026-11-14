@@ -1,0 +1,9 @@
+# Optional slider color study. Everything else inherits the normal application theme.
+theme.name=EasyKnack Slider Study - Amber
+theme.extends=/easyknack.gltheme
+
+slider.progressLight=#79613C
+slider.progressDark=#79613C
+slider.focusProgressLight=#947747
+slider.focusProgressDark=#947747
+slider.arrowPressed=#947747

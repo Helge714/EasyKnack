@@ -1,0 +1,14 @@
+# Optional combined study: flat mint sliders and dark, desaturated type-colored bodies.
+theme.name=EasyKnack Study - Mint + Typed Nodes
+theme.extends=/easyknack-slider-mint.gltheme
+
+@COLOR easyknack.node.AUDIO.background=#3C3645
+@COLOR easyknack.node.VALUE.background=#3B3B3B
+@COLOR easyknack.node.MIDI.background=#30453F
+@COLOR easyknack.node.WAVETABLE.background=#303B4F
+@COLOR easyknack.node.ANALYSIS.background=#474231
+@COLOR easyknack.node.VECTOR.background=#33434B
+@COLOR easyknack.node.TRIGGER.background=#493E33
+@COLOR easyknack.node.HISTORY.background=#40384A
+@COLOR easyknack.node.SPECTRUM.background=#474231
+@COLOR easyknack.node.PARTIALS.background=#493637
