@@ -7,6 +7,35 @@ import com.vingame.glswing.component.*;
 import com.vingame.glswing.input.*;
 import com.vingame.glswing.ui.*;
 class InspectorKeyboardTest {
+ @Test void windowFallbackWorksWithoutFocusOnBothSurfaceTypes()throws Exception{
+  SwingUtilities.invokeAndWait(()->{
+   for(GLParent host:java.util.List.of(new GLSwingPanel(){},new GLSwingContainerCanvas(){})){
+    var frame=new JFrame();WorkspaceView view=null;
+    try{
+     view=new WorkspaceView(frame);host.addGL(view);
+     var workspace=(com.vingame.glswing.node.GLNodeWorkspace)field(view,"workspace");
+     var surface=(java.awt.Component)host;surface.setSize(900,600);view.setBounds(0,0,900,600);
+     host.requestGLFocus(null);workspace.setInspectorVisible(false);
+     send(surface,KeyEvent.VK_N);assertTrue(workspace.isInspectorVisible(),host.getClass().getSuperclass().getSimpleName());
+     var outside=new GLButton("Other area");host.addGL(outside);host.requestGLFocus(outside);
+     send(surface,KeyEvent.VK_N);assertFalse(workspace.isInspectorVisible());
+     var text=new GLTextEditor("Name");host.addGL(text);host.requestGLFocus(text);
+     send(surface,KeyEvent.VK_N);assertFalse(workspace.isInspectorVisible());
+     var popup=new GLPopupMenu();popup.addItem("Test",e->{});popup.show(host,5,5);
+     send(surface,KeyEvent.VK_N);assertFalse(workspace.isInspectorVisible());
+     send(surface,KeyEvent.VK_ESCAPE);assertFalse(popup.isShowing());
+     host.requestGLFocus(null);send(surface,KeyEvent.VK_N);assertTrue(workspace.isInspectorVisible());
+    }catch(Exception failure){throw new AssertionError(failure);}finally{
+     if(view!=null)view.close();frame.dispose();
+     if(host instanceof GLSwingPanel panel)panel.destroy();else ((GLSwingContainerCanvas)host).destroy();
+    }
+   }
+  });
+ }
+ private static void send(java.awt.Component surface,int code){
+  var event=new KeyEvent(surface,KeyEvent.KEY_PRESSED,0,0,code,(char)code);
+  for(var listener:surface.getKeyListeners())listener.keyPressed(event);
+ }
  private static Object field(Object object,String name)throws Exception{var f=object.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(object);}
  private static GLKeyEvent key(int code){return new GLKeyEvent(new KeyEvent(new java.awt.Canvas(),KeyEvent.KEY_PRESSED,0,0,code,(char)code));}
  private static void dispatch(GLKeyTarget target,GLKeyEvent event)throws Exception{

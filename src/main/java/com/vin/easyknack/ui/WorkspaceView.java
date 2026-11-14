@@ -277,6 +277,16 @@ public final class WorkspaceView extends GLContainer implements AutoCloseable, c
         }
     }
 
+    @Override protected void attached(com.vingame.glswing.component.GLParent parent) {
+        super.attached(parent);
+        var keyboard=parent.getGLKeyboardManager();
+        if(keyboard!=null)keyboard.setDefaultTarget(this);
+    }
+    @Override protected void detached(com.vingame.glswing.component.GLParent parent) {
+        var keyboard=parent.getGLKeyboardManager();
+        if(keyboard!=null && keyboard.getDefaultTarget()==this)keyboard.setDefaultTarget(null);
+        super.detached(parent);
+    }
     @Override public boolean isFocusTraversable() { return false; }
     @Override public boolean preservesKeyboardFocusOnPress(){return analysisFocus.isVisible();}
 

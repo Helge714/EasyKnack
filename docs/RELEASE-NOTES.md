@@ -12,8 +12,9 @@
   remain neutral; the retired tinted-body study falls back to Mint. Theme geometry may change node
   dimensions; graph content and positions are preserved.
 
-- Restore keyboard shortcuts after menu-bar use and remove side-button insets
-  from sliders in Mint and Amber.
+- Route unhandled keyboard commands through a shared focus/hover/window-default
+  manager. The workspace remains reachable without a focused control; text input
+  and open menus keep priority. Remove slider side-button insets in Mint and Amber.
 
 - Clarify which compiler components are actually shipped and document recipient
   source access, with a preliminary release-license and interface-origin review.
