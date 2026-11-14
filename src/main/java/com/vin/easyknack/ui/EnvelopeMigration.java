@@ -32,6 +32,10 @@ final class EnvelopeMigration {
                     node=new GLGraphNode(node.id(),node.typeId(),node.typeVersion(),values);changed++;
                 }
 
+                if(envelope(node)&&node.properties().containsKey("curve")){
+                    var curve=com.vin.easyknack.nodes.CurveData.decode((String)node.properties().get("curve").toJavaValue());
+                    node=node.withProperty("curve",GLNodeValue.of(com.vin.easyknack.nodes.CurveData.encode(com.vin.easyknack.nodes.CurveData.envelopePhases(curve))));
+                }
                 nodes.add(node);
             }
             var d=asset.compositeDescriptor();

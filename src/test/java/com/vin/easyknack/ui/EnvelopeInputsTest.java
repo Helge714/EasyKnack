@@ -25,9 +25,21 @@ class EnvelopeInputsTest {
             assertTrue(rows.stream().noneMatch(r->r.key().equals(EnvelopeNode.SUSTAIN)));
         });
     }
+    @Test void equalPhasePlotPreservesShapesAndIsIdempotent(){
+        var original=CurveData.ADSR.mode(0,com.vingame.glswing.ui.GLFunctionCurve.Mode.BEZIER).handle(0,false,.05,.15).handle(1,true,.15,.9)
+            .mode(1,com.vingame.glswing.ui.GLFunctionCurve.Mode.BEZIER).mode(2,com.vingame.glswing.ui.GLFunctionCurve.Mode.BEZIER);
+        var normalized=CurveData.envelopePhases(original);var points=normalized.points();
+        assertEquals(1.0/3,points.get(1).x());assertEquals(2.0/3,points.get(2).x());
+        for(int i=0;i<=100;i++){
+            double t=i/100.0;assertEquals(original.evaluate(.2*t),normalized.evaluate(t/3),1e-8);
+            assertEquals(original.evaluate(.2+.3*t),normalized.evaluate((1+t)/3),1e-8);
+            assertEquals(original.evaluate(.5+.5*t),normalized.evaluate((2+t)/3),1e-8);
+        }
+        assertEquals(normalized,CurveData.envelopePhases(normalized));
+    }
     @Test void oldCombinedTimingIsSplitAndRetiredConnectionsAreRemoved(){
         var envelope=new EnvelopeNode();var id=com.vingame.glswing.node.model.GLNodeId.random();var sourceId=com.vingame.glswing.node.model.GLNodeId.random();
-        var values=new java.util.HashMap<>(envelope.defaults());values.remove("decay");values.put("duration",com.vingame.glswing.node.model.GLNodeValue.of(500));values.put("sustain-position",com.vingame.glswing.node.model.GLNodeValue.of(.5));
+        var values=new java.util.HashMap<>(envelope.defaults());values.remove("decay");values.put("curve",com.vingame.glswing.node.model.GLNodeValue.of(CurveData.encode(CurveData.ADSR)));values.put("duration",com.vingame.glswing.node.model.GLNodeValue.of(500));values.put("sustain-position",com.vingame.glswing.node.model.GLNodeValue.of(.5));
         var graph=new com.vingame.glswing.node.model.GLNodeGraph();var value=new ValueNode();
         graph.edit("Old envelope",e->{e.addNode(new com.vingame.glswing.node.model.GLGraphNode(id,envelope.registration().id(),values));e.addNode(new com.vingame.glswing.node.model.GLGraphNode(sourceId,value.registration().id(),value.defaults()));
             e.addConnection(new com.vingame.glswing.node.model.GLGraphConnection(com.vingame.glswing.node.model.GLNodeConnectionId.random(),new com.vingame.glswing.node.model.GLNodeEndpoint(sourceId,"value-out"),new com.vingame.glswing.node.model.GLNodeEndpoint(id,"sustain-position")));});

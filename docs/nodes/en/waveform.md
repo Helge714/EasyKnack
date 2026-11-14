@@ -41,3 +41,5 @@ Curve mode defines a periodic waveform using control points. Resource mode edits
 [Node index](index.md) · [Deutsch](../de/waveform.md)
 
 Control points and Bezier handles appear while hovering or editing the graph. Clicking outside hides them and leaves the curve visible.
+
+Point shapes show the following segment: circle = Bezier, square = Linear, diamond = Step. The last point uses the preceding segment.

@@ -48,3 +48,5 @@ Normiert den Eingang anhand Input min/max, liest die Kurve und skaliert auf Outp
 [Node-Verzeichnis](index.md) · [English](../en/curve-mapping.md)
 
 Kontrollpunkte und Bézier-Griffe erscheinen beim Hover oder im aktiven Graph-Editor. Ein Klick außerhalb blendet sie aus; die Kurve bleibt sichtbar.
+
+Die Punktform zeigt den folgenden Abschnitt: Kreis = Bézier, Quadrat = Linear, Raute = Step. Der letzte Punkt verwendet den vorherigen Abschnitt.

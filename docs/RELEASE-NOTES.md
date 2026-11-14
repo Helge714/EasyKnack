@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Show curve modes with round Bezier, square Linear and diamond Step points.
+  Envelope phases occupy equal, edge-aligned thirds without an extra Hold marker.
+
 - Give Envelope separate Attack, Decay and Release duration inputs and vertically
   movable curve points. Hold stays at the end of Decay. Older combined times are
   split; existing duration wires now drive Attack. Sustain-position wires and

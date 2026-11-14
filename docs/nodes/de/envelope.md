@@ -26,7 +26,7 @@ Erzeugt eine kurvenförmige Hüllkurve aus Gate und Trigger.
 
 Eine steigende Gate-Flanke über 0 oder ein Trigger startet Attack und danach Decay. Jede Phase hat einen eigenen Dauereingang (0–60.000 ms). Bei eingeschaltetem Hold und positivem Gate wird der Pegel am Ende von Decay gehalten. Gate 0 startet Release vom aktuellen Pegel, auch während Attack oder Decay. Bei ausgeschaltetem Hold oder einem Trigger ohne Gate folgt Release direkt auf Decay. Phasen mit Dauer 0 enden sofort. Retrigger starten beim aktuellen Pegel; der Ausgang bleibt auf 0–1 begrenzt.
 
-Kurvenpunkte lassen sich vertikal bewegen; ihre horizontalen Positionen und ihre Anzahl bleiben fest. Der erste innere Punkt beendet Attack, der letzte innere Punkt beendet Decay. Bézier-Griffe formen weiterhin die Übergänge. Punkte und Griffe erscheinen bei Hover oder aktivem Editor und verschwinden nach einem Fokuswechsel nach außen. Alte Kurven behalten ihre vorhandene Form.
+Kurvenpunkte lassen sich vertikal bewegen; ihre horizontalen Positionen und ihre Anzahl bleiben fest. Der erste innere Punkt beendet Attack, der letzte innere Punkt beendet Decay. Bézier-Griffe formen weiterhin die Übergänge. Punkte und Griffe erscheinen bei Hover oder aktivem Editor und verschwinden nach einem Fokuswechsel nach außen. Vorhandene Kurven werden phasenweise an die Darstellung angepasst.
 
 Die bisherige kombinierte Zeit wird am ersten inneren Kurvenpunkt aufgeteilt. Bestehende Verbindungen des Dauereingangs steuern jetzt Attack. Die Halteposition entfällt samt ihren Verbindungen und kopierten Bindungen; Hold verwendet das Ende von Decay. Alte Patches mit modulierter Zeit oder verschobener Halteposition können dadurch anders klingen.
 
@@ -49,3 +49,7 @@ Die bisherige kombinierte Zeit wird am ersten inneren Kurvenpunkt aufgeteilt. Be
 | Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/envelope.md)
+
+Die Punktform zeigt den folgenden Abschnitt: Kreis = Bézier, Quadrat = Linear, Raute = Step. Der letzte Punkt verwendet den vorherigen Abschnitt.
+
+Attack, Decay und Release belegen je ein Drittel des randbündigen Graphen. Die tatsächlichen Dauern bestimmen die drei Zeiteingänge. Eine zusätzliche Hold-Markierung gibt es nicht.
