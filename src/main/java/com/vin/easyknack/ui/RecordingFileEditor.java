@@ -32,7 +32,7 @@ public record RecordingFileEditor() implements Editor {
    browse.setIcon(Icon.FOLDER);browse.setToolTipText(AppText.text("recording.directory"));
    addGL(name,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
    addGL(browse,GLConstraints.at(1,0).fillBoth().connectAll());
-   name.addActionListener(e->commit());browse.addActionListener(e->chooseDirectory());
+   name.addActionListener(e->{commit();name.requestGLFocus(null);});browse.addActionListener(e->chooseDirectory());
    update(GLNodeValue.of(""));sizeButton();
   }
   @Override protected void themeChanged(){super.themeChanged();sizeButton();}

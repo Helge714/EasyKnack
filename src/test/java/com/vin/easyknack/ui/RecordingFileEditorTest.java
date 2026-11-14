@@ -21,6 +21,21 @@ class RecordingFileEditorTest {
    group.name.setText("../Wrong");group.commit();assertEquals(1,values.size());
   });
  }
+ @Test void enterCommitsTheNameAndLeavesTheTextField()throws Exception{
+  javax.swing.SwingUtilities.invokeAndWait(()->{
+   var host=new com.vingame.glswing.component.GLSwingPanel(){};
+   try{
+    var values=new java.util.ArrayList<GLNodeValue>();
+    var group=new RecordingFileEditor.Target(values::add);host.addGL(group);
+    var original=Path.of("target","First.wav").toAbsolutePath();group.update(GLNodeValue.of(original.toString()));
+    host.requestGLFocus(group.name);assertTrue(group.name.isFocused());group.name.setText("Second");
+    var event=new java.awt.event.KeyEvent(host,java.awt.event.KeyEvent.KEY_PRESSED,0,0,java.awt.event.KeyEvent.VK_ENTER,'\n');
+    for(var listener:host.getKeyListeners())listener.keyPressed(event);
+    assertFalse(group.name.isFocused());assertEquals(1,values.size());
+    assertEquals(original.resolveSibling("Second.wav").toString(),values.get(0).toJavaValue());
+   }finally{host.destroy();}
+  });
+ }
  @Test void namesKeepTheirFormatAndCannotContainPaths(){
   assertEquals("Take.wav",RecordingFileEditor.filename("Take"));
   assertEquals("Take.MP3",RecordingFileEditor.filename("Take.MP3"));

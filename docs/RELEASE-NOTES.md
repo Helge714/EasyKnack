@@ -3,7 +3,8 @@
 ## Unreleased - 0.3.0
 
 - Add an inline recording filename field grouped with a folder button using
-  the shared Core folder icon at a readable size. Keep
+  the shared Core folder icon at a readable size. Enter accepts the filename and
+  leaves the text field. Keep
   existing document paths compatible. Without Overwrite, first takes use the
   selected name; collisions move the existing take into a numbered series and
   create the next index. This changes output filename behavior; existing numbered
