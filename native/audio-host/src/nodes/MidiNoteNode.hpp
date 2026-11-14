@@ -22,7 +22,7 @@ struct MidiNoteNode : NodeProcessor {
     bool supportsEventRate() const noexcept override{return true;}
     bool writesEventBuffer(std::size_t port)const noexcept override{return port==2;}
     bool acceptsMidi(std::size_t p) const noexcept override{return p==0;}
-    std::size_t outputCount() const noexcept override{return 4;}
+    std::size_t outputCount() const noexcept override{return 5;}
     void configure(std::istream& in) override {
         in>>std::ws;if(in.peek()=='!'){auto p=parameters::MidiNoteNodeParameters::read(in);
         sources=p.sources();channel=p.channel_value;bendRange=p.bend_range_value;voiceCount=p.voices_value;
@@ -86,6 +86,7 @@ struct MidiNoteNode : NodeProcessor {
             if(auto* gate=c.outputAt(1))gate[i]=selected>=0?1.f:0.f;
             if(auto* pulse=c.outputAt(2))pulse[i]=trigger?1.f:0.f;
             if(auto* velocity=c.outputAt(3))velocity[i]=selected>=0?notes[selected].velocity/127.f:0.f;
+            if(auto* voice=c.outputAt(4))voice[i]=static_cast<float>(voiceIndex);
         }
     }
 };

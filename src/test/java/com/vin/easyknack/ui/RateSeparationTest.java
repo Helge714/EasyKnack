@@ -85,7 +85,7 @@ class RateSeparationTest {
         var layout=new MathNode().layout(new NodeState(resolved.properties()));
         assertEquals(ProcessingRate.AUDIO,layout.rows().stream().filter(r->r.id().equals("a")).findFirst().orElseThrow().rate());
         assertEquals(ProcessingRate.CONTROL,layout.rows().stream().filter(r->r.id().equals("b")).findFirst().orElseThrow().rate());
-        String encoded=AudioGraphEncoder.encode(graph.snapshot());assertTrue(encoded.contains("@ aaea e"));assertTrue(encoded.contains("@ a ac"));
+        String encoded=AudioGraphEncoder.encode(graph.snapshot());assertTrue(encoded.contains("@ aaeaa e"));assertTrue(encoded.contains("@ a ac"));
     }
     @Test void oldCrossTypeWiresGetExplicitConvertersAndRemainConnected(){
         var graph=new GLNodeGraph();var clock=add(graph,new ClockNode());var math=add(graph,new MathNode());var value=add(graph,new ValueNode());

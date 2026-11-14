@@ -11,7 +11,7 @@ Converts MIDI notes into per-voice frequency, gate, velocity and triggers.
 | MIDI | [MIDI](../../user/en/data-types.md#midi) | — | MIDI events | — | — | [MIDI](../../user/en/rates.md) | Always |
 | Channel (0 = all) | [Editor](../../user/en/reference-tables.md) | 0–16 | — | 0 | — | — | Always |
 | Voices | [Editor](../../user/en/reference-tables.md) | 1–32 | — | 1 | — | — | Always |
-| Pitch bend | [Editor](../../user/en/reference-tables.md) | 0–48 st | — | 2 st | [cent](../../user/en/units.md), [st](../../user/en/units.md), [oct](../../user/en/units.md), [Factor](../../user/en/units.md) | — | Always |
+| Pitch-bend range | [Editor](../../user/en/reference-tables.md) | 0–48 st | — | 2 st | [cent](../../user/en/units.md), [st](../../user/en/units.md), [oct](../../user/en/units.md), [Factor](../../user/en/units.md) | — | Always |
 
 ## Outputs
 
@@ -21,6 +21,7 @@ Converts MIDI notes into per-voice frequency, gate, velocity and triggers.
 | Gate | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 | Trigger | [Trigger](../../user/en/data-types.md#trigger) | — | [Trigger](../../user/en/rates.md#trigger) | [Auto](../../user/en/data-types.md#channels) |
 | Velocity | [Value](../../user/en/data-types.md#value) | 0–1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
+| Voice | [Value](../../user/en/data-types.md#value) | 0–Voices−1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
@@ -45,3 +46,5 @@ Frequency = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate is 1 while a 
 | Not supported |
 
 [Node index](index.md) · [Deutsch](../de/midi-note.md)
+
+Voice is a stable zero-based index: 0 in mono, 0 to Voices−1 in polyphony, including after note-off. Pitch-bend range remains 2 semitones by default: a MIDI pitch-wheel message applies up to ±2 semitones. The range control alone is not a pitch offset; 0 disables bending.

@@ -21,6 +21,7 @@ Wandelt MIDI-Noten in Frequenz, Gate, Anschlagstärke und Trigger je Stimme um.
 | Gate | [Wert](../../user/de/data-types.md#value) | 0–1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Trigger | [Trigger](../../user/de/data-types.md#trigger) | — | [Trigger](../../user/de/rates.md#trigger) | [Auto](../../user/de/data-types.md#channels) |
 | Anschlagstärke (Velocity) | [Wert](../../user/de/data-types.md#value) | 0–1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
+| Stimme (Voice) | [Wert](../../user/de/data-types.md#value) | 0–Voices−1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
@@ -45,3 +46,5 @@ Frequenz = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate ist 1, solange
 | Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/midi-note.md)
+
+Voice ist ein stabiler, nullbasierter Index: 0 bei Mono, 0 bis Voices−1 bei Polyphonie, auch nach Note-off. Der Pitchbend-Bereich bleibt standardmäßig bei 2 Halbtönen: Eine MIDI-Pitchwheel-Nachricht bewirkt bis zu ±2 Halbtöne. Der Bereichsregler allein verstimmt keine Note; 0 deaktiviert Pitchbend.

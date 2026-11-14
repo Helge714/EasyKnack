@@ -6,6 +6,8 @@
   Envelope phases occupy equal, edge-aligned thirds without an extra Hold marker.
 - Muted Digital Noise passes Frequency unchanged, outputs Factor 1 and emits no
   Trigger, including inside Instance Groups.
+- Add a stable zero-based Voice output to MIDI Note. Clarify Pitch-bend range;
+  its default remains 2 semitones and requires MIDI pitch-wheel messages.
 
 - Give Envelope separate Attack, Decay and Release duration inputs and vertically
   movable curve points. Hold stays at the end of Decay. Older combined times are

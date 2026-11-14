@@ -126,7 +126,7 @@ For sliders, picking, tabs or labels: start in Core ui/, not AudioNodeFactory.
 
 - Language and preferences: `i18n/AppText`, `app/ApplicationSettings`; old public `ui` names delegate for compatibility. Preferences retain their original node.
 - Compilation kernels: `compiler/MathFusion`, `SampleFusion`, `StatefulChainSpecialization`, `SpectralSourceSpecialization`, `CompiledManualTargets`. `ui/GroupSourceExporter` orchestrates application group metadata.
-- View-independent execution policy: `graph/GraphExecutionPolicy`; `WorkspaceController` delegates composite and leaf Mute/feedback preparation. Neutral Digital Noise stays executable with a native bypass flag (Factor 1, Frequency forwarded, Trigger silent); instance/spectral leaf preparation shares this policy.
+- View-independent execution policy: `graph/GraphExecutionPolicy`; `WorkspaceController` delegates composite and leaf Mute/feedback preparation. Neutral Digital Noise stays executable with a native bypass flag (Factor 1, Frequency forwarded, Trigger silent); instance/spectral leaf preparation shares this policy. `ControlOutputsTest` covers routing and MIDI voice/pitch behavior.
 - Native build policy: `native/audio-host/build.properties`, `scripts/NativeBuild.ps1`, plugin `NativeBuildSettings`; host scripts and packaging share one invocation. CMake reads the same policy and requires Maven-generated contracts.
 - Native root headers forward to implementation folders, preserving exported SDK include paths. Deferred driver sources: `native/experimental/virtual-audio`.
 - Cleanup progress, validation and deliberately retained material: [CLEANUP-PLAN.md](CLEANUP-PLAN.md).

@@ -69,7 +69,7 @@ class FilterMidiNodesTest {
                 });
                 String encoded=controller.audioGraph().replaceAll(" ![0-9a-f]{16} "," ");
                 assertTrue(encoded.contains("osc 1 440.0"));assertTrue(encoded.contains("envelope 257 0.0 513 0.0"));
-                assertEquals(4,new MidiNoteNode().layout(new NodeState(new MidiNoteNode().defaults())).ports().stream().filter(p->p.direction()==GLPortDirection.OUTPUT).count());
+                assertEquals(5,new MidiNoteNode().layout(new NodeState(new MidiNoteNode().defaults())).ports().stream().filter(p->p.direction()==GLPortDirection.OUTPUT).count());
                 var endpoint=new MidiDevices.Device("123456789","Test MIDI",true);MidiDevices.publish(List.of(MidiDevices.NONE,endpoint));
                 controller.setNodeProperty(ids.get(0),MidiInputNode.DEVICE,GLNodeValue.of(endpoint.reference()));
                 var node=controller.workspace().editor().getNodes().stream().filter(n->AudioNodeFactory.idOf(n).filter(ids.get(0)::equals).isPresent()).findFirst().orElseThrow();
