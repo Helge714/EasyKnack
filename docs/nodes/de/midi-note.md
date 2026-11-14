@@ -25,7 +25,7 @@ Wandelt MIDI-Noten in Frequenz, Gate, Anschlagstärke und Trigger je Stimme um.
 
 ## Verhalten
 
-Frequenz = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate ist 1, solange eine Note gehalten wird, einschließlich Haltepedal. Anschlagstärke ist Note-on-Velocity/127 und wird beim Loslassen 0. Die Frequenz behält den letzten Ton. Jedes Note-on erzeugt einen Trigger. Eine Stimme bevorzugt die zuletzt gespielte Note und fällt auf gehaltene Noten zurück; bei Polyphonie entstehen getrennte Stimmen, bei Überbelegung wird die älteste gehaltene Stimme ersetzt. [Voice Merge](voice-merge.md) fasst sie vor gemeinsamen Effekten zusammen; ein Audio-Ausgang mischt Stimmen ebenfalls.
+Frequenz = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate ist 1, solange eine Note gehalten wird, einschließlich Haltepedal. Anschlagstärke ist Note-on-Velocity/127. Anschlagstärke und Frequenz halten nach Note-off ihre letzten Werte je Stimme, damit eine Hüllkurve ausklingen kann. Nur Gate fällt auf 0. Losgelassene Stimmen halten ihre Frequenz auch bei Pitchwheel-Bewegungen; aktive Stimmen folgen weiterhin Pitchbend. Eine neue Note ersetzt die gehaltenen Werte; Panic oder ein Quellen-Reset setzt Velocity auf 0. Jedes Note-on erzeugt einen Trigger. Eine Stimme bevorzugt die zuletzt gespielte Note und fällt auf gehaltene Noten zurück; bei Polyphonie entstehen getrennte Stimmen, bei Überbelegung wird die älteste gehaltene Stimme ersetzt. [Voice Merge](voice-merge.md) fasst sie vor gemeinsamen Effekten zusammen; ein Audio-Ausgang mischt Stimmen ebenfalls.
 
 ## Mute
 

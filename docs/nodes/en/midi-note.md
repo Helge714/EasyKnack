@@ -25,7 +25,7 @@ Converts MIDI notes into per-voice frequency, gate, velocity and triggers.
 
 ## Behavior
 
-Frequency = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate is 1 while a note is held, including sustain. Velocity is note-on velocity/127 and becomes 0 on release. Frequency retains the last pitch on release. Each note-on emits a Trigger. One voice uses last-note priority with held-note fallback; polyphony assigns separate voices and steals the oldest held voice when full. Use [Voice Merge](voice-merge.md) to combine them before shared effects; an Audio Output also merges voices.
+Frequency = `440 · 2^((note − 69 + transpose + bend)/12)`. Gate is 1 while a note is held, including sustain. Velocity is note-on velocity/127. Velocity and Frequency hold their last per-voice values after note-off, allowing an envelope release to finish. Only Gate falls to 0. Released voices also retain their frequency when the pitch wheel moves; active voices still follow pitch bend. A new note replaces the latched values; panic/source reset clears Velocity to 0. Each note-on emits a Trigger. One voice uses last-note priority with held-note fallback; polyphony assigns separate voices and steals the oldest held voice when full. Use [Voice Merge](voice-merge.md) to combine them before shared effects; an Audio Output also merges voices.
 
 ## Mute
 

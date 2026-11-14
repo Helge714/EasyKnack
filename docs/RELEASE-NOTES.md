@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.3.0
 
+- Hold MIDI Note Velocity and Frequency per voice after note-off so envelope
+  release tails are not cut off. Gate still releases immediately; panic clears
+  Velocity. Patches that used Velocity as a gate should use Gate instead.
+
 - Show curve modes with round Bezier, square Linear and diamond Step points.
   Envelope phases occupy equal, edge-aligned thirds without an extra Hold marker.
 - Muted Digital Noise passes Frequency unchanged, outputs Factor 1 and emits no
