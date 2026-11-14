@@ -2,7 +2,8 @@
 
 ## Unreleased - 0.2.0
 
-- Make Mint the default theme; retain Amber and Classic as alternatives. Add
+- Make Mint the default; offer exactly Mint, Amber, Light Mint and Light Amber.
+  Migrate retired Classic/Blue choices to Mint and old Light to Light Mint. Add
   Light Mint and Light Amber with lighter type headers and dark title text.
   Mint and Amber provide coordinated control accents and
   moderately saturated pastel type colors. Compact controls, Control-rate

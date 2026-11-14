@@ -17,9 +17,17 @@ public final class ApplicationTheme {
     public static ApplicationTheme current() { return Default.INSTANCE; }
     public static void activate(ApplicationTheme theme){Default.INSTANCE=theme;}
     public static ApplicationTheme loadSelection(String id){
-        if(id.equals("classpath:/easyknack-slider-mint-nodes.gltheme"))id="classpath:/easyknack-slider-mint.gltheme";
+        id=normalizeSelection(id);
         if(id.startsWith("classpath:"))return new ApplicationTheme(GLThemeLoader.loadResource(id.substring(10)),GLThemeLoader.loadResource("/easyknack.gltheme"));
         return load(id.isBlank()?null:Path.of(id));
+    }
+    static String normalizeSelection(String id){
+        return switch(id){
+            case "", "classpath:/easyknack.gltheme", "classpath:/easyknack-blue.gltheme",
+                 "classpath:/easyknack-darkblue.gltheme", "classpath:/easyknack-slider-mint-nodes.gltheme" -> "classpath:"+DEFAULT_RESOURCE;
+            case "classpath:/easyknack-light.gltheme" -> "classpath:/easyknack-light-mint.gltheme";
+            default -> id;
+        };
     }
     private ApplicationTheme(GLTheme theme, GLTheme defaults) { this.theme = theme; this.defaults = defaults; }
     private static ApplicationTheme loadConfigured() {

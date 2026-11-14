@@ -10,22 +10,13 @@ import com.vingame.glswing.ui.GLThemeLoader;
 
 class ApplicationThemeTest {
     @TempDir Path directory;
-    @Test void variantsInheritCorePresetsAndShareApplicationGeometry(){
+    @Test void onlyFourSupportedThemesAreListedAndOldChoicesMigrate(){
         var choices=BundledThemes.available();
-        assertEquals("EasyKnack Mint",choices.get(0).toString());
-        assertTrue(choices.stream().map(Object::toString).toList().containsAll(java.util.List.of("EasyKnack Classic","EasyKnack Mint","EasyKnack Amber","EasyKnack Light Mint","EasyKnack Light Amber","EasyKnack Blue","EasyKnack Dark Blue","EasyKnack Light")));
-        assertTrue(choices.stream().noneMatch(c->c.resource().startsWith("/easyknack/themes/")));
-        var defaults=ApplicationTheme.load(null);
-        for(var entry:java.util.Map.of("blue","blue","darkblue","darkblue","light","light").entrySet()){
-            var variant=ApplicationTheme.loadSelection("classpath:/easyknack-"+entry.getKey()+".gltheme");
-            var base=GLThemeLoader.loadResource("/com/vingame/glswing/themes/"+entry.getValue()+".gltheme");
-            assertEquals(base.values().getColor("palette.surface"),variant.theme().values().getColor("palette.surface"));
-            assertEquals(base.values().getColor("palette.text"),variant.theme().labelStyle().textColor());
-            for(String key:java.util.List.of("node.minimumWidth","node.cornerRadius","node.rowGap","curve.height","metrics.controlHeight"))
-                assertEquals(defaults.theme().values().getFloat(key,-1),variant.theme().values().getFloat(key,-2),key);
-            for(var signal:SignalCategory.values())assertEquals(ApplicationTheme.loadSelection("classpath:/easyknack.gltheme").signal(signal),variant.signal(signal));
-            for(var kind:NodeKind.values())assertNotEquals(Color.MAGENTA,variant.title(kind).dark());
-        }
+        assertEquals(java.util.List.of("EasyKnack Mint","EasyKnack Amber","EasyKnack Light Mint","EasyKnack Light Amber"),choices.stream().map(Object::toString).toList());
+        for(var choice:choices)assertNotNull(ApplicationTheme.loadSelection(choice.id()));
+        for(String old:java.util.List.of("easyknack","easyknack-blue","easyknack-darkblue"))
+            assertEquals("classpath:"+ApplicationTheme.DEFAULT_RESOURCE,ApplicationTheme.normalizeSelection("classpath:/"+old+".gltheme"));
+        assertEquals("classpath:/easyknack-light-mint.gltheme",ApplicationTheme.normalizeSelection("classpath:/easyknack-light.gltheme"));
     }
     @Test void lightWorkspaceAndCurveHaveReadableContrast(){
         var theme=ApplicationTheme.loadSelection("classpath:/easyknack-light.gltheme").theme();

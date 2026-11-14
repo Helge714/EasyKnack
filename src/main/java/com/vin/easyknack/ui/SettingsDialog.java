@@ -19,7 +19,7 @@ final class SettingsDialog {
             final GLLabel message=new GLLabel("");
             boolean previewing;
             {language.setSelectedItem(ApplicationSettings.locale().getLanguage().equals("de")?"Deutsch":"English");
-                theme.setSelectedItem(choices.stream().filter(c->c.id().equals(ApplicationSettings.theme())).findFirst().orElseGet(()->choices.stream().filter(c->c.resource().equals(ApplicationTheme.DEFAULT_RESOURCE)).findFirst().orElseThrow()));
+                theme.setSelectedItem(choices.stream().filter(c->c.id().equals(ApplicationTheme.normalizeSelection(ApplicationSettings.theme()))).findFirst().orElseGet(()->choices.stream().filter(c->c.resource().equals(ApplicationTheme.DEFAULT_RESOURCE)).findFirst().orElseThrow()));
                 for(var c:List.of(languageLabel,themeLabel,language,theme,autosaveLabel,retentionLabel,interval,retention,curvature,save,cancel,message))addGL(c);
                 interval.setIntegerValuesOnly(true);interval.setUnit("s");retention.setIntegerValuesOnly(true);retention.setUnit(AppText.text("settings.days"));
                 curvature.setToolTipText(AppText.text("settings.curvature.hint"));curvature.addChangeListener(e->owner.previewCurvature(curvature.getValue()));

@@ -1,6 +1,0 @@
-# EasyKnack application bundle; base UI comes from the external GLSwing library.
-theme.type=bundle
-theme.name=EasyKnack Dark Blue
-theme.extends=/com/vingame/glswing/themes/darkblue.gltheme
-theme.colors=/easyknack/themes/colors.gltheme
-theme.metrics=/easyknack/themes/metrics.gltheme
