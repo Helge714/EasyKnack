@@ -26,3 +26,6 @@ node.portDiamondScale=0.85
 
 # Flush title fill; title text keeps its normal reading margin.
 node.titleInset=0
+
+# Side buttons meet the slider edges.
+slider.arrowInset=0

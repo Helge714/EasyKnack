@@ -17,6 +17,17 @@ class InspectorKeyboardTest {
    var frame=new JFrame();var host=new GLSwingPanel(){};WorkspaceView view=null;
    try{
     view=new WorkspaceView(frame);host.addGL(view);var workspace=(com.vingame.glswing.node.GLNodeWorkspace)field(view,"workspace");
+    host.setSize(900,600);view.setBounds(0,0,900,600);
+    host.requestGLFocus(workspace.editor());
+    var menuBar=(GLMenuBar)field(view,"menuBar");var menuItem=menuBar.getItems().get(0);
+    var press=GLSwingPanel.class.getDeclaredMethod("dispatchMousePressed",java.awt.event.MouseEvent.class,GLPickResult.class);press.setAccessible(true);
+    press.invoke(host,new java.awt.event.MouseEvent(host,java.awt.event.MouseEvent.MOUSE_PRESSED,0,0,5,5,1,false,java.awt.event.MouseEvent.BUTTON1),
+      new GLPickResult(1,menuItem,5,5,5,5,1,0,0,1,0,0));
+    menuItem.doClick();
+    menuBar.closeMenu();
+    assertSame(workspace.editor(),host.getGLFocusOwner(),"Closing a menu must restore the graph keyboard target");
+    workspace.setInspectorVisible(true);var afterMenu=key(KeyEvent.VK_N);dispatch(host.getGLFocusOwner(),afterMenu);
+    assertTrue(afterMenu.isConsumed());assertFalse(workspace.isInspectorVisible());
     workspace.setInspectorVisible(true);var button=new GLButton("Test");workspace.propertyInspector().addGL(button);host.requestGLFocus(button);
     var n=key(KeyEvent.VK_N);dispatch(button,n);assertTrue(n.isConsumed());assertFalse(workspace.isInspectorVisible());
     workspace.setInspectorVisible(true);host.requestGLFocus(button);var escape=key(KeyEvent.VK_ESCAPE);dispatch(button,escape);assertTrue(escape.isConsumed());assertFalse(workspace.isInspectorVisible());

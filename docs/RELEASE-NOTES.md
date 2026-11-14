@@ -12,6 +12,9 @@
   remain neutral; the retired tinted-body study falls back to Mint. Theme geometry may change node
   dimensions; graph content and positions are preserved.
 
+- Restore keyboard shortcuts after menu-bar use and remove side-button insets
+  from sliders in Mint and Amber.
+
 - Clarify which compiler components are actually shipped and document recipient
   source access, with a preliminary release-license and interface-origin review.
   Documentation only; existing 0.1.0 downloads are unchanged.
