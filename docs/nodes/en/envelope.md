@@ -15,6 +15,7 @@ Generates a curve-shaped envelope from Gate and Trigger.
 | Decay | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 180 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
 | Release | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
 | Hold | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Always |
+| Retrigger from current level | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Inspector |
 
 ## Outputs
 
@@ -24,7 +25,7 @@ Generates a curve-shaped envelope from Gate and Trigger.
 
 ## Behavior
 
-A Gate rise above 0 or a Trigger starts Attack, then Decay. Each phase has its own duration input (0–60,000 ms). With Hold on, a positive Gate holds the level at the end of Decay; Gate returning to 0 starts Release from the current level, including during Attack or Decay. With Hold off or a Trigger without Gate, Release follows Decay automatically. Zero-duration phases finish immediately. Retriggers start from the current level; output stays within 0–1.
+A Gate rise above 0 or a Trigger starts Attack, then Decay. Each phase has its own duration input (0–60,000 ms). With Hold on, a positive Gate holds the level at the end of Decay; Gate returning to 0 starts Release from the current level, including during Attack or Decay. With Hold off or a Trigger without Gate, Release follows Decay automatically. Zero-duration phases finish immediately. By default, retriggers start from the current level; output stays within 0–1.
 
 Curve points move vertically; their horizontal positions and count stay fixed. The first interior point ends Attack, the last interior point ends Decay; Bezier handles still shape the transitions. Points and handles appear while hovering or editing and disappear when focus moves outside. Existing curves are adapted phase by phase to the display.
 
@@ -53,3 +54,7 @@ Older combined timing is split at the curve's first interior point. Existing dur
 Point shapes show the following segment: circle = Bezier, square = Linear, diamond = Step. The last point uses the preceding segment.
 
 Attack, Decay and Release each occupy one third of the edge-aligned graph. Their actual durations come from the three duration inputs. There is no extra Hold marker.
+
+Before the first trigger the output is 0. The first Attack starts at the drawn first point, including 1. By default, retriggers start at the current level. Release ends at the drawn last point and holds that value until the next trigger; nonzero and rising release endpoints are supported.
+
+In the Inspector, Retrigger from current level is on by default. Turn it off to restart every trigger at the drawn first point, including during an active envelope. Changing the switch affects the next trigger and does not restart playback.

@@ -13,7 +13,9 @@ class EnvelopeInputsTest {
     @Test void parametersAreConnectableAndHoldDefaultsOn() {
         var node=new EnvelopeNode();
         assertEquals(true,node.defaults().get("hold").toJavaValue());
+        assertEquals(true,node.defaults().get("retrigger-current").toJavaValue());
         var rows=node.layout(new NodeState(node.defaults())).rows();
+        assertTrue(rows.stream().filter(r->r.key().equals(EnvelopeNode.RETRIGGER_CURRENT)).findFirst().orElseThrow().isInspectorOnly());
         for(var id:List.of(EnvelopeNode.DURATION,EnvelopeNode.DECAY,EnvelopeNode.RELEASE))
             assertEquals(NodeBuilder.RowKind.INPUT,rows.stream().filter(r->r.key().equals(id)).findFirst().orElseThrow().kind());
     }
@@ -91,16 +93,42 @@ class EnvelopeInputsTest {
                 EnvelopeNode phaseShot;phaseInit(phaseShot);phaseShot.hold=false;phaseShot.process(phases);assert(phaseShot.stage==EnvelopeNode::IDLE&&out[7]==0);
                 EnvelopeNode immediate;phaseInit(immediate);immediate.duration=immediate.decay=immediate.release=0;immediate.process(phases);assert(immediate.stage==EnvelopeNode::HOLD&&std::abs(out[0]-.6f)<1e-6);
                 immediate.gateValue=0;immediate.process(phases);assert(immediate.stage==EnvelopeNode::IDLE&&out[0]==0);
+                auto nonzeroInit=[](EnvelopeNode& n){
+                    std::istringstream shape("4 0 1 0 1 0 1 0 .3333333333333333 .5 .3333333333333333 .5 .3333333333333333 .5 0 .6666666666666666 .2 .6666666666666666 .2 .6666666666666666 .2 0 1 1 1 1 1 1 0");
+                    n.curve.read(shape);n.legacy=false;n.duration=2;n.decay=2;n.release=3;
+                };
+                EnvelopeNode nonzero;nonzeroInit(nonzero);nonzero.process(phases);for(float value:out)assert(value==0); // No trigger yet.
+                nonzero.gateValue=1;nonzero.process(phases);assert(out[0]==1&&std::abs(out[1]-.75f)<1e-6&&std::abs(out[4]-.2f)<1e-6);
+                nonzero.gateValue=0;nonzero.process(phases);assert(std::abs(out[0]-.2f)<1e-6&&out[1]>out[0]&&out[3]==1&&out[15]==1);
+                nonzero.process(phases);for(float value:out)assert(value==1); // Hold the drawn release endpoint.
+                EnvelopeNode restored;nonzeroInit(restored);restored.inheritState(nonzero);restored.process(phases);for(float value:out)assert(value==1);
+                EnvelopeNode earlyNonzero;nonzeroInit(earlyNonzero);earlyNonzero.gateValue=1;phases.bufferSize=2;earlyNonzero.process(phases);assert(out[1]==.75f);
+                earlyNonzero.gateValue=0;earlyNonzero.process(phases);assert(out[0]==.75f);float ongoing=out[1];
+                earlyNonzero.gateValue=1;phases.bufferSize=1;earlyNonzero.process(phases);assert(std::abs(out[0]-ongoing)<1e-6); // Retrigger is continuous.
+                earlyNonzero.retriggerCurrent=false;earlyNonzero.triggerValue=1;earlyNonzero.process(phases);assert(out[0]==1); // Explicit reset to the drawn start.
+                EnvelopeNode retainedOption;nonzeroInit(retainedOption);retainedOption.retriggerCurrent=true;retainedOption.applyParameters(earlyNonzero);assert(!retainedOption.retriggerCurrent);
+                phases.bufferSize=16;EnvelopeNode zeroNonzero;nonzeroInit(zeroNonzero);zeroNonzero.duration=zeroNonzero.decay=zeroNonzero.release=0;zeroNonzero.gateValue=1;zeroNonzero.process(phases);
+                zeroNonzero.gateValue=0;zeroNonzero.process(phases);for(float value:out)assert(value==1);
+                EnvelopeNode loop;loop.legacy=false;loop.duration=loop.decay=0;loop.release=4;loop.gateValue=1;
+                std::istringstream loopCurve("4 0 0 0 0 0 0 0 .3333333333333333 1 .3333333333333333 1 .3333333333333333 1 0 .6666666666666666 1 .6666666666666666 1 .7777777777777778 0 2 1 1 .8888888888888889 0 1 1 0");loop.curve.read(loopCurve);loop.process(phases);loop.gateValue=0;loop.process(phases);
+                assert(std::abs(out[2]-.25f)<.001&&out[4]==1&&out[15]==1); // Equal endpoints still retain Bezier motion.
                 float attackMs=4,decayMs=3,releaseMs=2;phaseInputs[2]=&attackMs;phaseInputs[3]=&decayMs;phaseInputs[4]=&releaseMs;phases.sourceRates="aaccc";
                 EnvelopeNode scalars;phaseInit(scalars);scalars.process(phases);assert(out[4]==1&&std::abs(out[7]-.6f)<1e-6);
                 float audioAttack[16]{};phaseInputs[2]=audioAttack;phases.sourceRates="aaacc";EnvelopeNode audioPhases;phaseInit(audioPhases);audioPhases.process(phases);assert(out[0]==1&&std::abs(out[3]-.6f)<1e-6);
                 EnvelopeNode latest;std::istringstream latestParameters("ENVELOPE_NEW_PARAMETERS");latest.configure(latestParameters);assert(!latest.legacy&&latest.duration==120&&latest.decay==180&&latest.sources.size()==5);
+                EnvelopeNode resetOption;std::istringstream resetParameters("ENVELOPE_RESET_PARAMETERS");resetOption.configure(resetParameters);assert(!resetOption.retriggerCurrent&&!resetOption.legacy);
+                EnvelopeNode previousPhases;std::istringstream previousParameters("!6e6e611f517ae942 -1 0 -1 0 -1 2 -1 3 -1 4 1 "+curve);previousPhases.configure(previousParameters);assert(!previousPhases.legacy&&previousPhases.retriggerCurrent&&previousPhases.decay==3);
                 EnvelopeNode old;std::istringstream legacy("!a11bbab0677e0e68 -1 1 -1 0 2 2 .5 "+curve);
                 old.configure(legacy);assert(old.hold&&old.sources.size()==2);
                 EnvelopeNode current;std::istringstream modern("!10ad0836639a66ae -1 1 -1 0 2 2 3 2 4 .5 0 "+curve);
                 current.configure(modern);assert(!current.hold&&current.sources[2]==2&&current.sources[4]==4);
             }
-            """.replace("ENVELOPE_NEW_PARAMETERS",RateConverterTest.payload(new EnvelopeNode(),"audio",-1)));
+            """.replace("ENVELOPE_NEW_PARAMETERS",RateConverterTest.payload(new EnvelopeNode(),"audio",-1)).replace("ENVELOPE_RESET_PARAMETERS",resetPayload()));
         RateConverterTest.compileAndRun(source,temp.resolve("envelope.exe"),temp);
     }
+    private static String resetPayload(){
+        var node=new EnvelopeNode();var values=new java.util.HashMap<>(node.defaults());values.put("retrigger-current",com.vingame.glswing.node.model.GLNodeValue.of(false));
+        return "!"+NativeContractGenerator.fingerprint(node)+" "+node.encode(new NodeState(values),p->-1);
+    }
+
 }
