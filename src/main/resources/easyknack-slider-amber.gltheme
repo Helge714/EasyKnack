@@ -1,9 +1,13 @@
-# Optional slider color study. Everything else inherits the normal application theme.
-theme.name=EasyKnack Slider Study - Amber
+# Optional coordinated accent theme; neutral workspace and original control geometry.
+theme.type=bundle
+theme.name=EasyKnack Amber
 theme.extends=/easyknack.gltheme
+theme.colors=/easyknack/themes/pastel.gltheme
 
+palette.accent=#79613C
+palette.selection=#79613CBF
+@COLOR easyknack.accent.focus=#D0AE79
 slider.progressLight=#79613C
 slider.progressDark=#79613C
 slider.focusProgressLight=#947747
 slider.focusProgressDark=#947747
-slider.arrowPressed=#947747

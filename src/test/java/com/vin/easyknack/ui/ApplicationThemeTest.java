@@ -33,6 +33,21 @@ class ApplicationThemeTest {
         assertTrue(contrast(theme.values().getColor("curve.line"),theme.values().getColor("curve.background"))>=3);
         assertNotEquals(0,theme.values().getColor("nodeEditor.gridMajor").getAlpha());
     }
+    @Test void pastelThemesKeepNeutralBodiesAndReadableTypeTitles(){
+        var defaults=ApplicationTheme.load(null);
+        for(String variant:java.util.List.of("mint","amber")){
+            var selected=ApplicationTheme.loadSelection("classpath:/easyknack-slider-"+variant+".gltheme");
+            var values=selected.theme().values();
+            assertEquals(defaults.theme().values().getColor("node.background"),values.getColor("node.background"));
+            assertEquals(values.getColor("palette.accent"),values.getColor("tabbedPane.tabSelected"));
+            for(var kind:NodeKind.values()){
+                assertTrue(contrast(selected.color("node.title.text"),selected.title(kind).light())>=4.5,kind.name());
+                assertTrue(contrast(selected.signal(kind.signal()),values.getColor("node.background"))>=3,kind.name());
+            }
+        }
+        assertEquals(ApplicationTheme.loadSelection("classpath:/easyknack-slider-mint.gltheme").theme().values().asMap(),
+                ApplicationTheme.loadSelection("classpath:/easyknack-slider-mint-nodes.gltheme").theme().values().asMap());
+    }
     @Test void variantsPreviewOnExistingNodesWithoutEditingTheDocument()throws Exception{
         javax.swing.SwingUtilities.invokeAndWait(()->{
             var previous=ApplicationTheme.current();

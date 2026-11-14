@@ -16,6 +16,7 @@ public final class ApplicationTheme {
     public static ApplicationTheme current() { return Default.INSTANCE; }
     public static void activate(ApplicationTheme theme){Default.INSTANCE=theme;}
     public static ApplicationTheme loadSelection(String id){
+        if(id.equals("classpath:/easyknack-slider-mint-nodes.gltheme"))id="classpath:/easyknack-slider-mint.gltheme";
         if(id.startsWith("classpath:"))return new ApplicationTheme(GLThemeLoader.loadResource(id.substring(10)),GLThemeLoader.loadResource("/easyknack.gltheme"));
         return load(id.isBlank()?null:Path.of(id));
     }
@@ -47,11 +48,7 @@ public final class ApplicationTheme {
         var colors = title(category);
         var text = color("node.title.text");
         String hex = String.format("#%06X", text.getRGB() & 0xFFFFFF);
-        var values = base.values().with("node.titleText", hex);
-        var background = theme.values().get("easyknack.node." + category.name() + ".background", null);
-        if (background != null)
-            values = values.with("node.background", background);
-        return GLNodeStyle.fromTheme(base.withValues(values))
+        return GLNodeStyle.fromTheme(base.withValues(base.values().with("node.titleText", hex)))
                 .withTitleGradient(colors.light(), colors.dark());
     }
 }

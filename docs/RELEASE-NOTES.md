@@ -2,10 +2,9 @@
 
 ## Unreleased - 0.2.0
 
-- Add optional Mint and Amber slider color studies in appearance settings, with
-  flat fills, an additional type-tinted node-body study, and the existing live
-  preview/cancel workflow. Default visuals,
-  slider interaction and document compatibility are unchanged.
+- Add optional Mint and Amber themes with coordinated control accents and subdued
+  pastel node-title and signal colors. Node bodies remain neutral; the earlier
+  tinted-body study falls back to Mint. Live preview and cancel preserve documents.
 
 - Clarify which compiler components are actually shipped and document recipient
   source access, with a preliminary release-license and interface-origin review.

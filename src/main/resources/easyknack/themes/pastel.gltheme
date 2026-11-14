@@ -1,0 +1,50 @@
+# Shared subdued type palette and accent routing for Mint and Amber.
+theme.type=colors
+
+button.pressedLight=${palette.accent}
+button.pressedDark=${palette.accent}
+button.hover=${palette.accent}
+button.focus=${easyknack.accent.focus}
+checkBox.focus=${easyknack.accent.focus}
+checkBox.check=${easyknack.accent.focus}
+textEditor.focus=${easyknack.accent.focus}
+menu.hover=${palette.accent}
+menuBar.hover=${palette.accent}
+node.selectedBorder=${palette.accent}
+node.activeSelectedBorder=${easyknack.accent.focus}
+@COLOR easyknack.midi.keyboard.focus=${easyknack.accent.focus}
+@COLOR curve.line=${easyknack.accent.focus}
+
+@COLOR easyknack.signal.AUDIO=#AC9ABC
+@COLOR easyknack.signal.VALUE=#B4B4B4
+@COLOR easyknack.signal.MIDI=#91BEAD
+@COLOR easyknack.signal.WAVETABLE=#91A7CB
+@COLOR easyknack.signal.ANALYSIS=#C6B785
+@COLOR easyknack.signal.SPECTRUM=${easyknack.signal.ANALYSIS}
+@COLOR easyknack.signal.VECTOR=#8FB9C8
+@COLOR easyknack.signal.TRIGGER=#C5A07F
+@COLOR easyknack.signal.HISTORY=#B4A0C6
+@COLOR easyknack.signal.PARTIALS=#CB979E
+
+# Dark pastel shades preserve white title text contrast.
+@COLOR easyknack.node.AUDIO.title.light=#6A5B7B
+@COLOR easyknack.node.AUDIO.title.dark=#51465F
+@COLOR easyknack.node.VALUE.title.light=#606060
+@COLOR easyknack.node.VALUE.title.dark=#494949
+@COLOR easyknack.node.MIDI.title.light=#486A5F
+@COLOR easyknack.node.MIDI.title.dark=#375148
+@COLOR easyknack.node.WAVETABLE.title.light=#506484
+@COLOR easyknack.node.WAVETABLE.title.dark=#3D4C64
+@COLOR easyknack.node.ANALYSIS.title.light=#70633F
+@COLOR easyknack.node.ANALYSIS.title.dark=#554B30
+@COLOR easyknack.node.SPECTRUM.title.light=${easyknack.node.ANALYSIS.title.light}
+@COLOR easyknack.node.SPECTRUM.title.dark=${easyknack.node.ANALYSIS.title.dark}
+@COLOR easyknack.node.VECTOR.title.light=#476875
+@COLOR easyknack.node.VECTOR.title.dark=#36505A
+@COLOR easyknack.node.TRIGGER.title.light=#7A5C43
+@COLOR easyknack.node.TRIGGER.title.dark=#5D4633
+@COLOR easyknack.node.HISTORY.title.light=#6A587E
+@COLOR easyknack.node.HISTORY.title.dark=#514360
+@COLOR easyknack.node.PARTIALS.title.light=#7D535B
+@COLOR easyknack.node.PARTIALS.title.dark=#604047
+
