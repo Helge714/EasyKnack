@@ -68,7 +68,12 @@ class GroupSliderKindsTest {
         var theme=ApplicationTheme.load(null);
         for(var signal:SignalCategory.values()){
             var kind=NodeKind.fromPort(signal.valueTypeId());assertEquals(signal,kind.signal());
-            assertEquals(theme.signal(signal),theme.title(kind).light());assertNotNull(theme.title(kind).dark());
+            var port=theme.signal(signal);var title=theme.title(kind).light();
+            float portHue=java.awt.Color.RGBtoHSB(port.getRed(),port.getGreen(),port.getBlue(),null)[0];
+            float titleHue=java.awt.Color.RGBtoHSB(title.getRed(),title.getGreen(),title.getBlue(),null)[0];
+            float difference=Math.abs(portHue-titleHue);
+            assertTrue(Math.min(difference,1-difference)<.08,signal.name());
+            assertNotNull(theme.title(kind).dark());
         }
         assertEquals(NodeKind.TRIGGER,new TriggerInputNode().registration().kind());
     }

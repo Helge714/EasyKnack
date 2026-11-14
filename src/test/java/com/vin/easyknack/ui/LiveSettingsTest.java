@@ -6,7 +6,7 @@ import com.vingame.glswing.ui.*;
 
 class LiveSettingsTest {
     @Test void themesAreDiscoverableAndLoadable(){
-        var choices=BundledThemes.available();assertTrue(choices.stream().anyMatch(c->c.resource().equals("/easyknack.gltheme")));
+        var choices=BundledThemes.available();assertTrue(choices.stream().anyMatch(c->c.resource().equals(ApplicationTheme.DEFAULT_RESOURCE)));
         for(var choice:choices)assertNotNull(ApplicationTheme.loadSelection(choice.id()).theme());
     }
     @Test void liveLanguagePreservesGraphAndUserText()throws Exception{

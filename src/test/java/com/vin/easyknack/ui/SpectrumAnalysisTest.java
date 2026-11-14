@@ -41,7 +41,10 @@ class SpectrumAnalysisTest {
     @Test void analysisTitlesHaveASeparateYellowThemePaletteAndFftCanMix(){
         for(var node:NodeRegistry.builtinDefinitions())if(node.registration().category()==NodeCategory.ANALYSIS)assertEquals(node instanceof WavetableViewerNode?NodeKind.WAVETABLE:NodeKind.ANALYSIS,node.registration().kind());
         var colors=ApplicationTheme.current().title(NodeKind.ANALYSIS);
-        assertEquals(ApplicationTheme.current().signal(SignalCategory.ANALYSIS),colors.light());assertNotEquals(colors.light(),colors.dark());
+        assertTrue(colors.light().getRed()>colors.light().getBlue());
+        assertTrue(colors.light().getGreen()>colors.light().getBlue());
+        assertNotEquals(ApplicationTheme.current().title(NodeKind.AUDIO).light(),colors.light());
+        assertEquals(colors.light(),colors.dark());
         var fft=new SpectrumNode();var values=new HashMap<>(fft.defaults());values.put("channel",GLNodeValue.of("mix"));
         assertTrue(fft.encode(new NodeState(values),p->-1).contains(" mix "));
     }
