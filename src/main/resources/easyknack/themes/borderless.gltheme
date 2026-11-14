@@ -6,4 +6,20 @@ textEditor.borderWidth=0
 comboBox.borderWidth=0
 button.borderWidth=0
 checkBox.borderWidth=0
+checkBox.boxSize=12.4
 nodeEditor.connectionBorderWidth=0
+
+layoutGroup.borderWidth=0
+menu.borderWidth=0
+# Compensate for the removed 1.3 px control border on each side.
+slider.height=21.4
+slider.preferredWidth=117.4
+numberSpinner.height=21.4
+numberSpinner.preferredWidth=117.4
+textEditor.height=21.4
+textEditor.preferredWidth=117.4
+comboBox.height=21.4
+comboBox.minimumWidth=117.4
+button.height=21.4
+# Ports previously had a 1.5 px outline; keep the colored silhouettes compact.
+node.portRadius=4.25

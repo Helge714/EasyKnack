@@ -62,7 +62,16 @@ class ApplicationThemeTest {
                     controller.workspace().setGLTheme(selected.theme());controller.refreshAppearance();
                     assertSame(node,controller.workspace().editor().getNodes().get(0));
                     assertEquals(selected.theme().values().getColor("palette.surface"),node.getGLTheme().values().getColor("palette.surface"));
-                    assertEquals(document,NodeDocuments.comparable(controller.snapshotDocument()));
+                    // Themes may change intrinsic editor sizes, but never graph content or placement.
+                    var after=NodeDocuments.comparable(controller.snapshotDocument());
+                    assertEquals(document.root().graph(),after.root().graph());
+                    assertEquals(document.root().metadata(),after.root().metadata());
+                    assertEquals(document.embeddedAssets(),after.embeddedAssets());
+                    assertEquals(document.externalAssets(),after.externalAssets());
+                    document.root().viewState().nodes().forEach((id,before)->{
+                        var bounds=after.root().viewState().nodes().get(id);
+                        assertEquals(before.x(),bounds.x());assertEquals(before.y(),bounds.y());
+                    });
                 }
             }finally{ApplicationTheme.activate(previous);}
         });

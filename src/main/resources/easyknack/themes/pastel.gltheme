@@ -28,26 +28,31 @@ node.activeSelectedBorder=${easyknack.accent.focus}
 
 # Separate type hues with restrained brightness preserve white title text contrast.
 @COLOR easyknack.node.AUDIO.title.light=#79529A
-@COLOR easyknack.node.AUDIO.title.dark=#593D72
+@COLOR easyknack.node.AUDIO.title.dark=${easyknack.node.AUDIO.title.light}
 @COLOR easyknack.node.VALUE.title.light=#606060
-@COLOR easyknack.node.VALUE.title.dark=#494949
+@COLOR easyknack.node.VALUE.title.dark=${easyknack.node.VALUE.title.light}
 @COLOR easyknack.node.MIDI.title.light=#3C7961
-@COLOR easyknack.node.MIDI.title.dark=#2D5B49
+@COLOR easyknack.node.MIDI.title.dark=${easyknack.node.MIDI.title.light}
 @COLOR easyknack.node.WAVETABLE.title.light=#4C68A0
-@COLOR easyknack.node.WAVETABLE.title.dark=#394E78
+@COLOR easyknack.node.WAVETABLE.title.dark=${easyknack.node.WAVETABLE.title.light}
 @COLOR easyknack.node.ANALYSIS.title.light=#806B30
-@COLOR easyknack.node.ANALYSIS.title.dark=#605024
+@COLOR easyknack.node.ANALYSIS.title.dark=${easyknack.node.ANALYSIS.title.light}
 @COLOR easyknack.node.SPECTRUM.title.light=${easyknack.node.ANALYSIS.title.light}
-@COLOR easyknack.node.SPECTRUM.title.dark=${easyknack.node.ANALYSIS.title.dark}
+@COLOR easyknack.node.SPECTRUM.title.dark=${easyknack.node.SPECTRUM.title.light}
 @COLOR easyknack.node.VECTOR.title.light=#347888
-@COLOR easyknack.node.VECTOR.title.dark=#275A66
+@COLOR easyknack.node.VECTOR.title.dark=${easyknack.node.VECTOR.title.light}
 @COLOR easyknack.node.TRIGGER.title.light=#946039
-@COLOR easyknack.node.TRIGGER.title.dark=#6F482B
+@COLOR easyknack.node.TRIGGER.title.dark=${easyknack.node.TRIGGER.title.light}
 @COLOR easyknack.node.HISTORY.title.light=#915784
-@COLOR easyknack.node.HISTORY.title.dark=#6D4163
+@COLOR easyknack.node.HISTORY.title.dark=${easyknack.node.HISTORY.title.light}
 @COLOR easyknack.node.PARTIALS.title.light=#995259
-@COLOR easyknack.node.PARTIALS.title.dark=#733E43
+@COLOR easyknack.node.PARTIALS.title.dark=${easyknack.node.PARTIALS.title.light}
 
 
 # Borderless socket outlines; retain type-colored socket fills.
 node.portBorder=#00000000
+
+# Tooltips reuse menu styling and enforce a minimum stroke width in Core.
+menu.border=#00000000
+layoutGroup.border=#00000000
+layoutGroup.focusBorder=#00000000
