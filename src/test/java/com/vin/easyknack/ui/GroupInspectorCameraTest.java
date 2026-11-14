@@ -59,6 +59,27 @@ class GroupInspectorCameraTest {
    assertTrue(c.history().undo());assertEquals(440,slider.getValue());
   }});
  }
+ @Test void inspectorTogglePreservesRenderedGraphPositionAtEveryZoom()throws Exception{
+  SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+   c.openDocument("Camera",GroupUnitsTest.document(false));var w=c.workspace();w.setBounds(0,0,1000,700);
+   var method=com.vingame.glswing.node.GLNodeEditor.class.getDeclaredMethod("viewTransform",com.vingame.glswing.rendering.GLTransform.class);method.setAccessible(true);
+   for(boolean group:new boolean[]{false,true}){
+    if(group)w.openComposite("test.asset");
+    for(float zoom:new float[]{.5f,1,2}){
+     var editor=w.editor();editor.setZoom(zoom);editor.setPan(120,80);
+     var before=(com.vingame.glswing.rendering.GLTransform)method.invoke(editor,new com.vingame.glswing.rendering.GLTransform());
+     boolean shown=w.isInspectorVisible();
+     for(boolean visible:new boolean[]{!shown,shown}){
+      w.setInspectorVisible(visible);
+      var after=(com.vingame.glswing.rendering.GLTransform)method.invoke(editor,new com.vingame.glswing.rendering.GLTransform());
+      assertEquals(before.transformX(200,150),after.transformX(200,150),.001);
+      assertEquals(before.transformY(200,150),after.transformY(200,150),.001);
+      assertEquals(zoom,editor.getZoom());
+     }
+    }
+   }
+  }catch(Exception failure){throw new AssertionError(failure);}});
+ }
  @Test void navigationRestoresGraphCentersAndKeepsTheSharedZoom()throws Exception{
   SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController();var restored=new WorkspaceController()){
    c.openDocument("Camera",GroupUnitsTest.document(false));var w=c.workspace();w.setBounds(0,0,1000,700);var editor=w.editor();
