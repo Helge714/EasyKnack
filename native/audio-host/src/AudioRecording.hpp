@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <cerrno>
 #include <mutex>
+#include <map>
+#include <limits>
 #include <fcntl.h>
 #ifdef _WIN32
 #include <io.h>
@@ -31,11 +33,60 @@ class AudioRecording {
     std::shared_ptr<AnalysisMailbox> mailbox;
     FILE* file=nullptr;
     std::unique_ptr<WindowsMp3Recording> mp3;
-    std::uint64_t frames=0,nextIndex=1;
+    std::uint64_t frames=0,pendingIndex=0;
+    std::filesystem::path pendingRename;
     unsigned state=0,error=0;
     std::string actualPath;
     static auto& registry(){static std::vector<std::weak_ptr<AudioRecording>> value;return value;}
     static auto& registryMutex(){static std::mutex value;return value;}
+    static auto& fileMutex(){static std::mutex value;return value;}
+    static auto& activeFiles(){static std::map<std::string,AudioRecording*> value;return value;}
+    static std::string lower(std::string value){for(auto& c:value)c=static_cast<char>(std::tolower(static_cast<unsigned char>(c)));return value;}
+    std::filesystem::path indexed(const std::filesystem::path& base,std::uint64_t number)const{
+        auto suffix=std::to_string(number);if(suffix.size()<digits)suffix.insert(0,digits-suffix.size(),'0');
+        return base.parent_path()/std::filesystem::u8path(base.stem().u8string()+"_"+suffix+base.extension().u8string());
+    }
+    static std::uint64_t next(std::uint64_t& number){
+        if(number==std::numeric_limits<std::uint64_t>::max())throw std::runtime_error("Recording index exhausted");
+        return ++number;
+    }
+    // Atomic no-replace moves: never overwrite an existing numbered take.
+    static bool moveAside(const std::filesystem::path& from,const std::filesystem::path& to){
+#ifdef _WIN32
+        if(MoveFileExW(from.c_str(),to.c_str(),0))return true;
+        auto error=GetLastError();if(error==ERROR_ALREADY_EXISTS||error==ERROR_FILE_EXISTS)return false;
+        throw std::filesystem::filesystem_error("Cannot number recording",from,to,std::error_code(error,std::system_category()));
+#else
+        if(::link(from.c_str(),to.c_str())){if(errno==EEXIST)return false;throw std::system_error(errno,std::generic_category(),"Cannot number recording");}
+        if(::unlink(from.c_str())){int error=errno;::unlink(to.c_str());throw std::system_error(error,std::generic_category(),"Cannot move recording");}
+        return true;
+#endif
+    }
+    std::filesystem::path chooseTarget(const std::filesystem::path& base){
+        auto parent=base.parent_path().empty()?std::filesystem::path("."):base.parent_path();
+        auto prefix=base.stem().u8string()+"_";auto extension=lower(base.extension().u8string());
+        std::uint64_t maximum=0;
+        for(const auto& entry:std::filesystem::directory_iterator(parent)){
+            auto path=entry.path();auto stem=path.stem().u8string();
+            if(lower(path.extension().u8string())!=extension||stem.compare(0,prefix.size(),prefix)!=0)continue;
+            auto suffix=stem.substr(prefix.size());if(suffix.empty()||!std::all_of(suffix.begin(),suffix.end(),[](unsigned char c){return c>='0'&&c<='9';}))continue;
+            try{maximum=std::max(maximum,static_cast<std::uint64_t>(std::stoull(suffix)));}catch(const std::out_of_range&){}
+        }
+        if(std::filesystem::exists(base)){
+            if(!std::filesystem::is_regular_file(base))throw std::runtime_error("Recording target is not a file");
+            auto active=activeFiles().find(base.u8string());
+            if(active!=activeFiles().end()){
+                auto previous=active->second;
+                if(previous->pendingRename.empty()){
+                    previous->pendingIndex=next(maximum);previous->pendingRename=indexed(base,maximum);
+                }
+                maximum=std::max(maximum,previous->pendingIndex);
+            }else{
+                while(!moveAside(base,indexed(base,next(maximum)))){}
+            }
+        }
+        return maximum?indexed(base,next(maximum)):base;
+    }
     static void word(FILE* f,std::uint32_t n,unsigned bytes){for(unsigned i=0;i<bytes;i++)std::fputc((n>>(8*i))&255,f);}
     void header(){
         std::rewind(file);std::fwrite("RIFF",1,4,file);word(file,36+static_cast<std::uint32_t>(frames*channels*4),4);
@@ -43,20 +94,33 @@ class AudioRecording {
         word(file,sampleRate*channels*4,4);word(file,channels*4,2);word(file,32,2);std::fwrite("data",1,4,file);word(file,static_cast<std::uint32_t>(frames*channels*4),4);
     }
     bool writing()const noexcept{return file||bool(mp3);}
-    void finish(){if(mp3){if(!mp3->finish())error=3;mp3.reset();state=error?3:2;}if(file){header();if(std::ferror(file)||std::fflush(file))error=3;if(std::fclose(file))error=3;file=nullptr;state=error?3:2;}}
+    void finish(){
+        bool completed=writing();
+        if(mp3){if(!mp3->finish())error=3;mp3.reset();state=error?3:2;}
+        if(file){header();if(std::ferror(file)||std::fflush(file))error=3;if(std::fclose(file))error=3;file=nullptr;state=error?3:2;}
+        if(completed){
+            std::lock_guard<std::mutex> lock(fileMutex());
+            auto active=activeFiles().find(actualPath);if(active!=activeFiles().end()&&active->second==this)activeFiles().erase(active);
+            if(!pendingRename.empty()){
+                try{if(!moveAside(std::filesystem::u8path(actualPath),pendingRename))throw std::runtime_error("Numbered recording already exists");actualPath=pendingRename.u8string();}
+                catch(...){error=1;state=3;failure.store(error,std::memory_order_release);}
+                pendingRename.clear();pendingIndex=0;
+            }
+        }
+    }
     void begin(){
         finish();frames=0;error=0;state=1;
         try{
             if(target.empty())throw std::runtime_error("No recording path");
-            auto base=std::filesystem::u8path(target);
+            auto base=std::filesystem::absolute(std::filesystem::u8path(target)).lexically_normal();
             auto extension=base.extension().u8string();std::transform(extension.begin(),extension.end(),extension.begin(),[](unsigned char c){return static_cast<char>(std::tolower(c));});bool compressed=extension==".mp3";
             if(!base.parent_path().empty())std::filesystem::create_directories(base.parent_path());
+            std::lock_guard<std::mutex> lock(fileMutex());
             for(;;){
-                auto path=base;
-                if(!overwrite){auto index=std::to_string(nextIndex++);if(index.size()<digits)index.insert(0,digits-index.size(),'0');path=base.parent_path()/std::filesystem::u8path(base.stem().u8string()+"_"+index+(compressed?".mp3":".wav"));}
+                auto path=overwrite?base:chooseTarget(base);
                 if(compressed){
                     auto encoder=std::make_unique<WindowsMp3Recording>();
-                    if(encoder->open(path,overwrite,channels,sampleRate)){mp3=std::move(encoder);actualPath=path.u8string();break;}
+                    if(encoder->open(path,overwrite,channels,sampleRate)){mp3=std::move(encoder);actualPath=path.u8string();activeFiles()[actualPath]=this;break;}
                     if(encoder->exists)continue;if(encoder->codecFailure)error=5;throw std::runtime_error("Cannot create MP3");
                 }
                 int fd;
@@ -67,7 +131,7 @@ class AudioRecording {
                 fd=::open(path.c_str(),O_WRONLY|O_CREAT|(overwrite?O_TRUNC:O_EXCL),0666);
                 if(fd>=0){file=fdopen(fd,"wb");if(!file)::close(fd);}
 #endif
-                if(file){actualPath=path.u8string();header();break;}
+                if(file){actualPath=path.u8string();activeFiles()[actualPath]=this;header();break;}
                 if(!overwrite&&fd<0&&errno==EEXIST)continue;
                 throw std::runtime_error("Cannot create WAV");
             }

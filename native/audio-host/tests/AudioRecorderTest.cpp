@@ -21,8 +21,24 @@ int main(int argc,char** argv){
     ValueEventBuffer start,end;start.clear(8);end.clear(8);start.push(2,1,ValueEventKind::trigger);end.push(6,1,ValueEventKind::trigger);
     const ValueEventBuffer* events[]{nullptr,&start,&end};c.valueEventInputs=events;node->process(c);assert(!node->active);
     // Destroy on the control thread drains accepted packets and fixes the RIFF sizes.
-    node.reset();auto first=root/std::filesystem::u8path("Aufnahme_ä_01.wav");auto data=samples(first,2);assert(data.size()==8);
+    node.reset();auto first=base;auto data=samples(first,2);assert(data.size()==8);
     for(int i=0;i<4;i++){assert(data[2*i]==i+2);assert(data[2*i+1]==-i-2);}
+    // The first take is unnumbered; a collision moves it aside and continues the series.
+    float secondSamples[]{.25f,.5f};
+    auto second=AudioRecording::create(base.u8string(),false,2,1,48000,8,"");second->push(1);second->push(2,secondSamples,2);second->push(3);second.reset();
+    assert(!std::filesystem::exists(base));
+    assert(samples(root/std::filesystem::u8path("Aufnahme_ä_01.wav"),2)==data);
+    assert(samples(root/std::filesystem::u8path("Aufnahme_ä_02.wav"),1).size()==2);
+    second=AudioRecording::create(base.u8string(),false,4,1,48000,8,"");second->push(1);second->push(2,secondSamples,2);second.reset();
+    assert(samples(root/std::filesystem::u8path("Aufnahme_ä_0003.wav"),1).size()==2);
+    // An active unnumbered take is renamed only after its writer has closed.
+    auto overlap=root/"Overlap.wav";
+    auto a=AudioRecording::create(overlap.u8string(),false,4,1,48000,8,"");a->push(1);a->push(2,secondSamples,2);
+    for(int i=0;i<2000&&!std::filesystem::exists(overlap);i++)std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    assert(std::filesystem::exists(overlap));
+    auto b=AudioRecording::create(overlap.u8string(),false,4,1,48000,8,"");b->push(1);b->push(2,secondSamples,2);b.reset();
+    assert(std::filesystem::exists(overlap));assert(samples(root/"Overlap_0002.wav",1).size()==2);
+    a.reset();assert(!std::filesystem::exists(overlap));assert(samples(root/"Overlap_0001.wav",1).size()==2);
     // Existing numbered files are never overwritten, even if the numeric width grows.
     for(int i=1;i<=99;i++){std::ofstream f(root/("Growth_"+std::to_string(i)+".wav"));}
     auto session=AudioRecording::create((root/"Growth.wav").u8string(),false,1,1,48000,8,"");float x[]{.25f,.5f};session->push(1);session->push(2,x,2);session->push(3);session.reset();
@@ -48,10 +64,10 @@ int main(int argc,char** argv){
             for(int i=0;i<256;i++)for(unsigned ch=0;ch<channels;ch++)wave[i*channels+ch]=.5f*std::sin(6.283185307179586*440*(b*256+i)/48000);
             assert(take->push(2,wave.data(),256*channels));
         }assert(take->push(3));take.reset();
-        auto path=root/std::filesystem::u8path(target.stem().u8string()+"_01.mp3");drmp3 decoder{};assert(drmp3_init_file_w(&decoder,path.c_str(),nullptr));assert(decoder.channels==channels&&decoder.sampleRate==48000);
+        auto path=target;drmp3 decoder{};assert(drmp3_init_file_w(&decoder,path.c_str(),nullptr));assert(decoder.channels==channels&&decoder.sampleRate==48000);
         std::vector<float> decoded(60000*channels);auto frames=drmp3_read_pcm_frames_f32(&decoder,60000,decoded.data());drmp3_uninit(&decoder);if(frames<51200||frames>=55000)std::fprintf(stderr,"MP3 channels=%u decoded=%llu\n",channels,static_cast<unsigned long long>(frames));assert(frames>=51200&&frames<55000);
         double power=0;for(std::size_t i=0;i<frames*channels;i++){assert(std::isfinite(decoded[i]));power+=decoded[i]*decoded[i];}assert(std::sqrt(power/(frames*channels))>.2);
-        auto bytes=std::filesystem::file_size(path);take=AudioRecording::create(target.u8string(),false,2,channels,48000,256,"");take->push(1);take->push(2,wave.data(),256*channels);take->push(3);take.reset();assert(std::filesystem::file_size(path)==bytes);assert(std::filesystem::exists(root/std::filesystem::u8path(target.stem().u8string()+"_02.mp3")));
+        auto bytes=std::filesystem::file_size(path);take=AudioRecording::create(target.u8string(),false,2,channels,48000,256,"");take->push(1);take->push(2,wave.data(),256*channels);take->push(3);take.reset();assert(!std::filesystem::exists(target));assert(std::filesystem::file_size(root/std::filesystem::u8path(target.stem().u8string()+"_01.mp3"))==bytes);assert(std::filesystem::exists(root/std::filesystem::u8path(target.stem().u8string()+"_02.mp3")));
     }
 #endif
 }

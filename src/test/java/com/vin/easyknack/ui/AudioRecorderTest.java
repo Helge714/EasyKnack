@@ -16,7 +16,7 @@ class AudioRecorderTest {
    awaitState(host,sink.toString(),1);
    graph.edit("Frequency",e->e.setProperty(source,"frequency",com.vingame.glswing.node.model.GLNodeValue.of(660.)));assertEquals("OK",host.command(com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot())));
    Thread.sleep(50);host.command("STOP");awaitState(host,sink.toString(),2);
-   var bytes=Files.readAllBytes(dir.resolve("Take_0001.wav"));assertTrue(bytes.length>44);assertEquals(3,bytes[20]);assertEquals(2,bytes[22]);assertFalse(Files.exists(dir.resolve("Take_0002.wav")),"Graph handover must retain the active take");
+   var bytes=Files.readAllBytes(dir.resolve("Take.wav"));assertTrue(bytes.length>44);assertEquals(3,bytes[20]);assertEquals(2,bytes[22]);assertFalse(Files.exists(dir.resolve("Take_0002.wav")),"Graph handover must retain the active take");
   }
  }
  private static void awaitState(com.vin.easyknack.audio.AudioHostClient host,String id,int state)throws Exception{

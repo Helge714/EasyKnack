@@ -1,6 +1,12 @@
 # Release notes
 
-## Unreleased - 0.2.1
+## Unreleased - 0.3.0
+
+- Add an inline recording filename field grouped with a folder button. Keep
+  existing document paths compatible. Without Overwrite, first takes use the
+  selected name; collisions move the existing take into a numbered series and
+  create the next index. This changes output filename behavior; existing numbered
+  takes remain untouched and series continue across recorder restarts.
 
 - Preserve the live graph connection curvature in image exports and previews.
 

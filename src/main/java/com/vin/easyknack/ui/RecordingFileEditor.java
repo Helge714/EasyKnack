@@ -2,18 +2,54 @@ package com.vin.easyknack.ui;
 
 import com.vin.easyknack.nodes.Editor;
 import com.vingame.glswing.node.model.GLNodeValue;
-import com.vingame.glswing.ui.GLButton;
-import com.vingame.glswing.file.GLFileDialogRequest;
+import com.vingame.glswing.ui.*;
+import com.vingame.glswing.layout.GLConstraints;
+import com.vingame.glswing.file.*;
+import com.vingame.glswing.rendering.GLIcon;
+import java.nio.file.*;
 
-/** A recording target, never an audio import/decode operation. */
+/** Inline recording name and directory selection; never imports or decodes audio. */
 public record RecordingFileEditor() implements Editor {
  public GLNodeValue defaultValue(){return GLNodeValue.of("");}
  public Control create(String label,java.util.function.Consumer<GLNodeValue> changed){
-  var button=new GLButton(AppText.text("recording.choose"));
-  button.addActionListener(e->{var files=new RememberingFileDialogs();files.show("audio.record",GLFileDialogRequest.save().title(AppText.text("recording.choose")).filter("WAV","wav").filter("MP3","mp3").build(),button.getGLParent())
-   .whenComplete((result,error)->java.awt.EventQueue.invokeLater(()->{files.close();if(error!=null){button.setToolTipText(error.toString());return;}if(result.approved()){
-    var path=result.selectedPath();var name=path.getFileName().toString().toLowerCase(java.util.Locale.ROOT);if(!name.endsWith(".wav")&&!name.endsWith(".mp3"))path=path.resolveSibling(path.getFileName()+".wav");changed.accept(GLNodeValue.of(path.toAbsolutePath().toString()));
-   }}));});
-  return new Control(button,v->{var path=(String)v.toJavaValue();button.setText(path.isBlank()?AppText.text("recording.choose"):java.nio.file.Path.of(path).getFileName().toString());button.setToolTipText(path);});
+  var target=new Target(changed);return new Control(target,target::update);
+ }
+ static String filename(String text){
+  var name=text.strip();
+  if(name.isEmpty()||name.equals(".")||name.equals("..")||name.matches(".*[\\\\/:*?\"<>|].*")||name.endsWith(".")||name.endsWith(" "))throw new IllegalArgumentException(AppText.text("recording.invalidName"));
+  if(Path.of(name).isAbsolute()||Path.of(name).getNameCount()!=1)throw new IllegalArgumentException(AppText.text("recording.invalidName"));
+  var lower=name.toLowerCase(java.util.Locale.ROOT);
+  return lower.endsWith(".wav")||lower.endsWith(".mp3")?name:name+".wav";
+ }
+ private static final class Icon {static final GLIcon FOLDER=GLIcon.fromSvgResource("/easyknack/icons/recording-folder.svg");}
+ static final class Target extends GLLayoutGroup {
+  final GLTextEditor name=new GLTextEditor();
+  final GLButton browse=new GLButton("");
+  private Path directory;
+  private final java.util.function.Consumer<GLNodeValue> changed;
+  Target(java.util.function.Consumer<GLNodeValue> changed){
+   this.changed=changed;name.setName(AppText.text("recording.filename"));browse.setName(AppText.text("recording.directory"));
+   browse.setIcon(Icon.FOLDER);browse.setToolTipText(AppText.text("recording.directory"));
+   addGL(name,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
+   addGL(browse,GLConstraints.at(1,0).fillBoth().connectAll());
+   name.addActionListener(e->commit());browse.addActionListener(e->chooseDirectory());
+   update(GLNodeValue.of(""));sizeButton();
+  }
+  @Override protected void themeChanged(){super.themeChanged();sizeButton();}
+  private void sizeButton(){if(browse!=null)browse.setPreferredGLSize(26,getGLTheme().textEditorStyle().height());}
+  void update(GLNodeValue value){
+   String text=(String)value.toJavaValue();
+   try{var path=text.isBlank()?null:Path.of(text).toAbsolutePath();directory=path==null?null:path.getParent();name.setText(path==null?"Recording.wav":path.getFileName().toString());name.setToolTipText(text.isBlank()?AppText.text("recording.directory"):text);}
+   catch(InvalidPathException failure){directory=null;name.setText(text);name.setToolTipText(failure.getMessage());}
+  }
+  void commit(){
+   try{var file=filename(name.getText());name.setText(file);if(directory!=null){var path=directory.resolve(file).toAbsolutePath();changed.accept(GLNodeValue.of(path.toString()));name.setToolTipText(path.toString());}}
+   catch(IllegalArgumentException failure){name.setToolTipText(failure.getMessage());}
+  }
+  private void chooseDirectory(){
+   var files=new RememberingFileDialogs();
+   files.show("audio.record.directory",GLFileDialogRequest.open().title(AppText.text("recording.directory")).selectionMode(GLFileSelectionMode.DIRECTORIES).initialDirectory(directory).build(),getGLParent())
+    .whenComplete((result,error)->java.awt.EventQueue.invokeLater(()->{files.close();if(error!=null){browse.setToolTipText(error.toString());return;}if(result.approved()){directory=result.selectedPath().toAbsolutePath();commit();}}));
+  }
  }
 }
