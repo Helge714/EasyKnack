@@ -99,7 +99,7 @@ final class MultipleGroups {
         var source=flat.graph().orElseThrow();
         for(var n:source.nodes())if(!supports(NodeRegistry.find(n.typeId()).orElse(null)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported node inside Instance Group: ")+n.typeId());
         var contracts=NodeRegistry.executionContracts();var types=contracts.types();var definitions=contracts.definitions();
-        source=com.vingame.glswing.node.execution.GLMutedGraphResolver.resolve(definitions.normalize(source),types);
+        source=com.vin.easyknack.graph.GraphExecutionPolicy.executable(definitions.normalize(source),types);
         // An empty public boundary has no runtime consumer. Do not schedule orphaned
         // instance processors (including Combine sinks) behind disconnected outputs.
         if(source.connections().stream().noneMatch(w->outputIds.contains(w.input().nodeId()))){

@@ -27,9 +27,11 @@ Factor wird über einen selbstmodulierten Zyklus gehalten; Frequency liefert `f 
 
 ## Mute
 
+Mute reicht Frequency unverändert durch, gibt Factor 1 aus und erzeugt keinen Trigger. Strength und Seed beeinflussen das stummgeschaltete Ergebnis nicht.
+
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
 | --- | --- | --- |
-| Ja | — | — |
+| Ja | Frequenz | Frequenz |
 
 ## Einfügen
 

@@ -11,6 +11,7 @@ public final class DigitalNoiseNode extends BasicNode {
 	public static final PropertyId TRIGGER = new PropertyId("trigger");
 	public static final PropertyId FREQUENCY_OUT = new PropertyId("frequency-out");
 	public static final PropertyId DISTRIBUTION = new PropertyId("distribution");
+    public static final PropertyId MUTE_BYPASS = new PropertyId("mute-bypass");
 	private enum Distribution {
 		UNIFORM, GAUSSIAN;
 		String id(){return name().toLowerCase(java.util.Locale.ROOT);}
@@ -45,6 +46,8 @@ public final class DigitalNoiseNode extends BasicNode {
 		return new NativeProcessor("digitalnoise", "nodes/DigitalNoiseNode.hpp",
 
 				ParameterContract.builder().source(FREQUENCY).value(FREQUENCY).source(STRENGTH).value(STRENGTH).source(SEED).integer(SEED)
-						.value(DISTRIBUTION).build());
+						.mapped(MUTE_BYPASS,s->s.flag(MUTE_BYPASS,false)?"1":"0").value(DISTRIBUTION).build());
 	}
+    @Override public void mute(MuteRouting routing,NodeState state){routing.connect(FREQUENCY,FREQUENCY_OUT);}
+
 }

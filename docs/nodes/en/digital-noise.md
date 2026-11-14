@@ -27,9 +27,11 @@ Factor is held for a self-modulated cycle; Frequency outputs `f × Factor`. Stre
 
 ## Mute
 
+Mute passes Frequency unchanged, outputs Factor 1 and emits no Trigger. Strength and Seed do not affect the muted result.
+
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |
 | --- | --- | --- |
-| Yes | — | — |
+| Yes | Frequency | Frequency |
 
 ## Insertion
 

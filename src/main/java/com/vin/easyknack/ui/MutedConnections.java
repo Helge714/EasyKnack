@@ -23,6 +23,7 @@ final class MutedConnections {
         var node=graph.findNode(output.nodeId()).orElse(null);
         if(node==null||!GLNodeState.isMuted(node))return true;
         var definition=com.vin.easyknack.nodes.NodeRegistry.find(node.typeId()).orElse(null);
+        if(definition instanceof com.vin.easyknack.nodes.DigitalNoiseNode&&(output.portId().equals("factor")||output.portId().equals("frequency-out")))return true;
         // Audio device inputs deliberately remain connected zero sources when muted.
         if(definition instanceof com.vin.easyknack.nodes.InputNode || definition!=null&&!definition.isMuteable())return true;
         if(!path.add(output))return false;

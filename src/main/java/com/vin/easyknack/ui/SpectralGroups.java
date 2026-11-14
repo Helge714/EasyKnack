@@ -181,7 +181,7 @@ final class SpectralGroups {
             .map(n->NodeRegistry.require(n.typeId()).isMuteable()?n:n.withoutProperty(GLNodeState.MUTED)).toList(),graph.connections());
         // Resolve after flattening so bypasses can cross nested group boundaries,
         // but before traversal so unused branches are not part of the bin program.
-        return com.vingame.glswing.node.execution.GLMutedGraphResolver.resolve(definitions.normalize(eligible),types);
+        return com.vin.easyknack.graph.GraphExecutionPolicy.executable(definitions.normalize(eligible),types);
     }
     private static void visit(GLNodeId id,GLNodeGraphSnapshot graph,Set<GLNodeId> visiting,Set<GLNodeId> done,List<GLGraphNode> order){
         if(done.contains(id))return;if(!visiting.add(id))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Cyclic bin graph"));

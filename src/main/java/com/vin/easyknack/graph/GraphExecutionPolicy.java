@@ -23,6 +23,15 @@ public final class GraphExecutionPolicy {
     }
 
     public static GLNodeGraphSnapshot executable(GLNodeGraphSnapshot snapshot,GLNodeTypeRegistry types) {
+        // A neutral multiplicative generator needs real outputs even while muted.
+        var neutralNoise=new java.util.HashSet<GLNodeId>();
+        var neutralNodes=snapshot.nodes().stream().map(node->{
+            if(GLNodeState.isMuted(node)&&NodeRegistry.find(node.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.DigitalNoiseNode){
+                neutralNoise.add(node.id());return node.withoutProperty(GLNodeState.MUTED).withProperty(com.vin.easyknack.nodes.DigitalNoiseNode.MUTE_BYPASS.value(),GLNodeValue.of(true));
+            }return node;
+        }).toList();
+        snapshot=new GLNodeGraphSnapshot(snapshot.graphId(),snapshot.revision(),neutralNodes,snapshot.connections().stream()
+            .filter(w->!neutralNoise.contains(w.input().nodeId())||w.input().portId().equals(com.vin.easyknack.nodes.DigitalNoiseNode.FREQUENCY.value())).toList());
         var muteable = new GLNodeGraphSnapshot(snapshot.graphId(), snapshot.revision(), snapshot.nodes().stream()
                 // Keep an explicit zero source connected. Disconnecting would activate downstream slider defaults.
                 .map(n -> GLNodeState.isMuted(n) && NodeRegistry.find(n.typeId()).orElse(null) instanceof com.vin.easyknack.nodes.InputNode

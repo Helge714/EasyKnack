@@ -19,7 +19,7 @@ struct DigitalNoiseNode : NodeProcessor {
     float frequencyValue = 440.f;
     float strengthValue = 0.f;
     int seedValue=-1,activeSeed=-1;
-    bool gaussian=false;
+    bool gaussian=false,muteBypass=false;
     float distributionAmount=-1;
     bool distributionGaussian=false;
     double lowerFactor=1,factorSpan=0,normalLow=0,normalSpan=1,normalSigma=0,normalShift=0;
@@ -51,13 +51,19 @@ struct DigitalNoiseNode : NodeProcessor {
     bool supportsLiveParameters() const noexcept override { return true; }
     void applyParameters(const NodeProcessor& configuration) noexcept override {
         const auto& p=static_cast<const DigitalNoiseNode&>(configuration);
-        frequencyValue=p.frequencyValue;strengthValue=p.strengthValue;seedValue=p.seedValue;gaussian=p.gaussian;
+        frequencyValue=p.frequencyValue;strengthValue=p.strengthValue;seedValue=p.seedValue;gaussian=p.gaussian;muteBypass=p.muteBypass;
     }
     void configure(
         std::istream& in
     ) override {
 
+        muteBypass=false;
         auto position=in.tellg();std::string marker;in>>marker;
+        if(marker=="!37322412def6ce9b"){
+            int f,s,seed;std::string distribution;
+            if(!(in>>f>>frequencyValue>>s>>strengthValue>>seed>>seedValue>>distribution)||f< -1||f>=2048||s< -1||s>=2048||seed< -1||seed>=2048||!std::isfinite(frequencyValue)||!std::isfinite(strengthValue)||frequencyValue<.00001f||frequencyValue>20000||strengthValue<0||strengthValue>1||seedValue< -1||seedValue>16777215||(distribution!="uniform"&&distribution!="gaussian"))throw std::runtime_error("Invalid legacy Digital Noise");
+            sources={f,s,seed};gaussian=distribution=="gaussian";return;
+        }
         // Pre-distribution source plugins retain this payload when rebuilt with a
         // newer SDK. Keep their parameter layout readable and default to Uniform.
         if(marker=="!5bc07ddcba438cf0"){
@@ -82,6 +88,8 @@ struct DigitalNoiseNode : NodeProcessor {
                 p.sources();
             seedValue=p.seed_value;
             gaussian=p.distribution_value=="gaussian";
+            if(p.mute_bypass_value!="0"&&p.mute_bypass_value!="1")throw std::runtime_error("Invalid Digital Noise mute mode");
+            muteBypass=p.mute_bypass_value=="1";
 
             frequencyValue =
                 static_cast<float>(
@@ -149,6 +157,11 @@ struct DigitalNoiseNode : NodeProcessor {
         ProcessContext& context
     ) noexcept override {
 
+        if(muteBypass){
+            auto frequency=context.numericInput(0,frequencyValue);auto* trigger=context.outputAt(1);auto* out=context.outputAt(2);
+            for(std::size_t i=0;i<context.bufferSize;i++){context.output[i]=1.f;if(trigger)trigger[i]=0.f;if(out)out[i]=frequency[i];}
+            return;
+        }
         float requestedSeed=context.numericInput(2,float(seedValue))[0];
         int selected=noiseSeedValue(requestedSeed);
         auto seed=selected<0?automaticSeed:noiseExplicitSeed(selected);
