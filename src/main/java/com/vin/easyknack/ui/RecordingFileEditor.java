@@ -21,7 +21,7 @@ public record RecordingFileEditor() implements Editor {
   var lower=name.toLowerCase(java.util.Locale.ROOT);
   return lower.endsWith(".wav")||lower.endsWith(".mp3")?name:name+".wav";
  }
- private static final class Icon {static final GLIcon FOLDER=GLIcon.fromSvgResource("/easyknack/icons/recording-folder.svg");}
+ private static final class Icon {static final GLIcon FOLDER=GLIcon.fromSvgResource("/com/vingame/glswing/icons/filedialog_folder.svg");}
  static final class Target extends GLLayoutGroup {
   final GLTextEditor name=new GLTextEditor();
   final GLButton browse=new GLButton("");
@@ -36,7 +36,10 @@ public record RecordingFileEditor() implements Editor {
    update(GLNodeValue.of(""));sizeButton();
   }
   @Override protected void themeChanged(){super.themeChanged();sizeButton();}
-  private void sizeButton(){if(browse!=null)browse.setPreferredGLSize(26,getGLTheme().textEditorStyle().height());}
+  private void sizeButton(){if(browse!=null){
+   browse.setGLStyle(getGLTheme().buttonStyle().withPadding(com.vingame.glswing.layout.GLInsets.all(2)));
+   browse.setPreferredGLSize(26,getGLTheme().textEditorStyle().height());
+  }}
   void update(GLNodeValue value){
    String text=(String)value.toJavaValue();
    try{var path=text.isBlank()?null:Path.of(text).toAbsolutePath();directory=path==null?null:path.getParent();name.setText(path==null?"Recording.wav":path.getFileName().toString());name.setToolTipText(text.isBlank()?AppText.text("recording.directory"):text);}
