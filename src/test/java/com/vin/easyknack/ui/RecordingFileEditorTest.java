@@ -36,6 +36,21 @@ class RecordingFileEditorTest {
    }finally{host.destroy();}
   });
  }
+ @Test void browseSelectsAFileAndSynchronizesTheInlineName()throws Exception{
+  javax.swing.SwingUtilities.invokeAndWait(()->{
+   var values=new java.util.ArrayList<GLNodeValue>();var group=new RecordingFileEditor.Target(values::add);
+   var original=Path.of("target","recordings","First.wav").toAbsolutePath();group.update(GLNodeValue.of(original.toString()));
+   group.name.setText("Pending.mp3");var request=group.fileRequest();
+   assertEquals(com.vingame.glswing.file.GLFileDialogMode.SAVE,request.mode());
+   assertEquals(com.vingame.glswing.file.GLFileSelectionMode.FILES,request.selectionMode());
+   assertEquals(original.getParent(),request.initialDirectory());assertEquals("Pending.mp3",request.suggestedFileName());
+   assertFalse(request.confirmOverwrite());
+   var selected=Path.of("target","other-recordings","Chosen.mp3").toAbsolutePath();group.selectFile(selected);
+   assertEquals("Chosen.mp3",group.name.getText());assertEquals(selected.toString(),values.get(0).toJavaValue());
+   group.name.setText("Renamed.mp3");group.commit();
+   assertEquals(selected.resolveSibling("Renamed.mp3").toString(),values.get(1).toJavaValue());
+  });
+ }
  @Test void newRecordersUseTheStandardRecordingFolder(){
   assertEquals(com.vin.easyknack.app.ApplicationSettings.recordings().resolve("Recording.wav").toAbsolutePath().toString(),new RecordingFileEditor().defaultValue().toJavaValue());
  }

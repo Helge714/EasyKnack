@@ -8,7 +8,7 @@ import com.vingame.glswing.file.*;
 import com.vingame.glswing.rendering.GLIcon;
 import java.nio.file.*;
 
-/** Inline recording name and directory selection; never imports or decodes audio. */
+/** Inline recording name and file selection; never imports or decodes audio. */
 public record RecordingFileEditor() implements Editor {
  public GLNodeValue defaultValue(){return GLNodeValue.of(com.vin.easyknack.app.ApplicationSettings.recordings().resolve("Recording.wav").toAbsolutePath().toString());}
  public Control create(String label,java.util.function.Consumer<GLNodeValue> changed){
@@ -28,11 +28,11 @@ public record RecordingFileEditor() implements Editor {
   private Path directory;
   private final java.util.function.Consumer<GLNodeValue> changed;
   Target(java.util.function.Consumer<GLNodeValue> changed){
-   this.changed=changed;name.setName(AppText.text("recording.filename"));browse.setName(AppText.text("recording.directory"));
-   browse.setIcon(Icon.FOLDER);browse.setToolTipText(AppText.text("recording.directory"));
+   this.changed=changed;name.setName(AppText.text("recording.filename"));browse.setName(AppText.text("recording.browse"));
+   browse.setIcon(Icon.FOLDER);browse.setToolTipText(AppText.text("recording.browse"));
    addGL(name,GLConstraints.at(0,0).weight(1,1).fillBoth().connectAll());
    addGL(browse,GLConstraints.at(1,0).fillBoth().connectAll());
-   name.addActionListener(e->{commit();name.requestGLFocus(null);});browse.addActionListener(e->chooseDirectory());
+   name.addActionListener(e->{commit();name.requestGLFocus(null);});browse.addActionListener(e->chooseFile());
    update(GLNodeValue.of(""));sizeButton();
   }
   @Override protected void themeChanged(){super.themeChanged();sizeButton();}
@@ -42,17 +42,27 @@ public record RecordingFileEditor() implements Editor {
   }}
   void update(GLNodeValue value){
    String text=(String)value.toJavaValue();
-   try{var path=text.isBlank()?null:Path.of(text).toAbsolutePath();directory=path==null?null:path.getParent();name.setText(path==null?"Recording.wav":path.getFileName().toString());name.setToolTipText(text.isBlank()?AppText.text("recording.directory"):text);}
+   try{var path=text.isBlank()?null:Path.of(text).toAbsolutePath();directory=path==null?null:path.getParent();name.setText(path==null?"Recording.wav":path.getFileName().toString());name.setToolTipText(text.isBlank()?AppText.text("recording.browse"):text);}
    catch(InvalidPathException failure){directory=null;name.setText(text);name.setToolTipText(failure.getMessage());}
   }
   void commit(){
    try{var file=filename(name.getText());name.setText(file);if(directory!=null){var path=directory.resolve(file).toAbsolutePath();changed.accept(GLNodeValue.of(path.toString()));name.setToolTipText(path.toString());}}
    catch(IllegalArgumentException failure){name.setToolTipText(failure.getMessage());}
   }
-  private void chooseDirectory(){
+  GLFileDialogRequest fileRequest(){
+   String suggested;
+   try{suggested=filename(name.getText());}catch(IllegalArgumentException invalid){suggested="Recording.wav";}
+   // Only select a future recording target; collision handling belongs to the recorder.
+   return GLFileDialogRequest.save().title(AppText.text("recording.browse")).initialDirectory(directory)
+    .suggestedFileName(suggested).filter("WAV / MP3","wav","mp3").confirmOverwrite(false).build();
+  }
+  void selectFile(Path selected){
+   var path=selected.toAbsolutePath();directory=path.getParent();name.setText(path.getFileName().toString());commit();
+  }
+  private void chooseFile(){
    var files=new RememberingFileDialogs();
-   files.show("audio.record.directory",GLFileDialogRequest.open().title(AppText.text("recording.directory")).selectionMode(GLFileSelectionMode.DIRECTORIES).initialDirectory(directory).build(),getGLParent())
-    .whenComplete((result,error)->java.awt.EventQueue.invokeLater(()->{files.close();if(error!=null){browse.setToolTipText(error.toString());return;}if(result.approved()){directory=result.selectedPath().toAbsolutePath();commit();}}));
+   files.show("audio.record.directory",fileRequest(),getGLParent())
+    .whenComplete((result,error)->java.awt.EventQueue.invokeLater(()->{files.close();if(error!=null){browse.setToolTipText(error.toString());return;}if(result.approved())selectFile(result.selectedPath());}));
   }
  }
 }

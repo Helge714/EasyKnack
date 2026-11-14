@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Let recorder Browse choose both folder and filename in a save dialog, while
+  keeping direct filename editing. Selecting a target does not create a file.
+
 - Bundle examples with the installation instead of copying them into Documents.
   Default new projects to EasyKnack/Projects and new recordings to
   EasyKnack/Recordings in the system Documents folder. Preserve existing targets
