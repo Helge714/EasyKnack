@@ -13,6 +13,40 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.ui.*;
 
 class GroupSliderKindsTest {
+    @Test void groupingPreservesSemanticInputAndOutputTypesIncludingNestedGroups()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var value=new ValueNode();var math=new MathNode();var osc=new OscillatorNode();var out=new OutputNode();
+            var source=GLNodeId.random();var numeric=GLNodeId.random();var audio=GLNodeId.random();var sink=GLNodeId.random();
+            c.workspace().currentGraph().edit("Mixed ports",e->{
+                e.addNode(new GLGraphNode(source,value.registration().id(),value.defaults()));
+                e.addNode(new GLGraphNode(numeric,math.registration().id(),math.defaults()));
+                e.addNode(new GLGraphNode(audio,osc.registration().id(),osc.defaults()));
+                e.addNode(new GLGraphNode(sink,out.registration().id(),out.defaults()));
+                e.addConnection(SpectralGroupsTest.wire(source,"value-out",numeric,MathNode.A.value()));
+                e.addConnection(SpectralGroupsTest.wire(numeric,"audio-out",audio,"frequency"));
+                e.addConnection(SpectralGroupsTest.wire(audio,"audio-out",sink,"audio-in"));
+            });
+            c.workspace().editor().setSelectedNodes(c.workspace().editor().getNodes().stream()
+                .filter(n->n instanceof BasicNodeView b&&Set.of(numeric,audio).contains(b.nodeId())).toList());
+            var inside=numeric;
+            for(int depth=0;depth<2;depth++){
+                c.actions().extractComposite();
+                var group=c.workspace().currentGraph().snapshot().nodes().stream()
+                    .filter(n->n.typeId().startsWith("easyknack.composite.")).findFirst().orElseThrow();
+                var contained=inside;
+                var asset=c.snapshotDocument().embeddedAssets().values().stream()
+                    .filter(a->a.graph().findNode(contained).isPresent()).findFirst().orElseThrow();
+                inside=group.id();
+                var ports=asset.compositeDescriptor().portMappings();assertEquals(2,ports.size());
+                assertEquals(SignalCategory.VALUE.valueTypeId(),ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT).findFirst().orElseThrow().publicPort().valueTypeId());
+                assertEquals(SignalCategory.AUDIO.valueTypeId(),ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).findFirst().orElseThrow().publicPort().valueTypeId());
+                var connections=c.workspace().currentGraph().snapshot().connections();
+                assertTrue(connections.stream().anyMatch(w->w.output().nodeId().equals(source)&&w.input().nodeId().equals(group.id())));
+                assertTrue(connections.stream().anyMatch(w->w.output().nodeId().equals(group.id())&&w.input().nodeId().equals(sink)));
+                assertTrue(c.actions().canExtractComposite());
+            }
+        }});
+    }
     @Test void copiedIntegerSliderRetainsStepAndLegacySnapshotsRemainUsable()throws Exception {
         SwingUtilities.invokeAndWait(()->{
             var def=new AdditiveOscillatorNode();var node=new GLGraphNode(GLNodeId.random(),def.registration().id(),def.defaults());

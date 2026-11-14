@@ -11,7 +11,7 @@ final class GroupKinds {
         if(asset.metadata().containsKey("easyknack.kind"))return asset;
         var d=asset.compositeDescriptor();
         var original=asset;
-        var ports=d.portMappings().stream().map(p->p.isBound()&&p.publicPort().direction()==GLPortDirection.OUTPUT?GroupEditorCopies.inheritPort(p,p.internalEndpoint(),original,groups):p).toList();
+        var ports=d.portMappings().stream().map(p->p.isBound()?GroupEditorCopies.inheritPort(p,p.internalEndpoint(),original,groups):p).toList();
         asset=GroupInputs.descriptor(asset,new com.vingame.glswing.node.composite.GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),ports,d.properties(),d.propertyMappings()));
         var kind=asset.compositeDescriptor().portMappings().stream()
             .filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT)

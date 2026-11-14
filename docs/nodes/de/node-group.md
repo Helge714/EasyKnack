@@ -21,6 +21,8 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 ## Verhalten
 
+Beim Gruppieren verbundener Nodes übernimmt jeder Gruppenport den semantischen Typ seines internen Ports (etwa Value oder Audio), unabhängig von dessen Verarbeitungsrate.
+
 Bei einem unverbundenen Gruppeneingang zuerst Editor übernehmen und anschließend die Quelle ausdrücklich auswählen. Bis zur Auswahl wird keine interne Verbindung oder Editorkopplung angelegt.
 
 Öffne die Gruppe zur Bearbeitung von Graph und Schnittstelle. Jeder öffentliche Port behält seinen gewählten Datentyp und seine Rate; die Tabelle bezeichnet konfigurierbare Ports und keine fest numerische Schnittstelle. Group-General legt Titelgestaltung sowie Mute- und Einfügepaare fest; Group-IO Portreihenfolge, Editoren und Bereiche. Übernommene Editoren erben ihre Darstellung und können kompatible interne Parameter steuern. Einheitenadapter erhalten die internen Einheiten an der Grenze. Bake optimiert die übernommene innere Definition; öffentliche Parameteränderungen bleiben Parameter. [Instance Groups](instance-group.md), [Spectral Groups](spectral-group.md) und [Formula Groups](formula-group.md) besitzen eigene Ausführungsregeln.

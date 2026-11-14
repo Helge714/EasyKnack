@@ -21,6 +21,8 @@ Exposes a reusable interface to an internal graph.
 
 ## Behavior
 
+Grouping connected nodes preserves the semantic type of each internal port (for example Value or Audio), independently of its processing rate.
+
 For an unconnected group input, select Copy Editor and then explicitly choose its source. No internal connection or editor coupling is created until a source is selected.
 
 Open the group to edit its internal graph and public interface. Each public port retains its selected data type and rate; the table above denotes configurable ports, not a fixed numeric-only interface. Group-General sets title appearance and Mute/insertion port pairs; Group-IO sets port order, editors and ranges. Copied editors inherit their source's presentation and can control compatible internal parameters. Unit adapters preserve internal units at the boundary. A Bake optimizes the accepted internal definition; public parameter changes remain parameters. [Instance Groups](instance-group.md), [Spectral Groups](spectral-group.md) and [Formula Groups](formula-group.md) have distinct execution rules.

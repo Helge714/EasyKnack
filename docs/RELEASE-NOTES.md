@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Preserve semantic input types when grouping connected nodes, including nested
+  groups. Value inputs no longer become Audio inputs; existing interfaces remain unchanged.
+
 - Respect Envelope curve endpoints: the first Attack starts at the drawn value,
   and Release holds its drawn endpoint, including nonzero values. Retriggers
   default to continuous; an Inspector switch can instead restart from the drawn
