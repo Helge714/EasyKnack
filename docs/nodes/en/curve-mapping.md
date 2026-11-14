@@ -46,3 +46,5 @@ Normalizes the input using Input min/max, samples the curve, then scales to Outp
 | Supported |
 
 [Node index](index.md) · [Deutsch](../de/curve-mapping.md)
+
+Control points and Bezier handles appear while hovering or editing the graph. Clicking outside hides them and leaves the curve visible.

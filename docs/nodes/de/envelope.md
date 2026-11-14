@@ -11,9 +11,9 @@ Erzeugt eine kurvenförmige Hüllkurve aus Gate und Trigger.
 | Hüllkurve (Envelope) | [Editor](../../user/de/reference-tables.md) | Kurveneditor | — | ADSR | — | — | Immer |
 | Gate | [Wert](../../user/de/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Audio](../../user/de/rates.md#audio) | Immer |
 | Trigger | [Trigger](../../user/de/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/de/rates.md#trigger) | Immer |
-| Attack + Decay | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Anstieg (Attack) | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 120 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
+| Abfall (Decay) | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 180 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
 | Ausklingen (Release) | [Wert](../../user/de/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/de/units.md), [s](../../user/de/units.md), [smp](../../user/de/units.md) | [Auto](../../user/de/rates.md#auto) | Immer |
-| Halteposition (Sustain position) | [Wert](../../user/de/data-types.md#value) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/de/rates.md#auto) | Immer |
 | Halten (Hold) | [Editor](../../user/de/reference-tables.md) | Aus / An | — | An | — | — | Immer |
 
 ## Ausgänge
@@ -24,7 +24,11 @@ Erzeugt eine kurvenförmige Hüllkurve aus Gate und Trigger.
 
 ## Verhalten
 
-Ein Gate-Anstieg über 0 oder ein Trigger startet Attack/Decay. Die Halteposition teilt die Kurve in Attack/Decay und Release. Bei Hold hält ein positives Gate den Sustainwert; das Loslassen startet Release vom aktuellen Pegel. Ohne Hold folgt Release automatisch auf Attack/Decay. Retrigger beginnen beim aktuellen Hüllkurvenpegel. Das Ergebnis ist auf 0–1 begrenzt.
+Eine steigende Gate-Flanke über 0 oder ein Trigger startet Attack und danach Decay. Jede Phase hat einen eigenen Dauereingang (0–60.000 ms). Bei eingeschaltetem Hold und positivem Gate wird der Pegel am Ende von Decay gehalten. Gate 0 startet Release vom aktuellen Pegel, auch während Attack oder Decay. Bei ausgeschaltetem Hold oder einem Trigger ohne Gate folgt Release direkt auf Decay. Phasen mit Dauer 0 enden sofort. Retrigger starten beim aktuellen Pegel; der Ausgang bleibt auf 0–1 begrenzt.
+
+Kurvenpunkte lassen sich vertikal bewegen; ihre horizontalen Positionen und ihre Anzahl bleiben fest. Der erste innere Punkt beendet Attack, der letzte innere Punkt beendet Decay. Bézier-Griffe formen weiterhin die Übergänge. Punkte und Griffe erscheinen bei Hover oder aktivem Editor und verschwinden nach einem Fokuswechsel nach außen. Alte Kurven behalten ihre vorhandene Form.
+
+Die bisherige kombinierte Zeit wird am ersten inneren Kurvenpunkt aufgeteilt. Bestehende Verbindungen des Dauereingangs steuern jetzt Attack. Die Halteposition entfällt samt ihren Verbindungen und kopierten Bindungen; Hold verwendet das Ende von Decay. Alte Patches mit modulierter Zeit oder verschobener Halteposition können dadurch anders klingen.
 
 ## Mute
 

@@ -41,7 +41,7 @@
       "id": "glswing-0.2.0-SNAPSHOT",
       "file": "glswing-0.2.0-SNAPSHOT-sources.jar",
       "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-sources.jar",
-      "sha256": "21f89c2c54dce527e1691810d42faba463f15f7bd6e5c3b450f1a6b46250488b"
+      "sha256": "b9380562d1039ea3d2162492f00ba6fd5b57c2ca8226363ed40ddd136de59c07"
     },
     {
       "id": "mingw-w64",
@@ -82,7 +82,7 @@
     {
       "id": "glswing-build-inputs",
       "file": "glswing-0.2.0-SNAPSHOT-build-inputs.zip",
-      "sha256": "078b4a5bb62041203ac3c587f7b02a794e317714f65109ce3bd67a799a9af8d6",
+      "sha256": "ddf222e04dc45fc218964907188b3238bb9ca2c713e08d8f2e55425c69b57e33",
       "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-build-inputs.zip"
     },
     {
@@ -99,7 +99,7 @@
     },
     {
       "file": "glswing-0.2.0-SNAPSHOT.jar",
-      "sha256": "ef6411879ff10d0f3a4e901c2cb2166f03ef05952c5a7db46e6d4aa15d4fb7a6"
+      "sha256": "dc7e3cda256d20a873a4654ef437b3d187c938e3f3db3f58a4050098b43ddef7"
     },
     {
       "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",

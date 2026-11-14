@@ -5,7 +5,8 @@ import com.vingame.glswing.node.model.GLNodeValue;
 import com.vingame.glswing.ui.*;
 
 /** Curve widget adapter: graph properties own the curve; no view-local undo entries. */
-public record CurveEditor(GLFunctionCurve initial) implements Editor {
+public record CurveEditor(GLFunctionCurve initial,boolean fixedPointPositions) implements Editor {
+    public CurveEditor(GLFunctionCurve initial){this(initial,false);}
     @Override public GLNodeValue defaultValue(){return GLNodeValue.of(CurveData.encode(initial));}
     @Override public void validate(GLNodeValue value){
         if(!(value instanceof GLNodeValue.TextValue text))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Curve text required"));
@@ -13,6 +14,7 @@ public record CurveEditor(GLFunctionCurve initial) implements Editor {
     }
     @Override public Control create(String label,Consumer<GLNodeValue> changed){
         var editor=new GLCurveEditor();
+        editor.setFixedPointPositions(fixedPointPositions);
         editor.setCurve(initial);
         editor.setResetCurve(initial);
         editor.setChangeListener(curve->changed.accept(GLNodeValue.of(CurveData.encode(curve))));

@@ -39,3 +39,5 @@ Im Kurvenmodus definieren Kontrollpunkte eine periodische Wellenform. Der Ressou
 | Nicht unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/waveform.md)
+
+Kontrollpunkte und Bézier-Griffe erscheinen beim Hover oder im aktiven Graph-Editor. Ein Klick außerhalb blendet sie aus; die Kurve bleibt sichtbar.

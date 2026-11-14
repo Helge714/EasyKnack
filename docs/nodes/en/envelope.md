@@ -11,9 +11,9 @@ Generates a curve-shaped envelope from Gate and Trigger.
 | Envelope | [Editor](../../user/en/reference-tables.md) | Curve editor | — | ADSR | — | — | Always |
 | Gate | [Value](../../user/en/data-types.md#value) | 0–1 | ±∞ | 0 | — | [Audio](../../user/en/rates.md#audio) | Always |
 | Trigger | [Trigger](../../user/en/data-types.md#trigger) | Button | — | — | — | [Trigger](../../user/en/rates.md#trigger) | Always |
-| Attack + Decay | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+| Attack | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 120 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
+| Decay | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 180 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
 | Release | [Value](../../user/en/data-types.md#value) | 0–60 000 ms | 0–60 000 ms | 300 ms | [ms](../../user/en/units.md), [s](../../user/en/units.md), [smp](../../user/en/units.md) | [Auto](../../user/en/rates.md#auto) | Always |
-| Sustain position | [Value](../../user/en/data-types.md#value) | 0.01–0.99 | 0.01–0.99 | 0.5 | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Hold | [Editor](../../user/en/reference-tables.md) | Off / On | — | On | — | — | Always |
 
 ## Outputs
@@ -24,7 +24,11 @@ Generates a curve-shaped envelope from Gate and Trigger.
 
 ## Behavior
 
-A Gate rise above 0 or a Trigger starts Attack/Decay. Sustain position divides the curve into attack/decay and release portions. With Hold on, a positive Gate holds the sustain value; releasing Gate starts Release from the current level. With Hold off, Release follows Attack/Decay automatically. Retriggers start from the current envelope level. The result is limited to 0–1.
+A Gate rise above 0 or a Trigger starts Attack, then Decay. Each phase has its own duration input (0–60,000 ms). With Hold on, a positive Gate holds the level at the end of Decay; Gate returning to 0 starts Release from the current level, including during Attack or Decay. With Hold off or a Trigger without Gate, Release follows Decay automatically. Zero-duration phases finish immediately. Retriggers start from the current level; output stays within 0–1.
+
+Curve points move vertically; their horizontal positions and count stay fixed. The first interior point ends Attack, the last interior point ends Decay; Bezier handles still shape the transitions. Points and handles appear while hovering or editing and disappear when focus moves outside. Older curves retain their existing shape.
+
+Older combined timing is split at the curve's first interior point. Existing duration connections now control Attack. Sustain position and its connections/copied bindings are retired; Hold uses the end of Decay. This can change older patches with modulated timing or a displaced hold position.
 
 ## Mute
 

@@ -39,7 +39,7 @@ final class NodeDocuments implements AutoCloseable {
         result.addAll(document.embeddedAssets().values()); return result;
     }
     static GLNodeGraphDocument prepare(GLNodeGraphDocument document) {
-        document=PartialAnalysisMigration.migrate(document);
+        document=EnvelopeMigration.migrate(PartialAnalysisMigration.migrate(document));
         document=BufferContextMigration.migrate(document);
         document=SpectrumBlurMigration.migrate(document);
         document=SpectrumMixMigration.migrate(document);

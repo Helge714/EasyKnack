@@ -2,6 +2,13 @@
 
 ## Unreleased - 0.3.0
 
+- Give Envelope separate Attack, Decay and Release duration inputs and vertically
+  movable curve points. Hold stays at the end of Decay. Older combined times are
+  split; existing duration wires now drive Attack. Sustain-position wires and
+  copied bindings are retired, so older modulated patches can sound different.
+- Reveal curve points and Bezier controls only on hover or editor focus; clicking
+  outside returns to the curve-only editing display.
+
 - Restore visible connection outlines for selection, insertion targets, warnings
   and errors in all four themes, while keeping ordinary wires borderless.
 

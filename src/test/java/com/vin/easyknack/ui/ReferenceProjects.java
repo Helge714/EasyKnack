@@ -57,7 +57,7 @@ final class ReferenceProjects {
         boolean midi=voices>0||name.equals("rates");
         if(voices>0){
             var note=g.node("notes",new MidiNoteNode(),"voices",voices);
-            var env=g.node("envelope",new EnvelopeNode(),"duration",30,"release",60);
+            var env=g.node("envelope",new EnvelopeNode(),"duration",12,"decay",18,"release",60);
             var osc=g.node("oscillator",new AdditiveOscillatorNode(),"harmonics",16,"falloff",1.5);
             var multiply=g.node("amplitude",new MathNode());
             var filter=g.node("filter",new FilterNode(),"cutoff",1800);

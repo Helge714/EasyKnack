@@ -46,3 +46,5 @@ Normiert den Eingang anhand Input min/max, liest die Kurve und skaliert auf Outp
 | Unterstützt |
 
 [Node-Verzeichnis](index.md) · [English](../en/curve-mapping.md)
+
+Kontrollpunkte und Bézier-Griffe erscheinen beim Hover oder im aktiven Graph-Editor. Ein Klick außerhalb blendet sie aus; die Kurve bleibt sichtbar.
