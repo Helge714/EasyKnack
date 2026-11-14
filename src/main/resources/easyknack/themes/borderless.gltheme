@@ -29,3 +29,12 @@ node.titleInset=0
 
 # Side buttons meet the slider edges.
 slider.arrowInset=0
+
+# Almost square silhouettes across all four application themes.
+metrics.cornerRadius=1
+node.cornerRadius=1
+dialog.cornerRadius=1
+scrollBar.cornerRadius=1
+menu.itemCornerRadius=1
+tree.disclosureCornerRadius=1
+codeEditor.inlay.radius=1

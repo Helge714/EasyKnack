@@ -15,6 +15,9 @@
   remain neutral; the retired tinted-body study falls back to Mint. Theme geometry may change node
   dimensions; graph content and positions are preserved.
 
+- Use almost square one-pixel corners across all four themes and subtle wire
+  curvature by default. Explicitly saved curvature preferences remain unchanged.
+
 - Route unhandled keyboard commands through a shared focus/hover/window-default
   manager. The workspace remains reachable without a focused control; text input
   and open menus keep priority. Remove slider side-button insets in Mint and Amber.
