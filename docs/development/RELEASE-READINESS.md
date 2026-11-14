@@ -1,11 +1,10 @@
-# Release readiness audit — 2026-11-10
+# Release readiness
 
-Current release: [0.1.0 - published 2026-11-13](source-audit/RELEASE-0.1.0.md).
-The final clean source is `fcf85a5`; development continues at `0.1.1-SNAPSHOT`.
-This manual Windows x64 release includes matching sources/checksums and an exact
-automated validation report. Clean-machine and physical-device manual acceptance
-remain explicitly open; official CI and signing remain future work.
-The audit and candidate gates below are historical, not the final binary report.
+Current release: [0.2.0 - published 2026-11-14](source-audit/RELEASE-0.2.0.md).
+Frozen source `6132264`; development continues at `0.2.1-SNAPSHOT`.
+Matching sources/checksums and exact automated validation evidence accompany it.
+Clean-machine and physical-device manual acceptance remain open; official CI and
+signing remain future work. The November 10 audit below is historical.
 
 Audited application baseline: `ae41864`; paired local GLSwing change: `2f5ed7c`.
 This is a repository and packaging-readiness review, not acceptance of a release

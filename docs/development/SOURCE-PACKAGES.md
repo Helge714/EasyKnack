@@ -76,7 +76,7 @@ or public upload is performed by these scripts.
 
 ## Candidate source match (2026-10-07)
 
-Current Core correspondence is recorded in [the November review](source-audit/GLSWING-2026-11-10.md).
+Current Core correspondence is recorded in [the November review](source-audit/GLSWING-2026-11-14.md).
 The current source lock selects that newly frozen candidate; the October evidence
 below describes the older artifacts and does not validate subsequent rebuilds.
 

@@ -1,5 +1,8 @@
 # EasyKnack 0.1.0 release - 2026-11-13
 
+Superseded by [0.2.0](RELEASE-0.2.0.md) on 2026-11-14. The old GitHub release
+and downloads were removed by user request; its source tag and local archive remain.
+
 Release source: `fcf85a5f61ccbe94045cf8393d4cf79c28228ca0`, tag `v0.1.0`.
 Windows x64, external x64 JDK 25 including javac, unsigned installer. This is a
 manual release with an explicitly local build identity; official CI remains pending.
