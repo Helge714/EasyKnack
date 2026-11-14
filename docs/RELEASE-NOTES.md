@@ -5,10 +5,11 @@
 - Add optional Mint and Amber themes with coordinated control accents and
   moderately saturated pastel type colors. Compact controls, Control-rate
   diamonds, wires, editor groups, popup menus and tooltips use borderless styling;
-  titles and sliders have flat fills. Audio-rate socket sizes and checkbox check
-  colors retain their original appearance. Connected port lists align flush with
-  adjacent buttons through updated GLSwing. Node bodies remain neutral; the
-  retired tinted-body study falls back to Mint. Theme geometry may change node
+  titles and sliders have flat fills, with titles extending to the node edges.
+  Audio-rate socket sizes and checkbox check colors retain their original appearance. Connected port lists align flush with
+  adjacent buttons without rounded shared corners through updated GLSwing.
+  Round socket fills retain their relative size across zoom levels. Node bodies
+  remain neutral; the retired tinted-body study falls back to Mint. Theme geometry may change node
   dimensions; graph content and positions are preserved.
 
 - Clarify which compiler components are actually shipped and document recipient

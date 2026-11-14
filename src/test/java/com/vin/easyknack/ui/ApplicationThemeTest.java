@@ -40,6 +40,7 @@ class ApplicationThemeTest {
             var values=selected.theme().values();
             assertEquals(defaults.theme().values().getFloat("node.portRadius",-1),values.getFloat("node.portRadius",-2));
             assertEquals(.85f,values.getFloat("node.portDiamondScale",1));
+            assertEquals(0,values.getFloat("node.titleInset",-1));
             assertEquals(values.getColor("palette.text"),values.getColor("checkBox.check"));
             assertEquals(defaults.theme().values().getColor("node.background"),values.getColor("node.background"));
             assertEquals(values.getColor("palette.accent"),values.getColor("tabbedPane.tabSelected"));

@@ -23,3 +23,6 @@ comboBox.minimumWidth=117.4
 button.height=21.4
 # Compact only Control-rate diamonds; retain round Audio-rate sockets and hit areas.
 node.portDiamondScale=0.85
+
+# Flush title fill; title text keeps its normal reading margin.
+node.titleInset=0
