@@ -48,3 +48,6 @@ node.activeSelectedBorder=${easyknack.accent.focus}
 @COLOR easyknack.node.PARTIALS.title.light=#995259
 @COLOR easyknack.node.PARTIALS.title.dark=#733E43
 
+
+# Borderless socket outlines; retain type-colored socket fills.
+node.portBorder=#00000000

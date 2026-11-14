@@ -3,7 +3,7 @@
 ## Unreleased - 0.2.0
 
 - Add optional Mint and Amber themes with coordinated control accents and subdued
-  pastel node-title and signal colors with distinct hues and moderate saturation. Node bodies remain neutral; the earlier
+  pastel node-title and signal colors with distinct hues and moderate saturation. Controls, sockets and wires use borderless styling. Node bodies remain neutral; the earlier
   tinted-body study falls back to Mint. Live preview and cancel preserve documents.
 
 - Clarify which compiler components are actually shipped and document recipient

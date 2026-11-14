@@ -1,0 +1,9 @@
+# Optional borderless control and wire study for Mint and Amber.
+theme.type=metrics
+slider.borderWidth=0
+numberSpinner.borderWidth=0
+textEditor.borderWidth=0
+comboBox.borderWidth=0
+button.borderWidth=0
+checkBox.borderWidth=0
+nodeEditor.connectionBorderWidth=0

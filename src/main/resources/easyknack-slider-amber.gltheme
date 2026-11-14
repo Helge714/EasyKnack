@@ -3,6 +3,7 @@ theme.type=bundle
 theme.name=EasyKnack Amber
 theme.extends=/easyknack.gltheme
 theme.colors=/easyknack/themes/pastel.gltheme
+theme.metrics=/easyknack/themes/borderless.gltheme
 
 palette.accent=#79613C
 palette.selection=#79613CBF
