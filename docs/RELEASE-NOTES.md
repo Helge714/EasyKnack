@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Restore visible connection outlines for selection, insertion targets, warnings
+  and errors in all four themes, while keeping ordinary wires borderless.
+
 - Prevent position-aware Arrange from spreading complex graphs into artificial
   global rows and columns. Compact connected nodes by signal flow while retaining
   branch order and rough placement of independent components.

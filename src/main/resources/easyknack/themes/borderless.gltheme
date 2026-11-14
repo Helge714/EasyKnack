@@ -7,7 +7,8 @@ comboBox.borderWidth=0
 button.borderWidth=0
 checkBox.borderWidth=0
 checkBox.boxSize=12.4
-nodeEditor.connectionBorderWidth=0
+# Keep state outlines visible; the normal wire border is transparent.
+nodeEditor.connectionBorderWidth=1.5
 
 layoutGroup.borderWidth=0
 menu.borderWidth=0

@@ -56,3 +56,7 @@ node.portBorder=#00000000
 menu.border=#00000000
 layoutGroup.border=#00000000
 layoutGroup.focusBorder=#00000000
+
+# Hide ordinary wire borders, retaining selection/insertion and diagnostic outlines.
+nodeEditor.connectionBorder=#00000000
+nodeEditor.selectedConnectionBorder=${easyknack.accent.focus}

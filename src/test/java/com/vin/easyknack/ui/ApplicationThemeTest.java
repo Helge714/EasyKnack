@@ -18,6 +18,15 @@ class ApplicationThemeTest {
             assertEquals("classpath:"+ApplicationTheme.DEFAULT_RESOURCE,ApplicationTheme.normalizeSelection("classpath:/"+old+".gltheme"));
         assertEquals("classpath:/easyknack-light-mint.gltheme",ApplicationTheme.normalizeSelection("classpath:/easyknack-light.gltheme"));
     }
+    @Test void borderlessThemesRetainVisibleConnectionStateOutlines(){
+        for(var choice:BundledThemes.available()){
+            var theme=ApplicationTheme.loadSelection(choice.id()).theme();var values=theme.values();
+            assertEquals(0,values.getColor("nodeEditor.connectionBorder").getAlpha());
+            assertTrue(values.getFloat("nodeEditor.connectionBorderWidth",0)>0);
+            for(String key:java.util.List.of("nodeEditor.selectedConnectionBorder","nodeEditor.warningConnectionBorder","nodeEditor.errorConnectionBorder"))assertEquals(255,values.getColor(key).getAlpha());
+            assertTrue(contrast(values.getColor("nodeEditor.selectedConnectionBorder"),values.getColor("nodeEditor.background"))>=3,choice.toString());
+        }
+    }
     @Test void lightWorkspaceAndCurveHaveReadableContrast(){
         var theme=ApplicationTheme.loadSelection("classpath:/easyknack-light.gltheme").theme();
         assertTrue(contrast(theme.labelStyle().textColor(),theme.values().getColor("node.background"))>=7);
