@@ -1,6 +1,6 @@
 # Release notes
 
-## Unreleased - 0.2.0
+## 0.2.0 - 2026-11-14
 
 - Make Mint the default; offer exactly Mint, Amber, Light Mint and Light Amber.
   Migrate retired Classic/Blue choices to Mint and old Light to Light Mint. Add

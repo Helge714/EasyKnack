@@ -1,0 +1,27 @@
+{
+  "commit": "bc2153d949dc4c78508bacce61e472ed9689beb8",
+  "version": "0.2.0-SNAPSHOT",
+  "tests": {
+    "tests": 184,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sourceJarMatchedEntries": 533,
+  "buildInputFiles": 778,
+  "artifacts": {
+    "glswing-0.2.0-SNAPSHOT-build-inputs.zip": "2529fa10e0b3f51751662c85d3284e52728562763be16e5fb438b88b06f462e0",
+    "glswing-0.2.0-SNAPSHOT-sources.jar": "078957242c4795ce8e0d69bd5d8528718b73dd14a91d5bf28f3debbb5294eb6a",
+    "glswing-0.2.0-SNAPSHOT.jar": "e88de8ce85a9702a2463f319fdb5d57b9fb3d0abca7eb2df9dbd803dd84815d7",
+    "glswing-parent-0.2.0-SNAPSHOT.pom": "31405f2c4ef8a565978f4b24f0171f6c0cdc54faabf690e1886ad76b248ff995"
+  },
+  "reconstruction": {
+    "binarySha256": "e88de8ce85a9702a2463f319fdb5d57b9fb3d0abca7eb2df9dbd803dd84815d7",
+    "rebuiltSha256": "5e597f5bf78c3ac84a46ba0710939c2fee432fb88b9bef0615861c9a90bc3f12",
+    "classCount": 963,
+    "differences": [
+      "META-INF/glswing/build.properties"
+    ],
+    "classDifferences": []
+  }
+}
