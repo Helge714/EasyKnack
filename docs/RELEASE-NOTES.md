@@ -2,6 +2,8 @@
 
 ## Unreleased - 0.2.1
 
+- Preserve the live graph connection curvature in image exports and previews.
+
 ## 0.2.0 - 2026-11-14
 
 - Make Mint the default; offer exactly Mint, Amber, Light Mint and Light Amber.

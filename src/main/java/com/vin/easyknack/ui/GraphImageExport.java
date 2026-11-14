@@ -173,6 +173,8 @@ final class GraphImageExport {
             clone.openDocument("Image",new GLNodeGraphDocument(root,clean,List.of()));var editor=clone.workspace().editor();
             var theme=ApplicationTheme.current().theme();if(transparent)theme=theme.withValues(theme.values().with("nodeEditor.background","#00000000").with("nodeEditor.gridVisible","false"));
             clone.workspace().setGLTheme(theme);clone.workspace().setGLLocalizer(GLLocalizer.forLocale(ApplicationSettings.locale()));
+            editor.setConnectionHandleFactor(live.getConnectionHandleFactor());
+            editor.setMinimumConnectionHandleLength(live.getMinimumConnectionHandleLength());
             float width,height;
             if(area==Area.VISIBLE){
                 var bounds=visibleBounds(live.getWidth(),live.getHeight(),live.getZoom(),live.getPanX(),live.getPanY());
