@@ -7,10 +7,11 @@ import com.vingame.glswing.node.model.*;
 
 /** One source path for Inspector Bake and source plugins. No second DSP formula set. */
 final class InstanceSourceSpecialization {
+    record Emission(String code,boolean oscillatorKernel){}
     private InstanceSourceSpecialization() { }
     private static String quote(String value){return "\""+value.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
 
-    static String emit(String name,String processor,List<GLGraphNode> nodes,
+    static Emission emit(String name,String processor,List<GLGraphNode> nodes,
             Map<GLNodeEndpoint,GLNodeEndpoint> wires,List<GLNodeId> external,List<GLNodeId> targets,
             List<GroupSourceExporter.Port> inputs,List<GroupSourceExporter.Port> outputs){
         if(nodes.size()!=1||!(NodeRegistry.require(nodes.get(0).typeId()) instanceof MultipleGraphNode))return null;
@@ -58,7 +59,7 @@ final class InstanceSourceSpecialization {
             .append(kernel==null?"":"        if(inner.channelIndex==0){audioKernel.invalidate();for(auto& instance:state->instances)static_cast<CompiledInstance&>(*instance).scalarCacheValid=false;}\n")
             .append("        processInstances<").append(kernel==null?"Instance":"CompiledInstance").append(">(inner);\n    }\n};\n")
             .append("EASYKNACK_NODE(").append(name).append(',').append(quote(processor)).append(")\n}\n");
-        return s.toString();
+        return new Emission(s.toString(),kernel!=null);
     }
 
     private record Operation(String type,Map<String,String> fields,List<Integer> sources) {

@@ -21,7 +21,7 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 ## Verhalten
 
-Bake zeigt einen Balken für abgeschlossene Bauschritte sowie die aktuelle Phase und bei der C++-Kompilierung deren Laufzeit. Der Balken ist keine zeitliche Prozentprognose und wird erst nach erfolgreicher Aktivierung vollständig gefüllt.
+Bake zeigt einen Balken für abgeschlossene Bauschritte sowie die aktuelle Phase und bei der C++-Kompilierung deren Laufzeit. Der Balken ist keine zeitliche Prozentprognose und verschwindet nach Abschluss; der Status bleibt sichtbar. Er unterscheidet Standard-Bake und verfügbare Oszillatoroptimierung. Der Tooltip erklärt Einschränkungen; die Angabe ist keine Live-Messung des tatsächlich gewählten Ausführungspfads.
 
 Beim Gruppieren verbundener Nodes übernimmt jeder Gruppenport den semantischen Typ seines internen Ports (etwa Value oder Audio), unabhängig von dessen Verarbeitungsrate.
 

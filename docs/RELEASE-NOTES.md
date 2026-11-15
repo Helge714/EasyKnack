@@ -2,8 +2,12 @@
 
 ## Unreleased - 0.3.0
 
-- Show Bake build-stage progress through compilation, validation and activation.
-  Avoid compiling redundant generated C++ wrapper files for each baked group.
+- Show theme-accent Bake progress through compilation, validation and activation,
+  then hide the bar. Distinguish available oscillator optimization from a standard
+  bake and explain fallback limits. Avoid redundant generated C++ compilation.
+
+- Retain fast Instance Group rendering with audio-rate frequency and phase
+  modulation, including input-rate changes.
 
 - Keep optimized Instance Group oscillator summation and Bake scalar caching when
   stateless Formula Groups compute harmonic weights. Dynamic formulas retain the

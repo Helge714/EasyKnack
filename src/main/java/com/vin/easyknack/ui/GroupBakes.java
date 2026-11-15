@@ -65,7 +65,8 @@ final class GroupBakes implements AutoCloseable {
     GroupBakes(Supplier<GLNodeGraphDocument> document,Builder builder,Runnable changed){this.document=document;this.builder=builder;this.changed=changed;}
     java.nio.file.Path host(){return host;}
     boolean busy(){return busy;}
-    String status(GLNodeId id){var e=entries.get(id);return AppText.literal(e==null?"Not baked":e.status);}
+    String status(GLNodeId id){var e=entries.get(id);String text=AppText.literal(e==null?"Not baked":e.status);return e!=null&&e.enabled&&e.source!=null?text+" · "+AppText.text(e.source.oscillatorKernel()?"bake.optimization.adaptive":"bake.optimization.general"):text;}
+    String optimizationHint(GLNodeId id){var e=entries.get(id);return e!=null&&e.enabled&&e.source!=null?AppText.text(e.source.oscillatorKernel()?"bake.optimization.adaptive.help":"bake.optimization.general.help"):"";}
     boolean enabled(GLNodeId id){var e=entries.get(id);return e!=null&&e.enabled;}
     void register(GLNodePropertySchemaRegistry schemas,GLCompositeGraphRegistry registry){
         for(var d:registry.composites()){
@@ -255,14 +256,14 @@ final class GroupBakes implements AutoCloseable {
             @Override protected void record(com.vingame.glswing.rendering.GLContext2D c){
                 c.fillRect(0,0,getWidth(),getHeight(),getGLTheme().menuBarStyle().background());
                 double value=busy&&id.equals(baking)?buildProgress:enabled(id)?1:0;
-                c.fillRect(0,0,(float)(getWidth()*value),getHeight(),ApplicationTheme.current().signal(SignalCategory.VALUE));
+                c.fillRect(0,0,(float)(getWidth()*value),getHeight(),ApplicationTheme.current().color("accent.focus"));
             }
         };
         final GLNodeId id;final GLLabel status=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Not baked"));final GLButton bake=new GLButton(com.vin.easyknack.i18n.AppText.literal("Bake")),disable=new GLButton(com.vin.easyknack.i18n.AppText.literal("Disable bake")),force=new GLButton(com.vin.easyknack.i18n.AppText.literal("Force rebuild"));
-        Panel(GLNodeId id){this.id=id;addGL(status);addGL(progress);addGL(bake);addGL(disable);addGL(force);setPreferredGLSize(220,112);panels.add(new WeakReference<>(this));
+        Panel(GLNodeId id){this.id=id;addGL(status);addGL(progress);addGL(bake);addGL(disable);addGL(force);setPreferredGLSize(220,100);panels.add(new WeakReference<>(this));
             bake.addActionListener(e->GroupBakes.this.bake(id));disable.addActionListener(e->GroupBakes.this.disable(id));force.addActionListener(e->GroupBakes.this.bake(id,true));refresh();}
-        void refresh(){progress.invalidateRecording();status.setText(GroupBakes.this.status(id));status.setToolTipText(GroupBakes.this.status(id)+"\n"+AppText.text("bake.progress.help"));bake.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Compile this editable group. Switching hosts briefly interrupts audio. ")+GroupBakes.this.status(id)+(host==null?"":"\nAudio host: "+host));bake.setEnabled(!busy&&!closed&&!enabled(id));disable.setEnabled(!busy&&enabled(id));force.setEnabled(!busy&&!closed);force.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Regenerate and compile this group without reusing a cached build. Switching hosts briefly interrupts audio."));}
+        void refresh(){boolean showing=busy&&id.equals(baking);progress.setVisible(showing);setPreferredGLSize(220,showing?112:100);resized(getWidth(),getHeight());progress.invalidateRecording();status.setText(GroupBakes.this.status(id));status.setToolTipText(GroupBakes.this.status(id)+"\n"+(enabled(id)?optimizationHint(id):AppText.text("bake.progress.help")));bake.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Compile this editable group. Switching hosts briefly interrupts audio. ")+GroupBakes.this.status(id)+(host==null?"":"\nAudio host: "+host));bake.setEnabled(!busy&&!closed&&!enabled(id));disable.setEnabled(!busy&&enabled(id));force.setEnabled(!busy&&!closed);force.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Regenerate and compile this group without reusing a cached build. Switching hosts briefly interrupts audio."));}
         @Override protected void record(com.vingame.glswing.rendering.GLContext2D context){}
-        @Override protected void resized(float w,float h){status.setBounds(0,0,w,26);progress.setBounds(0,28,w,6);bake.setBounds(0,42,w*.48f,28);disable.setBounds(w*.5f,42,w*.5f,28);force.setBounds(0,74,w,28);}
+        @Override protected void resized(float w,float h){status.setBounds(0,0,w,26);progress.setBounds(0,28,w,6);float top=progress.isVisible()?42:30;bake.setBounds(0,top,w*.48f,28);disable.setBounds(w*.5f,top,w*.5f,28);force.setBounds(0,top+32,w,28);}
     }
 }

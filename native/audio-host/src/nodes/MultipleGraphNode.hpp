@@ -130,7 +130,6 @@ struct MultipleGraphNode : NodeProcessor {
             const auto& osc=g.nodes[reductionOsc];
             if(osc.stereo||osc.controlRate||osc.eventRate)return false;
             if(osc.processor->sources.size()>1&&osc.processor->sources[1]>=0)return false;
-            if(osc.processor->sources.size()>2&&osc.processor->sources[2]>=0)return false;
             const auto& out=g.nodes[runtime->outputs[0]];
             for(int ref:osc.processor->sources)if(ref>=0&&g.nodes[ref%maxNodes].outputRate(ref/maxNodes)=='e')return false;
             int weight=out.processor->sources[1];
@@ -141,12 +140,14 @@ struct MultipleGraphNode : NodeProcessor {
             if(ref<0)return fallback;
             return runtime->graph.nodes[ref%maxNodes].voice(0).channelCache[0].outputs[ref/maxNodes][0];
         }
-        const float* audioFrequency()const noexcept{
-            const auto& g=runtime->graph;const auto& osc=*g.nodes[reductionOsc].processor;
-            int ref=osc.sources.empty()?-1:osc.sources[0];
+        const float* audioOscillatorInput(std::size_t port)const noexcept{
+            const auto& g=runtime->graph;const auto& node=g.nodes[reductionOsc];const auto& osc=*node.processor;
+            if(port<node.inputRates.size()&&node.inputRates[port]=='c')return nullptr;
+            int ref=port>=osc.sources.size()?-1:osc.sources[port];
             return ref>=0&&g.nodes[ref%maxNodes].outputRate(ref/maxNodes)=='a'
                 ?g.nodes[ref%maxNodes].voice(0).channelCache[0].outputs[ref/maxNodes].data():nullptr;
         }
+        const float* audioFrequency()const noexcept{return audioOscillatorInput(0);}
         template<class Render> void renderUpstream(int index,int frames,Render render)noexcept{
             auto& g=runtime->graph;auto& n=g.nodes[index];auto& lane=n.voice(0);auto& p=*n.processor;
             for(std::size_t port=0;port<p.sources.size();port++){
@@ -442,6 +443,9 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
                     float weight=instance.scalar(combine.sources[1],combine.weight);weight=std::isfinite(weight)?std::max(0.f,weight):0.f;
                     bool connected=!osc.sources.empty()&&osc.sources[0]>=0;
                     const float* modulation=instance.audioFrequency();
+                    const float* phaseInput=instance.audioOscillatorInput(2);
+                    const double savedPhase=osc.phaseOffset;
+                    const double phase=osc.sources.size()>2&&osc.sources[2]>=0?instance.scalar(osc.sources[2],0):savedPhase;
                     bool fixed=!modulation&&(connected||osc.currentFrequency==osc.frequency);
                     auto kernel=osc.prepareSample(connected?instance.scalar(osc.sources[0],osc.frequency):osc.frequency,c.sampleRate);
                     bool weighted=combine.mode=="weighted";
@@ -453,6 +457,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
                         state->weights[sample]+=gain;
                         osc.currentFrequency+=osc.sampleSmoothing*(osc.frequency-osc.currentFrequency);
                         if(!fixed)kernel=osc.prepareSample(modulation?modulation[sample]:osc.currentFrequency,c.sampleRate);
+                        osc.phaseOffset=phaseInput?phaseInput[sample]:phase;
                         // Zero weight saves the table lookup, but never freezes phase.
                         float value=0;
                         if(weight==0)cycles=OscillatorNode::wrap(cycles+kernel.increment);
@@ -461,6 +466,7 @@ if(id=="multiplevectorinput")return std::make_unique<MultipleVectorInputNode>();
                         if(weighted){state->weightLeft[0][sample]+=weight*gain;state->weightRight[0][sample]+=weight*gain;}
                     }
                     osc.phase=cycles*OscillatorNode::tau;
+                    osc.phaseOffset=savedPhase;
                     continue;
                 }
                 instance.renderGraph(int(frames),c.audioIO,c.midiSource);

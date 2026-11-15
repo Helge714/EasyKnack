@@ -14,6 +14,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static com.vin.easyknack.ui.AdvancedSourceExportTest.quote;
 
 class InstanceSourceSpecializationTest {
+    private static MultipleGroupsTest.Fixture phaseFixture(){
+        var f=formulaFixture();var a=f.document().embeddedAssets().values().stream().filter(MultipleGroups::multiple).findFirst().orElseThrow();
+        var osc=a.graph().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof OscillatorNode).findFirst().orElseThrow();
+        var d=a.compositeDescriptor();var ports=new ArrayList<>(d.portMappings());
+        ports.add(new GLCompositePortMapping(GLNodePortDescriptor.input("phase",SignalCategory.VALUE.valueTypeId(),false,1),new GLNodeEndpoint(osc.id(),"phase"),
+            new GLCompositePortPresentation(GLNodeInputEditorRegistry.SLIDER,true,Map.of("default",GLNodeValue.of(0.)))));
+        var asset=new GLNodeGraphAsset(a.id(),a.version(),a.kind(),a.graph(),a.viewState(),a.metadata(),new GLCompositeNodeDescriptor(d.nodeTypeId(),d.assetId(),d.minimumAssetVersion(),ports));
+        var assets=new HashMap<>(f.document().embeddedAssets());assets.put(asset.id(),asset);
+        return new MultipleGroupsTest.Fixture(new GLNodeGraphDocument(f.document().root(),assets,List.of()),f.instance());
+    }
     private static MultipleGroupsTest.Fixture formulaFixture(){
         var f=fixture();var a=f.document().embeddedAssets().values().iterator().next();var graph=new GLNodeGraph(a.graph());
         var formula=FormulaGroups.accept(FormulaGroups.create(),"result=1f/(signal+1); if(signal%2==1){result=0;}");
@@ -31,6 +41,7 @@ class InstanceSourceSpecializationTest {
     }
     @Test void nestedFormulaKeepsTheCompiledInstanceKernel(){
         var f=formulaFixture();var bake=GroupSourceExporter.create(f.document(),f.instance(),true);
+        assertTrue(bake.oscillatorKernel());
         var code=bake.files().get("native/"+bake.className()+".hpp");
         assertTrue(code.contains("struct CompiledInstance"));assertTrue(code.contains("static_cast<FormulaNode&>"));
         assertTrue(code.contains(".fallback[15]"));assertTrue(code.contains(".sampleContext||"));
@@ -85,14 +96,18 @@ class InstanceSourceSpecializationTest {
     void formulaKernelPreservesSoundAndCachesUnchangedWeights()throws Exception{
         generatedKernelPreservesRatesChannelsDefaultsAndState(3);
     }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void modulatedPhaseAndAudioFrequencyRetainTheFastKernel()throws Exception{
+        generatedKernelPreservesRatesChannelsDefaultsAndState(4);
+    }
     @ParameterizedTest @ValueSource(ints={0,1,2}) @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void generatedKernelPreservesRatesChannelsDefaultsAndState(int variant)throws Exception{
-        var f=variant==3?formulaFixture():variant>0?noiseFixture(variant==2):fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var definition=export.definition();
+        var f=variant==4?phaseFixture():variant==3?formulaFixture():variant>0?noiseFixture(variant==2):fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var definition=export.definition();
         if(variant==1||variant==2)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("DigitalNoiseNode::process(c)"));
-        var registry=new GLCompositeGraphRegistry();registry.registerDocument(f.document());
-        for(var asset:List.copyOf(registry.assets()))if(FormulaGroups.isFormula(asset))registry.replaceAsset(FormulaGroups.materialize(asset));
-        var node=MultipleGroups.compile(f.instance().withoutProperty(MultipleGroups.COUNT_PROPERTY),f.document().embeddedAssets().values().stream().filter(MultipleGroups::multiple).findFirst().orElseThrow(),registry,
-            new GLCompositeExpansionLimits(16,256,512,10000),Set.of("frequency"),new HashMap<>()).nodes().get(0);
+        var originalRegistry=new GLCompositeGraphRegistry();originalRegistry.registerDocument(f.document());
+        var registry=GroupCompiler.prepare(f.document().root(),originalRegistry).registry();
+        var node=MultipleGroups.compile(f.instance().withoutProperty(MultipleGroups.COUNT_PROPERTY),registry.assets().stream().filter(MultipleGroups::multiple).findFirst().orElseThrow(),registry,
+            new GLCompositeExpansionLimits(16,256,512,10000),Set.of("frequency","phase"),new HashMap<>()).nodes().get(0);
         var liveDef=NodeRegistry.require(node.typeId());
         String live="!"+NativeContractGenerator.fingerprint(liveDef)+" "+liveDef.encode(new NodeState(node.properties()),p->-1);
         String compiled="!"+NativeContractGenerator.fingerprint(definition)+" "+definition.encode(new NodeState(definition.defaults()),p->-1);
@@ -106,6 +121,7 @@ class InstanceSourceSpecializationTest {
             #include <iostream>
             using namespace easyknack;
             using Compiled=%s;
+            constexpr bool expectScalarCache=%s;
             int main(){
                 MultipleGraphNode live,reference;Compiled baked;
                 std::istringstream l(%s),b(%s);live.configure(l);baked.configure(b);
@@ -119,11 +135,11 @@ class InstanceSourceSpecializationTest {
                 memo.evaluate(0,2,4,48000,evaluate);assert(evaluations==2);
                 memo.evaluate(0,2,4,44100,evaluate);assert(evaluations==3);
                 live.prepare(48000,256);baked.prepare(48000,256);reference.prepare(48000,256);
-                std::array<float,256> x{},y{},z{},silence{},frequency{},right{};
-                float count=4;const float* inputs[]{&count,frequency.data()};const float* inputRight[]{&count,right.data()};
-                const float* reordered[]{frequency.data(),&count};const float* reorderedRight[]{right.data(),&count};
-                char rates[]{'c','c'},reorderedRates[]{'c','c'};
-                ProcessContext a{inputs,2,x.data(),256,48000,silence.data(),256};a.sourceRates=rates;
+                std::array<float,256> x{},y{},z{},silence{},frequency{},right{},phase{};
+                float count=4;const float* inputs[]{&count,frequency.data(),phase.data()};const float* inputRight[]{&count,right.data(),phase.data()};
+                const float* reordered[]{frequency.data(),&count,phase.data()};const float* reorderedRight[]{right.data(),&count,phase.data()};
+                char rates[]{'c','c','c'},reorderedRates[]{'c','c','c'};
+                ProcessContext a{inputs,3,x.data(),256,48000,silence.data(),256};a.sourceRates=rates;
                 auto c=a;c.inputs=reordered;c.output=y.data();c.sourceRates=reorderedRates;
                 for(int block=0;block<150;block++){
                     int frames=block%%3==0?17:256;a.bufferSize=a.blockFrames=c.bufferSize=c.blockFrames=frames;
@@ -131,7 +147,8 @@ class InstanceSourceSpecializationTest {
                     rates[1]=reorderedRates[0]=block>=60&&block<80?'a':'c';
                     a.rightInputs=block>=80&&block<100?inputRight:nullptr;
                     c.rightInputs=block>=80&&block<100?reorderedRight:nullptr;
-                    for(int i=0;i<256;i++){frequency[i]=220+block+(rates[1]=='a'?i*.1f:0);right[i]=frequency[i]+90;}
+                    rates[2]=reorderedRates[2]=block>=60&&block<80?'a':'c';
+                    for(int i=0;i<256;i++){frequency[i]=220+block+(rates[1]=='a'?i*.1f:0);right[i]=frequency[i]+90;phase[i]=block+(rates[2]=='a'?i*.2f:0);}
                     // Simulate inherited, not-yet-settled internal manual values.
                     if(block==110)for(MultipleGraphNode* group:{&live,&reference,static_cast<MultipleGraphNode*>(&baked)})
                         for(auto& instance:group->state->instances)for(auto& node:instance->runtime->graph.nodes)
@@ -160,12 +177,17 @@ class InstanceSourceSpecializationTest {
                 std::vector<std::pair<FormulaNode*,std::uint64_t>> formulas;
                 for(auto& instance:replacement.state->instances)for(auto& node:instance->runtime->graph.nodes)
                     if(auto* formula=dynamic_cast<FormulaNode*>(node.processor.get()))formulas.emplace_back(formula,formula->position);
-                assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
-                for(auto entry:formulas)assert(entry.first->position==entry.second); // Unchanged scalar formulas are not evaluated again.
+                live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
+                if(expectScalarCache)for(auto entry:formulas)assert(entry.first->position==entry.second); // Only the all-control fixture promises scalar caching.
+                rates[1]=rates[2]='a';for(int i=0;i<256;i++){frequency[i]=440+i*.05f;phase[i]=i*.7f;}
+                live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
+                for(int i=0;i<256;i++)assert(std::abs(x[i]-y[i])<3e-6f);
+                auto samplewise=direct;samplewise.samplewise=true;samplewise.bufferSize=1;
+                assert(!probe.process<Compiled::CompiledInstance>(replacement,samplewise));
                 direct.rightInputs=inputRight;
                 assert(!probe.process<Compiled::CompiledInstance>(replacement,direct));
             }
-            """.formatted(export.className(),export.className(),quote(live),quote(compiled),quote(compiled),quote(compiled));
+            """.formatted(export.className(),export.className(),variant!=4,quote(live),quote(compiled),quote(compiled),quote(compiled));
         var source=dir.resolve("test.cpp");Files.writeString(source,code);RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
     }
 }

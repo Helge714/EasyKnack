@@ -13,6 +13,17 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.node.document.*;
 
 class GroupBakeTest {
+    @Test void progressDisappearsAndReleasesItsSpaceAfterBake()throws Exception{
+        var p=ReferenceProjects.make("osc-gain-filter",0);var def=definition(GroupSourceExporter.create(p.document(),p.group(),true));
+        var entered=new CountDownLatch(1);var release=new CountDownLatch(1);
+        var manager=new GroupBakes(p::document,(files,progress)->{progress.accept("0 s — C++ 1/2: main.cpp");entered.countDown();assertTrue(release.await(10,TimeUnit.SECONDS));return new PluginManager.Build(Path.of("target/progress-bake"),List.of(def),Map.of(),false);},()->{});
+        var panel=new AtomicReference<GroupBakes.Panel>();
+        try{
+            edt(()->{panel.set(manager.new Panel(p.group().id()));assertFalse(panel.get().progress.isVisible());manager.bake(p.group().id());});
+            assertTrue(entered.await(10,TimeUnit.SECONDS));edt(()->assertTrue(panel.get().progress.isVisible()));
+            release.countDown();waitFor(manager);edt(()->{assertTrue(manager.enabled(p.group().id()));assertFalse(panel.get().progress.isVisible());assertEquals(30,panel.get().bake.getY());assertFalse(manager.optimizationHint(p.group().id()).isBlank());assertTrue(manager.status(p.group().id()).contains(com.vin.easyknack.i18n.AppText.text("bake.optimization.general")));});
+        }finally{release.countDown();edt(manager::close);NodeRegistry.installPlugins(List.of());}
+    }
     @Test void buildProgressTracksStagesAndNativeFilesWithoutClaimingCompletion(){
         assertEquals(0,GroupBakes.progressFor("Checking build cache"));
         assertEquals(.25,GroupBakes.progressFor("12 s — C++ 1/3: main.cpp + nodes"));

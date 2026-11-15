@@ -18,29 +18,32 @@ struct CompiledInstanceAudio {
     std::array<float,256> weights{};
     std::array<const float*,256> tables{};
     std::array<const float*,256> frequencies{};
+    std::array<const float*,256> phaseInputs{};
+    std::array<double,256> phaseOffsets{};
     std::array<OscillatorNode*,256> oscillators{};
     const MultipleGraphNode::State* plannedState=nullptr;
-    int plannedActive=-1;unsigned plannedMask=0;double plannedRate=0;
+    int plannedActive=-1;unsigned plannedMask=0,plannedRates=0;double plannedRate=0;
     void invalidate()noexcept{plannedState=nullptr;}
 
     template<class Instance> bool process(MultipleGraphNode& owner,ProcessContext& c)noexcept {
         const auto frames=c.blockFrames?c.blockFrames:c.bufferSize;
-        if(!owner.state||owner.outputs!=1||frames>owner.framesReserved)return false;
+        if(!owner.state||owner.outputs!=1||frames>owner.framesReserved||c.samplewise||c.bufferSize!=frames||c.sampleOffset)return false;
         // This narrow mono optimization falls back to the general compiled executor for wider interfaces.
         if(owner.sources.size()>9)return false;
         if(c.channelIndex!=0)return false; // shared cached right output is copied by fallback
         auto& state=*owner.state;
         float requested=c.numericInput(0,float(owner.count))[0];
         int active=std::isfinite(requested)?int(std::clamp(std::floor(requested),0.f,float(owner.maximum))):0;
-        // Crossfades and non-scalar modulation use the general kernel.
+        // Crossfades and distinct stereo inputs use the general kernel.
         for(int i=0;i<owner.maximum;i++)if(state.initialized&&state.gains[i]!=(i<active?1.f:0.f))return false;
         std::array<char,9> rates{};
         for(std::size_t p=0;p<std::min(c.inputCount,rates.size());p++){
             rates[p]=c.sourceRates?c.sourceRates[p]:c.input(p)?'a':'c';
-            if(c.input(p)&&(rates[p]!='c'||(c.rightInputs&&c.rightInputs[p]!=c.input(p))))return false;
+            if(c.input(p)&&(rates[p]=='e'||(c.rightInputs&&c.rightInputs[p]!=c.input(p))))return false;
         }
         unsigned mask=0;for(std::size_t p=0;p<std::min(c.inputCount,rates.size());p++)if(c.input(p))mask|=1u<<p;
-        const bool prepared=plannedState==&state&&plannedActive==active&&plannedMask==mask&&plannedRate==c.sampleRate;
+        unsigned rateMask=0;for(std::size_t p=0;p<std::min(c.inputCount,rates.size());p++)if(rates[p]!='c')rateMask|=1u<<p;
+        const bool prepared=plannedState==&state&&plannedActive==active&&plannedMask==mask&&plannedRates==rateMask&&plannedRate==c.sampleRate;
         // Validate every instance before advancing any processor state.
         for(int i=0;i<active;i++){
             auto& instance=static_cast<Instance&>(*state.instances[i]);
@@ -50,7 +53,7 @@ struct CompiledInstanceAudio {
             auto& osc=static_cast<OscillatorNode&>(*instance.runtime->graph.nodes[instance.reductionOsc].processor);
             if(osc.sources[0]<0&&osc.currentFrequency!=osc.frequency)return false;
         }
-        plannedState=&state;plannedActive=active;plannedMask=mask;plannedRate=c.sampleRate;
+        plannedState=&state;plannedActive=active;plannedMask=mask;plannedRates=rateMask;plannedRate=c.sampleRate;
         if(!state.initialized){for(int i=0;i<owner.maximum;i++)state.gains[i]=i<active?1.f:0.f;state.initialized=true;}
         float denominator=0;
         bool weighted=false;
@@ -70,6 +73,8 @@ struct CompiledInstanceAudio {
             phases[i]=osc.phase/OscillatorNode::tau;increments[i]=kernel.increment;
             tables[i]=osc.tables->waves[osc.waveform][kernel.level].data();oscillators[i]=&osc;
             frequencies[i]=instance.audioFrequency();
+            phaseInputs[i]=instance.audioOscillatorInput(2);
+            phaseOffsets[i]=osc.sources.size()>2&&osc.sources[2]>=0?instance.scalar(osc.sources[2],0):osc.phaseOffset;
         }
         bool mean=owner.mean;
         if(owner.explicitCombines)mean=static_cast<InstanceCombineNode&>(*state.instances[0]->runtime->graph.nodes[state.instances[0]->runtime->outputs[0]].processor).mode=="mean";
@@ -82,7 +87,7 @@ struct CompiledInstanceAudio {
                     const auto kernel=oscillators[i]->prepareSample(frequencies[i][sample],c.sampleRate);
                     increments[i]=kernel.increment;tables[i]=oscillators[i]->tables->waves[oscillators[i]->waveform][kernel.level].data();
                 }
-                if(weights[i]!=0){const auto offset=oscillators[i]->phaseOffset;sum+=static_cast<float>(OscillatorNode::lookup(tables[i],OscillatorNode::tableSize,offset==0?phases[i]:OscillatorNode::wrap(phases[i]+OscillatorNode::clean(offset)/360.)))*weights[i];}
+                if(weights[i]!=0){const auto offset=phaseInputs[i]?phaseInputs[i][sample]:phaseOffsets[i];sum+=static_cast<float>(OscillatorNode::lookup(tables[i],OscillatorNode::tableSize,offset==0?phases[i]:OscillatorNode::wrap(phases[i]+OscillatorNode::clean(offset)/360.)))*weights[i];}
                 phases[i]=OscillatorNode::wrap(phases[i]+increments[i]);
             }
             state.left[0][sample]=(weighted||mean)?(denominator>0?sum/denominator:0):sum;

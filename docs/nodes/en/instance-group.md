@@ -21,6 +21,8 @@ Runs an internal graph for multiple independent instances.
 
 ## Behavior
 
+Optimized oscillator summation also supports audio-rate frequency and phase modulation with scalar instance weights. Distinct left/right input signals and sample feedback continue to use the general executor.
+
 Stateless Formula Groups computing instance weights retain optimized oscillator summation. Bake caches unchanged calculations; time-, trigger- or buffer-dependent formulas continue to use the general executor.
 
 Expose Count through an enclosing ordinary group using a copied slider editor. The outer port remains a normal, editable group input; the fixed Count role belongs to the Instance Group itself.

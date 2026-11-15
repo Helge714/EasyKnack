@@ -28,7 +28,7 @@ final class GroupSourceExporter {
         String endpoint(boolean input){return switch(signal){case TRIGGER->input?"trigger-out":"trigger";case MIDI->input?"midi-out":"midi-in";case HISTORY->"history";case ANALYSIS->"analysis";case SPECTRUM->"spectrum";case PARTIALS->"partials";case VECTOR->"vector";case WAVETABLE->"waveform";default->input?"audio-out":"audio-in";};}
     }
     record ChoiceParameter(String property,String label,PropertyId id,Editor.ComboBox<GroupChoices.Option> editor){}
-    record Export(String className,String displayName,BasicNode definition,Map<String,String> files,GLNodeGraphDocument source,Map<String,List<String>> manualTargets){
+    record Export(String className,String displayName,BasicNode definition,Map<String,String> files,GLNodeGraphDocument source,Map<String,List<String>> manualTargets,boolean oscillatorKernel){
         String suggestedFileName(){
             String safe=displayName.replaceAll("[\\x00-\\x1f<>:\"/\\\\|?*]","_").strip().replaceAll("[. ]+$","");
             if(safe.isBlank())safe="Group";
@@ -143,7 +143,8 @@ final class GroupSourceExporter {
             if(origin!=null&&origin.sourceNodeId().toString().equals(monitorSource)&&order.get(i).typeId().equals("easyknack.analysis.pitchmonitor"))monitorPath="node"+i;
         }
         String java=javaSource(className,processor,asset,inputs,outputs,ratePlan,choices,monitorPath,experimental);
-        String cpp=nativeSource(className,processor,definition,order,sources,inputIds,outputIds,inputs,outputs,boundaryRate,dynamic,choices.isEmpty());
+        var nativeSource=nativeSource(className,processor,definition,order,sources,inputIds,outputIds,inputs,outputs,boundaryRate,dynamic,choices.isEmpty());
+        String cpp=nativeSource.code();
         var files=new LinkedHashMap<String,String>();
         files.putAll(com.vin.easyknack.plugins.PluginLicensing.files());
         files.put(com.vin.easyknack.plugins.PluginManifest.FILE,new com.vin.easyknack.plugins.PluginManifest(
@@ -203,7 +204,7 @@ final class GroupSourceExporter {
             manualTargets.computeIfAbsent(id,key->new ArrayList<>()).add("node"+i);
             if(origin!=null){String path=id;for(int j=origin.instances().size()-1;j>0;j--){path=origin.instances().get(j).nodeId()+"/"+path;manualTargets.computeIfAbsent(path,key->new ArrayList<>()).add("node"+i);}}
         }
-        return new Export(className,groupTitle(asset),definition,Collections.unmodifiableMap(files),document,Map.copyOf(manualTargets));
+        return new Export(className,groupTitle(asset),definition,Collections.unmodifiableMap(files),document,Map.copyOf(manualTargets),nativeSource.oscillatorKernel());
     }
     private static void visit(GLNodeId id,GLNodeGraphSnapshot graph,Map<GLNodeEndpoint,GLNodeEndpoint> sources,List<GLNodeId> external,Set<GLNodeId> visiting,Set<GLNodeId> done,List<GLGraphNode> order){
         if(external.contains(id)||done.contains(id))return;if(!visiting.add(id))return;
@@ -388,11 +389,12 @@ final class GroupSourceExporter {
         if(value instanceof Map<?,?> map)return "java.util.Map.ofEntries("+String.join(",",map.entrySet().stream().map(e->"java.util.Map.entry("+quote(e.getKey().toString())+","+javaValue(e.getValue())+")").toList())+")";
         throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported exported property: ")+value);
     }
-    private static String nativeSource(String name,String processor,BasicNode definition,List<GLGraphNode> nodes,Map<GLNodeEndpoint,GLNodeEndpoint> sources,List<GLNodeId> external,List<GLNodeId> targets,List<Port> inputs,List<Port> outputs,ProcessingRate boundaryRate,Map<GLNodeId,Map<Integer,String>> dynamic,boolean allowFusion){
+    private record NativeSource(String code,boolean oscillatorKernel){}
+    private static NativeSource nativeSource(String name,String processor,BasicNode definition,List<GLGraphNode> nodes,Map<GLNodeEndpoint,GLNodeEndpoint> sources,List<GLNodeId> external,List<GLNodeId> targets,List<Port> inputs,List<Port> outputs,ProcessingRate boundaryRate,Map<GLNodeId,Map<Integer,String>> dynamic,boolean allowFusion){
         var spectral=SpectralSourceSpecialization.emit(name,nodes,dynamic.keySet());
         if(allowFusion&&dynamic.isEmpty()){
-            String direct=InstanceSourceSpecialization.emit(name,processor,nodes,sources,external,targets,inputs,outputs);
-            if(direct!=null)return direct;
+            var direct=InstanceSourceSpecialization.emit(name,processor,nodes,sources,external,targets,inputs,outputs);
+            if(direct!=null)return new NativeSource(direct.code(),direct.oscillatorKernel());
         }
         var indices=new HashMap<GLNodeId,Integer>();
         for(int i=0;i<external.size();i++)indices.put(external.get(i),i);
@@ -482,7 +484,7 @@ final class GroupSourceExporter {
                 s.append("        }\n");i=region.last();
             }else appendScheduled(s,types,i);
         }
-        return s.append("    }\n};\nEASYKNACK_NODE(").append(name).append(',').append(quote(processor)).append(")\n}\n").toString();
+        return new NativeSource(s.append("    }\n};\nEASYKNACK_NODE(").append(name).append(',').append(quote(processor)).append(")\n}\n").toString(),false);
     }
     private static void appendScheduled(StringBuilder s,List<String> types,int i){
         s.append("        if(graph.nodes[").append(i).append("].active){graph.processNodeAs<").append(types.get(i)).append(",true>(").append(i).append(",frames,0,io,midi);if(graph.nodes[").append(i).append("].stereo)graph.processNodeAs<").append(types.get(i)).append(",true>(").append(i).append(",frames,1,io,midi);}\n");
