@@ -14,6 +14,27 @@ import static org.junit.jupiter.api.Assertions.*;
 import static com.vin.easyknack.ui.AdvancedSourceExportTest.quote;
 
 class InstanceSourceSpecializationTest {
+    private static MultipleGroupsTest.Fixture formulaFixture(){
+        var f=fixture();var a=f.document().embeddedAssets().values().iterator().next();var graph=new GLNodeGraph(a.graph());
+        var formula=FormulaGroups.accept(FormulaGroups.create(),"result=1f/(signal+1); if(signal%2==1){result=0;}");
+        var id=GLNodeId.random();var context=a.graph().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof InstanceContextNode).findFirst().orElseThrow();
+        var combine=a.graph().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof InstanceCombineNode).findFirst().orElseThrow();
+        var ports=formula.compositeDescriptor().portMappings();
+        graph.edit("Odd harmonics",e->{
+            for(var wire:a.graph().connections())if(wire.input().equals(new GLNodeEndpoint(combine.id(),"weight")))e.removeConnection(wire.id());
+            e.addNode(new GLGraphNode(id,formula.compositeDescriptor().nodeTypeId()));
+            e.addConnection(SpectralGroupsTest.wire(context.id(),"index",id,ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.INPUT).findFirst().orElseThrow().publicPort().id()));
+            e.addConnection(SpectralGroupsTest.wire(id,ports.stream().filter(p->p.publicPort().direction()==GLPortDirection.OUTPUT).findFirst().orElseThrow().publicPort().id(),combine.id(),"weight"));
+        });
+        var asset=new GLNodeGraphAsset(a.id(),a.version(),a.kind(),graph.snapshot(),a.viewState(),a.metadata(),a.compositeDescriptor());
+        return new MultipleGroupsTest.Fixture(new GLNodeGraphDocument(f.document().root(),Map.of(asset.id(),asset,formula.id(),formula),List.of()),f.instance());
+    }
+    @Test void nestedFormulaKeepsTheCompiledInstanceKernel(){
+        var f=formulaFixture();var bake=GroupSourceExporter.create(f.document(),f.instance(),true);
+        var code=bake.files().get("native/"+bake.className()+".hpp");
+        assertTrue(code.contains("struct CompiledInstance"));assertTrue(code.contains("static_cast<FormulaNode&>"));
+        assertTrue(code.contains(".fallback[15]"));assertTrue(code.contains(".sampleContext||"));
+    }
     private static MultipleGroupsTest.Fixture fixture(){
         var f=MultipleGroupsTest.fixture(false,"mean");var a=f.document().embeddedAssets().values().iterator().next();var d=a.compositeDescriptor();
         // Public Count need not be the first port. The inner execution order is independent.
@@ -60,12 +81,17 @@ class InstanceSourceSpecializationTest {
         }
         matcher.appendTail(result);return result.toString();
     }
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void formulaKernelPreservesSoundAndCachesUnchangedWeights()throws Exception{
+        generatedKernelPreservesRatesChannelsDefaultsAndState(3);
+    }
     @ParameterizedTest @ValueSource(ints={0,1,2}) @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void generatedKernelPreservesRatesChannelsDefaultsAndState(int variant)throws Exception{
-        var f=variant>0?noiseFixture(variant==2):fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var definition=export.definition();
-        if(variant>0)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("DigitalNoiseNode::process(c)"));
+        var f=variant==3?formulaFixture():variant>0?noiseFixture(variant==2):fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var definition=export.definition();
+        if(variant==1||variant==2)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("DigitalNoiseNode::process(c)"));
         var registry=new GLCompositeGraphRegistry();registry.registerDocument(f.document());
-        var node=MultipleGroups.compile(f.instance().withoutProperty(MultipleGroups.COUNT_PROPERTY),f.document().embeddedAssets().values().iterator().next(),registry,
+        for(var asset:List.copyOf(registry.assets()))if(FormulaGroups.isFormula(asset))registry.replaceAsset(FormulaGroups.materialize(asset));
+        var node=MultipleGroups.compile(f.instance().withoutProperty(MultipleGroups.COUNT_PROPERTY),f.document().embeddedAssets().values().stream().filter(MultipleGroups::multiple).findFirst().orElseThrow(),registry,
             new GLCompositeExpansionLimits(16,256,512,10000),Set.of("frequency"),new HashMap<>()).nodes().get(0);
         var liveDef=NodeRegistry.require(node.typeId());
         String live="!"+NativeContractGenerator.fingerprint(liveDef)+" "+liveDef.encode(new NodeState(node.properties()),p->-1);
@@ -126,8 +152,16 @@ class InstanceSourceSpecializationTest {
                 live.process(a);replacement.process(c);for(int i=0;i<256;i++)assert(std::abs(x[i]-y[i])<3e-6f);
                 // Prove the audio kernel is exercised, not merely its fallback.
                 CompiledInstanceAudio probe;auto direct=a;direct.output=y.data();
+                for(MultipleGraphNode* group:{&live,static_cast<MultipleGraphNode*>(&replacement)})
+                    for(auto& instance:group->state->instances)for(auto& node:instance->runtime->graph.nodes)
+                        if(auto* math=dynamic_cast<MathNode*>(node.processor.get())){math->currentA=math->aValue;math->currentB=math->bValue;}
                 live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
                 for(int i=0;i<256;i++)assert(std::abs(x[i]-y[i])<3e-6f);
+                std::vector<std::pair<FormulaNode*,std::uint64_t>> formulas;
+                for(auto& instance:replacement.state->instances)for(auto& node:instance->runtime->graph.nodes)
+                    if(auto* formula=dynamic_cast<FormulaNode*>(node.processor.get()))formulas.emplace_back(formula,formula->position);
+                assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
+                for(auto entry:formulas)assert(entry.first->position==entry.second); // Unchanged scalar formulas are not evaluated again.
                 direct.rightInputs=inputRight;
                 assert(!probe.process<Compiled::CompiledInstance>(replacement,direct));
             }

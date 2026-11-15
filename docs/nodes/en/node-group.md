@@ -21,6 +21,8 @@ Exposes a reusable interface to an internal graph.
 
 ## Behavior
 
+Bake shows completed build stages in a progress bar, plus the current phase and elapsed C++ compilation time. The bar does not predict remaining time and fills completely only after successful activation.
+
 Grouping connected nodes preserves the semantic type of each internal port (for example Value or Audio), independently of its processing rate.
 
 For an unconnected group input, select Copy Editor and then explicitly choose its source. No internal connection or editor coupling is created until a source is selected.

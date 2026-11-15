@@ -21,6 +21,8 @@ Runs an internal graph for multiple independent instances.
 
 ## Behavior
 
+Stateless Formula Groups computing instance weights retain optimized oscillator summation. Bake caches unchanged calculations; time-, trigger- or buffer-dependent formulas continue to use the general executor.
+
 Expose Count through an enclosing ordinary group using a copied slider editor. The outer port remains a normal, editable group input; the fixed Count role belongs to the Instance Group itself.
 
 The initial graph creates harmonic oscillators and an [Instance Merge](instance-merge.md); Frequency is its initial public parameter, not a mandatory permanent port. Each instance has independent DSP state. [Instance Context](instance-context.md) supplies Index, Count, Position and Seed. Maximum reserves state/memory; Count selects active instances and is not an ordinary editable Group-IO port. Multiple merge branches and shared downstream processing are allowed. Nested instance/spectral groups are supported. Public inputs accept numeric, Buffer, Vector, Wavetable and Spectrum; public outputs currently accept numeric or Spectrum. MIDI and other resource boundaries remain unsupported. Both Buffer Readers are supported. External Buffers are shared read-only; each instance retains its own playback state. Internal live Buffers have independent storage per instance. Identical generators can share work until their context or history differs.

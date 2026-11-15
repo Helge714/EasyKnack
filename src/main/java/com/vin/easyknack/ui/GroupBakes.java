@@ -49,6 +49,18 @@ final class GroupBakes implements AutoCloseable {
     private final Map<GLNodeId,Entry> entries=new HashMap<>();
     private final List<WeakReference<Panel>> panels=new ArrayList<>();
     private boolean busy,closed;private long generation;
+    private double buildProgress;
+    private GLNodeId baking;
+    static double progressFor(String stage){
+        var cpp=java.util.regex.Pattern.compile("C\\+\\+ (\\d+)/(\\d+):").matcher(stage);
+        if(cpp.find())return .25+.55*(Integer.parseInt(cpp.group(1))-1)/Math.max(1.,Integer.parseInt(cpp.group(2)));
+        if(stage.contains("Linking C++"))return .8;
+        if(stage.equals(AppText.literal("Checking audio host and parameter contracts")))return .9;
+        if(stage.equals(AppText.literal("Plugin build complete"))||stage.equals(AppText.literal("Loading cached plugins")))return .95;
+        if(stage.equals(AppText.literal("Compiling Java nodes")))return .2;
+        if(stage.equals(AppText.literal("Preparing plugin build")))return .1;
+        return 0;
+    }
     private java.nio.file.Path host;
     GroupBakes(Supplier<GLNodeGraphDocument> document,Builder builder,Runnable changed){this.document=document;this.builder=builder;this.changed=changed;}
     java.nio.file.Path host(){return host;}
@@ -162,11 +174,11 @@ final class GroupBakes implements AutoCloseable {
         // A fresh content-addressed build also has a fresh executable path. Never
         // overwrite a cached host that may still be running on Windows.
         if(force)files.put("bake-request.txt",UUID.randomUUID().toString());
-        long ticket=++generation;busy=true;entry.status="Compiling…";refresh();
+        long ticket=++generation;busy=true;baking=id;buildProgress=0;entry.status="Compiling…";refresh();
         worker.execute(()->{
             try {
                 var build=builder.build(Map.copyOf(files),progress->javax.swing.SwingUtilities.invokeLater(()->{
-                    if(!closed&&ticket==generation){entry.status=progress;refresh();}
+                    if(!closed&&ticket==generation){entry.status=progress;buildProgress=Math.max(buildProgress,progressFor(progress));refresh();}
                 }));
                 javax.swing.SwingUtilities.invokeLater(()->{
                     if(closed)return;busy=false;validate();
@@ -239,11 +251,18 @@ final class GroupBakes implements AutoCloseable {
     private void refresh(){panels.removeIf(ref->ref.get()==null);for(var ref:panels){var panel=ref.get();if(panel!=null)panel.refresh();}}
     @Override public void close(){closed=true;restoreTimer.stop();generation++;worker.shutdownNow();panels.clear();}
     final class Panel extends GLContainer {
+        final GLContainer progress=new GLContainer(){
+            @Override protected void record(com.vingame.glswing.rendering.GLContext2D c){
+                c.fillRect(0,0,getWidth(),getHeight(),getGLTheme().menuBarStyle().background());
+                double value=busy&&id.equals(baking)?buildProgress:enabled(id)?1:0;
+                c.fillRect(0,0,(float)(getWidth()*value),getHeight(),ApplicationTheme.current().signal(SignalCategory.VALUE));
+            }
+        };
         final GLNodeId id;final GLLabel status=new GLLabel(com.vin.easyknack.i18n.AppText.literal("Not baked"));final GLButton bake=new GLButton(com.vin.easyknack.i18n.AppText.literal("Bake")),disable=new GLButton(com.vin.easyknack.i18n.AppText.literal("Disable bake")),force=new GLButton(com.vin.easyknack.i18n.AppText.literal("Force rebuild"));
-        Panel(GLNodeId id){this.id=id;addGL(status);addGL(bake);addGL(disable);addGL(force);setPreferredGLSize(220,100);panels.add(new WeakReference<>(this));
+        Panel(GLNodeId id){this.id=id;addGL(status);addGL(progress);addGL(bake);addGL(disable);addGL(force);setPreferredGLSize(220,112);panels.add(new WeakReference<>(this));
             bake.addActionListener(e->GroupBakes.this.bake(id));disable.addActionListener(e->GroupBakes.this.disable(id));force.addActionListener(e->GroupBakes.this.bake(id,true));refresh();}
-        void refresh(){status.setText(GroupBakes.this.status(id));bake.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Compile this editable group. Switching hosts briefly interrupts audio. ")+GroupBakes.this.status(id)+(host==null?"":"\nAudio host: "+host));bake.setEnabled(!busy&&!closed&&!enabled(id));disable.setEnabled(!busy&&enabled(id));force.setEnabled(!busy&&!closed);force.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Regenerate and compile this group without reusing a cached build. Switching hosts briefly interrupts audio."));}
+        void refresh(){progress.invalidateRecording();status.setText(GroupBakes.this.status(id));status.setToolTipText(GroupBakes.this.status(id)+"\n"+AppText.text("bake.progress.help"));bake.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Compile this editable group. Switching hosts briefly interrupts audio. ")+GroupBakes.this.status(id)+(host==null?"":"\nAudio host: "+host));bake.setEnabled(!busy&&!closed&&!enabled(id));disable.setEnabled(!busy&&enabled(id));force.setEnabled(!busy&&!closed);force.setToolTipText(com.vin.easyknack.i18n.AppText.literal("Regenerate and compile this group without reusing a cached build. Switching hosts briefly interrupts audio."));}
         @Override protected void record(com.vingame.glswing.rendering.GLContext2D context){}
-        @Override protected void resized(float w,float h){status.setBounds(0,0,w,26);bake.setBounds(0,30,w*.48f,28);disable.setBounds(w*.5f,30,w*.5f,28);force.setBounds(0,62,w,28);}
+        @Override protected void resized(float w,float h){status.setBounds(0,0,w,26);progress.setBounds(0,28,w,6);bake.setBounds(0,42,w*.48f,28);disable.setBounds(w*.5f,42,w*.5f,28);force.setBounds(0,74,w,28);}
     }
 }

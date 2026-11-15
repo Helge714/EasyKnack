@@ -21,6 +21,8 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 ## Verhalten
 
+Bake zeigt einen Balken für abgeschlossene Bauschritte sowie die aktuelle Phase und bei der C++-Kompilierung deren Laufzeit. Der Balken ist keine zeitliche Prozentprognose und wird erst nach erfolgreicher Aktivierung vollständig gefüllt.
+
 Beim Gruppieren verbundener Nodes übernimmt jeder Gruppenport den semantischen Typ seines internen Ports (etwa Value oder Audio), unabhängig von dessen Verarbeitungsrate.
 
 Bei einem unverbundenen Gruppeneingang zuerst Editor übernehmen und anschließend die Quelle ausdrücklich auswählen. Bis zur Auswahl wird keine interne Verbindung oder Editorkopplung angelegt.

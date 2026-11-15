@@ -110,7 +110,8 @@ struct MultipleGraphNode : NodeProcessor {
                 if(n.voiceCount()!=1)return;
                 if(index==osc||index==runtime->outputs[0])continue;
                 const auto& id=n.processorId;
-                if(id!="multipleinput"&&id!="instancecontext"&&id!="math"&&id!="maprange"&&id!="clamp"&&id!="curve"&&id!="unitconvert"&&id!="value"&&id!="comparator"&&id!="digitalnoise"&&id!="noise")return;
+                if(id!="multipleinput"&&id!="instancecontext"&&id!="math"&&id!="maprange"&&id!="clamp"&&id!="curve"&&id!="unitconvert"&&id!="value"&&id!="comparator"&&id!="digitalnoise"&&id!="noise"&&id!="formula")return;
+                if(auto* formula=dynamic_cast<FormulaNode*>(n.processor.get());formula&&(formula->sampleContext||formula->bufferInputs||formula->triggerInputs||formula->triggerOutputs))return;
                 for(int ref:n.processor->sources)if(ref>=0&&(ref%maxNodes==osc||ref%maxNodes==runtime->outputs[0]))return;
             }
             for(int index:g.order)if(g.nodes[index].active&&index!=osc&&index!=runtime->outputs[0])scalarPlan.push_back(index);
@@ -124,6 +125,7 @@ struct MultipleGraphNode : NodeProcessor {
             if(reductionOsc<0||!sampleKernelsPrepared||interpolatingControls())return false;
             const auto& g=runtime->graph;
             for(int index:scalarPlan){const auto& n=g.nodes[index];if(n.eventRate||n.stereo)return false;
+                if(dynamic_cast<FormulaNode*>(n.processor.get())&&!n.controlRate)return false;
                 for(int ref:n.processor->sources)if(ref>=0&&g.nodes[ref%maxNodes].outputRate(ref/maxNodes)=='e')return false;}
             const auto& osc=g.nodes[reductionOsc];
             if(osc.stereo||osc.controlRate||osc.eventRate)return false;

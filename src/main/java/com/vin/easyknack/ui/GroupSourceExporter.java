@@ -150,7 +150,6 @@ final class GroupSourceExporter {
                 processor,"1.0.0",List.of("com.vin.easyknack.nodes."+className)).text());
         files.put("java/com/vin/easyknack/nodes/"+className+".java",java);
         files.put("native/"+className+".hpp",cpp);
-        files.put("native/"+className+".cpp","#include \""+className+".hpp\"\n");
         files.put("README.md","""
                 # EasyKnack source plugin
 

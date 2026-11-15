@@ -80,7 +80,7 @@ final class InstanceSourceSpecialization {
         int count=Integer.parseInt(tokens.remove());var result=new ArrayList<Operation>();
         for(int i=0;i<count;i++){
             tokens.remove();String type=tokens.remove();var d=definitions.get(type);
-            if(d==null||!Set.of("math","unitconvert","multipleinput","instancecontext","osc","instancecombine","digitalnoise","noise").contains(type))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported scalar kernel"));
+            if(d==null||!Set.of("math","unitconvert","multipleinput","instancecontext","osc","instancecombine","digitalnoise","noise","formula").contains(type))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unsupported scalar kernel"));
             if(!tokens.remove().equals("!"+NativeContractGenerator.fingerprint(d)))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Unknown contract"));
             var fields=new HashMap<String,String>();var sources=new ArrayList<Integer>();
             for(var f:d.processor().contract().fields()){
@@ -118,11 +118,22 @@ final class InstanceSourceSpecialization {
             if(scalarOrder.isEmpty()&&dynamic.isEmpty())return null;
             var guard=new StringBuilder();var body=new StringBuilder();var keys=new ArrayList<String>();
             keys.add("g.preparedSampleRate");
+            keys.add("double(frames)");
             for(int i:scalarOrder){var op=ops.get(i);String p="p"+i;
                 guard.append("        if(!g.nodes[").append(i).append("].controlRate){scalarCacheValid=false;Instance::renderScalars(frames);return;}\n");
                 if(op.type.equals("multipleinput"))keys.add("([&]{const auto& v=static_cast<const BakedInput&>(*g.nodes["+i+"].processor);return double(v.external&&v.external->input("+op.value("slot")+")?v.external->input("+op.value("slot")+")[0]:v.fallback);}())");
                 if(op.type.equals("instancecontext")){keys.add("double(static_cast<const InstanceContextNode&>(*g.nodes["+i+"].processor).count)");keys.add("double(static_cast<const InstanceContextNode&>(*g.nodes["+i+"].processor).index)");}
                 switch(op.type){
+                    case "formula" -> {
+                        guard.append("        auto& ").append(p).append("=static_cast<FormulaNode&>(*g.nodes[").append(i).append("].processor);\n")
+                            .append("        if(").append(p).append(".sampleContext||").append(p).append(".bufferInputs||").append(p).append(".triggerInputs||").append(p).append(".triggerOutputs){scalarCacheValid=false;Instance::renderScalars(frames);return;}\n");
+                        for(int port=0;port<FormulaNode.INPUTS;port++)keys.add("double("+p+".fallback["+port+"])");
+                        for(int ref:op.sources)if(ref>=0)body.append("        g.nodes[").append(ref%256).append("].voice(0).channelCache[0].outputs[").append(ref/256).append("][0]=").append(variable(ref)).append(";\n");
+                        body.append("        renderUpstream(").append(i).append(",frames,[](NodeProcessor& p,ProcessContext& c){p.process(c);});\n");
+                        var payload=new String(HexFormat.of().parseHex(op.value("program")),StandardCharsets.UTF_8).split("\\s+");
+                        int outputs=Integer.parseInt(payload[2]);
+                        for(int port=0;port<outputs;port++)body.append("        const float n").append(i).append('p').append(port).append("=g.nodes[").append(i).append("].voice(0).channelCache[0].outputs[").append(port).append("][0];\n");
+                    }
                     case "multipleinput" -> body.append("        const auto& ").append(p).append("=static_cast<const BakedInput&>(*g.nodes[").append(i).append("].processor);\n")
                         .append("        const float n").append(i).append("p0=").append(p).append(".external&&").append(p).append(".external->input(").append(op.value("slot")).append(")?").append(p).append(".external->input(").append(op.value("slot")).append(")[0]:").append(p).append(".fallback;\n");
                     case "instancecontext" -> {

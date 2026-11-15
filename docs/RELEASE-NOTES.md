@@ -2,6 +2,13 @@
 
 ## Unreleased - 0.3.0
 
+- Show Bake build-stage progress through compilation, validation and activation.
+  Avoid compiling redundant generated C++ wrapper files for each baked group.
+
+- Keep optimized Instance Group oscillator summation and Bake scalar caching when
+  stateless Formula Groups compute harmonic weights. Dynamic formulas retain the
+  general execution path; document formats and sound semantics are unchanged.
+
 - Preserve semantic input types when grouping connected nodes, including nested
   groups. Value inputs no longer become Audio inputs; existing interfaces remain unchanged.
 

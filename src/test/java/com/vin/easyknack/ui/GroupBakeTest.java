@@ -13,6 +13,15 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.node.document.*;
 
 class GroupBakeTest {
+    @Test void buildProgressTracksStagesAndNativeFilesWithoutClaimingCompletion(){
+        assertEquals(0,GroupBakes.progressFor("Checking build cache"));
+        assertEquals(.25,GroupBakes.progressFor("12 s — C++ 1/3: main.cpp + nodes"));
+        assertTrue(GroupBakes.progressFor("1 s — C++ 3/3: nodes/Test.cpp")<.8);
+        assertEquals(.8,GroupBakes.progressFor("0 s — Linking C++ audio host"));
+        assertEquals(.95,GroupBakes.progressFor(com.vin.easyknack.i18n.AppText.literal("Plugin build complete")));
+        var f=MultipleGroupsTest.fixture(false,"mean");var export=GroupSourceExporter.create(f.document(),f.instance(),true);
+        assertFalse(export.files().keySet().stream().anyMatch(p->p.endsWith(".cpp")),"Header-only generated nodes are already compiled through the host registry");
+    }
     @Test void duplicateInstancesReuseOneCompilationAndInvalidateTogether()throws Exception{
         var p=ReferenceProjects.make("osc-gain-filter",0);verifySharedBake(p.document(),p.group());
     }
