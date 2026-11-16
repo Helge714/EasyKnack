@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.3.0
 
+- Sine Cloud now sizes its IFFT from Max Bin Spacing (default 0.01 Hz),
+  including non-power-of-two tables. Narrow bands cap Actual count instead of
+  increasing resolution. Gaussian density is removed; old documents remain
+  readable but their stimulus frequencies, tone count and period may change.
+
 - Correct Sine Cloud Period to report the common waveform period of its active
   tones instead of the stored table duration; single tones report 1 / actual Hz.
 

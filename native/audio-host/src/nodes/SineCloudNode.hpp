@@ -26,9 +26,14 @@ struct SineCloudNode:NodeProcessor {
             if(marker=="!19022bc74d228d07"&&(!(in>>gaussian)||(gaussian!=0&&gaussian!=1)))throw std::runtime_error("Invalid legacy Gaussian setting");
             sources={a,b,c,d};settings={count,seed,lo,hi,gaussian!=0,true};return;
         }
+        if(marker=="!46e3c55a54e309e8"){
+            int a,b,c,d,gaussian,randomize;unsigned count,seed;double lo,hi;
+            if(!(in>>a>>count>>b>>lo>>c>>hi>>d>>seed>>gaussian>>randomize)||a< -1||b< -1||c< -1||d< -1||count<1||count>10000000||seed>16777215||!std::isfinite(lo)||!std::isfinite(hi)||lo<.00001||hi<.00001||lo>24000||hi>24000||(gaussian!=0&&gaussian!=1)||(randomize!=0&&randomize!=1))throw std::runtime_error("Invalid legacy Sine Cloud parameters");
+            sources={a,b,c,d};settings={count,seed,lo,hi,false,randomize!=0};return;
+        }
         in.clear();in.seekg(start);
         auto p=parameters::SineCloudNodeParameters::read(in);sources=p.sources();
-        settings={unsigned(p.count_value),unsigned(p.seed_value),p.minimum_value,p.maximum_value,p.gaussian_value!=0,p.randomize_value!=0};
+        settings={unsigned(p.count_value),unsigned(p.seed_value),p.minimum_value,p.maximum_value,false,p.randomize_value!=0,p.bin_spacing_value};
     }
     void applyParameters(const NodeProcessor& other)noexcept override{settings=static_cast<const SineCloudNode&>(other).settings;}
     void prepare(double rate,std::size_t)override{

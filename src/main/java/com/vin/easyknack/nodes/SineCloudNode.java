@@ -4,7 +4,7 @@ package com.vin.easyknack.nodes;
 public final class SineCloudNode extends BasicNode {
     private static final double NYQUIST=com.vin.easyknack.audio.AudioProcessing.SAMPLE_RATE*.5;
     public static final PropertyId COUNT=new PropertyId("count"), MIN=new PropertyId("minimum"),
-        MAX=new PropertyId("maximum"), SEED=new PropertyId("seed"), GAUSSIAN=new PropertyId("gaussian"), RANDOMIZE=new PropertyId("randomize");
+        MAX=new PropertyId("maximum"), SEED=new PropertyId("seed"), SPACING=new PropertyId("bin-spacing"), RANDOMIZE=new PropertyId("randomize");
     @Override public void define(NodeBuilder node,NodeState state){
         node.addOutput(new PropertyId("audio-out"),"Audio Out").rate(ProcessingRate.AUDIO);
         node.addOutput(new PropertyId("actual-count"),"Actual count").signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
@@ -13,11 +13,11 @@ public final class SineCloudNode extends BasicNode {
         node.addInput(MIN,"Min Frequency",Editor.Slider.button(20,.00001,NYQUIST).formats(UnitFormats.FREQUENCY).discrete()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
         node.addInput(MAX,"Max Frequency",Editor.Slider.button(Math.min(20000,NYQUIST),.00001,NYQUIST).formats(UnitFormats.FREQUENCY).discrete()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
         node.addInput(SEED,"Seed",Editor.Slider.button(0,0d,16777215d).integers().discrete()).signal(SignalCategory.VALUE).rate(ProcessingRate.CONTROL);
-        node.addEditor(GAUSSIAN,"Gaussian",new Editor.CheckBox(false));
+        node.addEditor(SPACING,"Max Bin Spacing",Editor.Slider.button(.01,.001,1000d).formats(UnitFormats.FREQUENCY).discrete());
         node.addEditor(RANDOMIZE,"Randomize phases",new Editor.CheckBox(true));
     }
     @Override public NativeProcessor processor(){
         return new NativeProcessor("sinecloud","nodes/SineCloudNode.hpp",ParameterContract.builder()
-            .source(COUNT).integer(COUNT).source(MIN).value(MIN).source(MAX).value(MAX).source(SEED).integer(SEED).value(GAUSSIAN).value(RANDOMIZE).build());
+            .source(COUNT).integer(COUNT).source(MIN).value(MIN).source(MAX).value(MAX).source(SEED).integer(SEED).value(RANDOMIZE).value(SPACING).build());
     }
 }
