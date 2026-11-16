@@ -10,6 +10,29 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.node.binding.GLNodeEditorViewState;
 
 class SineCloudTest {
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void singleTonePeriodReachesValueViewerThroughHost()throws Exception{
+        var graph=new GLNodeGraph();var source=new SineCloudNode();var viewer=new ValueViewerNode();
+        var sourceId=GLNodeId.random();var viewerId=GLNodeId.random();
+        var values=new java.util.HashMap<>(source.defaults());values.put("count",GLNodeValue.of(1));
+        values.put("minimum",GLNodeValue.of(440.));values.put("maximum",GLNodeValue.of(440.));
+        graph.edit("Period probe",e->{
+            e.addNode(new GLGraphNode(sourceId,source.registration().id(),values));
+            e.addNode(new GLGraphNode(viewerId,viewer.registration().id(),viewer.defaults()));
+            e.addConnection(new GLGraphConnection(GLNodeConnectionId.random(),new GLNodeEndpoint(sourceId,"period"),new GLNodeEndpoint(viewerId,"value-0")));
+        });
+        try(var host=new com.vin.easyknack.audio.AudioHostClient()){
+            host.start(Path.of(System.getProperty("easyknack.test.host",com.vin.easyknack.audio.AudioHostClient.defaultExecutable().toString())),true);
+            host.command(com.vin.easyknack.audio.AudioGraphEncoder.encode(graph.snapshot()));host.command("PLAY");
+            long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+            float last=0;
+            do{
+                Thread.sleep(30);var frame=com.vin.easyknack.audio.AudioAnalysis.parse(host.command("ANALYSIS")).get(viewerId.toString());
+                if(frame!=null&&frame.values().length>8){last=frame.values()[frame.values().length-1];if(last>0)break;}
+            }while(System.nanoTime()<deadline);
+            assertEquals(65536./(48000*601),last,1e-7,"Period at Value Viewer");
+        }
+    }
     @Test void registeredNodeEncodesControlInputsAndPersists()throws Exception{
         var node=new SineCloudNode();assertTrue(NodeRegistry.find(node.registration().id()).isPresent());
         assertEquals(4,node.processor().inputs().size());
