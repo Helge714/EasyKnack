@@ -52,17 +52,38 @@ struct SineCloudTable {
     }
     void build(Settings p,double rate){
         auto layout=plan(p,rate);auto size=layout.size;first=layout.first;last=layout.last;count=layout.count;
+        const double lo=std::clamp(std::min(p.minimum,p.maximum),.00001,rate*.5);
+        const double hi=std::clamp(std::max(p.minimum,p.maximum),lo,rate*.5);
+        auto previousBin=first-1;
+        auto selectedBin=[&](unsigned j){
+            if(count==1)return first;
+            const double frequency=lo+(double(j)+1)*(hi-lo)/(double(count)+1);
+            // Reserve one distinct bin for each remaining tone when the grid is full.
+            const auto bin=std::clamp<std::size_t>(std::size_t(std::llround(frequency*layout.size/rate)),previousBin+1,last-(count-1-j));
+            previousBin=bin;return bin;
+        };
+        std::size_t fundamental=0;
+        for(unsigned j=0;j<count;j++){
+            fundamental=std::gcd(fundamental,selectedBin(j));
+            if(fundamental==1)break;
+        }
+        periodSeconds=double(size)/(rate*fundamental);
+        // Select frequencies on the requested fine grid first, then remove exact
+        // sample repetitions. This changes neither frequencies nor initial phases.
+        const auto divisor=std::gcd(size,fundamental);
+        size/=divisor;
+        previousBin=first-1;
         std::vector<std::complex<double>> bins(size);
         std::uint64_t rng=p.seed;
-        std::size_t fundamental=0;
+        std::size_t occupiedFirst=0,occupiedLast=0;
         constexpr double tau=6.283185307179586476925286766559;
         for(unsigned j=0;j<count;j++){
-            auto bin=count==1?first:first+(std::uint64_t(j)*(last-first)+(count-1)/2)/(count-1);
-            fundamental=std::gcd(fundamental,bin);
+            auto bin=selectedBin(j)/divisor;
+            if(j==0)occupiedFirst=bin;occupiedLast=bin;
             double phase=p.randomPhases?(random(rng)>>11)*0x1.0p-53*tau:-tau/4; // IFFT cosine phase -> sine phase zero.
             bins[bin]=std::polar(1.,phase);bins[size-bin]=std::conj(bins[bin]);
         }
-        periodSeconds=double(size)/(rate*fundamental);
+        first=occupiedFirst;last=occupiedLast;
         bins=sineCloudInverse(bins);
         double peak=0;for(const auto& x:bins)peak=std::max(peak,std::abs(x.real()));
         samples.resize(size);

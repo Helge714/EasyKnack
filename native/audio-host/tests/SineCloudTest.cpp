@@ -26,15 +26,15 @@ int main(){
         }
     }
     SineCloudTable a,b;
-    SineCloudTable::Settings p{7,42,100,700,false,true,1};
+    SineCloudTable::Settings p{7,42,0,800,false,true,1};
     a.build(p,65536);b.build(p,65536);
-    assert(a.count==7&&a.samples==b.samples&&a.samples.size()==65536);
+    assert(a.count==7&&a.samples==b.samples&&a.samples.size()==16384);
     assert(std::abs(a.periodSeconds-.01)<1e-12);
     p.seed=43;b.build(p,65536);assert(a.samples!=b.samples);
     std::vector<std::complex<double>> bins(a.samples.begin(),a.samples.end());spectrumTransform(bins.data(),bins.size());
-    double magnitude=std::abs(bins[100]);assert(magnitude>1);
+    double magnitude=std::abs(bins[25]);assert(magnitude>1);
     for(unsigned k=1;k<bins.size()/2;k++){
-        if(k<=700&&k%100==0)assert(std::abs(std::abs(bins[k])/magnitude-1)<1e-5);
+        if(k<=175&&k%25==0)assert(std::abs(std::abs(bins[k])/magnitude-1)<1e-5);
         else assert(std::abs(bins[k])<magnitude*1e-5);
     }
     p.randomPhases=false;a.build(p,65536);p.seed=900;b.build(p,65536);
@@ -44,14 +44,33 @@ int main(){
     p={3,42,100,301,false,true,1};a.build(p,65536);assert(a.periodSeconds==1);
     p={1,42,440,440,false,true,.01};
     auto start=std::chrono::steady_clock::now();a.build(p,48000);
-    assert(a.samples.size()==4800000&&a.count==1&&a.first==44000);
+    assert(a.samples.size()==1200&&a.count==1&&a.first==11);
     assert(std::abs(a.periodSeconds-1./440)<1e-12);
     float peak=0;for(float x:a.samples){assert(std::isfinite(x));peak=std::max(peak,std::abs(x));}assert(peak==1);
     // A non-power-of-two table reconstructs the desired additive sinusoid.
     double cosine=0,sine=0;
-    for(std::size_t i=0;i<4800;i++){cosine+=a.samples[i]*std::cos(tau*440*i/48000);sine+=a.samples[i]*std::sin(tau*440*i/48000);}
+    for(std::size_t i=0;i<4800;i++){cosine+=a.samples[i%a.samples.size()]*std::cos(tau*440*i/48000);sine+=a.samples[i%a.samples.size()]*std::sin(tau*440*i/48000);}
     cosine/=2400;sine/=2400;
-    for(std::size_t i=0;i<4800;i++)assert(std::abs(a.samples[i]-(cosine*std::cos(tau*440*i/48000)+sine*std::sin(tau*440*i/48000)))<2e-6);
+    for(std::size_t i=0;i<4800;i++)assert(std::abs(a.samples[i%a.samples.size()]-(cosine*std::cos(tau*440*i/48000)+sine*std::sin(tau*440*i/48000)))<2e-6);
+    for(bool randomized:{false,true})for(unsigned seed:{0u,42u}){
+        p={2,seed,0,1320,false,randomized,.01};a.build(p,48000);
+        assert(a.count==2&&a.samples.size()==1200&&std::abs(a.periodSeconds-1./440)<1e-12);
+        std::vector<double> reference(a.samples.size());std::uint64_t rng=seed;
+        double phases[2];for(auto& phase:phases)phase=randomized?(SineCloudTable::random(rng)>>11)*0x1.0p-53*tau:-tau/4;
+        double peak=0,power=0;
+        for(std::size_t i=0;i<reference.size();i++){
+            reference[i]=std::cos(tau*440*i/48000+phases[0])+std::cos(tau*880*i/48000+phases[1]);
+            peak=std::max(peak,std::abs(reference[i]));
+        }
+        for(std::size_t i=0;i<reference.size();i++){assert(std::abs(a.samples[i]-reference[i]/peak)<1e-6);power+=a.samples[i]*a.samples[i];}
+        assert(power/reference.size()>.2); // Two audible tones must not be silent.
+    }
+    a.build({2,0,20,20000,false,true,.01},48000);
+    assert(a.count==2&&a.samples.size()==2400&&a.periodSeconds==.05);
+    a.build({2,0,0,24000,false,true,.01},48000);
+    assert(a.count==2&&a.samples.size()==6&&a.first==1&&a.last==2&&a.periodSeconds==1./8000);
+    double twoTonePower=0;for(float x:a.samples)twoTonePower+=x*x;assert(twoTonePower/a.samples.size()>.2);
+    p={100,42,20,20000,false,true,.01};start=std::chrono::steady_clock::now();b.build(p,48000);assert(b.samples.size()==4800000);
     std::cout<<"4.8M sample table build seconds="<<std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count()<<'\n';
     auto wide=SineCloudTable::plan({10000000,0,20,20000,false,true,.01},48000);
     assert(wide.size==4800000&&wide.count==1998001);
@@ -66,7 +85,7 @@ int main(){
     bool rejected=false;try{SineCloudTable::plan({1,0,20,20000,false,true,.00001},48000);}catch(const std::length_error&){rejected=true;}assert(rejected);
     SineCloudNode node;std::istringstream encoded(SINE_CLOUD_PAYLOAD);node.configure(encoded);
     assert(node.sources.size()==4&&node.settings.binSpacing==.01);
-    node.settings={7,42,100,700,false,true,1};node.prepare(65536,256);
+    node.settings={7,42,0,800,false,true,1};node.prepare(65536,256);
     for(const char* payload:{"!2303724719fab0c8 -1 7 -1 20 -1 20000 -1 42","!19022bc74d228d07 -1 7 -1 20 -1 20000 -1 42 1","!46e3c55a54e309e8 -1 7 -1 20 -1 24000 -1 42 1 0"}){
         SineCloudNode legacy;std::istringstream old(payload);legacy.configure(old);assert(legacy.sources.size()==4&&legacy.settings.binSpacing==.01);
     }
@@ -88,7 +107,7 @@ int main(){
     auto& table=node.worker->slots[node.active].table;node.cursor=table.samples.size()-128;render();
     for(unsigned i=0;i<256;i++)assert(output[i]==table.samples[(table.samples.size()-128+i)%table.samples.size()]);
     SineCloudNode configuration;configuration.settings=node.settings;configuration.settings.binSpacing=.5;
-    node.applyParameters(configuration);await(7,version);assert(node.worker->slots[node.active].table.samples.size()==131072);
+    node.applyParameters(configuration);await(7,version);assert(node.worker->slots[node.active].table.samples.size()==16384);
     version=node.worker->slots[node.active].version;configuration.settings.randomPhases=false;node.applyParameters(configuration);await(7,version);
     version=node.worker->slots[node.active].version;configuration.settings.seed=900;node.applyParameters(configuration);for(int j=0;j<20;j++)render();assert(node.worker->slots[node.active].version==version);
     float inputs[4]={1000,100,102,3};const float* pointers[]={inputs,inputs+1,inputs+2,inputs+3};char rates[]={'c','c','c','c'};

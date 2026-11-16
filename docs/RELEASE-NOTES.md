@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.3.0
 
+- Place Sine Cloud tones at interior interval subdivisions instead of its endpoints;
+  two tones in 0-24 kHz now produce 8 and 16 kHz (changed stimulus behavior).
+- Compact Sine Cloud tables before synthesis when occupied frequencies permit
+  exact sample repetition, preserving their phases, frequencies and waveform.
+
 - Sine Cloud now sizes its IFFT from Max Bin Spacing (default 0.01 Hz),
   including non-power-of-two tables. Narrow bands cap Actual count instead of
   increasing resolution. Gaussian density is removed; old documents remain

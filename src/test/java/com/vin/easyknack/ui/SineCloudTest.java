@@ -13,13 +13,16 @@ class SineCloudTest {
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void singleTonePeriodReachesValueViewerThroughHost()throws Exception{
         verifyViewer(1,440,440,1,1./440);
+        verifyViewer(2,20,20000,2,.05);
+        verifyViewer(2,0,1320,2,1./440);
+        verifyViewer(2,0,24000,2,1./8000);
         verifyViewer(100,100,100.025,3,100); // Keep the upper limit clear of float32 bin-edge rounding.
     }
     private void verifyViewer(int requested,double minimum,double maximum,int actual,double expectedPeriod)throws Exception{
         var graph=new GLNodeGraph();var source=new SineCloudNode();var viewer=new ValueViewerNode();
         var sourceId=GLNodeId.random();var viewerId=GLNodeId.random();
         var values=new java.util.HashMap<>(source.defaults());values.put("count",GLNodeValue.of(requested));
-        values.put("minimum",GLNodeValue.of(minimum));values.put("maximum",GLNodeValue.of(maximum));
+        values.put("minimum",GLNodeValue.of(Math.max(.00001,minimum)));values.put("maximum",GLNodeValue.of(maximum));
         var viewerValues=new java.util.HashMap<>(viewer.defaults());viewerValues.put("inputs",GLNodeValue.of(2));
         graph.edit("Period probe",e->{
             e.addNode(new GLGraphNode(sourceId,source.registration().id(),values));
