@@ -14,6 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static com.vin.easyknack.ui.AdvancedSourceExportTest.quote;
 
 class InstanceSourceSpecializationTest {
+    @Test void formulaWarmupDoesNotChangeBakeSources(){
+        var f=formulaFixture();var formula=f.document().embeddedAssets().values().stream().filter(FormulaGroups::isFormula).findFirst().orElseThrow();
+        var key=FormulaGroups.key(FormulaGroups.program(formula));var previous=FormulaGroups.libraries.remove(key);
+        try{
+            var cold=GroupSourceExporter.create(f.document(),f.instance(),true).files();
+            FormulaGroups.libraries.put(key,FormulaNode.hex("C:/temporary/formula-native.dll"));
+            assertEquals(cold,GroupSourceExporter.create(f.document(),f.instance(),true).files());
+        }finally{FormulaGroups.libraries.remove(key);if(previous!=null)FormulaGroups.libraries.put(key,previous);}
+    }
     private static MultipleGroupsTest.Fixture phaseFixture(){
         var f=formulaFixture();var a=f.document().embeddedAssets().values().stream().filter(MultipleGroups::multiple).findFirst().orElseThrow();
         var osc=a.graph().nodes().stream().filter(n->NodeRegistry.require(n.typeId()) instanceof OscillatorNode).findFirst().orElseThrow();
@@ -103,6 +112,7 @@ class InstanceSourceSpecializationTest {
     @ParameterizedTest @ValueSource(ints={0,1,2}) @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void generatedKernelPreservesRatesChannelsDefaultsAndState(int variant)throws Exception{
         var f=variant==4?phaseFixture():variant==3?formulaFixture():variant>0?noiseFixture(variant==2):fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var definition=export.definition();
+        if(variant==4)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("void renderMixed("));
         if(variant==1||variant==2)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("DigitalNoiseNode::process(c)"));
         var originalRegistry=new GLCompositeGraphRegistry();originalRegistry.registerDocument(f.document());
         var registry=GroupCompiler.prepare(f.document().root(),originalRegistry).registry();
@@ -186,8 +196,15 @@ class InstanceSourceSpecializationTest {
                 assert(!probe.process<Compiled::CompiledInstance>(replacement,samplewise));
                 direct.rightInputs=inputRight;
                 assert(!probe.process<Compiled::CompiledInstance>(replacement,direct));
+                // Real scheduler shape: the unwired Count editor is supplied by
+                // ControlInterpolation, while the raw right input remains null.
+                Compiled manualBake;std::istringstream manualParameters(%s);manualBake.configure(manualParameters);manualBake.prepare(48000,256);
+                ControlInterpolation editor("1 1 0 5 50 4 0 0 7 0 1 0 0 0 0 -");editor.begin(256,48000);
+                const float* manualInputs[]{frequency.data(),nullptr,phase.data()};
+                ProcessContext manual{manualInputs,3,y.data(),256,48000,silence.data(),256};manual.sourceRates="aca";manual.rightInputs=manualInputs;manual.controls=&editor;
+                manualBake.process(manual);assert(manualBake.audioKernel.plannedState);
             }
-            """.formatted(export.className(),export.className(),variant!=4,quote(live),quote(compiled),quote(compiled),quote(compiled));
+            """.formatted(export.className(),export.className(),variant!=4,quote(live),quote(compiled),quote(compiled),quote(compiled),quote(compiled));
         var source=dir.resolve("test.cpp");Files.writeString(source,code);RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
     }
 }

@@ -51,7 +51,7 @@ final class InstanceSourceSpecialization {
             .append("        std::array<const float*,").append(slots.size()).append("> left{},right{};std::array<char,").append(slots.size()).append("> rates{};rates.fill('c');\n");
         for(int i=0;i<slots.size();i++)if(slots.get(i)>=0){int p=slots.get(i);
             s.append("        left[").append(i).append("]=c.input(").append(p).append(");if(!left[").append(i).append("])left[").append(i).append("]=&defaults[").append(p).append("];\n")
-                .append("        right[").append(i).append("]=c.rightInputs&&").append(p).append("<c.inputCount?c.rightInputs[").append(p).append("]:c.input(").append(p).append(");if(!right[").append(i).append("])right[").append(i).append("]=&defaults[").append(p).append("];\n")
+                .append("        right[").append(i).append("]=c.rightInputs&&").append(p).append("<c.inputCount?c.rightInputs[").append(p).append("]:c.input(").append(p).append(");if(!right[").append(i).append("])right[").append(i).append("]=c.rawInput(").append(p).append(")?&defaults[").append(p).append("]:left[").append(i).append("];\n")
                 .append("        rates[").append(i).append("]=c.rawInput(").append(p).append(")?(c.sourceRates?c.sourceRates[").append(p).append("]:'a'):c.input(").append(p).append(")?(c.numericInput(").append(p).append(").stride?'a':'c'):'c';\n");
         }
         s.append("        auto inner=c;inner.inputs=left.data();inner.rightInputs=right.data();inner.sourceRates=rates.data();inner.inputCount=").append(slots.size()).append(";inner.controls=nullptr;\n")
@@ -117,11 +117,12 @@ final class InstanceSourceSpecialization {
             stores.removeIf(ref->dynamic.contains(ref%256));
             scalarOrder.removeIf(dynamic::contains);
             if(scalarOrder.isEmpty()&&dynamic.isEmpty())return null;
+            String mixed=dynamic.isEmpty()?mixedKernel(ops,scalarOrder):null;
             var guard=new StringBuilder();var body=new StringBuilder();var keys=new ArrayList<String>();
             keys.add("g.preparedSampleRate");
             keys.add("double(frames)");
             for(int i:scalarOrder){var op=ops.get(i);String p="p"+i;
-                guard.append("        if(!g.nodes[").append(i).append("].controlRate){scalarCacheValid=false;Instance::renderScalars(frames);return;}\n");
+                guard.append("        if(!g.nodes[").append(i).append("].controlRate){scalarCacheValid=false;").append(mixed==null?"Instance::renderScalars(frames)":"renderMixed(frames)").append(";return;}\n");
                 if(op.type.equals("multipleinput"))keys.add("([&]{const auto& v=static_cast<const BakedInput&>(*g.nodes["+i+"].processor);return double(v.external&&v.external->input("+op.value("slot")+")?v.external->input("+op.value("slot")+")[0]:v.fallback);}())");
                 if(op.type.equals("instancecontext")){keys.add("double(static_cast<const InstanceContextNode&>(*g.nodes["+i+"].processor).count)");keys.add("double(static_cast<const InstanceContextNode&>(*g.nodes["+i+"].processor).index)");}
                 switch(op.type){
@@ -157,12 +158,41 @@ final class InstanceSourceSpecialization {
                 }
             }
             for(int ref:stores)body.append("        g.nodes[").append(ref%256).append("].voice(0).channelCache[0].outputs[").append(ref/256).append("][0]=").append(variable(ref)).append(";\n");
-            return "    bool scalarCacheValid=false;std::array<double,"+keys.size()+"> scalarKeys{};\n"
+            return (mixed==null?"":mixed)+"    bool scalarCacheValid=false;std::array<double,"+keys.size()+"> scalarKeys{};\n"
                 +"    void renderScalars(int frames)noexcept{auto& g=runtime->graph;\n"+guard
                 +"        const std::array<double,"+keys.size()+"> keys{"+String.join(",",keys)+"};\n"
                 +"        if(!scalarCacheValid||keys!=scalarKeys){scalarKeys=keys;scalarCacheValid=true;\n"+body+"        }\n"+audioBody+"    }\n";
         }catch(IllegalArgumentException|NoSuchElementException e){return null;}
     }
+    /** Fuse only pure numeric audio dependencies; control/stateful work keeps its native processor. */
+    private static String mixedKernel(List<Operation> ops,List<Integer> order){
+        if(order.stream().anyMatch(i->!Set.of("multipleinput","instancecontext","math","unitconvert","formula").contains(ops.get(i).type)))return null;
+        var s=new StringBuilder("    void renderMixed(int frames)noexcept{auto& g=runtime->graph;\n");
+        String fallback="{Instance::renderScalars(frames);return;}\n";
+        for(int i:order){var op=ops.get(i);String p="m"+i;
+            if(op.type.equals("formula"))s.append("        const auto& ").append(p).append("=static_cast<const FormulaNode&>(*g.nodes[").append(i).append("].processor);if(!g.nodes[").append(i).append("].controlRate||").append(p).append(".sampleContext||").append(p).append(".bufferInputs||").append(p).append(".triggerInputs||").append(p).append(".triggerOutputs)").append(fallback);
+            if(op.type.equals("instancecontext"))s.append("        if(!g.nodes[").append(i).append("].controlRate)").append(fallback);
+            if(op.type.equals("math")){
+                s.append("        const auto& ").append(p).append("=static_cast<const MathNode&>(*g.nodes[").append(i).append("].processor);\n");
+                for(String port:List.of("a","b"))if(op.source(port)<0)s.append("        if(").append(p).append(port.equals("a")?".currentA!=":".currentB!=").append(number(op.value(port))).append(')').append(fallback);
+            }
+            for(int ref:op.sources)if(ref>=0)s.append("        if(g.nodes[").append(i).append("].controlRate&&g.nodes[").append(ref%256).append("].outputRate(").append(ref/256).append(")!='c')").append(fallback);
+        }
+        for(int i:order)s.append("        if(g.nodes[").append(i).append("].controlRate)renderUpstream(").append(i).append(",frames,[](NodeProcessor& p,ProcessContext& c){p.process(c);});\n");
+        var refs=new LinkedHashSet<Integer>();for(int i:order)for(int ref:ops.get(i).sources)if(ref>=0)refs.add(ref);
+        for(int ref:refs)s.append("        const auto* v").append(ref).append("=g.nodes[").append(ref%256).append("].voice(0).channelCache[0].outputs[").append(ref/256).append("].data();const auto stride").append(ref).append("=g.nodes[").append(ref%256).append("].outputRate(").append(ref/256).append(")=='c'?0u:1u;\n");
+        for(int i:order){var op=ops.get(i);if(op.type.equals("multipleinput"))s.append("        const auto& b").append(i).append("=static_cast<const BakedInput&>(*g.nodes[").append(i).append("].processor);auto input").append(i).append("=b").append(i).append(".external?b").append(i).append(".external->numericInput(").append(op.value("slot")).append(",b").append(i).append(".fallback):ProcessContext{}.numericInput(0,b").append(i).append(".fallback);\n");}
+        s.append("        for(int sample=0;sample<frames;sample++){\n");
+        for(int i:order){var op=ops.get(i);String expression=switch(op.type){
+            case "multipleinput"->"input"+i+"[sample]";
+            case "math"->"MathNode::evaluate("+mixedInput(op,"a")+","+mixedInput(op,"b")+",MathOperation::"+identifier(op.value("operation"))+","+(op.value("clamp").equals("1")?"true":"false")+")";
+            case "unitconvert"->"UnitConverterNode::evaluate("+mixedInput(op,"value")+",UnitFormat::"+identifier(op.value("from"))+",UnitFormat::"+identifier(op.value("to"))+",g.preparedSampleRate)";
+            default->null;};
+            if(expression!=null)s.append("        if(!g.nodes[").append(i).append("].controlRate)g.nodes[").append(i).append("].voice(0).channelCache[0].outputs[0][sample]=").append(expression).append(";\n");
+        }
+        return s.append("        }\n    }\n").toString();
+    }
+    private static String mixedInput(Operation op,String port){int ref=op.source(port);return ref<0?number(op.value(port)):"v"+ref+"[sample*stride"+ref+"]";}
     private static void visit(int i,List<Operation> ops,Set<Integer> done,Set<Integer> visiting,List<Integer> order){
         if(done.contains(i))return;if(!visiting.add(i))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Feedback"));
         for(int ref:ops.get(i).sources)if(ref>=0)visit(ref%256,ops,done,visiting,order);

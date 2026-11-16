@@ -21,6 +21,8 @@ Exposes a reusable interface to an internal graph.
 
 ## Behavior
 
+Disabling a bake retains its loaded result. An unchanged bake can be enabled again without recompiling; Force rebuild still forces a new build.
+
 Bake shows completed build stages in a progress bar, plus the current phase and elapsed C++ compilation time. The bar does not predict remaining time and disappears when the build finishes; the status remains visible. It distinguishes a standard bake from available oscillator optimization. The tooltip explains limitations; this is not a live measurement of the selected execution path.
 
 Grouping connected nodes preserves the semantic type of each internal port (for example Value or Audio), independently of its processing rate.

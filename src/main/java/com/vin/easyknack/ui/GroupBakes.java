@@ -39,7 +39,7 @@ final class GroupBakes implements AutoCloseable {
     static final String PROPERTY="easyknack.bake";
     interface Builder { PluginManager.Build build(Map<String,String> files,Consumer<String> progress)throws Exception; }
     private static final class Entry {
-        Object key; GroupSourceExporter.Export source; BasicNode definition;
+        Object key,loadedKey; GroupSourceExporter.Export source; BasicNode definition;
         boolean enabled,wanted; String status="Not baked";
     }
     private final Supplier<GLNodeGraphDocument> document;
@@ -62,6 +62,7 @@ final class GroupBakes implements AutoCloseable {
         return 0;
     }
     private java.nio.file.Path host;
+    private Set<String> loadedProcessors=Set.of();
     GroupBakes(Supplier<GLNodeGraphDocument> document,Builder builder,Runnable changed){this.document=document;this.builder=builder;this.changed=changed;}
     java.nio.file.Path host(){return host;}
     boolean busy(){return busy;}
@@ -127,7 +128,7 @@ final class GroupBakes implements AutoCloseable {
             var old=entries.get(node.id());
             if(old!=null&&old.key!=null)continue;
             var shared=available.get(key(doc,node.id()));if(shared==null)continue;
-            var e=new Entry();e.key=shared.key;e.source=shared.source;e.definition=shared.definition;e.enabled=true;e.wanted=true;e.status=shared.status;entries.put(node.id(),e);
+            var e=new Entry();e.key=shared.key;e.loadedKey=shared.loadedKey;e.source=shared.source;e.definition=shared.definition;e.enabled=true;e.wanted=true;e.status=shared.status;entries.put(node.id(),e);
         }
     }
     void validate(){
@@ -141,7 +142,7 @@ final class GroupBakes implements AutoCloseable {
         if(invalid)generation++;
         reuse(doc);refresh();
     }
-    void reset(){restoreTimer.stop();restoring.clear();generation++;entries.clear();host=null;refresh();}
+    void reset(){restoreTimer.stop();restoring.clear();generation++;entries.clear();host=null;loadedProcessors=Set.of();refresh();}
     void disable(GLNodeId id){
         var e=entries.get(id);if(e==null)return;
         generation++;e.wanted=false;e.enabled=false;e.status="Disabled";refresh();changed.run();
@@ -159,8 +160,11 @@ final class GroupBakes implements AutoCloseable {
                 if(asset.compositeDescriptor().propertyMappings().stream().anyMatch(p->p.internalNodeId().equals(id)))
                     throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("This instance has properties controlled by its parent group. Bake the parent group instead."));
             var currentKey=key(doc,id);
+            if(!force&&entry.definition!=null&&Objects.equals(entry.key,currentKey)&&Objects.equals(entry.loadedKey,currentKey)&&loadedProcessors.contains(entry.definition.processor().id())){
+                entry.enabled=true;entry.wanted=true;entry.status="Baked (cached)";refresh();changed.run();return;
+            }
             if(!force){var shared=entries.values().stream().filter(e->e!=entry&&e.enabled&&Objects.equals(e.key,currentKey)).findFirst().orElse(null);
-                if(shared!=null){entry.key=currentKey;entry.source=shared.source;entry.definition=shared.definition;entry.enabled=true;entry.wanted=true;entry.status=shared.status;refresh();changed.run();return;}
+                if(shared!=null){entry.key=currentKey;entry.loadedKey=shared.loadedKey;entry.source=shared.source;entry.definition=shared.definition;entry.enabled=true;entry.wanted=true;entry.status=shared.status;refresh();changed.run();return;}
             }
             entry.source=GroupSourceExporter.create(doc,node,true);entry.key=currentKey;entry.enabled=false;entry.wanted=true;
         }catch(Exception failure){entry.status=AppText.literal("Bake failed: ")+failure.getMessage();refresh();return;}
@@ -190,8 +194,9 @@ final class GroupBakes implements AutoCloseable {
                             .filter(d->d.processor().id().equals(e.source.definition().processor().id()))
                             .findFirst().orElseThrow(()->new IllegalStateException(com.vin.easyknack.i18n.AppText.literal("Compiled group definition missing")))));
                         NodeRegistry.installPlugins(build.definitions());host=build.host();
+                        loadedProcessors=build.definitions().stream().map(d->d.processor().id()).collect(java.util.stream.Collectors.toUnmodifiableSet());
                         requested.forEach((key,e)->{
-                            var target=entries.get(key);target.source=e.source;target.definition=definitions.get(key);target.enabled=true;target.status=build.cached()?"Baked (cached)":"Baked";
+                            var target=entries.get(key);target.source=e.source;target.loadedKey=e.key;target.definition=definitions.get(key);target.enabled=true;target.status=build.cached()?"Baked (cached)":"Baked";
                         });
                     } catch(Exception failure) {
                         entry.enabled=false;entry.wanted=false;entry.status=AppText.literal("Bake failed: ")+failure.getMessage();

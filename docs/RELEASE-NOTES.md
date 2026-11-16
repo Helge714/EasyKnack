@@ -2,6 +2,12 @@
 
 ## Unreleased - 0.3.0
 
+- Keep unwired manual inputs mono in Instance Bakes and fuse supported pure
+  audio-rate math/unit modulation while retaining native fallbacks for stateful DSP.
+
+- Re-enable unchanged, loaded Bakes without compiling again. Keep nested Formula
+  warmup DLL paths out of portable Bake sources so cold/warm cache identity agrees.
+
 - Fix a rendering crash when the Bake progress bar reads the theme accent.
   Resolve selected colors before consulting defaults; legacy themes retain a fallback.
 

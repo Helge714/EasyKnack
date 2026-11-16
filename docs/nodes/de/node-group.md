@@ -21,6 +21,8 @@ Stellt eine wiederverwendbare Schnittstelle zu einem internen Graphen bereit.
 
 ## Verhalten
 
+Deaktivieren verwirft einen geladenen Bake nicht. Ein unveränderter Bake kann anschließend ohne erneute Kompilierung aktiviert werden; Force rebuild erzwingt weiterhin einen neuen Build.
+
 Bake zeigt einen Balken für abgeschlossene Bauschritte sowie die aktuelle Phase und bei der C++-Kompilierung deren Laufzeit. Der Balken ist keine zeitliche Prozentprognose und verschwindet nach Abschluss; der Status bleibt sichtbar. Er unterscheidet Standard-Bake und verfügbare Oszillatoroptimierung. Der Tooltip erklärt Einschränkungen; die Angabe ist keine Live-Messung des tatsächlich gewählten Ausführungspfads.
 
 Beim Gruppieren verbundener Nodes übernimmt jeder Gruppenport den semantischen Typ seines internen Ports (etwa Value oder Audio), unabhängig von dessen Verarbeitungsrate.

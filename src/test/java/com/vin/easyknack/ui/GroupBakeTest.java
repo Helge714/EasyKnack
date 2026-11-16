@@ -13,6 +13,26 @@ import com.vingame.glswing.node.model.*;
 import com.vingame.glswing.node.document.*;
 
 class GroupBakeTest {
+    @Test void failedRebuildCannotReactivateAnOlderDefinitionForChangedContent()throws Exception{
+        var p=ReferenceProjects.make("osc-gain-filter",0);var def=definition(GroupSourceExporter.create(p.document(),p.group(),true));var calls=new AtomicInteger();var doc=new AtomicReference<>(p.document());
+        var manager=new GroupBakes(doc::get,(files,progress)->{if(calls.incrementAndGet()>1)throw new java.io.IOException("test failure");return new PluginManager.Build(Path.of("target/failed-rebuild-reuse"),List.of(def),Map.of(),false);},()->{});
+        try{
+            edt(()->manager.bake(p.group().id()));waitFor(manager);
+            edt(()->{doc.set(changed(doc.get()));manager.validate();manager.bake(p.group().id());});waitFor(manager);
+            edt(()->manager.bake(p.group().id()));waitFor(manager);
+            edt(()->assertFalse(manager.enabled(p.group().id())));assertEquals(3,calls.get());
+        }finally{edt(manager::close);NodeRegistry.installPlugins(List.of());}
+    }
+    @Test void disablingAndReenablingAnUnchangedBakeReusesTheLoadedDefinition()throws Exception{
+        var p=ReferenceProjects.make("osc-gain-filter",0);var def=definition(GroupSourceExporter.create(p.document(),p.group(),true));var calls=new AtomicInteger();
+        var manager=new GroupBakes(p::document,(files,progress)->{calls.incrementAndGet();return new PluginManager.Build(Path.of("target/reenabled-bake"),List.of(def),Map.of(),false);},()->{});
+        try{
+            edt(()->manager.bake(p.group().id()));waitFor(manager);
+            edt(()->{manager.disable(p.group().id());manager.bake(p.group().id());assertTrue(manager.enabled(p.group().id()));assertFalse(manager.busy());});
+            assertEquals(1,calls.get());
+            edt(()->manager.bake(p.group().id(),true));waitFor(manager);assertEquals(2,calls.get(),"Force rebuild must still compile");
+        }finally{edt(manager::close);NodeRegistry.installPlugins(List.of());}
+    }
     @Test void progressDisappearsAndReleasesItsSpaceAfterBake()throws Exception{
         var p=ReferenceProjects.make("osc-gain-filter",0);var def=definition(GroupSourceExporter.create(p.document(),p.group(),true));
         var entered=new CountDownLatch(1);var release=new CountDownLatch(1);
@@ -141,7 +161,7 @@ class GroupBakeTest {
             });
             edt(()->manager.bake(p.group().id()));waitFor(manager);
             edt(()->{doc.set(changed(doc.get()));manager.validate();assertFalse(manager.enabled(p.group().id()));assertTrue(manager.status(p.group().id()).startsWith("Changed"));});
-            assertEquals(2,calls.get());
+            assertEquals(1,calls.get(),"Reactivation must not invoke the compiler again");
         }finally{edt(manager::close);NodeRegistry.installPlugins(List.of());}
     }
     @Test void editDuringCompilationCannotActivateStaleResult()throws Exception{

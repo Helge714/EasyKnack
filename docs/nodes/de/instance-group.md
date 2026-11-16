@@ -21,6 +21,8 @@ Führt einen internen Graphen für mehrere unabhängige Instanzen aus.
 
 ## Verhalten
 
+Bake kann reine mathematische Frequenz-/Phasensteuerungen und Einheitenkonvertierungen bei Audio-Rate zusammenfassen. Zustandsbehaftete Modulatoren behalten ihre normale DSP-Ausführung.
+
 Die optimierte Oszillatorsummierung unterstützt auch laufende Frequenz- und Phasenmodulation bei skalaren Instanzgewichten. Unterschiedliche linke/rechte Eingangssignale und Sample-Feedback verwenden weiterhin die allgemeine Ausführung.
 
 Zustandslose Formula-Groups zur Berechnung von Instanzgewichten erhalten die optimierte Oszillatorsummierung. Beim Bake werden unveränderte Berechnungen zwischengespeichert; zeit-, trigger- oder bufferabhängige Formeln verwenden weiterhin die allgemeine Ausführung.

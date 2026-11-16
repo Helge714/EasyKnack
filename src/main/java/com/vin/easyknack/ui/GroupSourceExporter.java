@@ -105,6 +105,13 @@ final class GroupSourceExporter {
             wires.add(wire(new GLNodeEndpoint(instance.id(),p.mapping.publicPort().id()),new GLNodeEndpoint(id,p.endpoint(false))));}
         var root=new GLNodeGraphAsset("export.root",1,GLNodeGraphAssetKind.PROJECT,new GLNodeGraphSnapshot(document.root().graph().graphId(),0,rootNodes,wires),GLNodeEditorViewState.empty());
         var prepared=GroupCompiler.prepare(root,registry);
+        // Ephemeral Formula DLLs are a live-editor optimization, not a portable
+        // dependency or part of a baked definition's content identity.
+        for(var dependency:List.copyOf(prepared.registry().assets())){
+            var g=dependency.graph();var portable=g.nodes().stream().map(n->NodeRegistry.find(n.typeId()).orElse(null) instanceof FormulaNode?n.withProperty("library",GLNodeValue.of("-")):n).toList();
+            if(!portable.equals(g.nodes()))prepared.registry().replaceAsset(new GLNodeGraphAsset(dependency.id(),dependency.version(),dependency.kind(),
+                new GLNodeGraphSnapshot(g.graphId(),g.revision(),portable,g.connections()),dependency.viewState(),dependency.metadata(),dependency.compositeDescriptor()));
+        }
         var result=SpectralGroups.flatten(prepared,new GLCompositeExpansionLimits(16,256,512,10000));
         if(!result.isValid())throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Cannot expand group: ")+result.diagnostics());
         var graph=materializeUnits(AutomaticRates.resolve(result.graph().orElseThrow()));
