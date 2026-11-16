@@ -21,7 +21,7 @@ Generates a research stimulus of up to ten million equal-amplitude, uniformly or
 | --- | --- | --- | --- | --- |
 | Audio Out | [Audio](../../user/en/data-types.md#audio) | ±1 | [Audio](../../user/en/rates.md#audio) | [Auto](../../user/en/data-types.md#channels) |
 | Actual count | [Value](../../user/en/data-types.md#value) | 0–10,000,000 | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
-| Period | [Value](../../user/en/data-types.md#value) | 0 or N / sample rate | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
+| Period | [Value](../../user/en/data-types.md#value) | 0 or N / (sample rate × bin GCD) | [Control](../../user/en/rates.md#control) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 
@@ -31,7 +31,7 @@ With Gaussian off, frequencies are distributed as evenly as possible over distin
 
 Insufficient grid positions reduce the actual count. Actual count reports the newly active table's tone count, initially 0. At 48 kHz, 20–20,000 Hz accommodates ten million distinct tones in both distributions. Uniform uses 33,554,432 samples for this setting; Gaussian uses 67,108,864. Narrower bands may not accommodate that count. The longest table repeats after approximately 1,398.1 seconds (23.3 minutes) at 48 kHz.
 
-Period outputs the active table loop duration N / sample rate in seconds; its unit menu also offers milliseconds and samples. It is 0 before a table is available. While a replacement is building, it still reports the old table; when crossfading starts, it reports the new table. This is the full stored loop duration, not necessarily the shortest mathematical period of a special tone combination.
+Period outputs the shortest common waveform period of the active tones in seconds: N / (sample rate × greatest common divisor of the occupied bin indices). For one tone this is 1 / its actual, grid-quantized frequency; for coprime bin indices it equals the full table duration. Random phases do not change this period. This waveform period may span a noninteger number of samples; the stored sample sequence still loops after N samples. The unit menu also offers milliseconds and samples. The output is 0 before a table is available, retains the old period while a replacement builds, and switches to the new period when crossfading starts.
 
 Inputs are sampled at the start of each processing call. Changes build a new table in the background; rapid changes coalesce. The previous table continues until the replacement is ready; initial startup is silent. Changes restart the new table at its beginning and crossfade linearly for 20 ms. During the transition, equal component amplitudes apply within each table separately. Failed builds retain the previous table. Construction uses CPU time and temporary memory: the largest table occupies 256 MiB plus 1 GiB of complex IFFT scratch. Each node retains at most three tables.
 

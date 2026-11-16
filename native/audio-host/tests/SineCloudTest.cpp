@@ -15,6 +15,8 @@ int main(){
     SineCloudTable a,b;
     a.build({7,42,100,700},65536);b.build({7,42,100,700},65536);
     assert(a.count==7&&a.samples==b.samples&&a.samples.size()==65536);
+    assert(std::abs(a.periodSeconds-.01)<1e-12); // 100, 200, ..., 700 Hz.
+    b.build({3,42,100,301},65536);assert(b.periodSeconds==1); // Coprime bins.
     b.build({7,43,100,700},65536);assert(a.samples!=b.samples);
     std::vector<std::complex<double>> bins(a.samples.begin(),a.samples.end());
     spectrumTransform(bins.data(),bins.size());
@@ -40,6 +42,8 @@ int main(){
     for(unsigned k=1;k<bins.size()/2;k++)if(std::abs(bins[k])>1){++upperLines;assert(double(k)*48000/bins.size()>=23000);}
     assert(upperLines==7);
     a.build({1,0,440,440},48000);assert(a.count==1&&a.first==a.last);
+    assert(std::abs(a.periodSeconds-65536./(48000*a.first))<1e-12);
+    assert(a.periodSeconds<.00228&&a.periodSeconds>.00227);
     a.build({7,42,700,100},65536);b.build({7,42,100,700},65536);assert(a.samples==b.samples);
     for(bool gaussian:{false,true}){
         a.build({7,42,100,700,gaussian,false},65536);b.build({7,43,100,700,gaussian,false},65536);
@@ -71,7 +75,7 @@ int main(){
     float output[256]{},count[256]{},period[256]{},silence[256]{};float* outputs[]={output,count,period};
     ProcessContext c{nullptr,0,output,256,48000,silence,256};c.outputs=outputs;c.outputCount=3;
     auto render=[&]{rendering=true;node.process(c);rendering=false;for(float x:output)assert(std::isfinite(x)&&std::abs(x)<=1.000001);
-        double expected=node.active>=0?double(node.worker->slots[node.active].table.samples.size())/48000:0;
+        double expected=node.active>=0?node.worker->slots[node.active].table.periodSeconds:0;
         for(float x:period)assert(std::abs(x-expected)<1e-6);
     };
     {SineCloudNode unprepared;unprepared.process(c);assert(period[0]==0&&count[0]==0);}
@@ -99,6 +103,9 @@ int main(){
     c.inputs=pointers;c.inputCount=4;c.sourceRates=rates;
     for(unsigned j=0;j<20;j++){inputs[0]=31+j;render();}
     await(50,0);
+    version=node.worker->slots[node.active].version;
+    inputs[0]=1;inputs[1]=inputs[2]=440;await(1,version);
+    assert(period[0]>.00227f&&period[0]<.00228f);
     SineCloudNode replacement;replacement.settings=node.settings;replacement.prepare(48000,256);
     auto* engine=node.worker.get();rendering=true;replacement.adoptState(node);rendering=false;
     assert(replacement.worker.get()==engine&&replacement.active>=0);

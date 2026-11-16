@@ -69,7 +69,7 @@ struct SineCloudNode:NodeProcessor {
                 if(fade>=fadeLength){if(previous>=0)worker->slots[previous].state.store(SineCloudWorker::free);previous=-1;fading=false;}
             }
             c.output[i]=value;if(countOut)countOut[i]=active>=0?float(worker->slots[active].table.count):0.f;
-            if(periodOut)periodOut[i]=active>=0?float(worker->slots[active].table.samples.size()/sampleRate):0.f;
+            if(periodOut)periodOut[i]=active>=0?float(worker->slots[active].table.periodSeconds):0.f;
         }
     }
 };

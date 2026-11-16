@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Correct Sine Cloud Period to report the common waveform period of its active
+  tones instead of the stored table duration; single tones report 1 / actual Hz.
+
 - Render eligible Instance Bakes in one synthesis loop: share matching input/math/
   unit calculations across partials and avoid per-instance audio modulation buffers.
   Preserve independent phases, control-rate semantics and native fallback state.

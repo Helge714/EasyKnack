@@ -21,7 +21,7 @@ Erzeugt einen Forschungsstimulus aus bis zu zehn Millionen gleich lauten, gleich
 | --- | --- | --- | --- | --- |
 | Audioausgang (Audio Out) | [Audio](../../user/de/data-types.md#audio) | ±1 | [Audio](../../user/de/rates.md#audio) | [Auto](../../user/de/data-types.md#channels) |
 | Tatsächliche Anzahl (Actual count) | [Wert](../../user/de/data-types.md#value) | 0–10.000.000 | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
-| Periodenlänge (Period) | [Wert](../../user/de/data-types.md#value) | 0 oder N / Samplerate | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
+| Periodenlänge (Period) | [Wert](../../user/de/data-types.md#value) | 0 oder N / (Samplerate × Bin-ggT) | [Control](../../user/de/rates.md#control) | [Auto](../../user/de/data-types.md#channels) |
 
 ## Verhalten
 
@@ -31,7 +31,7 @@ Bei ausgeschalteter Gaußverteilung werden die Frequenzen möglichst gleichmäß
 
 Bei zu wenigen Rasterplätzen sinkt die tatsächliche Anzahl. Actual count meldet die Anzahl der neu aktiven Tabelle, anfangs 0. Bei 48 kHz ermöglicht 20–20.000 Hz zehn Millionen unterschiedliche Sinusse in beiden Verteilungen. Gleichmäßig benötigt diese Einstellung 33.554.432 Samples, Gauß 67.108.864. Eine enge Bandbreite kann diese Anzahl unterschreiten. Die längste Tabelle wiederholt sich bei 48 kHz nach etwa 1.398,1 Sekunden (23,3 Minuten).
 
-Periodenlänge gibt die aktive Tabellenschleife N / Samplerate in Sekunden aus; im Einheitenmenü sind auch Millisekunden und Samples verfügbar. Vor der ersten verfügbaren Tabelle ist der Wert 0. Während eine neue Tabelle berechnet wird, gilt die alte Länge; beim Beginn der Überblendung die neue. Dies ist die vollständige gespeicherte Schleifenlänge, nicht zwingend die kürzeste mathematische Periode einer besonderen Tonkombination.
+Periodenlänge gibt die kürzeste gemeinsame Wellenformperiode der aktiven Töne in Sekunden aus: N / (Samplerate × größter gemeinsamer Teiler der belegten Bin-Indizes). Bei einem Ton ist das 1 / seine tatsächliche, auf das Raster gerundete Frequenz; bei teilerfremden Bin-Indizes entspricht es der vollständigen Tabellendauer. Zufallsphasen ändern diese Periode nicht. Die Wellenformperiode kann eine nicht ganzzahlige Sampleanzahl umfassen; die gespeicherte Samplefolge wird weiterhin nach N Samples geloopt. Im Einheitenmenü sind auch Millisekunden und Samples verfügbar. Vor der ersten verfügbaren Tabelle ist der Wert 0. Während eine neue Tabelle berechnet wird, gilt die alte Periode; beim Beginn der Überblendung die neue.
 
 Eingänge werden am Anfang jedes Verarbeitungsaufrufs ausgewertet. Änderungen erzeugen im Hintergrund eine neue Tabelle; schnelle Änderungen werden zusammengefasst. Bis zur Fertigstellung läuft die alte Tabelle weiter, beim ersten Start herrscht Stille. Der Wechsel startet die neue Tabelle an ihrem Anfang und blendet 20 ms lang linear über. Währenddessen gelten gleiche Einzelamplituden nur innerhalb der jeweiligen Tabelle. Falls eine Erzeugung scheitert, bleibt die bisherige Tabelle aktiv. Die Erstellung kostet Rechenzeit und temporären Speicher: Die größte Tabelle benötigt 256 MiB, der komplexe IFFT-Arbeitsspeicher zusätzlich 1 GiB. Pro Node werden höchstens drei Tabellen gehalten.
 

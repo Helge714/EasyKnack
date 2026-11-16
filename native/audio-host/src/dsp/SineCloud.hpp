@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstdint>
+#include <numeric>
 
 namespace easyknack {
 /** Bounded, periodic research stimulus. No dependency on the streaming FFT limits. */
@@ -23,6 +24,7 @@ struct SineCloudTable {
     std::vector<float> samples;
     unsigned count=0;
     std::size_t first=0,last=0;
+    double periodSeconds=0;
     static std::uint64_t random(std::uint64_t& state){
         auto x=(state+=0x9e3779b97f4a7c15ULL);x=(x^(x>>30))*0xbf58476d1ce4e5b9ULL;
         x=(x^(x>>27))*0x94d049bb133111ebULL;return x^(x>>31);
@@ -70,13 +72,16 @@ struct SineCloudTable {
         auto layout=plan(p,rate);auto size=layout.size;first=layout.first;last=layout.last;count=layout.count;
         std::vector<std::complex<double>> bins(size);
         std::uint64_t rng=p.seed;
+        std::size_t fundamental=0;
         constexpr double tau=6.283185307179586476925286766559;
         for(unsigned j=0;j<count;j++){
             auto bin=count==1?first:first+(std::uint64_t(j)*(last-first)+(count-1)/2)/(count-1);
             if(p.gaussian&&count>1)bin=first+std::size_t(std::llround((last-first)*gaussianPosition(double(j)/(count-1))));
+            fundamental=std::gcd(fundamental,bin);
             double phase=p.randomPhases?(random(rng)>>11)*0x1.0p-53*tau:-tau/4; // IFFT cosine phase -> sine phase zero.
             bins[bin]=std::polar(1.,phase);bins[size-bin]=std::conj(bins[bin]);
         }
+        periodSeconds=double(size)/(rate*fundamental);
         spectrumTransform(bins.data(),size,true);
         double peak=0;for(const auto& x:bins)peak=std::max(peak,std::abs(x.real()));
         samples.resize(size);
