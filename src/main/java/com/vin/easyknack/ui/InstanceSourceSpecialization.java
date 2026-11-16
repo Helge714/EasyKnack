@@ -34,8 +34,8 @@ final class InstanceSourceSpecialization {
         s.append("struct ").append(name).append(":MultipleGraphNode {\n");
         if(kernel!=null){
             s.append("    CompiledInstanceAudio audioKernel;\n    std::shared_ptr<CompiledScalarMemo> scalarMemo=std::make_shared<CompiledScalarMemo>();\n    struct CompiledInstance final:Instance {\n    std::shared_ptr<CompiledScalarMemo> memo;\n").append(kernel)
-                .append("    void prepare(double rate,std::size_t frames)override{Instance::prepare(rate,frames);scalarCacheValid=false;}\n")
-                .append("    void adoptState(NodeProcessor& p)noexcept override{Instance::adoptState(p);scalarCacheValid=false;}\n    };\n")
+                .append("    void prepare(double rate,std::size_t frames)override{Instance::prepare(rate,frames);scalarCacheValid=false;invalidateDirect();}\n")
+                .append("    void adoptState(NodeProcessor& p)noexcept override{Instance::adoptState(p);scalarCacheValid=false;invalidateDirect();}\n    };\n")
                 .append("    void prepare(double rate,std::size_t frames)override{MultipleGraphNode::prepare(rate,frames);audioKernel.invalidate();}\n")
                 .append("    std::unique_ptr<Instance> createInstance()override{auto instance=std::make_unique<CompiledInstance>();instance->memo=scalarMemo;return instance;}\n");
         }
@@ -56,7 +56,7 @@ final class InstanceSourceSpecialization {
         }
         s.append("        auto inner=c;inner.inputs=left.data();inner.rightInputs=right.data();inner.sourceRates=rates.data();inner.inputCount=").append(slots.size()).append(";inner.controls=nullptr;\n")
             .append(kernel==null?"":"        if(audioKernel.process<CompiledInstance>(*this,inner))return;\n")
-            .append(kernel==null?"":"        if(inner.channelIndex==0){audioKernel.invalidate();for(auto& instance:state->instances)static_cast<CompiledInstance&>(*instance).scalarCacheValid=false;}\n")
+            .append(kernel==null?"":"        if(inner.channelIndex==0){audioKernel.invalidate();for(auto& instance:state->instances){auto& compiled=static_cast<CompiledInstance&>(*instance);compiled.scalarCacheValid=false;compiled.invalidateDirect();}}\n")
             .append("        processInstances<").append(kernel==null?"Instance":"CompiledInstance").append(">(inner);\n    }\n};\n")
             .append("EASYKNACK_NODE(").append(name).append(',').append(quote(processor)).append(")\n}\n");
         return new Emission(s.toString(),kernel!=null);
@@ -158,17 +158,13 @@ final class InstanceSourceSpecialization {
                 }
             }
             for(int ref:stores)body.append("        g.nodes[").append(ref%256).append("].voice(0).channelCache[0].outputs[").append(ref/256).append("][0]=").append(variable(ref)).append(";\n");
-            return (mixed==null?"":mixed)+"    bool scalarCacheValid=false;std::array<double,"+keys.size()+"> scalarKeys{};\n"
+            return (mixed==null?"":directKernel(ops,scalarOrder)+mixed)+"    bool scalarCacheValid=false;std::array<double,"+keys.size()+"> scalarKeys{};\n"
                 +"    void renderScalars(int frames)noexcept{auto& g=runtime->graph;\n"+guard
                 +"        const std::array<double,"+keys.size()+"> keys{"+String.join(",",keys)+"};\n"
                 +"        if(!scalarCacheValid||keys!=scalarKeys){scalarKeys=keys;scalarCacheValid=true;\n"+body+"        }\n"+audioBody+"    }\n";
         }catch(IllegalArgumentException|NoSuchElementException e){return null;}
     }
-    /** Fuse only pure numeric audio dependencies; control/stateful work keeps its native processor. */
-    private static String mixedKernel(List<Operation> ops,List<Integer> order){
-        if(order.stream().anyMatch(i->!Set.of("multipleinput","instancecontext","math","unitconvert","formula").contains(ops.get(i).type)))return null;
-        var s=new StringBuilder("    void renderMixed(int frames)noexcept{auto& g=runtime->graph;\n");
-        String fallback="{Instance::renderScalars(frames);return;}\n";
+    private static void appendPureGuards(StringBuilder s,List<Operation> ops,List<Integer> order,String fallback){
         for(int i:order){var op=ops.get(i);String p="m"+i;
             if(op.type.equals("formula"))s.append("        const auto& ").append(p).append("=static_cast<const FormulaNode&>(*g.nodes[").append(i).append("].processor);if(!g.nodes[").append(i).append("].controlRate||").append(p).append(".sampleContext||").append(p).append(".bufferInputs||").append(p).append(".triggerInputs||").append(p).append(".triggerOutputs)").append(fallback);
             if(op.type.equals("instancecontext"))s.append("        if(!g.nodes[").append(i).append("].controlRate)").append(fallback);
@@ -178,6 +174,13 @@ final class InstanceSourceSpecialization {
             }
             for(int ref:op.sources)if(ref>=0)s.append("        if(g.nodes[").append(i).append("].controlRate&&g.nodes[").append(ref%256).append("].outputRate(").append(ref/256).append(")!='c')").append(fallback);
         }
+    }
+    /** Fuse only pure numeric audio dependencies; control/stateful work keeps its native processor. */
+    private static String mixedKernel(List<Operation> ops,List<Integer> order){
+        if(order.stream().anyMatch(i->!Set.of("multipleinput","instancecontext","math","unitconvert","formula").contains(ops.get(i).type)))return null;
+        var s=new StringBuilder("    void renderMixed(int frames)noexcept{auto& g=runtime->graph;\n");
+        String fallback="{Instance::renderScalars(frames);return;}\n";
+        appendPureGuards(s,ops,order,fallback);
         for(int i:order)s.append("        if(g.nodes[").append(i).append("].controlRate)renderUpstream(").append(i).append(",frames,[](NodeProcessor& p,ProcessContext& c){p.process(c);});\n");
         var refs=new LinkedHashSet<Integer>();for(int i:order)for(int ref:ops.get(i).sources)if(ref>=0)refs.add(ref);
         for(int ref:refs)s.append("        const auto* v").append(ref).append("=g.nodes[").append(ref%256).append("].voice(0).channelCache[0].outputs[").append(ref/256).append("].data();const auto stride").append(ref).append("=g.nodes[").append(ref%256).append("].outputRate(").append(ref/256).append(")=='c'?0u:1u;\n");
@@ -192,6 +195,59 @@ final class InstanceSourceSpecialization {
         }
         return s.append("        }\n    }\n").toString();
     }
+    /** Compile the modulation DAG into the oscillator loop, sharing its invariant
+     * prefix across instances only when their complete external input views match. */
+    private static String directKernel(List<Operation> ops,List<Integer> order){
+        var shared=new HashSet<Integer>();
+        for(int i:order){var op=ops.get(i);if(op.type.equals("multipleinput")||Set.of("math","unitconvert").contains(op.type)&&op.sources.stream().allMatch(r->r<0||shared.contains(r%256)))shared.add(i);}
+        var refs=new LinkedHashMap<Integer,Integer>();
+        for(int i:order){refs.putIfAbsent(i,refs.size());for(int ref:ops.get(i).sources)if(ref>=0)refs.putIfAbsent(ref,refs.size());}
+        var osc=ops.stream().filter(op->op.type.equals("osc")).findFirst().orElseThrow();
+        for(String port:List.of("frequency","phase")){int ref=osc.source(port);if(ref>=0)refs.putIfAbsent(ref,refs.size());}
+        var keys=new ArrayList<String>();keys.add("g.preparedSampleRate");keys.add("double(frames)");
+        for(int i:order){var op=ops.get(i);keys.add("double(directAudio["+i+"])");
+            if(op.type.equals("multipleinput"))keys.add("directAudio["+i+"]?0.:double(directInput"+i+"[0])");
+            if(op.type.equals("instancecontext"))for(String field:List.of("index","count"))keys.add("double(static_cast<const InstanceContextNode&>(*g.nodes["+i+"].processor)."+field+")");
+            if(op.type.equals("formula")){for(int p=0;p<FormulaNode.INPUTS;p++)keys.add("double(m"+i+".fallback["+p+"])");keys.add("double(m"+i+".seed>>32)");keys.add("double(m"+i+".seed&0xffffffffULL)");}
+        }
+        var s=new StringBuilder("    std::array<bool,"+ops.size()+"> directAudio{};std::array<float,"+refs.size()+"> directControl{};double directRate=0;\n"
+            +"    bool directControlValid=false;std::array<double,"+keys.size()+"> directKeys{};\n    void invalidateDirect()noexcept{directControlValid=false;}\n");
+        for(int i:order)if(ops.get(i).type.equals("multipleinput"))s.append("    ProcessContext::NumericInput directInput").append(i).append("{nullptr,0,0};\n");
+        s.append("    bool prepareDirect(int frames)noexcept{auto& g=runtime->graph;const bool previousValid=directControlValid;directControlValid=false;\n");
+        appendPureGuards(s,ops,order,"{return false;}\n");
+        for(String port:List.of("frequency","phase")){int ref=osc.source(port),slot=port.equals("frequency")?0:2;
+            if(ref>=0)s.append("        if(g.nodes[").append(ops.indexOf(osc)).append("].inputRates[").append(slot).append("]=='c'&&g.nodes[").append(ref%256).append("].outputRate(").append(ref/256).append(")!='c')return false;\n");
+        }
+        s.append("        bool allControl=true;directRate=g.preparedSampleRate;\n");
+        for(int i:order)s.append("        directAudio[").append(i).append("]=!g.nodes[").append(i).append("].controlRate;allControl&=!directAudio[").append(i).append("];\n");
+        s.append("        if(allControl)return false;scalarCacheValid=false;\n");
+        for(int i:order){var op=ops.get(i);if(op.type.equals("multipleinput"))s.append("        const auto& b").append(i).append("=static_cast<const BakedInput&>(*g.nodes[").append(i).append("].processor);directInput").append(i).append("=b").append(i).append(".external?b").append(i).append(".external->numericInput(").append(op.value("slot")).append(",b").append(i).append(".fallback):ProcessContext{}.numericInput(0,b").append(i).append(".fallback);\n");}
+        s.append("        const std::array<double,").append(keys.size()).append("> keys{").append(String.join(",",keys)).append("};if(!previousValid||keys!=directKeys){\n");
+        for(int i:order)s.append("        if(!directAudio[").append(i).append("])renderUpstream(").append(i).append(",frames,[](NodeProcessor& p,ProcessContext& c){p.process(c);});\n");
+        for(var ref:refs.entrySet())s.append("        if(!directAudio[").append(ref.getKey()%256).append("])directControl[").append(ref.getValue()).append("]=g.nodes[").append(ref.getKey()%256).append("].voice(0).channelCache[0].outputs[").append(ref.getKey()/256).append("][0];\n");
+        s.append("        directKeys=keys;}directControlValid=true;return true;\n    }\n    bool directInputsMatch(const CompiledInstance& other)const noexcept{return directRate==other.directRate");
+        for(int i:order)if(ops.get(i).type.equals("multipleinput"))for(String field:List.of("data","stride","fallback"))s.append("&&directInput").append(i).append('.').append(field).append("==other.directInput").append(i).append('.').append(field);
+        s.append(";}\n    bool directFrequencyIsAudio()const noexcept{return ").append(osc.source("frequency")<0?"false":"directAudio["+(osc.source("frequency")%256)+"]").append(";}\n");
+        s.append("    bool sharedDirectPhase()const noexcept{return ").append(osc.source("phase")>=0&&shared.contains(osc.source("phase")%256)?"true":"false").append(";}\n");
+        s.append("    void renderShared(std::size_t sample,float* shared)const noexcept{\n");
+        for(int i:order)if(shared.contains(i))s.append("        shared[").append(i).append("]=directAudio[").append(i).append("]?").append(directExpression(ops.get(i),i,shared)).append(":directControl[").append(refs.get(i)).append("];\n");
+        s.append("    }\n    void directModulation(std::size_t sample,const float* shared,float& frequency,double& phase)const noexcept{\n");
+        for(int i:order)if(!shared.contains(i))for(var ref:refs.entrySet())if(ref.getKey()%256==i){
+            String value="directControl["+ref.getValue()+"]";
+            if(ref.getKey()/256==0&&Set.of("math","unitconvert").contains(ops.get(i).type))value="directAudio["+i+"]?"+directExpression(ops.get(i),i,shared)+":"+value;
+            s.append("        const float v").append(ref.getKey()).append('=').append(value).append(";\n");
+        }
+        s.append("        frequency=").append(osc.source("frequency")>=0?directReference(osc.source("frequency"),shared):"static_cast<const OscillatorNode&>(*runtime->graph.nodes[reductionOsc].processor).frequency").append(";\n");
+        s.append("        phase=").append(osc.source("phase")>=0?directReference(osc.source("phase"),shared):"static_cast<const OscillatorNode&>(*runtime->graph.nodes[reductionOsc].processor).phaseOffset").append(";\n    }\n");
+        return s.toString();
+    }
+    private static String directReference(int ref,Set<Integer> shared){return shared.contains(ref%256)?"shared["+(ref%256)+"]":"v"+ref;}
+    private static String directInput(Operation op,String port,Set<Integer> shared){int ref=op.source(port);return ref<0?number(op.value(port)):directReference(ref,shared);}
+    private static String directExpression(Operation op,int index,Set<Integer> shared){return switch(op.type){
+        case "multipleinput"->"directInput"+index+"[sample]";
+        case "math"->"MathNode::evaluate("+directInput(op,"a",shared)+","+directInput(op,"b",shared)+",MathOperation::"+identifier(op.value("operation"))+","+(op.value("clamp").equals("1")?"true":"false")+")";
+        case "unitconvert"->"UnitConverterNode::evaluate("+directInput(op,"value",shared)+",UnitFormat::"+identifier(op.value("from"))+",UnitFormat::"+identifier(op.value("to"))+",directRate)";
+        default->throw new IllegalArgumentException("Unsupported direct operation");};}
     private static String mixedInput(Operation op,String port){int ref=op.source(port);return ref<0?number(op.value(port)):"v"+ref+"[sample*stride"+ref+"]";}
     private static void visit(int i,List<Operation> ops,Set<Integer> done,Set<Integer> visiting,List<Integer> order){
         if(done.contains(i))return;if(!visiting.add(i))throw new IllegalArgumentException(com.vin.easyknack.i18n.AppText.literal("Feedback"));

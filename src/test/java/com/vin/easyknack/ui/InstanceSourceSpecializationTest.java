@@ -112,7 +112,7 @@ class InstanceSourceSpecializationTest {
     @ParameterizedTest @ValueSource(ints={0,1,2}) @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void generatedKernelPreservesRatesChannelsDefaultsAndState(int variant)throws Exception{
         var f=variant==4?phaseFixture():variant==3?formulaFixture():variant>0?noiseFixture(variant==2):fixture();var export=GroupSourceExporter.create(f.document(),f.instance());var definition=export.definition();
-        if(variant==4)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("void renderMixed("));
+        if(variant==4){var source=export.files().get("native/"+export.className()+".hpp");assertTrue(source.contains("void renderShared("));assertTrue(source.contains("bool prepareDirect("));}
         if(variant==1||variant==2)assertTrue(export.files().get("native/"+export.className()+".hpp").contains("DigitalNoiseNode::process(c)"));
         var originalRegistry=new GLCompositeGraphRegistry();originalRegistry.registerDocument(f.document());
         var registry=GroupCompiler.prepare(f.document().root(),originalRegistry).registry();
@@ -132,6 +132,7 @@ class InstanceSourceSpecializationTest {
             using namespace easyknack;
             using Compiled=%s;
             constexpr bool expectScalarCache=%s;
+            constexpr bool expectDirect=%s;
             int main(){
                 MultipleGraphNode live,reference;Compiled baked;
                 std::istringstream l(%s),b(%s);live.configure(l);baked.configure(b);
@@ -157,7 +158,7 @@ class InstanceSourceSpecializationTest {
                     rates[1]=reorderedRates[0]=block>=60&&block<80?'a':'c';
                     a.rightInputs=block>=80&&block<100?inputRight:nullptr;
                     c.rightInputs=block>=80&&block<100?reorderedRight:nullptr;
-                    rates[2]=reorderedRates[2]=block>=60&&block<80?'a':'c';
+                    rates[2]=reorderedRates[2]=(block>=30&&block<35)||(block>=60&&block<80)?'a':'c';
                     for(int i=0;i<256;i++){frequency[i]=220+block+(rates[1]=='a'?i*.1f:0);right[i]=frequency[i]+90;phase[i]=block+(rates[2]=='a'?i*.2f:0);}
                     // Simulate inherited, not-yet-settled internal manual values.
                     if(block==110)for(MultipleGraphNode* group:{&live,&reference,static_cast<MultipleGraphNode*>(&baked)})
@@ -190,12 +191,32 @@ class InstanceSourceSpecializationTest {
                 live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
                 if(expectScalarCache)for(auto entry:formulas)assert(entry.first->position==entry.second); // Only the all-control fixture promises scalar caching.
                 rates[1]=rates[2]='a';for(int i=0;i<256;i++){frequency[i]=440+i*.05f;phase[i]=i*.7f;}
+                auto& first=*replacement.state->instances[0];auto& runtime=first.runtime->graph;
+                int frequencySource=runtime.nodes[first.reductionOsc].processor->sources[0];
+                if(expectDirect)runtime.nodes[frequencySource%%256].voice(0).channelCache[0].outputs[frequencySource/256][1]=12345.f;
                 live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
+                assert(probe.direct[0]==expectDirect);
+                if(expectDirect)assert(static_cast<Compiled::CompiledInstance&>(*replacement.state->instances[0]).directInputsMatch(static_cast<Compiled::CompiledInstance&>(*replacement.state->instances[1])));
+                if(expectDirect)assert(runtime.nodes[frequencySource%%256].voice(0).channelCache[0].outputs[frequencySource/256][1]==12345.f); // No per-instance modulation buffer render.
                 for(int i=0;i<256;i++)assert(std::abs(x[i]-y[i])<3e-6f);
+                if(expectDirect){
+                    formulas.clear();for(auto& instance:replacement.state->instances)for(auto& node:instance->runtime->graph.nodes)
+                        if(auto* formula=dynamic_cast<FormulaNode*>(node.processor.get()))formulas.emplace_back(formula,formula->position);
+                    for(auto& value:frequency)value+=7;
+                    live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
+                    for(auto entry:formulas)assert(entry.first->position==entry.second); // Audio modulation does not invalidate invariant control formulas.
+                    for(int i=0;i<256;i++)assert(std::abs(x[i]-y[i])<3e-6f);
+                }
                 auto samplewise=direct;samplewise.samplewise=true;samplewise.bufferSize=1;
                 assert(!probe.process<Compiled::CompiledInstance>(replacement,samplewise));
                 direct.rightInputs=inputRight;
                 assert(!probe.process<Compiled::CompiledInstance>(replacement,direct));
+                // A forced control-rate oscillator input must still downsample its
+                // audio source, including when returning from the direct loop.
+                for(MultipleGraphNode* group:{&live,static_cast<MultipleGraphNode*>(&replacement)})for(auto& instance:group->state->instances)
+                    instance->runtime->graph.nodes[instance->reductionOsc].inputRates[0]='c';
+                direct.rightInputs=nullptr;probe.invalidate();live.process(a);assert(probe.process<Compiled::CompiledInstance>(replacement,direct));
+                assert(!probe.direct[0]);for(int i=0;i<256;i++)assert(std::abs(x[i]-y[i])<3e-6f);
                 // Real scheduler shape: the unwired Count editor is supplied by
                 // ControlInterpolation, while the raw right input remains null.
                 Compiled manualBake;std::istringstream manualParameters(%s);manualBake.configure(manualParameters);manualBake.prepare(48000,256);
@@ -204,7 +225,7 @@ class InstanceSourceSpecializationTest {
                 ProcessContext manual{manualInputs,3,y.data(),256,48000,silence.data(),256};manual.sourceRates="aca";manual.rightInputs=manualInputs;manual.controls=&editor;
                 manualBake.process(manual);assert(manualBake.audioKernel.plannedState);
             }
-            """.formatted(export.className(),export.className(),variant!=4,quote(live),quote(compiled),quote(compiled),quote(compiled),quote(compiled));
+            """.formatted(export.className(),export.className(),variant!=4,variant!=1&&variant!=2,quote(live),quote(compiled),quote(compiled),quote(compiled),quote(compiled));
         var source=dir.resolve("test.cpp");Files.writeString(source,code);RateConverterTest.compileAndRun(source,dir.resolve("test.exe"),dir);
     }
 }

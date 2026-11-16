@@ -21,6 +21,8 @@ Runs an internal graph for multiple independent instances.
 
 ## Behavior
 
+For eligible oscillator groups, Bake evaluates the instance-independent frequency/phase modulation prefix once per sample. Partials then render in one shared loop without per-instance audio modulation buffers. Invariant partial weights stay cached during audio-rate modulation. Individual phases are retained; differing inputs or unsupported states continue to use the general executor.
+
 Bake can fuse pure audio-rate math for frequency/phase modulation and unit conversion. Stateful modulators retain their normal DSP execution.
 
 Optimized oscillator summation also supports audio-rate frequency and phase modulation with scalar instance weights. Distinct left/right input signals and sample feedback continue to use the general executor.

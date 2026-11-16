@@ -163,6 +163,13 @@ struct MultipleGraphNode : NodeProcessor {
         void renderScalars(int frames)noexcept{
             for(int index:scalarPlan)renderUpstream(index,frames,[](NodeProcessor& p,ProcessContext& c){p.process(c);});
         }
+        bool prepareDirect(int)noexcept{return false;}
+        void invalidateDirect()noexcept{}
+        bool directInputsMatch(const Instance&)const noexcept{return false;}
+        bool directFrequencyIsAudio()const noexcept{return false;}
+        bool sharedDirectPhase()const noexcept{return false;}
+        void renderShared(std::size_t,float*)const noexcept{}
+        void directModulation(std::size_t,const float*,float&,double&)const noexcept{}
         void configure(std::istream&)override{throw std::runtime_error("Use configureGraph for a Multiple Group instance");}
         void renderGraph(int frames,AudioIO* io,MidiSource* midi)noexcept override{renderFeedbackGraph(frames,io,midi);}
         char resolveAutoRate(const char* rates,std::size_t count)noexcept override{

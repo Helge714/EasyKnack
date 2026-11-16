@@ -20,6 +20,9 @@ struct CompiledInstanceAudio {
     std::array<const float*,256> frequencies{};
     std::array<const float*,256> phaseInputs{};
     std::array<double,256> phaseOffsets{};
+    std::array<bool,256> direct{};
+    std::array<bool,256> directAudioFrequency{};
+    std::array<float,256> sharedValues{};
     std::array<OscillatorNode*,256> oscillators{};
     const MultipleGraphNode::State* plannedState=nullptr;
     int plannedActive=-1;unsigned plannedMask=0,plannedRates=0;double plannedRate=0;
@@ -57,37 +60,51 @@ struct CompiledInstanceAudio {
         if(!state.initialized){for(int i=0;i<owner.maximum;i++)state.gains[i]=i<active?1.f:0.f;state.initialized=true;}
         float denominator=0;
         bool weighted=false;
+        bool shareDirect=active>0;
         if(active)weighted=static_cast<InstanceCombineNode&>(*state.instances[0]->runtime->graph.nodes[state.instances[0]->runtime->outputs[0]].processor).mode=="weighted";
         for(int i=0;i<active;i++){
             auto& instance=static_cast<Instance&>(*state.instances[i]);
             for(auto* context:instance.contexts)context->count=active;
             for(int input:instance.runtime->inputs){auto& n=instance.runtime->graph.nodes[input];static_cast<BakedInput&>(*n.processor).external=&c;static_cast<BakedInput&>(*n.rightProcessor).external=&c;}
-            instance.renderScalars(int(frames));
+            direct[i]=instance.prepareDirect(int(frames));
+            directAudioFrequency[i]=direct[i]&&instance.directFrequencyIsAudio();
+            if(!direct[i]){shareDirect=false;instance.renderScalars(int(frames));}
+            else if(i&&(!direct[0]||!instance.directInputsMatch(static_cast<Instance&>(*state.instances[0]))))shareDirect=false;
             auto& osc=static_cast<OscillatorNode&>(*instance.runtime->graph.nodes[instance.reductionOsc].processor);
             auto& combine=static_cast<InstanceCombineNode&>(*instance.runtime->graph.nodes[instance.runtime->outputs[0]].processor);
             float weight=instance.scalar(combine.sources[1],combine.weight);
             weights[i]=std::isfinite(weight)?std::max(0.f,weight):0.f;
             denominator+=weighted?weights[i]:1.f;
-            auto kernel=osc.prepareSample(instance.scalar(osc.sources[0],osc.frequency),c.sampleRate);
+            auto kernel=osc.prepareSample(directAudioFrequency[i]?0.f:instance.scalar(osc.sources[0],osc.frequency),c.sampleRate);
             if(osc.reset.take())osc.resetPhase();
             phases[i]=osc.phase/OscillatorNode::tau;increments[i]=kernel.increment;
             tables[i]=osc.tables->waves[osc.waveform][kernel.level].data();oscillators[i]=&osc;
-            frequencies[i]=instance.audioFrequency();
-            phaseInputs[i]=instance.audioOscillatorInput(2);
-            phaseOffsets[i]=osc.sources.size()>2&&osc.sources[2]>=0?instance.scalar(osc.sources[2],0):osc.phaseOffset;
+            frequencies[i]=direct[i]?nullptr:instance.audioFrequency();
+            phaseInputs[i]=direct[i]?nullptr:instance.audioOscillatorInput(2);
+            phaseOffsets[i]=direct[i]?0:osc.sources.size()>2&&osc.sources[2]>=0?instance.scalar(osc.sources[2],0):osc.phaseOffset;
         }
         bool mean=owner.mean;
         if(owner.explicitCombines)mean=static_cast<InstanceCombineNode&>(*state.instances[0]->runtime->graph.nodes[state.instances[0]->runtime->outputs[0]].processor).mode=="mean";
+        const bool sharePhase=shareDirect&&static_cast<Instance&>(*state.instances[0]).sharedDirectPhase();
         // One local accumulation and one output write per sample. No per-partial
         // left/right buffers or samplewise denominator accumulation.
         for(std::size_t sample=0;sample<frames;sample++){
             float sum=0;
+            float firstFrequency=0;double commonPhase=0,commonTurns=0;
+            if(shareDirect){auto& first=static_cast<Instance&>(*state.instances[0]);first.renderShared(sample,sharedValues.data());
+                if(sharePhase){first.directModulation(sample,sharedValues.data(),firstFrequency,commonPhase);commonTurns=OscillatorNode::clean(commonPhase)/360.;}}
             for(int i=0;i<active;i++){
-                if(frequencies[i]){
-                    const auto kernel=oscillators[i]->prepareSample(frequencies[i][sample],c.sampleRate);
+                float frequency=0;double offset=phaseInputs[i]?phaseInputs[i][sample]:phaseOffsets[i];
+                if(direct[i]){auto& instance=static_cast<Instance&>(*state.instances[i]);
+                    if(!shareDirect)instance.renderShared(sample,sharedValues.data());
+                    if(i==0&&sharePhase){frequency=firstFrequency;offset=commonPhase;}
+                    else instance.directModulation(sample,sharedValues.data(),frequency,offset);
+                }
+                if(directAudioFrequency[i]||(!direct[i]&&frequencies[i])){
+                    const auto kernel=oscillators[i]->prepareSample(direct[i]?frequency:frequencies[i][sample],c.sampleRate);
                     increments[i]=kernel.increment;tables[i]=oscillators[i]->tables->waves[oscillators[i]->waveform][kernel.level].data();
                 }
-                if(weights[i]!=0){const auto offset=phaseInputs[i]?phaseInputs[i][sample]:phaseOffsets[i];sum+=static_cast<float>(OscillatorNode::lookup(tables[i],OscillatorNode::tableSize,offset==0?phases[i]:OscillatorNode::wrap(phases[i]+OscillatorNode::clean(offset)/360.)))*weights[i];}
+                if(weights[i]!=0){const double turns=sharePhase?commonTurns:OscillatorNode::clean(offset)/360.;sum+=static_cast<float>(OscillatorNode::lookup(tables[i],OscillatorNode::tableSize,turns==0?phases[i]:OscillatorNode::wrap(phases[i]+turns)))*weights[i];}
                 phases[i]=OscillatorNode::wrap(phases[i]+increments[i]);
             }
             state.left[0][sample]=(weighted||mean)?(denominator>0?sum/denominator:0):sum;

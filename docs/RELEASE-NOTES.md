@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.3.0
 
+- Render eligible Instance Bakes in one synthesis loop: share matching input/math/
+  unit calculations across partials and avoid per-instance audio modulation buffers.
+  Preserve independent phases, control-rate semantics and native fallback state.
+  Bake caches remain local; document formats are unchanged.
+
 - Keep unwired manual inputs mono in Instance Bakes and fuse supported pure
   audio-rate math/unit modulation while retaining native fallbacks for stateful DSP.
 

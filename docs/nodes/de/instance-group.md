@@ -21,6 +21,8 @@ Führt einen internen Graphen für mehrere unabhängige Instanzen aus.
 
 ## Verhalten
 
+Für geeignete Oszillatorgruppen berechnet Bake den instanzunabhängigen Teil der Frequenz-/Phasensteuerung einmal pro Sample. Die Teiltöne werden danach in einer gemeinsamen Schleife ohne eigene Audio-Steuerpuffer erzeugt. Konstante Teiltongewichte bleiben auch bei laufender Audio-Modulation zwischengespeichert. Individuelle Phasen bleiben erhalten; unterschiedliche Eingänge oder nicht unterstützte Zustände verwenden weiterhin die allgemeine Ausführung.
+
 Bake kann reine mathematische Frequenz-/Phasensteuerungen und Einheitenkonvertierungen bei Audio-Rate zusammenfassen. Zustandsbehaftete Modulatoren behalten ihre normale DSP-Ausführung.
 
 Die optimierte Oszillatorsummierung unterstützt auch laufende Frequenz- und Phasenmodulation bei skalaren Instanzgewichten. Unterschiedliche linke/rechte Eingangssignale und Sample-Feedback verwenden weiterhin die allgemeine Ausführung.
