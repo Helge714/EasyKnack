@@ -1,6 +1,7 @@
 # Shared EasyKnack colors, layered over the selected GLSwing preset.
 theme.type=colors
 
+@COLOR easyknack.accent.focus=#83B9AB
 @COLOR easyknack.node.title.text=#FFFFFF
 @COLOR easyknack.node.GENERATOR.title.light=#796298
 @COLOR easyknack.node.GENERATOR.title.dark=#51416A

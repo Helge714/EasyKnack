@@ -10,6 +10,19 @@ import com.vingame.glswing.ui.GLThemeLoader;
 
 class ApplicationThemeTest {
     @TempDir Path directory;
+    @Test void selectedColorsDoNotRequireTheSameKeyInTheFallback()throws Exception{
+        var file=directory.resolve("selected-only.gltheme");
+        Files.writeString(file,"theme.extends=default\n@COLOR easyknack.selected.only=#123456\n");
+        assertEquals(new Color(0x123456),ApplicationTheme.load(file).color("selected.only"));
+    }
+    @Test void bakeAccentResolvesForEveryBundledThemeAndLegacyCustomThemes()throws Exception{
+        for(var choice:BundledThemes.available()){
+            var theme=ApplicationTheme.loadSelection(choice.id());
+            assertEquals(theme.theme().values().getColor("easyknack.accent.focus"),theme.color("accent.focus"));
+        }
+        var legacy=directory.resolve("legacy.gltheme");Files.writeString(legacy,"theme.extends=default\n");
+        assertEquals(new Color(0x83B9AB),ApplicationTheme.load(legacy).color("accent.focus"));
+    }
     @Test void onlyFourSupportedThemesAreListedAndOldChoicesMigrate(){
         var choices=BundledThemes.available();
         assertEquals(java.util.List.of("EasyKnack Mint","EasyKnack Amber","EasyKnack Light Mint","EasyKnack Light Amber"),choices.stream().map(Object::toString).toList());

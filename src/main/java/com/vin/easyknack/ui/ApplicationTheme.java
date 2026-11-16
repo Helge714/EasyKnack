@@ -46,7 +46,8 @@ public final class ApplicationTheme {
     public GLTheme theme() { return theme; }
     public Color color(String key) {
         String fullKey = "easyknack." + key;
-        return theme.values().getColor(fullKey, defaults.values().getColor(fullKey));
+        var selected=theme.values().getColor(fullKey,null);
+        return selected!=null?selected:defaults.values().getColor(fullKey);
     }
     public TitleColors title(NodeKind category) {
         return new TitleColors(color("node." + category.name() + ".title.light"), color("node." + category.name() + ".title.dark"));

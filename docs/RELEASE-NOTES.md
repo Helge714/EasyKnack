@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Fix a rendering crash when the Bake progress bar reads the theme accent.
+  Resolve selected colors before consulting defaults; legacy themes retain a fallback.
+
 - Show theme-accent Bake progress through compilation, validation and activation,
   then hide the bar. Distinguish available oscillator optimization from a standard
   bake and explain fallback limits. Avoid redundant generated C++ compilation.
