@@ -17,6 +17,8 @@ Twelve short chapters cover operation and essential processing concepts. Detaile
 | 11. [MIDI and control](midi.md) |
 | 12. [Buffers and recording](buffers.md) |
 
+[Formula language reference](formula-language.md)
+
 [Node index](../../nodes/en/index.md) · [Deutsch](../de/index.md)
 
 <a id="documentation-language"></a>

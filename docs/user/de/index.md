@@ -17,6 +17,8 @@ Zwölf kurze Kapitel erklären die Bedienung und die wichtigsten Verarbeitungsko
 | 11. [MIDI und Steuerung](midi.md) |
 | 12. [Buffer und Aufnahme](buffers.md) |
 
+[Formula-Sprachreferenz](formula-language.md)
+
 [Node-Verzeichnis](../../nodes/de/index.md) · [English](../en/index.md)
 
 <a id="dokumentationssprache"></a>

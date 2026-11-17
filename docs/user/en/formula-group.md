@@ -17,7 +17,7 @@ phase += frequency / sampleRate;
 phase -= floor(phase);
 ```
 
-Auto, Audio or Control selects evaluation precision. The language supports numeric types, casts, if/else and the offered math functions, plus typed user functions and bounded for loops. Arbitrary C++ calls, pointers, recursion and while loops are unavailable. See the [node reference](../../nodes/en/formula-group.md#user-functions-and-bounded-loops) for syntax and limits. Completion and hover help show available functions and time/random context values. Digital Noise is an alternative for changing random control signals.
+Auto, Audio or Control selects evaluation rate. The separate [language reference](formula-language.md) explains syntax, state/final/const, types, functions, loops and Buffer access. Completion and hover help show available functions and context values. Digital Noise is an alternative for changing random control signals.
 
 Buffer inputs provide indexed reads and metadata; an audio input does not provide arbitrary past history. **Live** applies valid code after a short pause; otherwise use **Apply**. Invalid code shows diagnostics. Saving retains code and initial states, not running DSP state.
 

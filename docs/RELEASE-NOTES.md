@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Separate the bilingual Formula language reference from group controls, with
+  detailed state/final/const lifetimes and examples; built-in help opens it directly.
+
 - Add Formula final locals/parameters and input-independent const expressions,
   bold read-only names and italic state names. Ctrl+click built-ins opens their
   localized function reference. The new keywords final/const are reserved and
