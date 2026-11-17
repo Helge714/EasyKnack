@@ -111,8 +111,17 @@ public final class FormulaLanguage implements GLCodeLanguage {
             var symbols=index(d);var tokens=new ArrayList<GLCodeSemanticToken>();
             for(int i=0;i<symbols.tokens.size();i++){
                 var token=symbols.tokens.get(i);
-                if((symbols.functions.containsKey(token.text())||FormulaCompiler.FUNCTIONS.containsKey(token.text()))&&i+1<symbols.tokens.size()&&symbols.tokens.get(i+1).text().equals("("))
+                if((symbols.functions.containsKey(token.text())||FormulaCompiler.FUNCTIONS.containsKey(token.text()))&&i+1<symbols.tokens.size()&&symbols.tokens.get(i+1).text().equals("(")){
                     tokens.add(new GLCodeSemanticToken(token.start(),token.end(),"function",Set.of()));
+                    continue;
+                }
+                var symbol=symbols.symbol(token.text(),token.start()).orElse(null);
+                if(symbol!=null){
+                    boolean parameter=symbols.functions.values().stream().flatMap(f->f.parameters().stream()).anyMatch(p->p.start()==symbol.start());
+                    tokens.add(new GLCodeSemanticToken(token.start(),token.end(),parameter?"parameter":"variable",!parameter&&token.start()==symbol.start()?Set.of("declaration"):Set.of()));
+                }else for(var port:ports)if(port.name().equals(token.text())){
+                    tokens.add(new GLCodeSemanticToken(token.start(),token.end(),"variable",port.output()?Set.of():Set.of("readonly")));break;
+                }
             }
             return CompletableFuture.completedFuture(List.copyOf(tokens));
         }

@@ -16,7 +16,7 @@ class FormulaEditStateTest {
    var registry=new GLCompositeGraphRegistry();registry.registerAsset(invalid);var d=invalid.compositeDescriptor();
    var factory=new GroupViewFactory(registry,new GLNodeCatalog(),(id,key,value)->{},new GLHistoryManager(),()->{});
    var node=new GLGraphNode(GLNodeId.random(),d.nodeTypeId(),Map.of());var view=(GroupViewFactory.GroupView)factory.createNode(node,d.nodeType());
-   assertTrue(view.getTitle().contains("!"));registry.replaceAsset(accepted);view.refreshFormulaState();assertFalse(view.getTitle().contains("!"));
+   assertEquals("!",view.getTitleBadge());assertFalse(view.getTitle().contains("!"));registry.replaceAsset(accepted);view.refreshFormulaState();assertEquals("",view.getTitleBadge());
    assertTrue(FormulaGroups.editState(FormulaGroups.accept(pending,FormulaGroups.draft(pending))).applied());
   });
  }

@@ -134,7 +134,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
             if(!FormulaGroups.isFormula(formula))return;
             var edit=FormulaGroups.editState(formula);String warning=edit.valid()?"":AppText.text("formula.invalidDraft")+" — "+edit.error();
             if(Objects.equals(warning,formulaWarning))return;formulaWarning=warning;
-            setTitleSuffix(warning.isEmpty()?"":"  !");GLToolTipManager.leave(this);
+            setTitleBadge(warning.isEmpty()?"":"!",warning.isEmpty()?GLNodeConnectionStatus.NORMAL:GLNodeConnectionStatus.ERROR);GLToolTipManager.leave(this);
         }
 
         @Override public void mouseEntered(com.vingame.glswing.input.GLMouseEvent event){super.mouseEntered(event);if(!formulaWarning.isEmpty())GLToolTipManager.hover(this,event,formulaWarning,null);}

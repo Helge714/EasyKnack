@@ -15,6 +15,16 @@ class FormulaEditorHelpTest {
             assertTrue(tokens.stream().anyMatch(t->t.start()==text.lastIndexOf("shape")));
         }
     }
+    @Test void variablesParametersAndPortsReceiveSemanticColors(){
+        String text="float shape(float x){float amount=x*2;return amount;}float gain=1;result=shape(signal)*gain;";var d=doc(text);
+        try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){
+            var tokens=session.semanticTokens(d).toCompletableFuture().join();
+            assertTrue(tokens.stream().anyMatch(t->t.start()==text.indexOf("x)")&&t.type().equals("parameter")));
+            assertTrue(tokens.stream().anyMatch(t->t.start()==text.lastIndexOf("gain")&&t.type().equals("variable")));
+            assertTrue(tokens.stream().anyMatch(t->t.start()==text.indexOf("signal")&&t.modifiers().contains("readonly")));
+            assertTrue(tokens.stream().anyMatch(t->t.start()==text.indexOf("amount=")&&t.modifiers().contains("declaration")));
+        }
+    }
     @Test void userFunctionsParametersLoopsAndPersistentArgumentHints(){
         String source="float scale(float value,float factor){float local=value*factor;return local;} result=scale(signal, mix(1,2,0.5)); for(int i=0;i<3;i++){result+=i;}";
         assertTrue(complete(source,source.indexOf("return local")).stream().anyMatch(c->c.label().equals("factor")));

@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Keep Formula warnings red and right-aligned in a reserved title slot, visible
+  with long names; color variables, parameters and read-only inputs semantically.
+
 - Show Formula draft validity and applied state, mark invalid Formula nodes with !,
   color user/built-in functions semantically, and avoid completion on Backspace.
 

@@ -58,7 +58,7 @@ Opening Formula while background preparation is still running shows a loading me
 
 Completion appears while typing identifiers (or with Ctrl+Space). Hover, signature help and inline parameter labels describe built-in and user-defined functions. Enter and Format indent single-statement if/else bodies even without braces.
 
-The editor distinguishes Applied, Not applied yet and Invalid draft, separately from native optimization progress. An invalid draft keeps the last applied program running and shows ! on every Formula node using that asset, with the error available on hover. Built-in and user-defined function names use the theme's semantic function color. Backspace does not open completion.
+The editor distinguishes Applied, Not applied yet and Invalid draft, separately from native optimization progress. An invalid draft keeps the last applied program running and shows a red, right-aligned ! in a reserved title slot on every Formula node using that asset, with the error available on hover. Built-in and user-defined function names, variables, parameters and read-only input ports use the theme's corresponding semantic colors. Long titles are truncated before the warning badge, which remains visible. Backspace does not open completion.
 
 ### User functions and bounded loops
 
