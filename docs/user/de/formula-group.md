@@ -17,7 +17,7 @@ phase += frequency / sampleRate;
 phase -= floor(phase);
 ```
 
-Auto, Audio oder Control bestimmen die Auswertungsrate. Die Sprache unterstützt numerische Typen, Casts, if/else und die angebotenen Mathematikfunktionen, aber keine beliebigen C++-Aufrufe, Pointer oder eigenen Schleifen. Vervollständigung und Hover-Hilfe zeigen verfügbare Funktionen und Kontextwerte für Zeit und Zufall. Digital Noise ist eine Alternative für zeitlich wechselnde Zufallssteuerung.
+Auto, Audio oder Control bestimmen die Auswertungsrate. Die Sprache unterstützt numerische Typen, Casts, if/else und die angebotenen Mathematikfunktionen, sowie eigene typisierte Funktionen und begrenzte for-Schleifen. Beliebige C++-Aufrufe, Pointer, Rekursion und while-Schleifen sind nicht verfügbar. Syntax und Grenzen stehen in der [Node-Referenz](../../nodes/de/formula-group.md#eigene-funktionen-und-begrenzte-schleifen). Vervollständigung und Hover-Hilfe zeigen verfügbare Funktionen und Kontextwerte für Zeit und Zufall. Digital Noise ist eine Alternative für zeitlich wechselnde Zufallssteuerung.
 
 Buffer-Eingänge erlauben indizierte Reads und Metadaten; ein Audioeingang besitzt keine beliebig abrufbare Vergangenheit. **Live** übernimmt gültigen Code nach einer kurzen Pause; sonst **Apply** verwenden. Ungültiger Code zeigt Diagnosen. Gespeichert werden Code und Anfangszustände, nicht der laufende DSP-Zustand.
 

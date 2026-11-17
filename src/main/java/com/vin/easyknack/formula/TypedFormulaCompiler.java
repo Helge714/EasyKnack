@@ -15,7 +15,7 @@ final class TypedFormulaCompiler {
     static final Set<String> TYPES=Set.of("bool","int","uint","long","ulong","float","double","unsigned");
     static boolean isTyped(String source){
         var ts=FormulaCompiler.tokens(source);
-        for(int i=0;i<ts.size();i++)if(Set.of("int","uint","long","ulong","double","unsigned").contains(ts.get(i).text())||ts.get(i).text().equals("(")&&i+2<ts.size()&&TYPES.contains(ts.get(i+1).text())&&ts.get(i+2).text().equals(")"))return true;
+        for(int i=0;i<ts.size();i++)if(Set.of("int","uint","long","ulong","double","unsigned","for","return").contains(ts.get(i).text())||TYPES.contains(ts.get(i).text())&&i+2<ts.size()&&ts.get(i+2).text().equals("(")||ts.get(i).text().equals("(")&&i+2<ts.size()&&TYPES.contains(ts.get(i+1).text())&&ts.get(i+2).text().equals(")"))return true;
         return false;
     }
     static Program compile(String source,List<Port> ports,int version){return new Parser(source,ports,version).compile();}
@@ -27,6 +27,11 @@ final class TypedFormulaCompiler {
         final List<Token> ts; final List<Port> ports; final int version;
         final Map<String,V> vars=new LinkedHashMap<>();final Set<String> assigned=new HashSet<>(),used=new LinkedHashSet<>();
         final List<I> ins=new ArrayList<>();final List<S> states=new ArrayList<>();int at,registers,depth,serial;boolean body,contextual;
+        record Parameter(String name,K kind){}
+        record Function(String name,K kind,List<Parameter> parameters,int body,int end){}
+        record ReturnFrame(K kind,int register,List<Integer> jumps){}
+        final Map<String,Function> functions=new LinkedHashMap<>();final Map<Integer,Function> definitions=new HashMap<>();
+        final Set<String> calls=new HashSet<>(),counters=new HashSet<>();ReturnFrame returns;
         Parser(String source,List<Port> ports,int version){
             this.ts=FormulaCompiler.tokens(source);this.ports=List.copyOf(ports);this.version=version;
             var ids=new HashSet<String>();int in=0,out=0;
@@ -39,16 +44,102 @@ final class TypedFormulaCompiler {
                 if(!p.output()||k==K.BOOL)assigned.add(p.name());
             }
         }
-        boolean reserved(String n){return TYPES.contains(n)||Set.of("state","if","else","true","false","pi","tau").contains(n)||CONTEXT.contains(n)||FUNCTIONS.containsKey(n);}
+        boolean reserved(String n){return TYPES.contains(n)||Set.of("state","if","else","for","while","return","true","false","pi","tau").contains(n)||CONTEXT.contains(n)||FUNCTIONS.containsKey(n)||functions.containsKey(n);}
         Program compile(){
+            collectFunctions();
+            validateFunctions();
             var cpp=new StringBuilder();int index=0;for(var p:ports){if(p.output()){if(p.type()==Type.BOOLEAN)cpp.append("output[").append(index).append("] = 0.0f;\n");index++;}}
-            while(!peek("")){cpp.append(statement());if(cpp.length()>1048576)throw fail("Generated formula exceeds 1 MiB");}
+            while(!peek("")){if(definitions.containsKey(at)){at=definitions.get(at).end();continue;}cpp.append(statement());if(cpp.length()>1048576)throw fail("Generated formula exceeds 1 MiB");}
             index=0;for(var p:ports)if(p.output()){if(!assigned.contains(p.name()))throw fail("Output must be assigned on every path: "+p.name());var v=vars.get(p.name());emit("output",v.kind(),index++,v.reg(),0,0,"0");}
             for(int i=0;i<states.size();i++){var v=vars.get(states.get(i).name());emit("store",v.kind(),i,v.reg(),0,0,"0");cpp.append("context.typedState[").append(i).append("] = easyknack::formulaPack(").append(v.cpp()).append(");\n");}
             var wire=new StringBuilder("FORM3 ").append(registers).append(' ').append(ins.size()).append(' ').append(states.size()).append(' ').append(contextual||!states.isEmpty()?1:0);
             for(var s:states)wire.append(' ').append(s.name()).append(' ').append(s.kind().ordinal()).append(' ').append(s.bits());
             for(var i:ins)wire.append(' ').append(i.op()).append(' ').append(i.kind().ordinal()).append(' ').append(i.target()).append(' ').append(i.a()).append(' ').append(i.b()).append(' ').append(i.c()).append(' ').append(i.value());
             return new Program(cpp.toString(),used,ports,List.of(),registers,List.of(),wire.toString(),contextual||!states.isEmpty());
+        }
+        void collectFunctions(){
+            int saved=at,level=0;
+            while(!peek("")){
+                int start=at;
+                if(level==0&&TYPES.contains(now().text())){
+                    K kind=type();Token name=now();
+                    if(name.text().matches("[A-Za-z_][A-Za-z0-9_]*")&&at+1<ts.size()&&ts.get(at+1).text().equals("(")){
+                        if(reserved(name.text())||vars.containsKey(name.text()))throw new Failure(name,"Duplicate or reserved function name");
+                        at+=2;var parameters=new ArrayList<Parameter>();var names=new HashSet<String>();
+                        if(!peek(")"))do{K k=type();if(k==null)throw fail("Expected parameter type");Token p=identifier();if(reserved(p.text())||!names.add(p.text()))throw new Failure(p,"Duplicate or reserved parameter");parameters.add(new Parameter(p.text(),k));if(parameters.size()>16)throw fail("At most 16 parameters per function");}while(take(","));
+                        expect(")");int body=at;expect("{");int braces=1;
+                        while(braces>0){if(peek(""))throw fail("Expected }");if(take("{"))braces++;else if(take("}"))braces--;else at++;}
+                        var f=new Function(name.text(),kind,List.copyOf(parameters),body,at);functions.put(name.text(),f);definitions.put(start,f);continue;
+                    }
+                    at=start;
+                }
+                if(take("{"))level++;else if(take("}"))level--;else at++;
+            }
+            at=saved;
+        }
+        E userFunction(Token token){
+            var f=functions.get(token.text());expect("(");var args=new ArrayList<E>();
+            if(!peek(")"))do{args.add(expression(0));}while(take(","));expect(")");
+            if(args.size()!=f.parameters().size())throw new Failure(token,"Wrong argument count for "+f.name());
+            return inlineFunction(f,args,token);
+        }
+        void validateFunctions(){
+            int size=ins.size(),savedRegisters=registers,savedSerial=serial;boolean savedContext=contextual;var savedUsed=new LinkedHashSet<>(used);
+            for(var f:functions.values()){
+                var args=new ArrayList<E>();for(var parameter:f.parameters())args.add(constant(parameter.kind(),"0"));
+                inlineFunction(f,args,ts.get(f.body()));
+                ins.subList(size,ins.size()).clear();registers=savedRegisters;serial=savedSerial;contextual=savedContext;used.clear();used.addAll(savedUsed);
+            }
+        }
+        E inlineFunction(Function f,List<E> args,Token token){
+            if(!calls.add(f.name()))throw new Failure(token,"Recursive function calls are not supported");
+            int savedAt=at;boolean savedBody=body;var savedVars=new LinkedHashMap<>(vars);var savedAssigned=new HashSet<>(assigned);var savedCounters=new HashSet<>(counters);var savedReturns=returns;
+            var code=new StringBuilder("([&]() -> "+f.kind().cpp+" {\n");
+            vars.entrySet().removeIf(e->e.getValue().port()==null||e.getValue().port().output());assigned.retainAll(vars.keySet());counters.clear();
+            int result=registers++;returns=new ReturnFrame(f.kind(),result,new ArrayList<>());vars.put("$return",new V(f.kind(),"",result,null));
+            try{
+                for(int i=0;i<args.size();i++){
+                    var p=f.parameters().get(i);E value=assignment(args.get(i),p.kind(),false);int reg=registers++;String cpp="parameter"+(serial++);
+                    emit("copy",p.kind(),reg,value.reg(),0,0,"0");vars.put(p.name(),new V(p.kind(),cpp,reg,null));assigned.add(p.name());
+                    code.append(p.kind().cpp).append(' ').append(cpp).append(" = ").append(value.cpp()).append(";\n");
+                }
+                at=f.body();code.append(statement());
+                if(!assigned.contains("$return"))throw new Failure(ts.get(f.body()),"Function must return a value on every path: "+f.name());
+                for(int jump:returns.jumps())jump(jump,ins.size());
+                return new E(f.kind(),code.append("})()").toString(),result);
+            }finally{at=savedAt;body=savedBody;vars.clear();vars.putAll(savedVars);assigned.clear();assigned.addAll(savedAssigned);counters.clear();counters.addAll(savedCounters);returns=savedReturns;calls.remove(f.name());}
+        }
+        long integerLiteral(){
+            boolean negative=take("-");if(!negative)take("+");Token token=now();
+            if(!token.text().matches("[0-9]+"))throw fail("Loop bounds and steps must be integer literals");at++;
+            try{long value=Long.parseLong((negative?"-":"")+token.text());if(value<Integer.MIN_VALUE||value>Integer.MAX_VALUE)throw new NumberFormatException();return value;}
+            catch(NumberFormatException e){throw new Failure(token,"Loop integer is outside int range");}
+        }
+        String loop(){
+            expect("(");if(type()!=K.INT)throw fail("Declare an int loop counter");Token name=identifier();
+            if(vars.containsKey(name.text())||reserved(name.text()))throw new Failure(name,"Loop counter must have a new name");expect("=");long value=integerLiteral();expect(";");
+            expect(name.text());String comparison=now().text();if(!Set.of("<","<=",">",">=").contains(comparison))throw fail("Expected loop comparison");at++;long limit=integerLiteral();expect(";");
+            long step;
+            if(take("++")){expect(name.text());step=1;}else if(take("--")){expect(name.text());step=-1;}else{
+                expect(name.text());if(take("++"))step=1;else if(take("--"))step=-1;else if(take("+="))step=integerLiteral();else if(take("-="))step=-integerLiteral();else throw fail("Use ++, --, += or -= for the loop step");
+            }
+            expect(")");if(step==0||(comparison.startsWith("<")?step<0:step>0))throw new Failure(name,"Loop step must approach its bound");
+            var values=new ArrayList<Long>();
+            while(switch(comparison){case "<"->value<limit;case "<="->value<=limit;case ">"->value>limit;default->value>=limit;}){
+                if(values.size()>=1024)throw new Failure(name,"Loop exceeds 1024 iterations");if(value<Integer.MIN_VALUE||value>Integer.MAX_VALUE)throw new Failure(name,"Loop counter overflow");values.add(value);value+=step;
+            }
+            int start=at;var outerVars=new LinkedHashMap<>(vars);var outerAssigned=new HashSet<>(assigned);var savedUsed=new LinkedHashSet<>(used);boolean savedContext=contextual;int instructions=ins.size(),savedRegisters=registers,savedSerial=serial,returnJumps=returns==null?0:returns.jumps().size();var code=new StringBuilder();
+            counters.add(name.text());
+            try{
+                for(long iteration:values.isEmpty()?List.of(0L):values){
+                    at=start;E counter=constant(K.INT,Integer.toUnsignedString((int)iteration));String cpp="counter"+(serial++);
+                    vars.put(name.text(),new V(K.INT,cpp,counter.reg(),null));assigned.add(name.text());
+                    code.append("{\nstd::int32_t ").append(cpp).append(" = ").append(iteration).append(";\n").append(branch()).append("}\n");
+                    if(code.length()>1048576)throw fail("Expanded loop exceeds 1 MiB");
+                }
+                if(values.isEmpty()){ins.subList(instructions,ins.size()).clear();registers=savedRegisters;serial=savedSerial;contextual=savedContext;used.clear();used.addAll(savedUsed);assigned.clear();assigned.addAll(outerAssigned);if(returns!=null)returns.jumps().subList(returnJumps,returns.jumps().size()).clear();code.setLength(0);}
+                vars.keySet().retainAll(outerVars.keySet());assigned.retainAll(outerVars.keySet());return code.toString();
+            }finally{counters.remove(name.text());vars.remove(name.text());}
         }
         K type(){
             if(take("unsigned")){if(take("int"))return K.UINT;if(take("long"))return K.ULONG;throw fail("Expected int or long after unsigned");}
@@ -57,6 +148,15 @@ final class TypedFormulaCompiler {
         }
         String statement(){
             enter();try{
+                if(take("return")){
+                    if(returns==null)throw fail("return belongs inside a function");
+                    E value=assignment(expression(0),returns.kind(),false);expect(";");
+                    emit("copy",returns.kind(),returns.register(),value.reg(),0,0,"0");
+                    returns.jumps().add(emit("jump",K.BOOL,0,0,0,0,"0"));assigned.add("$return");
+                    return "return "+value.cpp()+";\n";
+                }
+                if(take("for"))return loop();
+                if(peek("while"))throw fail("Use a for loop with fixed integer bounds (at most 1024 iterations)");
                 if(take("state")){
                     if(depth!=1||body||states.size()>=64)throw fail("Declare at most 64 state variables at the beginning, outside branches");
                     K k=type();if(k==null)throw fail("Expected state type");Token name=identifier();if(vars.containsKey(name.text())||reserved(name.text()))throw fail("Duplicate or reserved variable");expect("=");
@@ -69,16 +169,18 @@ final class TypedFormulaCompiler {
                 body=true;
                 if(take("{")){var before=new HashSet<>(vars.keySet());var code=new StringBuilder("{\n");while(!peek("}")){if(peek(""))throw fail("Expected }");code.append(statement());}expect("}");vars.keySet().retainAll(before);assigned.retainAll(before);return code.append("}\n").toString();}
                 if(take("if")){
-                    expect("(");E e=expression(0);requireBool(e);expect(")");int j=emit("jz",K.BOOL,0,e.reg(),0,0,"0");var before=new HashSet<>(assigned);String yes=branch();var after=new HashSet<>(assigned);assigned.clear();assigned.addAll(before);int end=emit("jump",K.BOOL,0,0,0,0,"0");jump(j,ins.size());String no=take("else")?branch():"{}\n";after.retainAll(assigned);assigned.clear();assigned.addAll(after);jump(end,ins.size());return "if ("+e.cpp()+") "+yes+"else "+no;
+                    expect("(");Token condition=now();E e=expression(0);try{requireBool(e);}catch(Failure error){throw new Failure(condition,error.getMessage());}expect(")");int j=emit("jz",K.BOOL,0,e.reg(),0,0,"0");var before=new HashSet<>(assigned);String yes=branch();var after=new HashSet<>(assigned);assigned.clear();assigned.addAll(before);int end=emit("jump",K.BOOL,0,0,0,0,"0");jump(j,ins.size());String no=take("else")?branch():"{}\n";after.retainAll(assigned);assigned.clear();assigned.addAll(after);jump(end,ins.size());return "if ("+e.cpp()+") "+yes+"else "+no;
                 }
                 K declared=type();Token name=identifier();V v=vars.get(name.text());
                 if(declared!=null){if(v!=null||reserved(name.text()))throw fail("Duplicate or reserved variable");v=new V(declared,"local"+(serial++),registers++,null);}
-                else if(v==null)throw fail("Unknown variable: "+name.text());
-                else if(v.port()!=null&&!v.port().output())throw fail("Inputs are read-only");
+                else if(v==null)throw new Failure(name,"Unknown variable: "+name.text());
+                else if(counters.contains(name.text()))throw new Failure(name,"Loop counters are read-only inside the loop body");
+                else if(returns!=null&&v.port()!=null)throw new Failure(name,"Function ports are read-only; use the return value");
+                else if(v.port()!=null&&!v.port().output())throw new Failure(name,"Inputs are read-only");
                 String op=now().text();boolean compound=Set.of("+=","-=","*=","/=").contains(op);
                 if(compound){if(declared!=null||!assigned.contains(name.text()))throw fail("Compound assignment requires an initialized variable");at++;}else expect("=");
                 E value=expression(0);expect(";");if(compound)value=binary(op.substring(0,1),new E(v.kind(),v.cpp(),v.reg()),value);
-                value=assignment(value,v.kind(),v.port()!=null);vars.put(name.text(),v);assigned.add(name.text());emit("copy",v.kind(),v.reg(),value.reg(),0,0,"0");
+                try{value=assignment(value,v.kind(),v.port()!=null);}catch(Failure e){throw new Failure(name,e.getMessage());}vars.put(name.text(),v);assigned.add(name.text());emit("copy",v.kind(),v.reg(),value.reg(),0,0,"0");
                 String target=v.port()!=null?v.port().type()==Type.BOOLEAN?"output["+outputIndex(v.port())+"]":v.cpp():v.cpp();
                 return (declared==null?"":declared.cpp+" ")+target+" = "+value.cpp()+";\n";
             }finally{depth--;}
@@ -111,23 +213,24 @@ final class TypedFormulaCompiler {
             if(n.equals("pi")||n.equals("tau"))return constant(K.DOUBLE,Long.toUnsignedString(Double.doubleToRawLongBits(n.equals("pi")?Math.PI:2*Math.PI)));
             if(v==null&&(n.equals("Audio")||n.equals("Control")))return constant(K.INT,n.equals("Audio")?"1":"0");
             if(!n.isEmpty()&&(Character.isDigit(n.charAt(0))||n.charAt(0)=='.'))return literal(t);
+            if(functions.containsKey(n))return userFunction(t);
             if(FUNCTIONS.containsKey(n))return function(n);
-            if(v==null)throw fail("Unknown symbol: "+n);if(v.kind()==K.BUFFER)throw fail("Use a Buffer member");if(!assigned.contains(n))throw fail("Value is not assigned on every path: "+n);if(v.port()!=null&&!v.port().output())used.add(v.port().id());return new E(v.kind(),v.cpp(),v.reg());
+            if(v==null)throw new Failure(t,"Unknown symbol: "+n);if(v.kind()==K.BUFFER)throw new Failure(t,"Use a Buffer member");if(!assigned.contains(n))throw new Failure(t,"Value is not assigned on every path: "+n);if(v.port()!=null&&!v.port().output())used.add(v.port().id());return new E(v.kind(),v.cpp(),v.reg());
         }
         E member(V v){
             if(v.port()==null||v.port().output())throw fail("Properties belong to inputs only");used.add(v.port().id());int slot=0;for(var p:ports){if(p==v.port())break;if(!p.output())slot++;}
-            String name=identifier().text();
-            if(v.kind()!=K.BUFFER){if(name.equals(v.kind()==K.BOOL?"active":"value"))return new E(v.kind(),v.cpp(),v.reg());if(name.equals("rate")&&v.kind()==K.FLOAT)return operation(K.FLOAT,K.FLOAT,"context.rate("+slot+")","inputRate",0,0,0,""+slot);throw fail("Invalid input property");}
+            Token fieldToken=identifier();String name=fieldToken.text();
+            if(v.kind()!=K.BUFFER){if(name.equals(v.kind()==K.BOOL?"active":"value"))return new E(v.kind(),v.cpp(),v.reg());if(name.equals("rate")&&v.kind()==K.FLOAT)return operation(K.FLOAT,K.FLOAT,"context.rate("+slot+")","inputRate",0,0,0,""+slot);throw new Failure(fieldToken,"Invalid input property");}
             if(name.equals("size"))return operation(K.FLOAT,K.FLOAT,"context.size("+slot+")","bufferSize",0,0,0,""+slot);
             int field=List.of("begin","end","writePosition","sampleRate").indexOf(name.equals("writepos")?"writePosition":name);if(field>=0){contextual|=field!=3;return operation(K.FLOAT,K.FLOAT,"context.info("+slot+", "+field+")","bufferInfo",0,0,0,""+(slot*4+field));}
-            if(!name.equals("read"))throw fail("Unknown Buffer property");expect("(");E pos=cast(expression(0),K.DOUBLE);contextual=true;
+            if(!name.equals("read"))throw new Failure(fieldToken,"Unknown Buffer property");expect("(");E pos=cast(expression(0),K.DOUBLE);contextual=true;
             if(version>=2&&peek(")")||peek(",")&&at+1<ts.size()&&Set.of("Clamp","Wrap","Zero").contains(ts.get(at+1).text())){
                 int mode=0,linear=1;if(take(",")){mode=List.of("Clamp","Wrap","Zero").indexOf(now().text());if(mode<0)throw fail("Expected read mode");at++;if(take(",")){linear=List.of("Nearest","Linear").indexOf(now().text());if(linear<0)throw fail("Expected interpolation mode");at++;}}expect(")");return operation(K.FLOAT,K.FLOAT,"context.readTimeline("+slot+", "+pos.cpp()+", "+mode+", "+linear+")","bufferTimeline",pos.reg(),0,0,""+(slot*8+mode*2+linear));
             }
             E wrap=constant(K.BOOL,"0"),linear=constant(K.BOOL,"1");if(take(",")){wrap=expression(0);requireBool(wrap);if(take(",")){linear=expression(0);requireBool(linear);}}expect(")");return operation(K.FLOAT,K.FLOAT,"context.read("+slot+", "+pos.cpp()+", "+wrap.cpp()+", "+linear.cpp()+")","bufferRead",pos.reg(),wrap.reg(),linear.reg(),""+slot);
         }
         E function(String name){
-            expect("(");var args=new ArrayList<E>();if(!peek(")"))do{args.add(expression(0));}while(take(","));expect(")");if(args.size()!=FUNCTIONS.get(name)&&!(name.equals("rand")&&args.size()==3))throw fail("Wrong argument count for "+name);
+            Token call=ts.get(Math.max(0,at-1));expect("(");var args=new ArrayList<E>();if(!peek(")"))do{args.add(expression(0));}while(take(","));expect(")");if(args.size()!=FUNCTIONS.get(name)&&!(name.equals("rand")&&args.size()==3))throw new Failure(call,"Wrong argument count for "+name);
             if(name.equals("sineWave")){E phase=cast(args.get(0),K.DOUBLE);return operation(K.FLOAT,K.FLOAT,"context.sineWave("+phase.cpp()+")","sineWave",phase.reg(),0,0,"0");}
             if(name.equals("rand")){contextual=true;int site=serial++;for(int i=0;i<args.size();i++)args.set(i,cast(args.get(i),K.FLOAT));String code="context.random("+site+", "+String.join(", ",args.stream().map(E::cpp).toList())+")";return operation(K.FLOAT,K.FLOAT,code,args.size()==3?"randSeed":"rand",args.get(0).reg(),args.get(1).reg(),args.size()==3?args.get(2).reg():0,""+site);}
             K k=args.get(0).kind();for(int i=1;i<args.size();i++)k=common(k,args.get(i).kind());numeric(k);if(k==K.BOOL)k=K.INT;
@@ -138,7 +241,7 @@ final class TypedFormulaCompiler {
         }
         E assignment(E e,K target,boolean output){
             if(target==K.BOOL){if(e.kind()!=K.BOOL)throw fail("Use an explicit bool cast or comparison");return e;}
-            numeric(e.kind());boolean narrow=e.kind()==K.DOUBLE&&target!=K.DOUBLE||e.kind()==K.FLOAT&&target.integer()||e.kind().integer()&&target.integer()&&e.kind()!=K.BOOL&&(e.kind().unsigned()!=target.unsigned()||e.kind().ordinal()>=K.LONG.ordinal()&&target.ordinal()<K.LONG.ordinal());
+            numeric(e.kind());boolean narrow=e.kind()==K.DOUBLE&&target.integer()||e.kind()==K.FLOAT&&target.integer()||e.kind().integer()&&target.integer()&&e.kind()!=K.BOOL&&(e.kind().unsigned()!=target.unsigned()||e.kind().ordinal()>=K.LONG.ordinal()&&target.ordinal()<K.LONG.ordinal());
             if(narrow&&!output)throw fail("Narrowing conversion requires an explicit ("+target.name().toLowerCase()+") cast");return cast(e,target);
         }
         K common(K a,K b){numeric(a);numeric(b);if(a==K.DOUBLE||b==K.DOUBLE)return K.DOUBLE;if(a==K.FLOAT||b==K.FLOAT)return K.FLOAT;if(a==K.BOOL&&b!=K.BOOL)return b;if(b==K.BOOL&&a!=K.BOOL)return a;if(a==K.BOOL)a=K.INT;if(b==K.BOOL)b=K.INT;if(a.unsigned()!=b.unsigned())throw fail("Mixing signed and unsigned integers requires an explicit cast");return a.ordinal()>b.ordinal()?a:b;}

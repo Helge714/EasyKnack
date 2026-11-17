@@ -9,12 +9,15 @@ public final class FormulaLanguage implements GLCodeLanguage {
     private final List<FormulaCompiler.Port> ports; private final int version;
     public FormulaLanguage(List<FormulaCompiler.Port> ports){this(ports,2);} public FormulaLanguage(List<FormulaCompiler.Port> ports,int version){this.ports=List.copyOf(ports);this.version=version;}
     @Override public String id(){return "easyknack-formula";}
+    @Override public boolean supportsAutomaticCompletion(){return true;}
+    @Override public String indentationAfter(String source,int offset,int width){return " ".repeat(FormulaIndentation.next(source.substring(0,offset))*width);}
+    @Override public String formatSource(String source,int width){return FormulaIndentation.format(source,width);}
     @Override public List<GLCodeToken> tokenize(String source){
         // Keep highlighting usable while the user is in the middle of invalid syntax.
         var result=new ArrayList<GLCodeToken>();
         var pattern=java.util.regex.Pattern.compile("//[^\\r\\n]*|[A-Za-z_][A-Za-z0-9_]*|(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?");
         var m=pattern.matcher(source);while(m.find()){
-            String s=m.group();var type=s.startsWith("//")?GLCodeToken.Type.COMMENT:TypedFormulaCompiler.TYPES.contains(s)?GLCodeToken.Type.TYPE:Character.isDigit(s.charAt(0))||s.charAt(0)=='.'?GLCodeToken.Type.NUMBER:Set.of("state","if","else","true","false","pi","tau").contains(s)||FormulaCompiler.CONTEXT.contains(s)||FormulaCompiler.FUNCTIONS.containsKey(s)?GLCodeToken.Type.KEYWORD:GLCodeToken.Type.PLAIN;
+            String s=m.group();var type=s.startsWith("//")?GLCodeToken.Type.COMMENT:TypedFormulaCompiler.TYPES.contains(s)?GLCodeToken.Type.TYPE:Character.isDigit(s.charAt(0))||s.charAt(0)=='.'?GLCodeToken.Type.NUMBER:Set.of("state","if","else","for","return","true","false","pi","tau").contains(s)||FormulaCompiler.CONTEXT.contains(s)||FormulaCompiler.FUNCTIONS.containsKey(s)?GLCodeToken.Type.KEYWORD:GLCodeToken.Type.PLAIN;
             result.add(new GLCodeToken(m.start(),m.end(),type));
         }return List.copyOf(result);
     }
@@ -53,8 +56,9 @@ public final class FormulaLanguage implements GLCodeLanguage {
                 symbols.visible(start).forEach((n,s)->names.put(n,s.description()));
                 FormulaCompiler.CONTEXT.forEach(n->names.put(n,contextDescription(n,typed)));
                 FormulaCompiler.FUNCTIONS.keySet().forEach(n->{names.put(n,FormulaEditorHelp.function(n,typed).description());callable.add(n);});
+                symbols.functions.forEach((n,f)->{names.put(n,f.call().description());callable.add(n);});
                 TypedFormulaCompiler.TYPES.forEach(n->names.put(n,FormulaEditorHelp.type(n)));
-                for(String n:List.of("state","if","else","true","false","pi","tau"))names.put(n,keyword(n,typed));
+                for(String n:List.of("state","if","else","for","return","true","false","pi","tau"))names.put(n,keyword(n,typed));
                 for(String n:List.of("Clamp","Wrap","Zero","Linear","Nearest","Audio","Control"))names.putIfAbsent(n,option(n));
             }
             var proposals=new ArrayList<GLCodeCompletion>();int next=end;while(next<text.length()&&Character.isWhitespace(text.charAt(next)))next++;boolean parenthesis=next<text.length()&&text.charAt(next)=='(';
@@ -77,6 +81,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
                 var local=symbols.symbol(name,start);if(local.isPresent())description=local.get().description();
                 if(description==null)for(var p:ports)if(p.name().equals(name))description=portDescription(p);
                 if(description==null&&FormulaCompiler.FUNCTIONS.containsKey(name))description=FormulaEditorHelp.function(name,typed).description();
+                if(description==null&&symbols.functions.containsKey(name))description=symbols.functions.get(name).call().description();
                 if(description==null&&FormulaCompiler.CONTEXT.contains(name))description=contextDescription(name,typed);
                 if(description==null)description=FormulaEditorHelp.type(name);
                 if(description==null)description=keyword(name,typed);
@@ -92,7 +97,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
                 String token=ts.get(i).text();if(token.equals("(")){
                     FormulaEditorHelp.Call call=null;if(i>0){String name=ts.get(i-1).text();String owner=memberOwner(d.text(),ts.get(i-1).start());
                         if(owner!=null){if(name.equals("read")&&members(owner).containsKey("read"))call=FormulaEditorHelp.read(version);}
-                        else call=FormulaEditorHelp.function(name,typed);}
+                        else call=symbols.functions.containsKey(name)?symbols.functions.get(name).call():FormulaEditorHelp.function(name,typed);}
                     stack.add(new CallFrame(call,0));
                 }else if(token.equals(")")){if(!stack.isEmpty())stack.remove(stack.size()-1);}
                 else if(token.equals(",")&&!stack.isEmpty()){var f=stack.get(stack.size()-1);stack.set(stack.size()-1,new CallFrame(f.call(),f.argument()+1));}
@@ -102,6 +107,25 @@ public final class FormulaLanguage implements GLCodeLanguage {
             return CompletableFuture.completedFuture(List.of());
         }
         @Override public void close(){index=null;}
+        @Override public CompletableFuture<List<GLCodeInlayHint>> inlayHints(GLCodeDocument d){
+            var symbols=index(d);var ts=symbols.tokens;var hints=new ArrayList<GLCodeInlayHint>();boolean typed=version>=3||symbols.typed();
+            for(int i=1;i<ts.size();i++)if(ts.get(i).text().equals("(")){
+                var name=ts.get(i-1);String owner=memberOwner(d.text(),name.start());FormulaEditorHelp.Call call;
+                if(owner!=null)call=name.text().equals("read")&&members(owner).containsKey("read")?FormulaEditorHelp.read(version):null;
+                else if(symbols.functions.containsKey(name.text())){var function=symbols.functions.get(name.text());if(name.start()==function.start())continue;call=function.call();}
+                else call=FormulaEditorHelp.function(name.text(),typed);
+                if(call==null)continue;int level=0,argument=0;boolean start=true;
+                for(int j=i+1;j<ts.size();j++){
+                    var t=ts.get(j);if(level==0&&Set.of(")",";","{").contains(t.text()))break;
+                    if(start&&argument<call.parameters().size()){
+                        String label=call.parameters().get(argument).replaceAll("\\s*\\(.*","").strip();int space=label.lastIndexOf(' ');if(space>=0)label=label.substring(space+1);
+                        if(!t.text().equals(label))hints.add(new GLCodeInlayHint(t.start(),label+":"));start=false;
+                    }
+                    if(t.text().equals("("))level++;else if(t.text().equals(")"))level--;else if(t.text().equals(",")&&level==0){argument++;start=true;}
+                }
+            }
+            return CompletableFuture.completedFuture(List.copyOf(hints));
+        }
     };}
     private Map<String,String> members(String owner){
         var names=new LinkedHashMap<String,String>();for(var p:ports)if(!p.output()&&p.name().equals(owner))switch(p.type()){
@@ -117,6 +141,6 @@ public final class FormulaLanguage implements GLCodeLanguage {
     }
     private static String portDescription(FormulaCompiler.Port p){return (p.type()==FormulaCompiler.Type.NUMBER?"float":p.type()==FormulaCompiler.Type.BOOLEAN?"bool":"Buffer")+" "+p.name()+" — "+(p.output()?"output":"read-only input")+"; port ID: "+p.id();}
     private static String contextDescription(String name,boolean typed){String type=typed?(name.equals("sampleRate")?"double":"ulong"):"float";return type+" "+name+" — "+switch(name){case "sampleRate"->"sample rate in Hz.";case "blockSize"->"full audio block length in samples, including during feedback processing.";case "samplePosition"->"samples processed by this node; retained across live edits; advances a full block at Control rate.";default->"zero-based sample offset in the current audio block.";};}
-    private static String keyword(String name,boolean typed){return switch(name){case "state"->"state type name = literal; persistent per processor. Matching name/type/initializer retains state across live edits.";case "if"->"if (bool condition) { ... } else { ... }";case "else"->"Alternative branch when the if condition is false.";case "true","false"->"bool constant: "+name;case "pi"->(typed?"double":"float")+" pi — π radians (half a turn).";case "tau"->(typed?"double":"float")+" tau — 2π radians (one turn).";default->null;};}
+    private static String keyword(String name,boolean typed){return switch(name){case "state"->"state type name = literal; persistent per processor. Matching name/type/initializer retains state across live edits.";case "if"->"if (bool condition) statement; else statement; braces are optional.";case "for"->"for (int i=0; i<8; i++) { ... } — fixed integer bounds, at most 1024 iterations; counter is read-only in the body.";case "return"->"return expression; — return a value from a user-defined function.";case "else"->"Alternative branch when the if condition is false.";case "true","false"->"bool constant: "+name;case "pi"->(typed?"double":"float")+" pi — π radians (half a turn).";case "tau"->(typed?"double":"float")+" tau — 2π radians (one turn).";default->null;};}
     private static String option(String name){return switch(name){case "Clamp"->"Buffer read: hold the nearest valid sample outside the available range.";case "Wrap"->"Buffer read: wrap the position into the available range.";case "Zero"->"Buffer read: return zero outside the available range.";case "Linear"->"Buffer read: linear interpolation between adjacent samples.";case "Nearest"->"Buffer timeline read: nearest sample (legacy boolean false uses the lower index).";case "Audio"->"Signal rate constant: 1.";default->"Signal rate constant: 0.";};}
 }

@@ -45,7 +45,7 @@ public final class FormulaCompiler {
             else if(Character.isDigit(c)||c=='.'&&i+1<source.length()&&Character.isDigit(source.charAt(i+1))){
                 i++;while(i<source.length()&&(Character.isDigit(source.charAt(i))||source.charAt(i)=='.'))i++;
                 if(i<source.length()&&(source.charAt(i)=='e'||source.charAt(i)=='E')){i++;if(i<source.length()&&(source.charAt(i)=='+'||source.charAt(i)=='-'))i++;while(i<source.length()&&Character.isDigit(source.charAt(i)))i++;}
-            }else if(i+1<source.length()&&Set.of("&&","||","==","!=","<=",">=","+=","-=","*=","/=").contains(source.substring(i,i+2)))i+=2;
+            }else if(i+1<source.length()&&Set.of("&&","||","==","!=","<=",">=","+=","-=","*=","/=","++","--").contains(source.substring(i,i+2)))i+=2;
             else if("+-*/%<>=!(){};,.".indexOf(c)>=0)i++;
             else throw new Failure(new Token("",i,i+1),"Unexpected character: "+c);
             result.add(new Token(source.substring(start,i),start,i));

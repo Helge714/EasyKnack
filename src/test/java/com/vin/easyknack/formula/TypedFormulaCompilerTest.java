@@ -14,13 +14,25 @@ class TypedFormulaCompilerTest {
         for(String code:List.of("double seconds=(double)samplePosition/sampleRate;result=(float)sin(tau*440.0*seconds);", "unsigned long p=samplePosition;uint low=(uint)p;result=low;", "state double phase=0;phase+=signal/sampleRate;phase-=floor(phase);result=sin(tau*phase);", "bool active=(bool)signal;int count=active+clock;result=count;", "state long x=-9223372036854775808;state ulong y=18446744073709551615;result=(float)x;", "float a=1.5f;double b=(double)a;result=(float)a/(double)b;", "uint a=1u;ulong b=1ul;result=a+b;")){
             var p=assertDoesNotThrow(()->compile(code),code);assertTrue(p.bytecode().startsWith("FORM3 "));assertTrue(new FormulaLanguage(PORTS,3).diagnose(code).isEmpty());
         }
-        for(String code:List.of("double x=1.5;float y=x;result=y;", "long x=1;int y=x;result=y;", "uint x=1;result=x;", "int x=1;uint y=(uint)2;result=x+y;", "bool x=1;result=x;", "if(signal)result=0;else result=1;", "state uint x=-1;result=x;", "state ulong x=18446744073709551616;result=0;", "state double x=1e999;result=0;", "result+=1;", "signal*=2;result=0;", "float x=1.5f; x/=2.0;result=x;"))assertThrows(FormulaCompiler.Failure.class,()->compile(code),code);
+        for(String code:List.of("long x=1;int y=x;result=y;", "uint x=1;result=x;", "int x=1;uint y=(uint)2;result=x+y;", "bool x=1;result=x;", "if(signal)result=0;else result=1;", "state uint x=-1;result=x;", "state ulong x=18446744073709551616;result=0;", "state double x=1e999;result=0;", "result+=1;", "signal*=2;result=0;"))assertThrows(FormulaCompiler.Failure.class,()->compile(code),code);
         assertTrue(FormulaCompiler.compile("double x=1;result=x;",PORTS,2).bytecode().startsWith("FORM3 "));
     }
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void typedPreviewAndCompiledResultsAgreeAtNumericBoundaries()throws Exception{
         var cases=new LinkedHashMap<String,Float>();
                 cases.put("int x=5/2;result=x;",2f);
+        cases.put("float square(float x){return x*x;} result=square(signal)+square(2);",13f);
+        cases.put("float choose(float x){if(x>0)return x;return -x;} result=choose(-3);",3f);
+        cases.put("float a(float x){return b(x)+1;} float b(float y){return y*2;} result=a(3);",7f);
+        cases.put("result=0;for(int i=0;i<4;i++)result+=i;",6f);
+        cases.put("result=0;for(int i=4;i>=0;i-=2)result+=i;",6f);
+        cases.put("result=0;for(int i=0;i<3;i++){for(int j=0;j<2;j++)result+=i+j;}",9f);
+        cases.put("float sum(float x){float a=0;for(int i=0;i<4;i++){if(i==2)return a+x;a+=i;}return -1;}result=sum(3);",4f);
+        cases.put("float f(float x){for(int i=0;i<0;i++)return 3;return x;}result=f(7);",7f);
+        cases.put("float x=1.5;x*=2.0;result=x;",3f);
+        cases.put("bool positive(float x){return x>0;} if(positive(signal))result=1;else result=0;",1f);
+        cases.put("state float x=2;float square(float a){return a*a;}result=square(x);x+=1;",4f);
+
         cases.put("result=sineWave(0.25);",1f);
         cases.put("result=sineWave(-0.25);",-1f);
         cases.put("result=sineWave(1000000.25);",1f);

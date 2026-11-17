@@ -38,7 +38,7 @@ Beim Öffnen während der laufenden Hintergrundvorbereitung erscheint eine Ladea
 
 - Typen: `bool`, `int`, `uint` (`unsigned int`), `long`, `ulong` (`unsigned long`), `float`, `double`; Casts wie `(double) value`.
 - Anweisungen: lokale Deklarationen, `state` Deklarationen vor anderen Anweisungen, Zuweisungen, `+=`, `-=`, `*=`, `/=`, `if` / `else`, Blöcke `{ }`, Kommentare `//`.
-- Operatoren: `+`, `-`, `*`, `/`, `%`, unäres `+` / `-` / `!`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`; Klammern bestimmen die Reihenfolge. Keine Schleifen, Pointer oder beliebigen C++-Aufrufe.
+- Operatoren: `+`, `-`, `*`, `/`, `%`, unäres `+` / `-` / `!`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`; Klammern bestimmen die Reihenfolge. Keine Pointer, Rekursion, while-Schleifen oder beliebigen C++-Aufrufe.
 - Konstanten: `true`, `false`, `pi`, `tau`, `Audio`, `Control`, `Clamp`, `Wrap`, `Zero`, `Linear`, `Nearest`.
 - Kontext: `sampleRate` (Hz), `blockSize` (Samples), `sampleIndex` (innerhalb des Blocks), `samplePosition` (absolute Sampleanzahl). Vergangene Sekunden: `samplePosition / sampleRate`.
 - Numerische Eingänge: `.value`, `.rate`; Triggereingänge: `.active`.
@@ -57,6 +57,28 @@ Beim Öffnen während der laufenden Hintergrundvorbereitung erscheint eine Ladea
 | `rand` | `(minimum, maximum[, seed])` |
 
 Vervollständigung, Hover- und Signaturhilfe erklären Definitionsbereiche und Argumentdetails.
+
+### Eigene Funktionen und begrenzte Schleifen
+
+Numerische/boolesche Funktionen besitzen typisierte Parameter und einen Rückgabetyp und dürfen vor oder nach ihrem Aufruf stehen. Jeder Ausführungspfad muss einen Wert zurückgeben. Funktionen haben lokale Variablen und Parameter, dürfen Eingänge/Kontext lesen und andere Funktionen aufrufen. Sie dürfen keine Ausgangsports beschreiben, Aufrufer-Lokale/Zustände übernehmen, persistenten Zustand deklarieren oder rekursiv aufrufen. Höchstens 16 Parameter sind erlaubt. Ausgänge werden mit dem Rückgabewert gesetzt.
+
+```cpp
+float shape(float x, float amount) {
+    return tanh(x * amount);
+}
+
+float sum = 0;
+for (int i = 0; i < 4; i++) {
+    sum += shape(signal, i + 1);
+}
+result = sum / 4.0;
+```
+
+`for` benötigt einen neuen `int`-Zähler, feste ganzzahlige Literale für Anfang/Grenze/Schritt, `<`, `<=`, `>` oder `>=` und `++`, `--`, `+=` oder `-=`. Der Schritt muss zur Grenze führen; im Rumpf ist der Zähler schreibgeschützt. Jede Schleife erlaubt höchstens 1.024 Durchläufe. Schleifen und Aufrufe werden beim Kompilieren eingebettet; verschachtelte Erweiterungen unterliegen weiter den Gesamtgrenzen für Anweisungen, Register und Quelltext. `break` und `continue` sind nicht verfügbar. Eine Schleife mit null Durchläufen setzt ihre Ausgänge nicht. Geschweifte Klammern um if/else- und Schleifenrümpfe sind optional.
+
+Zuweisungen und Funktionsargumente dürfen `double`-Ergebnisse implizit nach `float` umwandeln; Float-Variablen benötigen deshalb nach Rechnungen mit Dezimalliteralen keine erneuten Casts. Float-zu-Ganzzahl und verengende Ganzzahlkonvertierungen erfordern für Lokale, Zustand und Funktionsargumente weiterhin Casts. Bedingungen benötigen bool; dafür einen Vergleich oder expliziten bool-Cast verwenden. Bestehende Sprachversionen bleiben lesbar; Funktions-/Schleifensyntax wählt die typisierte Ausführung ohne Änderung des Dokumentformats.
+
+Vervollständigung erscheint beim Tippen von Bezeichnern oder mit Strg+Leertaste. Hover, Signaturhilfe und eingeblendete Parameternamen unterstützen auch eigene Funktionen. Enter und Format berücksichtigen if/else ohne geschweifte Klammern.
 
 ## Mute
 

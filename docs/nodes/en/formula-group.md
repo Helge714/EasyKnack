@@ -38,7 +38,7 @@ Opening Formula while background preparation is still running shows a loading me
 
 - Types: `bool`, `int`, `uint` (`unsigned int`), `long`, `ulong` (`unsigned long`), `float`, `double`; casts such as `(double) value`.
 - Statements: local declarations, `state` declarations before other statements, assignments, `+=`, `-=`, `*=`, `/=`, `if` / `else`, blocks `{ }`, comments `//`.
-- Operators: `+`, `-`, `*`, `/`, `%`, unary `+` / `-` / `!`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`; parentheses control precedence. No loops, pointers or arbitrary C++ calls.
+- Operators: `+`, `-`, `*`, `/`, `%`, unary `+` / `-` / `!`, `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`; parentheses control precedence. No pointers, recursion, while loops or arbitrary C++ calls.
 - Constants: `true`, `false`, `pi`, `tau`, `Audio`, `Control`, `Clamp`, `Wrap`, `Zero`, `Linear`, `Nearest`.
 - Context: `sampleRate` (Hz), `blockSize` (samples), `sampleIndex` (within the block), `samplePosition` (absolute sample count). Elapsed seconds: `samplePosition / sampleRate`.
 - Numeric inputs: `.value`, `.rate`; Trigger inputs: `.active`.
@@ -56,7 +56,27 @@ Opening Formula while background preparation is still running shows a loading me
 | `mix` | `(a, b, factor)` |
 | `rand` | `(minimum, maximum[, seed])` |
 
-Completion, hover and signature help describe function domains and argument details.
+Completion appears while typing identifiers (or with Ctrl+Space). Hover, signature help and inline parameter labels describe built-in and user-defined functions. Enter and Format indent single-statement if/else bodies even without braces.
+
+### User functions and bounded loops
+
+Define numeric/bool functions with typed parameters and a return type, before or after their calls. Every execution path must return a value. Functions have local variables and parameters, can read input ports/context and call other functions, but cannot write output ports, capture caller locals/state, declare persistent state or recurse. At most 16 parameters are allowed. Use the return value to assign an output.
+
+```cpp
+float shape(float x, float amount) {
+    return tanh(x * amount);
+}
+
+float sum = 0;
+for (int i = 0; i < 4; i++) {
+    sum += shape(signal, i + 1);
+}
+result = sum / 4.0;
+```
+
+`for` requires an `int` counter with a new name, literal integer start/bound/step, `<`, `<=`, `>` or `>=`, and `++`, `--`, `+=` or `-=`. The step must approach the bound; the counter is read-only inside the body. Each loop allows at most 1,024 iterations. Loops and calls are expanded during compilation; nested expansion remains subject to the overall instruction/register/source limits. There is no `break` or `continue`. A zero-iteration loop does not assign its outputs. Braces around if/else and loop bodies are optional.
+
+Assignments and function arguments may implicitly convert `double` results to `float`; a float variable therefore does not need repeated casts after calculations with decimal literals. Float-to-integer and narrowing integer conversions still require casts for locals, state and function arguments. Conditions require bool; use a comparison or explicit bool cast. Existing formula language versions remain readable; function/loop syntax selects typed execution without changing the document format.
 
 ## Mute
 

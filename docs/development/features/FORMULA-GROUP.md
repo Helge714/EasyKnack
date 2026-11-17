@@ -33,7 +33,7 @@ numeric outputs must be assigned on every execution path.
 Supported: typed numeric/bool locals, if/else, arithmetic, comparisons, short-circuit boolean
 operators, and abs, sqrt, trigonometry, sineWave, exp, log/log2/log10, floor/ceil/round, pow,
 min/max, clamp, mix and sign. `pi` and `tau` are constants. Inputs are read-only.
-There are no loops, pointers or arbitrary C++ calls. Persistent variables use explicit state declarations (see below).
+User-defined typed functions and compile-time bounded for loops are supported; see the node reference for their limits. There are no pointers, recursion, while loops or arbitrary C++ calls. Persistent variables use explicit state declarations (see below).
 Limits: 16 inputs, 8 outputs; bounded source size, nesting and generated code.
 
 Hyperbolic functions are `sinh(value)`, `cosh(value)` and `tanh(value)`, with
@@ -242,7 +242,7 @@ Mixed arithmetic prefers double, then float, then the wider integer of the same
 signedness. Bool contributes 0 or 1; bool + bool returns int. Bool also combines
 with unsigned values without introducing a signed operand. Other signed/unsigned
 integer mixtures require a cast, including comparisons. Integral division truncates
-toward zero. Assignment to a narrower local/state type requires an explicit cast,
+toward zero. Double-to-float assignment is implicit. Float-to-integer and narrower integer local/state assignments require an explicit cast,
 including compound assignment. Conditions require bool; use a comparison or a bool
 cast for numeric conditions. Arithmetic results cannot implicitly assign to bool.
 

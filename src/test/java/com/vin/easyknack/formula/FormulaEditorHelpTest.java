@@ -7,6 +7,21 @@ import org.junit.jupiter.api.Test;
 import com.vingame.glswing.ui.*;
 
 class FormulaEditorHelpTest {
+    @Test void userFunctionsParametersLoopsAndPersistentArgumentHints(){
+        String source="float scale(float value,float factor){float local=value*factor;return local;} result=scale(signal, mix(1,2,0.5)); for(int i=0;i<3;i++){result+=i;}";
+        assertTrue(complete(source,source.indexOf("return local")).stream().anyMatch(c->c.label().equals("factor")));
+        assertFalse(complete(source,source.indexOf("result=scale")).stream().anyMatch(c->c.label().equals("factor")));
+        assertTrue(complete(source,source.indexOf("result+=i")).stream().anyMatch(c->c.label().equals("i")));
+        assertFalse(complete(source,source.length()).stream().anyMatch(c->c.label().equals("i")));
+        assertTrue(complete("float scale(float x){return x;}result=sc",38).stream().anyMatch(c->c.label().equals("scale")));
+        var d=doc(source);try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){
+            var hints=session.inlayHints(d).toCompletableFuture().join();
+            assertTrue(hints.stream().anyMatch(h->h.offset()==source.indexOf("signal, mix")&&h.label().equals("value:")));
+            assertTrue(hints.stream().anyMatch(h->h.offset()==source.indexOf("mix(1")&&h.label().equals("factor:")));
+            assertTrue(hints.size()>=5);
+        }
+        assertTrue(signature("float scale(float value,float factor){return value*factor;}result=scale(signal,").get(0).parameters().get(1).contains("factor"));
+    }
     private final List<FormulaCompiler.Port> ports=List.of(FormulaCompilerTest.number("signal",false),FormulaCompilerTest.trigger("clock",false),FormulaCompilerTest.number("result",true),new FormulaCompiler.Port("buffer-id","buffer",FormulaCompiler.Type.BUFFER,false));
     private GLCodeDocument doc(String text){return new GLCodeDocument(URI.create("test:/formula"),"easyknack-formula",1,text);}
     private List<GLCodeCompletion> complete(String source,int offset){var d=doc(source);try(var s=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){return s.complete(d,offset,null).toCompletableFuture().join();}}

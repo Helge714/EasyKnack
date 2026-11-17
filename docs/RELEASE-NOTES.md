@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.3.0
 
+- Improve Formula diagnostics, automatic completion, persistent parameter hints
+  and indentation for braceless if/else bodies. Allow implicit double-to-float
+  assignments, typed user functions and fixed-bound for loops (up to 1,024
+  iterations); preserve interpreted/native parity and existing document formats.
+
 - Place Sine Cloud tones at interior interval subdivisions instead of its endpoints;
   two tones in 0-24 kHz now produce 8 and 16 kHz (changed stimulus behavior).
 - Compact Sine Cloud tables before synthesis when occupied frequencies permit
