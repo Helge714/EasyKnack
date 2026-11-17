@@ -38,6 +38,7 @@ final class FormulaEditorPanel extends GLContainer implements AutoCloseable {
         for(var c:List.of(code,apply,format,live,ports))addGL(c);debounce.setRepeats(false);
         var initial=asset();
         code.configureDocument(java.net.URI.create("easyknack-formula:/"+assetId),new FormulaLanguage(FormulaGroups.ports(initial),FormulaGroups.version(initial)));
+        code.setNavigationHandler(location->{if("easyknack-formula-help".equals(location.uri().getScheme()))DocumentationViewer.show(code,"nodes/en/formula-group.md",location.uri().getPath().substring(1));});
         schema=List.copyOf(initial.compositeDescriptor().portMappings());
         apply.addActionListener(e->apply());format.addActionListener(e->code.formatCode());
         live.addActionListener(e->{if(updating)return;var a=asset();var meta=new HashMap<>(a.metadata());meta.put(FormulaGroups.LIVE,GLNodeValue.of(live.isSelected()));groups.replaceAsset(FormulaGroups.metadata(a,meta));if(live.isSelected())debounce.restart();else debounce.stop();changed.run();});

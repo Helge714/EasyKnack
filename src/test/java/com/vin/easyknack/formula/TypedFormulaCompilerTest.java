@@ -21,6 +21,9 @@ class TypedFormulaCompilerTest {
     void typedPreviewAndCompiledResultsAgreeAtNumericBoundaries()throws Exception{
         var cases=new LinkedHashMap<String,Float>();
                 cases.put("int x=5/2;result=x;",2f);
+        cases.put("final float x=signal*2;result=x;",6f);
+        cases.put("const float lo=0.5;const float hi=lo*4;result=hi;",2f);
+        cases.put("float f(final float x){const float n=2;final float y=x*n;return y;}result=f(signal);",6f);
         cases.put("float square(float x){return x*x;} result=square(signal)+square(2);",13f);
         cases.put("float choose(float x){if(x>0)return x;return -x;} result=choose(-3);",3f);
         cases.put("float a(float x){return b(x)+1;} float b(float y){return y*2;} result=a(3);",7f);
@@ -73,6 +76,8 @@ class TypedFormulaCompilerTest {
         n=0;for(var expected:cases.values()){source.append("{FormulaProgram p;p.read(\"").append(programs.get(n).bytecode()).append("\",2,1);auto bank=p.typed.values;auto nativeContext=context;nativeContext.typedState=bank.data();p.evaluate(input,vm,context);test").append(n++).append("(input,native,nativeContext);assert(vm[0]==native[0]);assert(bank==p.typed.values);");if(expected!=null)source.append("assert(vm[0]==").append(expected).append("f);");source.append("}\n");}
         source.append("auto dll=LoadLibraryA(\"").append(dll.library().toString().replace("\\","\\\\")).append("\");assert(dll);auto sample=reinterpret_cast<void(*)(const float*,float*,const FormulaContext*)>(GetProcAddress(dll,\"easyknack_formula_sample\"));assert(sample);\n");
         source.append("FormulaProgram p;p.read(\"").append(program.bytecode()).append("\",2,1);auto nativeState=p.typed.values;context.typedState=nativeState.data();for(int i=0;i<5000;i++){sample(input,native,&context);auto preview=context;preview.typedState=nullptr;p.evaluate(input,vm,preview);assert(vm[0]==native[0]);assert(nativeState==p.typed.values);context.samplePosition++;}\n");
+        var live=compile("const float scale=2;final float value=signal*scale;result=value;");
+        source.append("{FormulaProgram live;live.read(\"").append(live.bytecode()).append("\",2,1);for(float value:{1.f,4.f,-2.f}){input[0]=value;live.evaluate(input,vm,context);assert(vm[0]==value*2);}input[0]=3;}\n");
         var reordered=compile("state bool active=false;state double phase=0;state ulong count=9007199254740993;result=phase;");
         source.append("FormulaProgram next;next.read(\"").append(reordered.bytecode()).append("\",2,1);next.inheritState(p);assert(next.typed.values[0]==p.typed.values[2]);assert(next.typed.values[1]==p.typed.values[1]);assert(next.typed.values[2]==p.typed.values[0]);\n");
         var legacy=FormulaCompiler.compile("result=sineWave(signal);",PORTS,2);

@@ -8,6 +8,24 @@ import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 
 class DocumentationViewerTest {
+    @Test void formulaBuiltinNavigationAnchorsExistInBothLanguages()throws Exception {
+        SwingUtilities.invokeAndWait(()->{try{
+            for(String language:List.of("de","en")){
+                var page=new DocumentationPage(link->{});page.show(DocumentationPage.parse(NodeDocumentation.read("nodes/"+language+"/formula-group.md"),language));
+                var anchors=new ArrayList<>(com.vin.easyknack.formula.FormulaCompiler.FUNCTIONS.keySet());anchors.add("buffer-read");
+                for(String name:anchors)assertTrue(page.anchor(name.toLowerCase(Locale.ROOT))>0,language+"/"+name);
+            }
+        }catch(Exception e){throw new AssertionError(e);}});
+    }
+    @Test void formulaHelpOpensAtAnAnchorInTheIndependentDocumentationLanguage()throws Exception {
+        String override=System.getProperty("easyknack.documentation.language");System.setProperty("easyknack.documentation.language","de");
+        try{
+            var holder=new AtomicReference<DocumentationViewer>();
+            SwingUtilities.invokeAndWait(()->{var panel=new DocumentationViewer(()->{});panel.setBounds(0,0,800,320);holder.set(panel);});
+            var panel=holder.get();await(()->panel.openPage("nodes/en/formula-group.md","sinewave"));
+            SwingUtilities.invokeAndWait(()->{assertEquals("nodes/de/formula-group.md",panel.position().page());assertEquals(panel.content.anchor("sinewave"),panel.position().y(),1);});
+        }finally{if(override==null)System.clearProperty("easyknack.documentation.language");else System.setProperty("easyknack.documentation.language",override);}
+    }
     @Test void linksUseCoreHandCursorAndReleaseItOnExitOrPageReplacement()throws Exception{
         SwingUtilities.invokeAndWait(()->{try{
             var page=new DocumentationPage(link->{});page.show(DocumentationPage.parse("# Test\n\n[Link](index.md) Plain text\n","en"));

@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.3.0
 
+- Add Formula final locals/parameters and input-independent const expressions,
+  bold read-only names and italic state names. Ctrl+click built-ins opens their
+  localized function reference. The new keywords final/const are reserved and
+  require renaming any older identifiers with those names.
+
 - Enable Ctrl+click definition navigation for Formula functions, locals and
   parameters; remove empty code-editor component-name tooltips.
 

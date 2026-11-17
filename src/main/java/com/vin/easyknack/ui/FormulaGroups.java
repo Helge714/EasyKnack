@@ -56,7 +56,7 @@ final class FormulaGroups {
         String old=codeName(port);var accepted=acceptedPorts(a).stream().map(p->p.id().equals(portId(port))?new FormulaCompiler.Port(p.id(),name,p.type(),p.output()):p).toList();
         String source=renameText(source(a),old,name);FormulaCompiler.compile(source,accepted,version(a));
         // Validate new names even when the new port is not in the last valid program yet.
-        var current=ports(after);var seen=new HashSet<String>();for(var p:current)if(!p.name().matches("[A-Za-z_][A-Za-z0-9_]*")||!seen.add(p.name())||FormulaCompiler.CONTEXT.contains(p.name())||FormulaCompiler.FUNCTIONS.containsKey(p.name())||Set.of("state","float","double","int","long","uint","ulong","unsigned","bool","if","else","true","false","pi","tau").contains(p.name()))throw new IllegalArgumentException("Invalid or duplicate code identifier: "+name);
+        var current=ports(after);var seen=new HashSet<String>();for(var p:current)if(!p.name().matches("[A-Za-z_][A-Za-z0-9_]*")||!seen.add(p.name())||FormulaCompiler.CONTEXT.contains(p.name())||FormulaCompiler.FUNCTIONS.containsKey(p.name())||Set.of("state","final","const","for","while","return","float","double","int","long","uint","ulong","unsigned","bool","if","else","true","false","pi","tau").contains(p.name()))throw new IllegalArgumentException("Invalid or duplicate code identifier: "+name);
         var metadata=new HashMap<>(after.metadata());metadata.put(SOURCE,GLNodeValue.of(source));metadata.put(DRAFT,GLNodeValue.of(renameText(draft(a),old,name)));metadata.put(PORTS,storedPorts(accepted));return metadata(after,metadata);
     }
     private static String renameText(String text,String old,String replacement){

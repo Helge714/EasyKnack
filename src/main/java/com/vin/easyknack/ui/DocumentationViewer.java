@@ -51,13 +51,14 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
         copy.addActionListener(e->java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(content.document().plain()),null));
         close.addActionListener(e->onClose.run());setBounds(0,0,1100,740);buttons();
     }
-    static void show(GLContainer owner,String page){
+    static void show(GLContainer owner,String page){show(owner,page,"");}
+    static void show(GLContainer owner,String page,String anchor){
         var dialog=new GLDialog[1];var panel=new DocumentationViewer(()->dialog[0].close());
         dialog[0]=new GLDialog(AppText.text("help.nodeDocumentation"),panel);dialog[0].setDecoration(GLDialog.Decoration.THEMED);
         int width=1200,height=820;
         if(!java.awt.GraphicsEnvironment.isHeadless()){var screen=java.awt.Toolkit.getDefaultToolkit().getScreenSize();width=Math.max(320,Math.min(width,screen.width-80));height=Math.max(240,Math.min(height,screen.height-100));}
         dialog[0].setSize(width,height);dialog[0].closedFuture().whenComplete((v,e)->panel.disposed=true);
-        dialog[0].show(owner);panel.openPage(page);
+        dialog[0].show(owner);panel.openPage(page,anchor);
     }
     CompletableFuture<Void> chooseLanguage(Language next){
         try{ApplicationSettings.saveDocumentationLanguage(next.id);}
@@ -69,7 +70,8 @@ final class DocumentationViewer extends GLContainer implements GLKeyPressCapture
         return document.title()+(contentLocale().getLanguage().equals("de")&&!page.contains("/de/")?" \u2014 "+AppText.text("help.englishFallback"):"");
     }
     Position position(){return current==null?null:new Position(current.page(),"",scroll.getHorizontalScrollOffset(),scroll.getVerticalScrollOffset());}
-    CompletableFuture<Void> openPage(String page){return navigate(new Position(page,"",0,0),true);}
+    CompletableFuture<Void> openPage(String page){return openPage(page,"");}
+    CompletableFuture<Void> openPage(String page,String anchor){return navigate(new Position(page,anchor,0,0),true);}
     CompletableFuture<Void> follow(String link){
         if(current==null)return CompletableFuture.completedFuture(null);
         String target=NodeDocumentation.target(current.page(),link);String anchor=link.contains("#")?link.substring(link.indexOf('#')+1):"";

@@ -7,6 +7,26 @@ import org.junit.jupiter.api.Test;
 class FormulaFunctionsTest {
     static final List<FormulaCompiler.Port> PORTS=List.of(FormulaCompilerTest.number("signal",false),FormulaCompilerTest.number("result",true));
     static FormulaCompiler.Program compile(String source){return FormulaCompiler.compile(source,PORTS,3);}
+    @Test void finalAndConstHaveDistinctDependenciesAndCannotBeReassigned(){
+        for(String code:List.of(
+            "final float gain=signal*2;result=gain;",
+            "const float lo=0.5;const float hi=lo*4;result=hi;",
+            "const double angle=sin(pi/2);result=angle;",
+            "float f(final float x){final float y=x*2;return y;}final float x=1;result=f(x);",
+            "result=0;if(signal>0){const float x=2;result=x;}float x=3;x+=1;result+=x;",
+            "result=0;for(int i=0;i<3;i++){final float x=i;result+=x;}float x=1;x=2;result+=x;"))assertDoesNotThrow(()->compile(code),code);
+        for(String code:List.of(
+            "final float x=1;x=2;result=x;", "const float x=1;x+=2;result=x;",
+            "const float x=signal;result=x;", "final float x=1;const float y=x;result=y;",
+            "float x=1;const float y=x;result=y;", "const double x=sampleRate;result=x;",
+            "const float x=rand(0,1);result=x;", "const float x=sineWave(0);result=x;",
+            "state final float x=0;result=x;", "const final float x=1;result=x;", "final const float x=1;result=x;",
+            "float f(final float x){x+=1;return x;}result=f(signal);",
+            "float f(const float x){return x;}result=f(signal);",
+            "float f(float x){const float y=x;return y;}result=f(signal);"))assertThrows(FormulaCompiler.Failure.class,()->compile(code),code);
+        assertTrue(FormulaCompiler.compile("const float x=2;result=x;",PORTS,2).bytecode().startsWith("FORM3"));
+        assertTrue(compile("final float gain=signal;result=gain;").usedInputs().contains(PORTS.get(0).id()));
+    }
     @Test void functionsSupportForwardCallsBranchesAndLexicalParameters(){
         for(String source:List.of(
             "float square(float x){return x*x;} result=square(signal);",

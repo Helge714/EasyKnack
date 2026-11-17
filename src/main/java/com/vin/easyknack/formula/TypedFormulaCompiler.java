@@ -15,7 +15,7 @@ final class TypedFormulaCompiler {
     static final Set<String> TYPES=Set.of("bool","int","uint","long","ulong","float","double","unsigned");
     static boolean isTyped(String source){
         var ts=FormulaCompiler.tokens(source);
-        for(int i=0;i<ts.size();i++)if(Set.of("int","uint","long","ulong","double","unsigned","for","return").contains(ts.get(i).text())||TYPES.contains(ts.get(i).text())&&i+2<ts.size()&&ts.get(i+2).text().equals("(")||ts.get(i).text().equals("(")&&i+2<ts.size()&&TYPES.contains(ts.get(i+1).text())&&ts.get(i+2).text().equals(")"))return true;
+        for(int i=0;i<ts.size();i++)if(Set.of("int","uint","long","ulong","double","unsigned","for","return","final","const").contains(ts.get(i).text())||TYPES.contains(ts.get(i).text())&&i+2<ts.size()&&ts.get(i+2).text().equals("(")||ts.get(i).text().equals("(")&&i+2<ts.size()&&TYPES.contains(ts.get(i+1).text())&&ts.get(i+2).text().equals(")"))return true;
         return false;
     }
     static Program compile(String source,List<Port> ports,int version){return new Parser(source,ports,version).compile();}
@@ -27,11 +27,11 @@ final class TypedFormulaCompiler {
         final List<Token> ts; final List<Port> ports; final int version;
         final Map<String,V> vars=new LinkedHashMap<>();final Set<String> assigned=new HashSet<>(),used=new LinkedHashSet<>();
         final List<I> ins=new ArrayList<>();final List<S> states=new ArrayList<>();int at,registers,depth,serial;boolean body,contextual;
-        record Parameter(String name,K kind){}
+        record Parameter(String name,K kind,boolean readOnly){}
         record Function(String name,K kind,List<Parameter> parameters,int body,int end){}
         record ReturnFrame(K kind,int register,List<Integer> jumps){}
         final Map<String,Function> functions=new LinkedHashMap<>();final Map<Integer,Function> definitions=new HashMap<>();
-        final Set<String> calls=new HashSet<>(),counters=new HashSet<>();ReturnFrame returns;
+        final Set<String> calls=new HashSet<>(),counters=new HashSet<>(),readOnly=new HashSet<>(),constants=new HashSet<>();boolean constantInitializer;ReturnFrame returns;
         Parser(String source,List<Port> ports,int version){
             this.ts=FormulaCompiler.tokens(source);this.ports=List.copyOf(ports);this.version=version;
             var ids=new HashSet<String>();int in=0,out=0;
@@ -44,7 +44,7 @@ final class TypedFormulaCompiler {
                 if(!p.output()||k==K.BOOL)assigned.add(p.name());
             }
         }
-        boolean reserved(String n){return TYPES.contains(n)||Set.of("state","if","else","for","while","return","true","false","pi","tau").contains(n)||CONTEXT.contains(n)||FUNCTIONS.containsKey(n)||functions.containsKey(n);}
+        boolean reserved(String n){return TYPES.contains(n)||Set.of("state","final","const","if","else","for","while","return","true","false","pi","tau").contains(n)||CONTEXT.contains(n)||FUNCTIONS.containsKey(n)||functions.containsKey(n);}
         Program compile(){
             collectFunctions();
             validateFunctions();
@@ -66,7 +66,7 @@ final class TypedFormulaCompiler {
                     if(name.text().matches("[A-Za-z_][A-Za-z0-9_]*")&&at+1<ts.size()&&ts.get(at+1).text().equals("(")){
                         if(reserved(name.text())||vars.containsKey(name.text()))throw new Failure(name,"Duplicate or reserved function name");
                         at+=2;var parameters=new ArrayList<Parameter>();var names=new HashSet<String>();
-                        if(!peek(")"))do{K k=type();if(k==null)throw fail("Expected parameter type");Token p=identifier();if(reserved(p.text())||!names.add(p.text()))throw new Failure(p,"Duplicate or reserved parameter");parameters.add(new Parameter(p.text(),k));if(parameters.size()>16)throw fail("At most 16 parameters per function");}while(take(","));
+                        if(!peek(")"))do{boolean immutable=take("final");if(peek("const"))throw fail("Use final for parameters; const requires a constant initializer");K k=type();if(k==null)throw fail("Expected parameter type");Token p=identifier();if(reserved(p.text())||!names.add(p.text()))throw new Failure(p,"Duplicate or reserved parameter");parameters.add(new Parameter(p.text(),k,immutable));if(parameters.size()>16)throw fail("At most 16 parameters per function");}while(take(","));
                         expect(")");int body=at;expect("{");int braces=1;
                         while(braces>0){if(peek(""))throw fail("Expected }");if(take("{"))braces++;else if(take("}"))braces--;else at++;}
                         var f=new Function(name.text(),kind,List.copyOf(parameters),body,at);functions.put(name.text(),f);definitions.put(start,f);continue;
@@ -93,21 +93,22 @@ final class TypedFormulaCompiler {
         }
         E inlineFunction(Function f,List<E> args,Token token){
             if(!calls.add(f.name()))throw new Failure(token,"Recursive function calls are not supported");
-            int savedAt=at;boolean savedBody=body;var savedVars=new LinkedHashMap<>(vars);var savedAssigned=new HashSet<>(assigned);var savedCounters=new HashSet<>(counters);var savedReturns=returns;
+            int savedAt=at;boolean savedBody=body;var savedVars=new LinkedHashMap<>(vars);var savedAssigned=new HashSet<>(assigned);var savedCounters=new HashSet<>(counters);var savedReadOnly=new HashSet<>(readOnly);var savedConstants=new HashSet<>(constants);var savedReturns=returns;
             var code=new StringBuilder("([&]() -> "+f.kind().cpp+" {\n");
-            vars.entrySet().removeIf(e->e.getValue().port()==null||e.getValue().port().output());assigned.retainAll(vars.keySet());counters.clear();
+            vars.entrySet().removeIf(e->e.getValue().port()==null||e.getValue().port().output());assigned.retainAll(vars.keySet());counters.clear();readOnly.clear();constants.clear();
             int result=registers++;returns=new ReturnFrame(f.kind(),result,new ArrayList<>());vars.put("$return",new V(f.kind(),"",result,null));
             try{
                 for(int i=0;i<args.size();i++){
                     var p=f.parameters().get(i);E value=assignment(args.get(i),p.kind(),false);int reg=registers++;String cpp="parameter"+(serial++);
                     emit("copy",p.kind(),reg,value.reg(),0,0,"0");vars.put(p.name(),new V(p.kind(),cpp,reg,null));assigned.add(p.name());
-                    code.append(p.kind().cpp).append(' ').append(cpp).append(" = ").append(value.cpp()).append(";\n");
+                    if(p.readOnly())readOnly.add(p.name());
+                    code.append(p.readOnly()?"const ":"").append(p.kind().cpp).append(' ').append(cpp).append(" = ").append(value.cpp()).append(";\n");
                 }
                 at=f.body();code.append(statement());
                 if(!assigned.contains("$return"))throw new Failure(ts.get(f.body()),"Function must return a value on every path: "+f.name());
                 for(int jump:returns.jumps())jump(jump,ins.size());
                 return new E(f.kind(),code.append("})()").toString(),result);
-            }finally{at=savedAt;body=savedBody;vars.clear();vars.putAll(savedVars);assigned.clear();assigned.addAll(savedAssigned);counters.clear();counters.addAll(savedCounters);returns=savedReturns;calls.remove(f.name());}
+            }finally{at=savedAt;body=savedBody;vars.clear();vars.putAll(savedVars);assigned.clear();assigned.addAll(savedAssigned);counters.clear();counters.addAll(savedCounters);readOnly.clear();readOnly.addAll(savedReadOnly);constants.clear();constants.addAll(savedConstants);returns=savedReturns;calls.remove(f.name());}
         }
         long integerLiteral(){
             boolean negative=take("-");if(!negative)take("+");Token token=now();
@@ -159,7 +160,7 @@ final class TypedFormulaCompiler {
                 if(peek("while"))throw fail("Use a for loop with fixed integer bounds (at most 1024 iterations)");
                 if(take("state")){
                     if(depth!=1||body||states.size()>=64)throw fail("Declare at most 64 state variables at the beginning, outside branches");
-                    K k=type();if(k==null)throw fail("Expected state type");Token name=identifier();if(vars.containsKey(name.text())||reserved(name.text()))throw fail("Duplicate or reserved variable");expect("=");
+                    if(peek("final")||peek("const"))throw fail("state variables cannot be final or const");K k=type();if(k==null)throw fail("Expected state type");Token name=identifier();if(vars.containsKey(name.text())||reserved(name.text()))throw fail("Duplicate or reserved variable");expect("=");
                     boolean neg=take("-");if(!neg)take("+");Token literal=now();at++;
                     if(literal.end()==now().start()&&Set.of("f","F","u","U","l","L","ul","UL","ull","ULL").contains(now().text()))at++;
                     String bits=stateBits(k,(neg?"-":"")+literal.text());expect(";");int slot=states.size();states.add(new S(name.text(),k,bits));
@@ -167,26 +168,28 @@ final class TypedFormulaCompiler {
                     return k.cpp+" "+cpp+" = easyknack::formulaUnpack<"+k.cpp+">(context.typedState["+slot+"]);\n";
                 }
                 body=true;
-                if(take("{")){var before=new HashSet<>(vars.keySet());var code=new StringBuilder("{\n");while(!peek("}")){if(peek(""))throw fail("Expected }");code.append(statement());}expect("}");vars.keySet().retainAll(before);assigned.retainAll(before);return code.append("}\n").toString();}
+                if(take("{")){var before=new HashSet<>(vars.keySet());var code=new StringBuilder("{\n");while(!peek("}")){if(peek(""))throw fail("Expected }");code.append(statement());}expect("}");vars.keySet().retainAll(before);assigned.retainAll(before);readOnly.retainAll(before);constants.retainAll(before);return code.append("}\n").toString();}
                 if(take("if")){
                     expect("(");Token condition=now();E e=expression(0);try{requireBool(e);}catch(Failure error){throw new Failure(condition,error.getMessage());}expect(")");int j=emit("jz",K.BOOL,0,e.reg(),0,0,"0");var before=new HashSet<>(assigned);String yes=branch();var after=new HashSet<>(assigned);assigned.clear();assigned.addAll(before);int end=emit("jump",K.BOOL,0,0,0,0,"0");jump(j,ins.size());String no=take("else")?branch():"{}\n";after.retainAll(assigned);assigned.clear();assigned.addAll(after);jump(end,ins.size());return "if ("+e.cpp()+") "+yes+"else "+no;
                 }
-                K declared=type();Token name=identifier();V v=vars.get(name.text());
+                boolean constant=take("const"),immutable=constant||take("final");
+                K declared=type();if(immutable&&declared==null)throw fail("Use one qualifier (const or final), followed by a variable type");Token name=identifier();V v=vars.get(name.text());
                 if(declared!=null){if(v!=null||reserved(name.text()))throw fail("Duplicate or reserved variable");v=new V(declared,"local"+(serial++),registers++,null);}
                 else if(v==null)throw new Failure(name,"Unknown variable: "+name.text());
+                else if(readOnly.contains(name.text()))throw new Failure(name,"Cannot assign to a final or const variable: "+name.text());
                 else if(counters.contains(name.text()))throw new Failure(name,"Loop counters are read-only inside the loop body");
                 else if(returns!=null&&v.port()!=null)throw new Failure(name,"Function ports are read-only; use the return value");
                 else if(v.port()!=null&&!v.port().output())throw new Failure(name,"Inputs are read-only");
                 String op=now().text();boolean compound=Set.of("+=","-=","*=","/=").contains(op);
                 if(compound){if(declared!=null||!assigned.contains(name.text()))throw fail("Compound assignment requires an initialized variable");at++;}else expect("=");
-                E value=expression(0);expect(";");if(compound)value=binary(op.substring(0,1),new E(v.kind(),v.cpp(),v.reg()),value);
-                try{value=assignment(value,v.kind(),v.port()!=null);}catch(Failure e){throw new Failure(name,e.getMessage());}vars.put(name.text(),v);assigned.add(name.text());emit("copy",v.kind(),v.reg(),value.reg(),0,0,"0");
+                E value;constantInitializer=constant;try{value=expression(0);}finally{constantInitializer=false;}expect(";");if(compound)value=binary(op.substring(0,1),new E(v.kind(),v.cpp(),v.reg()),value);
+                try{value=assignment(value,v.kind(),v.port()!=null);}catch(Failure e){throw new Failure(name,e.getMessage());}vars.put(name.text(),v);assigned.add(name.text());if(immutable)readOnly.add(name.text());if(constant)constants.add(name.text());emit("copy",v.kind(),v.reg(),value.reg(),0,0,"0");
                 String target=v.port()!=null?v.port().type()==Type.BOOLEAN?"output["+outputIndex(v.port())+"]":v.cpp():v.cpp();
-                return (declared==null?"":declared.cpp+" ")+target+" = "+value.cpp()+";\n";
+                return (declared==null?"":(immutable?"const ":"")+declared.cpp+" ")+target+" = "+value.cpp()+";\n";
             }finally{depth--;}
         }
         int outputIndex(Port p){int n=0;for(var q:ports)if(q.output()){if(q==p)return n;n++;}throw new AssertionError();}
-        String branch(){var before=new HashSet<>(vars.keySet());String s=statement();vars.keySet().retainAll(before);assigned.retainAll(before);return "{\n"+s+"}\n";}
+        String branch(){var before=new HashSet<>(vars.keySet());String s=statement();vars.keySet().retainAll(before);assigned.retainAll(before);readOnly.retainAll(before);constants.retainAll(before);return "{\n"+s+"}\n";}
         E expression(int min){enter();try{E left=primary();while(true){String op=now().text();int p=precedence(op);if(p<min)break;at++;
             if(op.equals("&&")||op.equals("||")){requireBool(left);int reg=registers++;emit("copy",K.BOOL,reg,left.reg(),0,0,"0");int jump=emit(op.equals("&&")?"jz":"jnz",K.BOOL,0,left.reg(),0,0,"0");E right=expression(p+1);requireBool(right);emit("copy",K.BOOL,reg,right.reg(),0,0,"0");jump(jump,ins.size());left=new E(K.BOOL,"("+left.cpp()+op+right.cpp()+")",reg);}
             else left=binary(op,left,expression(p+1));
@@ -206,6 +209,7 @@ final class TypedFormulaCompiler {
             if(take("+")){E e=expression(7);numeric(e.kind());return e.kind()==K.BOOL?cast(e,K.INT):e;}
             if(take("(")){K k=type();if(k!=null){expect(")");return cast(expression(7),k);}E e=expression(0);expect(")");return e;}
             Token t=now();at++;String n=t.text();
+            if(constantInitializer&&(CONTEXT.contains(n)||functions.containsKey(n)||Set.of("rand","sineWave").contains(n)||vars.containsKey(n)&&!constants.contains(n)))throw new Failure(t,"const initializer must use literals, constants and pure built-in math functions only");
             if(CONTEXT.contains(n)){contextual|=!n.equals("sampleRate")&&!n.equals("blockSize");K k=n.equals("sampleRate")?K.DOUBLE:K.ULONG;return operation(k,k,"context."+n,n,0,0,0,"0");}
             V v=vars.get(n);
             if(v!=null&&take("."))return member(v);

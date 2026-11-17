@@ -6,9 +6,11 @@ import com.vingame.glswing.ui.*;
 
 /** Core code-editor integration using the same parser as native code generation. */
 public final class FormulaLanguage implements GLCodeLanguage {
+    private static final Map<String,GLTextStyle> MODIFIER_STYLES=Map.of("readonly",new GLTextStyle(true,false),"persistent",new GLTextStyle(false,true));
     private final List<FormulaCompiler.Port> ports; private final int version;
     public FormulaLanguage(List<FormulaCompiler.Port> ports){this(ports,2);} public FormulaLanguage(List<FormulaCompiler.Port> ports,int version){this.ports=List.copyOf(ports);this.version=version;}
     @Override public String id(){return "easyknack-formula";}
+    @Override public Map<String,GLTextStyle> semanticModifierStyles(){return MODIFIER_STYLES;}
     @Override public boolean supportsAutomaticCompletion(){return true;}
     @Override public String indentationAfter(String source,int offset,int width){return " ".repeat(FormulaIndentation.next(source.substring(0,offset))*width);}
     @Override public String formatSource(String source,int width){return FormulaIndentation.format(source,width);}
@@ -17,7 +19,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
         var result=new ArrayList<GLCodeToken>();
         var pattern=java.util.regex.Pattern.compile("//[^\\r\\n]*|[A-Za-z_][A-Za-z0-9_]*|(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?");
         var m=pattern.matcher(source);while(m.find()){
-            String s=m.group();var type=s.startsWith("//")?GLCodeToken.Type.COMMENT:TypedFormulaCompiler.TYPES.contains(s)?GLCodeToken.Type.TYPE:Character.isDigit(s.charAt(0))||s.charAt(0)=='.'?GLCodeToken.Type.NUMBER:Set.of("state","if","else","for","return","true","false","pi","tau").contains(s)||FormulaCompiler.CONTEXT.contains(s)||FormulaCompiler.FUNCTIONS.containsKey(s)?GLCodeToken.Type.KEYWORD:GLCodeToken.Type.PLAIN;
+            String s=m.group();var type=s.startsWith("//")?GLCodeToken.Type.COMMENT:TypedFormulaCompiler.TYPES.contains(s)?GLCodeToken.Type.TYPE:Character.isDigit(s.charAt(0))||s.charAt(0)=='.'?GLCodeToken.Type.NUMBER:Set.of("state","final","const","if","else","for","return","true","false","pi","tau").contains(s)||FormulaCompiler.CONTEXT.contains(s)||FormulaCompiler.FUNCTIONS.containsKey(s)?GLCodeToken.Type.KEYWORD:GLCodeToken.Type.PLAIN;
             result.add(new GLCodeToken(m.start(),m.end(),type));
         }return List.copyOf(result);
     }
@@ -47,7 +49,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
                 names.putAll(members(owner));if(names.containsKey("read"))callable.add("read");
             }else if(previous.equals("unsigned")){
                 names.put("int",FormulaEditorHelp.type("uint"));names.put("long",FormulaEditorHelp.type("ulong"));
-            }else if(previous.equals("state")){
+            }else if(Set.of("state","final","const").contains(previous)){
                 TypedFormulaCompiler.TYPES.forEach(n->names.put(n,FormulaEditorHelp.type(n)));
             }else if(TypedFormulaCompiler.TYPES.contains(previous)){
                 return CompletableFuture.completedFuture(List.of()); // A new name belongs here, not an existing symbol.
@@ -58,7 +60,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
                 FormulaCompiler.FUNCTIONS.keySet().forEach(n->{names.put(n,FormulaEditorHelp.function(n,typed).description());callable.add(n);});
                 symbols.functions.forEach((n,f)->{names.put(n,f.call().description());callable.add(n);});
                 TypedFormulaCompiler.TYPES.forEach(n->names.put(n,FormulaEditorHelp.type(n)));
-                for(String n:List.of("state","if","else","for","return","true","false","pi","tau"))names.put(n,keyword(n,typed));
+                for(String n:List.of("state","final","const","if","else","for","return","true","false","pi","tau"))names.put(n,keyword(n,typed));
                 for(String n:List.of("Clamp","Wrap","Zero","Linear","Nearest","Audio","Control"))names.putIfAbsent(n,option(n));
             }
             var proposals=new ArrayList<GLCodeCompletion>();int next=end;while(next<text.length()&&Character.isWhitespace(text.charAt(next)))next++;boolean parenthesis=next<text.length()&&text.charAt(next)=='(';
@@ -112,10 +114,12 @@ public final class FormulaLanguage implements GLCodeLanguage {
             if(offset>0&&(offset==d.text().length()||!Character.isJavaIdentifierPart(d.text().charAt(offset)))&&Character.isJavaIdentifierPart(d.text().charAt(offset-1)))offset--;
             if(symbols.inComment(offset))return CompletableFuture.completedFuture(List.of());
             for(var token:symbols.tokens)if(offset>=token.start()&&offset<token.end()){
+                String owner=memberOwner(d.text(),token.start());
+                if(owner!=null)return CompletableFuture.completedFuture(token.text().equals("read")&&members(owner).containsKey("read")?List.of(new GLCodeLocation(java.net.URI.create("easyknack-formula-help:/buffer-read"),0,0)):List.of());
                 Integer target=null;var function=symbols.functions.get(token.text());
                 if(function!=null)target=function.start();
                 else {var symbol=symbols.symbol(token.text(),token.start()).orElse(null);if(symbol!=null)target=symbol.start();}
-                if(target==null)return CompletableFuture.completedFuture(List.of());
+                if(target==null)return CompletableFuture.completedFuture(FormulaCompiler.FUNCTIONS.containsKey(token.text())?List.of(new GLCodeLocation(java.net.URI.create("easyknack-formula-help:/"+token.text().toLowerCase(Locale.ROOT)),0,0)):List.of());
                 String before=d.text().substring(0,target);int line=(int)before.chars().filter(c->c=='\n').count();
                 return CompletableFuture.completedFuture(List.of(new GLCodeLocation(d.uri(),line,target-before.lastIndexOf('\n')-1)));
             }
@@ -129,10 +133,14 @@ public final class FormulaLanguage implements GLCodeLanguage {
                     tokens.add(new GLCodeSemanticToken(token.start(),token.end(),"function",Set.of()));
                     continue;
                 }
+                if(FormulaCompiler.CONTEXT.contains(token.text())){
+                    tokens.add(new GLCodeSemanticToken(token.start(),token.end(),"variable",Set.of("readonly")));continue;
+                }
                 var symbol=symbols.symbol(token.text(),token.start()).orElse(null);
                 if(symbol!=null){
                     boolean parameter=symbols.functions.values().stream().flatMap(f->f.parameters().stream()).anyMatch(p->p.start()==symbol.start());
-                    tokens.add(new GLCodeSemanticToken(token.start(),token.end(),parameter?"parameter":"variable",!parameter&&token.start()==symbol.start()?Set.of("declaration"):Set.of()));
+                    var modifiers=new HashSet<String>();if(token.start()==symbol.start())modifiers.add("declaration");if(symbol.state())modifiers.add("persistent");if(!symbol.qualifier().isEmpty())modifiers.add("readonly");
+                    tokens.add(new GLCodeSemanticToken(token.start(),token.end(),parameter?"parameter":"variable",Set.copyOf(modifiers)));
                 }else for(var port:ports)if(port.name().equals(token.text())){
                     tokens.add(new GLCodeSemanticToken(token.start(),token.end(),"variable",port.output()?Set.of():Set.of("readonly")));break;
                 }
@@ -173,6 +181,6 @@ public final class FormulaLanguage implements GLCodeLanguage {
     }
     private static String portDescription(FormulaCompiler.Port p){return (p.type()==FormulaCompiler.Type.NUMBER?"float":p.type()==FormulaCompiler.Type.BOOLEAN?"bool":"Buffer")+" "+p.name()+" — "+(p.output()?"output":"read-only input")+"; port ID: "+p.id();}
     private static String contextDescription(String name,boolean typed){String type=typed?(name.equals("sampleRate")?"double":"ulong"):"float";return type+" "+name+" — "+switch(name){case "sampleRate"->"sample rate in Hz.";case "blockSize"->"full audio block length in samples, including during feedback processing.";case "samplePosition"->"samples processed by this node; retained across live edits; advances a full block at Control rate.";default->"zero-based sample offset in the current audio block.";};}
-    private static String keyword(String name,boolean typed){return switch(name){case "state"->"state type name = literal; persistent per processor. Matching name/type/initializer retains state across live edits.";case "if"->"if (bool condition) statement; else statement; braces are optional.";case "for"->"for (int i=0; i<8; i++) { ... } — fixed integer bounds, at most 1024 iterations; counter is read-only in the body.";case "return"->"return expression; — return a value from a user-defined function.";case "else"->"Alternative branch when the if condition is false.";case "true","false"->"bool constant: "+name;case "pi"->(typed?"double":"float")+" pi — π radians (half a turn).";case "tau"->(typed?"double":"float")+" tau — 2π radians (one turn).";default->null;};}
+    private static String keyword(String name,boolean typed){return switch(name){case "final"->"final type name = expression; read-only during this evaluation; recomputed for every sample or Control block.";case "const"->"const type name = constant expression; use literals, earlier const variables and pure built-in math only. Implies read-only; do not combine with final.";case "state"->"state type name = literal; persistent per processor. Matching name/type/initializer retains state across live edits.";case "if"->"if (bool condition) statement; else statement; braces are optional.";case "for"->"for (int i=0; i<8; i++) { ... } — fixed integer bounds, at most 1024 iterations; counter is read-only in the body.";case "return"->"return expression; — return a value from a user-defined function.";case "else"->"Alternative branch when the if condition is false.";case "true","false"->"bool constant: "+name;case "pi"->(typed?"double":"float")+" pi — π radians (half a turn).";case "tau"->(typed?"double":"float")+" tau — 2π radians (one turn).";default->null;};}
     private static String option(String name){return switch(name){case "Clamp"->"Buffer read: hold the nearest valid sample outside the available range.";case "Wrap"->"Buffer read: wrap the position into the available range.";case "Zero"->"Buffer read: return zero outside the available range.";case "Linear"->"Buffer read: linear interpolation between adjacent samples.";case "Nearest"->"Buffer timeline read: nearest sample (legacy boolean false uses the lower index).";case "Audio"->"Signal rate constant: 1.";default->"Signal rate constant: 0.";};}
 }

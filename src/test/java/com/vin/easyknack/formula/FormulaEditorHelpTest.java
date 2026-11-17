@@ -7,7 +7,21 @@ import org.junit.jupiter.api.Test;
 import com.vingame.glswing.ui.*;
 
 class FormulaEditorHelpTest {
-    @Test void definitionsResolveForwardFunctionsParametersAndLocalsButNotCommentsOrBuiltins(){
+    @Test void qualifiersHaveCompletionHoverAndPersistentOrReadonlyEmphasis(){
+        String text="state float phase=0;float f(final float x){return x;}const float lo=0.5;final float gain=signal;result=f(gain)+lo+phase+sampleRate;";
+        var d=doc(text);var language=new FormulaLanguage(ports,3);
+        try(var session=language.codeIntelligenceProvider().open(d,r->{})){
+            var tokens=session.semanticTokens(d).toCompletableFuture().join();
+            for(String name:List.of("lo","gain","x","signal","sampleRate"))assertTrue(tokens.stream().anyMatch(t->text.substring(t.start(),t.end()).equals(name)&&t.modifiers().contains("readonly")),name);
+            assertTrue(tokens.stream().filter(t->text.substring(t.start(),t.end()).equals("phase")).allMatch(t->t.modifiers().contains("persistent")));
+        }
+        assertTrue(language.semanticModifierStyles().get("readonly").bold());assertTrue(language.semanticModifierStyles().get("persistent").italic());
+        assertTrue(hover(text,text.lastIndexOf("gain")).contains("final float gain"));
+        assertTrue(hover(text,text.lastIndexOf("lo")).contains("const float lo"));
+        assertTrue(complete("const ",6).stream().anyMatch(c->c.label().equals("float")));
+        var read=doc("result=buffer.read(0);");try(var session=language.codeIntelligenceProvider().open(read,r->{})){assertEquals(URI.create("easyknack-formula-help:/buffer-read"),session.definitions(read,16).toCompletableFuture().join().get(0).uri());}
+    }
+    @Test void definitionsResolveUserSymbolsAndBuiltinDocumentationButIgnoreComments(){
         String source="// shape(signal)\r\nresult=shape(signal);\r\nfloat shape(float x){float local=x*2;return local;}";var d=doc(source);
         try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){
             var function=session.definitions(d,source.indexOf("shape",source.indexOf("result="))).toCompletableFuture().join().get(0);
@@ -16,7 +30,7 @@ class FormulaEditorHelpTest {
             var local=session.definitions(d,source.lastIndexOf("local")).toCompletableFuture().join().get(0);assertEquals(source.indexOf("local=")-source.lastIndexOf('\n',source.indexOf("local="))-1,local.character());
             assertTrue(session.definitions(d,5).toCompletableFuture().join().isEmpty());
         }
-        var builtin=doc("result=sin(signal);");try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(builtin,r->{})){assertTrue(session.definitions(builtin,8).toCompletableFuture().join().isEmpty());}
+        var builtin=doc("result=sin(signal);");try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(builtin,r->{})){assertEquals(URI.create("easyknack-formula-help:/sin"),session.definitions(builtin,8).toCompletableFuture().join().get(0).uri());}
     }
     @Test void coreNavigationMovesTheCaretToTheFormulaFunctionDeclaration()throws Exception {
         String text="result=shape(signal);\nfloat shape(float x){return x*2;}";var editor=new java.util.concurrent.atomic.AtomicReference<GLCodeEditor>();
