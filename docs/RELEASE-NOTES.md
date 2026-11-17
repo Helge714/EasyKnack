@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Add documentation Find using the shared Core text/code search dialog, with
+  match highlighting and navigation; remove component-name documentation tooltips.
+
 - Separate the bilingual Formula language reference from group controls, with
   detailed state/final/const lifetimes and examples; built-in help opens it directly.
 

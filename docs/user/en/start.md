@@ -22,7 +22,7 @@ Audio files and plugins are not embedded in `.knack`. Check them after sharing o
 
 Application preferences control language and appearance. Document settings include control interpolation, unused groups and experimental features. Legacy documents using experimental nodes enable the option automatically unless explicitly saved off. Disabling it while such nodes exist requires warning confirmation; existing nodes remain intact.
 
-The documentation window remembers **Same as application / Deutsch / English** independently of application language. Node context menus and Help open the relevant node reference; Back/Forward follows local links.
+The documentation window remembers **Same as application / Deutsch / English** independently of application language. Node context menus and Help open the relevant node reference; Back/Forward follows local links. **Find / Ctrl+F** searches the current page with the same options as the text/code editor; **F3 / Shift+F3** selects the next/previous highlighted match.
 
 [Manual](index.md) · [Node index](../../nodes/en/index.md) · [Deutsch](../de/start.md)
 

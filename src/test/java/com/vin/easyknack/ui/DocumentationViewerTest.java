@@ -8,6 +8,24 @@ import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 
 class DocumentationViewerTest {
+    @Test void sharedCoreSearchHighlightsScrollsAndNavigatesAndClearsOnNewPage()throws Exception {
+        var holder=new AtomicReference<DocumentationViewer>();
+        SwingUtilities.invokeAndWait(()->{var panel=new DocumentationViewer(()->{});panel.setBounds(0,0,800,320);holder.set(panel);});
+        var panel=holder.get();await(()->panel.openPage("user/en/formula-language.md"));
+        SwingUtilities.invokeAndWait(()->{
+            assertTrue(panel.find.isEnabled());
+            assertTrue(panel.content.startSearch("buffer.read",com.vingame.glswing.ui.GLTextSearchOptions.DEFAULT)>0);
+            assertFalse(panel.content.searchHighlights().isEmpty());assertTrue(panel.scroll.getVerticalScrollOffset()>0);
+            panel.content.startSearch("float",com.vingame.glswing.ui.GLTextSearchOptions.DEFAULT);
+            assertEquals(0,panel.content.getActiveSearchMatchIndex());
+            var next=new com.vingame.glswing.input.GLKeyEvent(new java.awt.event.KeyEvent(new java.awt.Canvas(),java.awt.event.KeyEvent.KEY_PRESSED,0,0,java.awt.event.KeyEvent.VK_F3,java.awt.event.KeyEvent.CHAR_UNDEFINED));
+            assertTrue(panel.capturesKeyPress(next));assertEquals(1,panel.content.getActiveSearchMatchIndex());
+            var previous=new com.vingame.glswing.input.GLKeyEvent(new java.awt.event.KeyEvent(new java.awt.Canvas(),java.awt.event.KeyEvent.KEY_PRESSED,0,java.awt.event.InputEvent.SHIFT_DOWN_MASK,java.awt.event.KeyEvent.VK_F3,java.awt.event.KeyEvent.CHAR_UNDEFINED));
+            assertTrue(panel.capturesKeyPress(previous));assertEquals(0,panel.content.getActiveSearchMatchIndex());
+        });
+        await(()->panel.openPage("user/en/rates.md"));
+        SwingUtilities.invokeAndWait(()->{assertEquals(0,panel.content.getSearchMatchCount());assertTrue(panel.content.searchHighlights().isEmpty());});
+    }
     @Test void formulaBuiltinNavigationAnchorsExistInBothLanguages()throws Exception {
         SwingUtilities.invokeAndWait(()->{try{
             for(String language:List.of("de","en")){
