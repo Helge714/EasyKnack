@@ -171,6 +171,16 @@ result = sum / 4.0;
 
 In typed formulas, math functions use promoted argument types; integer arguments use double except abs, sign, min, max and clamp, which preserve promoted integer types. sineWave, rand and Buffer reads return float. No automatic oversampling is applied.
 
+| Area | Functions |
+| --- | --- |
+| Magnitude and limits | [abs](#abs), [sign](#sign), [min](#min), [max](#max), [clamp](#clamp) |
+| Powers and logarithms | [sqrt](#sqrt), [pow](#pow), [exp](#exp), [expm1](#expm1), [log](#log), [log2](#log2), [log10](#log10), [log1p](#log1p) |
+| Trigonometry | [sin](#sin), [cos](#cos), [tan](#tan), [asin](#asin), [acos](#acos), [atan](#atan), [atan2](#atan2) |
+| Hyperbolic functions | [sinh](#sinh), [cosh](#cosh), [tanh](#tanh), [asinh](#asinh), [acosh](#acosh), [atanh](#atanh) |
+| Rounding and interpolation | [floor](#floor), [ceil](#ceil), [round](#round), [mix](#mix) |
+| Signal and random values | [sineWave](#sinewave), [rand](#rand) |
+| Buffer access | [buffer.read](#buffer-read) |
+
 ### abs
 
 `abs(value)` returns the magnitude. The minimum signed integer retains its value because the positive counterpart is out of range.

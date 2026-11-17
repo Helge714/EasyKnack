@@ -171,6 +171,16 @@ result = sum / 4.0;
 
 In typisierten Formeln verwenden Mathematikfunktionen den gemeinsamen Argumenttyp; ganzzahlige Argumente rechnen in double, außer abs, sign, min, max und clamp, die den gemeinsamen Ganzzahltyp erhalten. sineWave, rand und Buffer-Lesen liefern float. Es erfolgt kein automatisches Oversampling.
 
+| Bereich | Funktionen |
+| --- | --- |
+| Betrag und Begrenzung | [abs](#abs), [sign](#sign), [min](#min), [max](#max), [clamp](#clamp) |
+| Potenzen und Logarithmen | [sqrt](#sqrt), [pow](#pow), [exp](#exp), [expm1](#expm1), [log](#log), [log2](#log2), [log10](#log10), [log1p](#log1p) |
+| Trigonometrie | [sin](#sin), [cos](#cos), [tan](#tan), [asin](#asin), [acos](#acos), [atan](#atan), [atan2](#atan2) |
+| Hyperbolische Funktionen | [sinh](#sinh), [cosh](#cosh), [tanh](#tanh), [asinh](#asinh), [acosh](#acosh), [atanh](#atanh) |
+| Rundung und Interpolation | [floor](#floor), [ceil](#ceil), [round](#round), [mix](#mix) |
+| Signal und Zufall | [sineWave](#sinewave), [rand](#rand) |
+| Buffer-Zugriff | [buffer.read](#buffer-read) |
+
 ### abs
 
 `abs(value)` liefert den Betrag. Die kleinste vorzeichenbehaftete Ganzzahl bleibt unverändert, weil ihr positiver Gegenwert nicht darstellbar ist.
