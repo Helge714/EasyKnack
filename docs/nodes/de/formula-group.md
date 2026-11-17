@@ -58,7 +58,7 @@ Beim Öffnen während der laufenden Hintergrundvorbereitung erscheint eine Ladea
 
 Vervollständigung, Hover- und Signaturhilfe erklären Definitionsbereiche und Argumentdetails.
 
-Der Editor unterscheidet Übernommen, Noch nicht übernommen und Ungültiger Entwurf, getrennt vom Stand der nativen Optimierung. Ein ungültiger Entwurf erhält das letzte übernommene Programm und zeigt ein rotes, rechtsbündiges ! in einem reservierten Titelbereich am zugehörigen Formula-Node; Hover zeigt den Fehler. Funktionsnamen, Variablen, Parameter und schreibgeschützte Eingänge verwenden die jeweiligen semantischen Theme-Farben. Lange Titel werden vor der Warnmarkierung gekürzt; das ! bleibt sichtbar. Backspace öffnet keine Vervollständigung.
+Der Editor unterscheidet Übernommen, Noch nicht übernommen und Ungültiger Entwurf, getrennt vom Stand der nativen Optimierung. Ein ungültiger Entwurf erhält das letzte übernommene Programm und zeigt ein rechtsbündiges rotes Badge mit kontrastierendem ! in einem reservierten Titelbereich am zugehörigen Formula-Node; Hover zeigt den Fehler. Funktionsnamen, Variablen, Parameter und schreibgeschützte Eingänge verwenden die jeweiligen semantischen Theme-Farben. Lange Titel werden vor der Warnmarkierung gekürzt; das ! bleibt sichtbar. Backspace öffnet keine Vervollständigung. Format verwendet `name(...)` bei Aufrufen, `name(...) {` bei Definitionen und `if (...)` / `for (...)` bei Kontrollanweisungen, mit einem Leerzeichen nach Argumentkommas. Kommentare bleiben unverändert. Vorläufige und dauerhafte Parameterhinweise werden pro Argument zusammengeführt.
 
 ### Eigene Funktionen und begrenzte Schleifen
 

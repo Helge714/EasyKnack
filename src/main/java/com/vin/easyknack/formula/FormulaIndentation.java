@@ -17,11 +17,26 @@ final class FormulaIndentation {
     static String format(String source,int width){
         var layout=new FormulaIndentation(source);var result=new StringBuilder();String[] rows=source.split("\n",-1);int offset=0,previous=0;
         for(int i=0;i<rows.length;i++){
-            String row=rows[i].strip();int level=layout.lines.getOrDefault(offset,previous);
+            String row=spacing(rows[i].strip());int level=layout.lines.getOrDefault(offset,previous);
             if(!row.isEmpty())result.append(" ".repeat(level*width)).append(row);
             previous=level;if(i+1<rows.length)result.append('\n');offset+=rows[i].length()+1;
         }
         return result.toString();
+    }
+    private static String spacing(String row){
+        int comment=row.indexOf("//");String suffix=comment<0?"":row.substring(comment);
+        String code=comment<0?row:row.substring(0,comment).stripTrailing();
+        var matcher=java.util.regex.Pattern.compile("\\b([A-Za-z_][A-Za-z0-9_]*)[ \\t]*\\(").matcher(code);var normalized=new StringBuffer();
+        while(matcher.find()){
+            String name=matcher.group(1);String gap=Set.of("if","for","while","switch","return").contains(name)?" ":"";
+            matcher.appendReplacement(normalized,java.util.regex.Matcher.quoteReplacement(name+gap+"("));
+        }
+        matcher.appendTail(normalized);
+        code=normalized.toString().replaceAll("[ \\t]+"," ").replaceAll("\\([ \\t]+","(").replaceAll("[ \\t]+\\)",")")
+            .replaceAll("[ \\t]*,[ \\t]*",", ").replaceAll("\\)[ \\t]*\\{",") {")
+            .replaceAll("\\belse[ \\t]*\\{","else {").replaceAll("\\}[ \\t]*else\\b","} else")
+            .replaceAll("\\{[ \\t]+\\}","{}").stripTrailing();
+        return code+(suffix.isEmpty()?"":code.isEmpty()?suffix:" "+suffix);
     }
     private void mark(int level){if(at<tokens.size()){int line=source.lastIndexOf('\n',Math.max(0,tokens.get(at).start()-1))+1;lines.putIfAbsent(line,level);}next=level;}
     private boolean peek(String value){return at<tokens.size()&&tokens.get(at).text().equals(value);}

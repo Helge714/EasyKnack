@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.3.0
 
+- Standardize Formula call/definition spacing and merge duplicate argument hints.
+  Improve warning contrast with a filled badge; node title length no longer
+  changes minimum width, while editor/content minimum widths remain respected.
+
 - Keep Formula warnings red and right-aligned in a reserved title slot, visible
   with long names; color variables, parameters and read-only inputs semantically.
 

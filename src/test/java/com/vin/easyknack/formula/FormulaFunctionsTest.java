@@ -67,6 +67,15 @@ class FormulaFunctionsTest {
         assertEquals(0,FormulaIndentation.next("if(signal>0)\n    if(signal<2)\n        result=1;"));
         assertEquals(1,FormulaIndentation.next("if(signal>0){\n    result=1;"));
         String source="if(signal>0)\nresult=1;\nelse\nresult=0;\nresult+=2;";
-        assertEquals("if(signal>0)\n    result=1;\nelse\n    result=0;\nresult+=2;",FormulaIndentation.format(source,4));
+        assertEquals("if (signal>0)\n    result=1;\nelse\n    result=0;\nresult+=2;",FormulaIndentation.format(source,4));
+    }
+    @Test void formatUsesCppCallAndDefinitionSpacingWithoutChangingCommentsOrMeaning(){
+        String source="float shape  ( float x ,float amount )  {\nreturn tanh ( x*amount ); // keep name () {}\n}\nif(signal>0){\nresult=shape ( signal,2.0 );\n}else {\nresult=shape( 0 , 1 );\n}";
+        String formatted=FormulaIndentation.format(source,4);
+        assertTrue(formatted.contains("float shape(float x, float amount) {"));
+        assertTrue(formatted.contains("if (signal>0) {"));assertTrue(formatted.contains("} else {"));
+        assertTrue(formatted.contains("shape(signal, 2.0)"));assertTrue(formatted.contains("// keep name () {}"));
+        assertEquals(compile(source).bytecode(),compile(formatted).bytecode());assertEquals(formatted,FormulaIndentation.format(formatted,4));
+        assertEquals("float f() {}",FormulaIndentation.format("float f () { }",4));
     }
 }
