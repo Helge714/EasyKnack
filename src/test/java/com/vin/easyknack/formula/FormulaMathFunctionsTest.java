@@ -30,6 +30,38 @@ class FormulaMathFunctionsTest {
         assertTrue(FormulaEditorHelp.function("log1p",true).help().contains("NaN"));
     }
 
+    @Test void chosenBaseAndDegreeHaveArityHelpAndConstantSupport(){
+        for(int version:List.of(2,3)){
+            for(String expression:List.of("log(signal)","log(signal,2)","root(signal,3)"))assertDoesNotThrow(()->FormulaCompiler.compile("result="+expression+";",PORTS,version));
+            for(String expression:List.of("log()","log(1,2,3)","root(1)","root(1,2,3)"))assertThrows(FormulaCompiler.Failure.class,()->FormulaCompiler.compile("result="+expression+";",PORTS,version));
+        }
+        assertDoesNotThrow(()->FormulaCompiler.compile("const double n=root(8,3);const double x=log(8,2);result=n+x;",PORTS,3));
+        assertEquals(List.of("value","degree"),FormulaEditorHelp.function("root",true).parameters());
+        assertTrue(FormulaEditorHelp.function("log",true).parameters().get(1).contains("optional"));
+    }
+
+    @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
+    void chosenBaseAndRootDomainsAgreeAcrossPreviewKernelsAndStandaloneDlls()throws Exception{
+        Path root=Files.createTempDirectory(Path.of("target"),"formula-log-root-").toAbsolutePath(),cxx=Path.of(System.getProperty("easyknack.test.cxx"));
+        var cases=new LinkedHashMap<String,String>();
+        cases.put("log(8,2)","3");cases.put("log(1,10)","0");cases.put("log(4,0.5)","-2");cases.put("log(0,2)","NAN");cases.put("log(-1,2)","NAN");cases.put("log(2,0)","NAN");cases.put("log(2,1)","NAN");cases.put("log(2,-1)","NAN");cases.put("log(2,1.0/0.0)","NAN");cases.put("log(1.0/0.0,2)","INFINITY");
+        cases.put("root(16,2)","4");cases.put("root(-8,3)","-2");cases.put("root(-8,-3)","-0.5");cases.put("root(16,-2)","0.25");cases.put("root(4,0.5)","16");cases.put("root(0,3)","0");cases.put("root(0,-2)","INFINITY");cases.put("root(-16,4)","NAN");cases.put("root(-8,3.00001)","NAN");cases.put("root(8,0)","NAN");cases.put("root(8,1.0/0.0)","NAN");cases.put("root(sqrt(-1),3)","NAN");cases.put("root(-1.0/0.0,3)","-INFINITY");
+        var source=new StringBuilder("#include <cassert>\n#include <windows.h>\n#include \"FormulaProgram.hpp\"\n");var checks=new StringBuilder();int index=0;
+        var compiler=new FormulaNativeCompiler(cxx,root);
+        for(int version:List.of(2,3)){
+            for(var entry:cases.entrySet()){
+                var program=FormulaCompiler.compile("result="+entry.getKey()+";",PORTS,version);
+                source.append("void kernel").append(index).append("(const float* input,float* output,const easyknack::FormulaContext& context){\n").append(program.cpp()).append("}\n");
+                checks.append("{easyknack::FormulaProgram p;p.read(\"").append(program.bytecode()).append("\",1,1);float input[]{0},vm[1]{},native[1]{};p.evaluate(input,vm,context);kernel").append(index++).append("(input,native,context);check(vm[0],").append(entry.getValue()).append(");check(native[0],").append(entry.getValue()).append(");}\n");
+            }
+            var program=FormulaCompiler.compile("result=log(abs(signal)+1,2)+root(-8,3);",PORTS,version);var dll=compiler.compile(program);
+            checks.append("{auto library=LoadLibraryA(\"").append(dll.library().toString().replace("\\","\\\\")).append("\");assert(library);auto sample=reinterpret_cast<void(*)(const float*,float*,const easyknack::FormulaContext*)>(GetProcAddress(library,\"easyknack_formula_sample\"));assert(sample);float input[]{7},output[1]{};sample(input,output,&context);check(output[0],1);FreeLibrary(library);}\n");
+        }
+        source.append("void check(float value,float expected){if(std::isnan(expected))assert(std::isnan(value));else if(std::isinf(expected))assert(value==expected);else assert(std::abs(value-expected)<2e-6f*std::max(1.f,std::abs(expected)));}\nint main(){easyknack::FormulaContext context;\n").append(checks).append("}\n");
+        Path cpp=root.resolve("check.cpp"),exe=root.resolve("check.exe"),log=root.resolve("check.log");Files.writeString(cpp,source);
+        run(List.of(cxx.toString(),"-std=c++17","-O2","-ffp-contract=off","-static","-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),cpp.toString(),"-o",exe.toString()),log);run(List.of(exe.toString()),log);
+    }
+
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void interpretersAndGeneratedKernelsMatchStandardMathIncludingDomainBoundaries()throws Exception{
         Path root=Files.createTempDirectory(Path.of("target"),"formula-hyperbolic-").toAbsolutePath();

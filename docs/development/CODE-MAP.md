@@ -88,7 +88,7 @@ Paths below are relative to `native/audio-host/src/`.
 | Spectrum / workers / resources | `analysis/Spectrum.hpp`, `analysis/SpectrumStream.hpp`, `runtime/SpectralWorker.hpp`, `resources/AnalysisResources.hpp`, `resources/WaveformResource.hpp`, `dsp/Wavetables.hpp` | FFT frame resources, spectral work, analysis and oscillator waveforms. |
 | Buffer metadata / migration | `nodes/BufferContextNode.java`, native `nodes/BufferContextNode.hpp`, `ui/BufferContextMigration.java` | Resource size and sample-accurate next-write position; legacy writer connections and composite outputs migrate without loss. `NodeDocuments` reports file migrations through `DocumentActions`. Regression: `BufferWritePositionTest`. |
 | Buffers / generated execution / telemetry | `dsp/BufferRead.hpp`, `runtime/BakedGraph.hpp`, `runtime/CompiledInstanceAudio.hpp`, `runtime/RenderTelemetry.hpp`, `runtime/RenderCadence.hpp` | Buffer access, compiled group execution and workload/deadline measurements. |
-| Formula math execution | `FormulaProgram.hpp`, `TypedFormulaProgram.hpp`, `FormulaNumeric.hpp` | Keep function registry/help in Java, legacy/typed interpreters and generated kernels aligned. `FormulaMathFunctionsTest` covers domains and native/preview parity, including standalone SDK compilation. |
+| Formula math execution | `FormulaProgram.hpp`, `TypedFormulaProgram.hpp`, `FormulaNumeric.hpp` | Keep function registry/help in Java, legacy/typed interpreters and generated kernels aligned. `FormulaNumeric.hpp` shares chosen-base logarithm and real-root domains across kernels and interpreters. `FormulaMathFunctionsTest` covers domains and native/preview parity, including standalone SDK compilation. |
 
 ## Resources, builds and tests
 

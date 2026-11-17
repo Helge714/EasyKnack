@@ -14,7 +14,7 @@ struct TypedFormulaProgram {
     void inheritState(const TypedFormulaProgram& old)noexcept{for(std::size_t i=0;i<states.size();i++)for(std::size_t j=0;j<old.states.size();j++)if(states[i].name==old.states[j].name&&states[i].kind==old.states[j].kind&&states[i].initial==old.states[j].initial){values[i]=old.values[j];break;}}
     void read(const std::string& text,unsigned inputs,unsigned outputs){
         static const std::vector<std::string> ops={"constant","input","output","copy","cast","load","store","jump","jz","jnz","not","sampleRate","blockSize","sampleIndex","samplePosition","rand","randSeed","bufferSize","bufferInfo","bufferRead","bufferTimeline","inputRate","sineWave"};
-        static const std::vector<std::string> math={"add","sub","mul","div","mod","neg","abs","sqrt","sin","cos","tan","asin","acos","atan","atan2","exp","log","log2","log10","floor","ceil","round","pow","min","max","clamp","mix","sign","sinh","cosh","tanh","asinh","acosh","atanh","expm1","log1p","eq","ne","lt","gt","le","ge"};
+        static const std::vector<std::string> math={"add","sub","mul","div","mod","neg","abs","sqrt","sin","cos","tan","asin","acos","atan","atan2","exp","log","log2","log10","floor","ceil","round","pow","min","max","clamp","mix","sign","sinh","cosh","tanh","asinh","acosh","atanh","expm1","log1p","logBase","root","eq","ne","lt","gt","le","ge"};
         std::istringstream in(text);std::string version;unsigned size,count,sc,context;
         auto bad=[](){throw std::invalid_argument("Invalid typed formula program");};
         if(!(in>>version>>size>>count>>sc>>context)||version!="FORM3"||size==0||size>20000||count>40000||sc>64||context>1)bad();
@@ -36,7 +36,7 @@ struct TypedFormulaProgram {
                 else if(i.op==cast){reg(i.a);if(i.b>6||kinds[i.a]!=i.b)bad();}
                 else if(i.op==arithmetic){reg(i.a);reg(i.b);reg(i.c);if(kinds[i.a]!=i.kind)bad();
                     if(i.kind<5&&!(i.math<=FormulaOp::abs||i.math==FormulaOp::min||i.math==FormulaOp::max||i.math==FormulaOp::clamp||i.math==FormulaOp::sign||i.math>=FormulaOp::eq))bad();
-                    bool binary=i.math<=FormulaOp::mod||i.math==FormulaOp::atan2||i.math==FormulaOp::pow||i.math>=FormulaOp::min&&i.math<=FormulaOp::mix||i.math>=FormulaOp::eq;
+                    bool binary=i.math<=FormulaOp::mod||i.math==FormulaOp::atan2||i.math==FormulaOp::pow||i.math==FormulaOp::root||i.math==FormulaOp::logBase||i.math>=FormulaOp::min&&i.math<=FormulaOp::mix||i.math>=FormulaOp::eq;
                     if(binary&&kinds[i.b]!=i.kind)bad();if((i.math==FormulaOp::clamp||i.math==FormulaOp::mix)&&kinds[i.c]!=i.kind)bad();
                 }
                 else if(i.op==bufferRead||i.op==bufferTimeline){reg(i.a);if(kinds[i.a]!=6||i.kind!=5)bad();if(i.op==bufferRead){reg(i.b);reg(i.c);if(kinds[i.b]!=0||kinds[i.c]!=0)bad();}}

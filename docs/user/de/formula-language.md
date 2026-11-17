@@ -143,6 +143,10 @@ Für einen konfigurierten Buffer-Eingang namens buffer:
 
 Metadaten und gelesene Samples sind float. Positionen sind absolute Samplepositionen, anders als der normierte 0–1-Positionsausgang des Buffer-Nodes. Ressourcen sind schreibgeschützt und nur als Eingänge unterstützt.
 
+### buffer.read
+
+`buffer.read(position[, mode[, interpolation]])` liefert eine float-Probe an einer absoluten Sampleposition. Modi: Clamp (Standard), Wrap, Zero; Interpolation: Linear (Standard), Nearest. Leere Buffer liefern null. Alte boolesche Argumente der Sprachversion 1 behalten die physische Indexsemantik.
+
 ```cpp
 result = buffer.read(buffer.end - 1, Clamp, Linear);
 ```
@@ -174,12 +178,11 @@ In typisierten Formeln verwenden Mathematikfunktionen den gemeinsamen Argumentty
 | Bereich | Funktionen |
 | --- | --- |
 | Betrag und Begrenzung | [abs](#abs), [sign](#sign), [min](#min), [max](#max), [clamp](#clamp) |
-| Potenzen und Logarithmen | [sqrt](#sqrt), [pow](#pow), [exp](#exp), [expm1](#expm1), [log](#log), [log2](#log2), [log10](#log10), [log1p](#log1p) |
+| Potenzen und Logarithmen | [sqrt](#sqrt), [root](#root), [pow](#pow), [exp](#exp), [expm1](#expm1), [log](#log), [log2](#log2), [log10](#log10), [log1p](#log1p) |
 | Trigonometrie | [sin](#sin), [cos](#cos), [tan](#tan), [asin](#asin), [acos](#acos), [atan](#atan), [atan2](#atan2) |
 | Hyperbolische Funktionen | [sinh](#sinh), [cosh](#cosh), [tanh](#tanh), [asinh](#asinh), [acosh](#acosh), [atanh](#atanh) |
 | Rundung und Interpolation | [floor](#floor), [ceil](#ceil), [round](#round), [mix](#mix) |
 | Signal und Zufall | [sineWave](#sinewave), [rand](#rand) |
-| Buffer-Zugriff | [buffer.read](#buffer-read) |
 
 ### abs
 
@@ -192,6 +195,12 @@ In typisierten Formeln verwenden Mathematikfunktionen den gemeinsamen Argumentty
 ### sqrt
 
 `sqrt(value)` liefert die Quadratwurzel; negative Eingaben ergeben NaN.
+
+### root
+
+`root(value, degree)` liefert die reelle degree-te Wurzel: `root(16, 2)` = 4 und `root(-8, 3)` = -2. Der Wurzelexponent muss endlich und ungleich null sein. Negative Werte benötigen einen ungeraden ganzzahligen Wurzelexponenten; gerade oder nicht ganzzahlige Exponenten ergeben NaN. Positive Werte erlauben auch nicht ganzzahlige Wurzelexponenten.
+
+Ein negativer Wurzelexponent liefert den Kehrwert: `root(16, -2)` = 0.25. Null ergibt bei positivem Wurzelexponenten null, bei negativem positive Unendlichkeit. Ungültige Wurzelexponenten oder NaN als Eingabe ergeben NaN. Für die Quadratwurzel gibt es `sqrt(value)`, für Potenzen `pow(value, exponent)`.
 
 ### sin
 
@@ -257,6 +266,8 @@ In typisierten Formeln verwenden Mathematikfunktionen den gemeinsamen Argumentty
 
 `log(value)` liefert den natürlichen Logarithmus. Positive Eingaben ergeben endliche Werte, null negative Unendlichkeit, negative Eingaben NaN.
 
+`log(value, base)` liefert den Logarithmus zu einer gewählten Basis: `log(8, 2)` = 3. value muss positiv sein, base endlich, positiv und ungleich 1; sonst ergibt sich NaN. Basen zwischen 0 und 1 werden unterstützt.
+
 ### log2
 
 `log2(value)` liefert den Logarithmus zur Basis 2; für endliche Ergebnisse muss die Eingabe positiv sein.
@@ -308,9 +319,5 @@ In typisierten Formeln verwenden Mathematikfunktionen den gemeinsamen Argumentty
 ### rand
 
 `rand(minimum, maximum[, seed])` liefert pro Auswertung einen reproduzierbaren, gleichverteilten float-Zufallswert. Der optionale Seed wählt die Folge, sonst gilt der Node-Seed. Vertauschte Grenzen werden getauscht.
-
-### buffer-read
-
-`buffer.read(position[, mode[, interpolation]])` liefert eine float-Probe an einer absoluten Sampleposition. Modi: Clamp (Standard), Wrap, Zero; Interpolation: Linear (Standard), Nearest. Leere Buffer liefern null. Alte boolesche Argumente der Sprachversion 1 behalten die physische Indexsemantik.
 
 [Formula Group](../../nodes/de/formula-group.md) · [Handbuch](index.md) · [English](../en/formula-language.md)

@@ -27,8 +27,9 @@ public final class FormulaCompiler {
         Map.entry("asinh",1),Map.entry("acosh",1),Map.entry("atanh",1),
         Map.entry("expm1",1),Map.entry("log1p",1),Map.entry("exp",1),Map.entry("log",1),Map.entry("log2",1),
         Map.entry("log10",1),Map.entry("floor",1),Map.entry("ceil",1),Map.entry("round",1),
-        Map.entry("pow",2),Map.entry("min",2),Map.entry("max",2),Map.entry("clamp",3),
+        Map.entry("root",2),Map.entry("pow",2),Map.entry("min",2),Map.entry("max",2),Map.entry("clamp",3),
         Map.entry("sineWave",1),Map.entry("mix",3),Map.entry("sign",1),Map.entry("rand",2));
+    static boolean acceptsArguments(String name,int count){return Objects.equals(FUNCTIONS.get(name),count)||name.equals("rand")&&count==3||name.equals("log")&&count==2;}
     public static final Set<String> CONTEXT=Set.of("sampleRate","blockSize","sampleIndex","samplePosition");
     private static final Set<String> RESERVED=Set.of("state","float","bool","if","else","true","false","pi","tau");
     private FormulaCompiler(){}
@@ -193,10 +194,12 @@ public final class FormulaCompiler {
             }
             if(FUNCTIONS.containsKey(t.text())){
                 expect("(");var args=new ArrayList<String>();var refs=new ArrayList<Integer>();if(!peek(")"))do{var e=expression(0);require(e,Type.NUMBER);args.add(e.cpp());refs.add(e.register());}while(take(","));expect(")");
-                if(args.size()!=FUNCTIONS.get(t.text())&&!(t.text().equals("rand")&&args.size()==3))throw new Failure(t,"Wrong argument count for "+t.text());
+                if(!acceptsArguments(t.text(),args.size()))throw new Failure(t,"Wrong argument count for "+t.text());
                 if(t.text().equals("rand")){int site=serial++;return operation(Type.NUMBER,"context.random("+site+", "+String.join(", ",args)+")",args.size()==3?"randSeed":"rand",refs.get(0),refs.get(1),args.size()==3?refs.get(2):0,site);}
                 if(t.text().equals("sineWave"))return operation(Type.NUMBER,"context.sineWave("+args.get(0)+")","sineWave",refs.get(0),0,0,0);
-                String name=t.text();String code=switch(name){
+                String name=t.text().equals("log")&&args.size()==2?"logBase":t.text();String code=switch(name){
+                    case "root" -> "easyknack::formulaRoot("+String.join(", ",args)+")";
+                    case "logBase" -> "easyknack::formulaLogBase("+String.join(", ",args)+")";
                     case "mix" -> "("+args.get(0)+" + ("+args.get(1)+" - "+args.get(0)+") * "+args.get(2)+")";
                     case "sign" -> "static_cast<float>(("+args.get(0)+" > 0.0f) - ("+args.get(0)+" < 0.0f))";
                     case "clamp" -> "std::min(std::max("+args.get(0)+", "+args.get(1)+"), "+args.get(2)+")";

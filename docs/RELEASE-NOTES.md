@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.3.0
 
+- Add Formula log(value, base) and real root(value, degree), including negative
+  values with odd integer degrees. The new root function name is reserved; older
+  identifiers named root must be renamed. Keep buffer.read documentation with Buffer members.
+
 - Add documentation Find using the shared Core text/code search dialog, with
   match highlighting and navigation; remove component-name documentation tooltips.
 

@@ -12,7 +12,7 @@ final class FormulaEditorHelp {
     }
     static Call function(String name,boolean typed){
         if(!FormulaCompiler.FUNCTIONS.containsKey(name))return null;
-        List<String> parameters=switch(name){case "atan2"->List.of("y","x");case "pow"->List.of("base","exponent");case "min","max"->List.of("a","b");case "clamp"->List.of("value","minimum","maximum");case "mix"->List.of("a","b","factor");case "rand"->List.of("minimum","maximum","seed (optional)");case "sin","cos","tan"->List.of("angle");case "sineWave"->List.of("phase");default->List.of("value");};
+        List<String> parameters=switch(name){case "atan2"->List.of("y","x");case "pow"->List.of("base","exponent");case "root"->List.of("value","degree");case "log"->List.of("value","base (optional)");case "min","max"->List.of("a","b");case "clamp"->List.of("value","minimum","maximum");case "mix"->List.of("a","b","factor");case "rand"->List.of("minimum","maximum","seed (optional)");case "sin","cos","tan"->List.of("angle");case "sineWave"->List.of("phase");default->List.of("value");};
         String help=switch(name){
             case "sineWave"->"Phase in cycles (1 = one period). Shared 2048-point sine table with linear interpolation; wraps negative/large phases. Nonfinite phase returns zero.";
             case "sin","cos","tan"->"Angle in radians. Standard mathematical function; integer arguments compute in double in typed formulas.";
@@ -27,7 +27,9 @@ final class FormulaEditorHelp {
             case "expm1"->"Computes exp(value) - 1 accurately for values near zero.";
             case "log1p"->"Computes log(1 + value) accurately near zero; finite for value > -1, -infinity at -1, NaN below -1.";
             case "sqrt"->"Square root; negative values produce NaN.";
-            case "log","log2","log10"->"Logarithm; positive input required for a finite result.";
+            case "root"->"Returns the degree-th real root. Degree must be finite and nonzero; negative values require an odd integer degree. A negative degree gives the reciprocal root. Invalid domains produce NaN.";
+            case "log"->"log(value) is the natural logarithm. log(value, base) uses the chosen finite base > 0, != 1 and requires value > 0; invalid base/value produces NaN.";
+            case "log2","log10"->"Logarithm; positive input required for a finite result.";
             case "rand"->"Uniform reproducible random value per evaluation sample. Optional seed selects the sequence; default seed belongs to this node. Reversed bounds are exchanged.";
             case "mix"->"Linear interpolation: a + (b - a) * factor; factor is not clamped.";
             case "clamp"->"Limits value between minimum and maximum; supply minimum <= maximum.";

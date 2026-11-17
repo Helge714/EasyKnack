@@ -28,7 +28,20 @@ template<class T,class S> inline T formulaCast(S value)noexcept {
         using U=std::make_unsigned_t<T>;U bits=static_cast<U>(value);T out;std::memcpy(&out,&bits,sizeof(T));return out;
     }else return static_cast<T>(value);
 }
-enum class FormulaOp {add,sub,mul,div,mod,neg,abs,sqrt,sin,cos,tan,asin,acos,atan,atan2,exp,log,log2,log10,floor,ceil,round,pow,min,max,clamp,mix,sign,sinh,cosh,tanh,asinh,acosh,atanh,expm1,log1p,eq,ne,lt,gt,le,ge};
+// Shared domains for native kernels and both preview interpreters.
+template<class T> inline T formulaLogBase(T value,T base)noexcept {
+    if(!(value>T(0))||!(base>T(0))||base==T(1)||!std::isfinite(base))return std::numeric_limits<T>::quiet_NaN();
+    return std::log(value)/std::log(base);
+}
+template<class T> inline T formulaRoot(T value,T degree)noexcept {
+    if(!std::isfinite(degree)||degree==T(0)||std::isnan(value))return std::numeric_limits<T>::quiet_NaN();
+    if(value<T(0)){
+        if(std::trunc(degree)!=degree||std::fmod(std::abs(degree),T(2))!=T(1))return std::numeric_limits<T>::quiet_NaN();
+        return -std::pow(-value,T(1)/degree);
+    }
+    return std::pow(value,T(1)/degree);
+}
+enum class FormulaOp {add,sub,mul,div,mod,neg,abs,sqrt,sin,cos,tan,asin,acos,atan,atan2,exp,log,log2,log10,floor,ceil,round,pow,min,max,clamp,mix,sign,sinh,cosh,tanh,asinh,acosh,atanh,expm1,log1p,logBase,root,eq,ne,lt,gt,le,ge};
 template<class T> inline T formulaCalc(FormulaOp op,T a,T b=T(0),T c=T(0))noexcept {
     using O=FormulaOp;
     if constexpr(std::is_integral_v<T>){
@@ -51,6 +64,8 @@ template<class T> inline T formulaCalc(FormulaOp op,T a,T b=T(0),T c=T(0))noexce
         switch(op){case O::add:return a+b;case O::sub:return a-b;case O::mul:return a*b;case O::div:return a/b;case O::mod:return std::fmod(a,b);case O::neg:return -a;case O::abs:return std::abs(a);default:break;}
     }
     switch(op){
+        case O::logBase:if constexpr(std::is_floating_point_v<T>)return formulaLogBase(a,b);else return 0;
+        case O::root:if constexpr(std::is_floating_point_v<T>)return formulaRoot(a,b);else return 0;
         case O::min:return std::min(a,b);case O::max:return std::max(a,b);case O::clamp:return std::min(std::max(a,b),c);case O::sign:return T((a>0)-(a<0));
         case O::mix:return a+(b-a)*c;
         case O::sqrt:return T(std::sqrt(a));case O::sin:return T(std::sin(a));case O::cos:return T(std::cos(a));case O::tan:return T(std::tan(a));case O::asin:return T(std::asin(a));case O::acos:return T(std::acos(a));case O::atan:return T(std::atan(a));case O::atan2:return T(std::atan2(a,b));

@@ -143,6 +143,10 @@ For a configured Buffer input named buffer:
 
 Metadata and read samples are float. Positions are absolute sample positions, unlike the Buffer node's normalized 0–1 position output. Resources are read-only and supported as inputs only.
 
+### buffer.read
+
+`buffer.read(position[, mode[, interpolation]])` returns a float sample at an absolute sample position. Modes: Clamp (default), Wrap, Zero; interpolation: Linear (default), Nearest. Empty buffers return zero. Legacy version-1 boolean arguments retain physical-index semantics.
+
 ```cpp
 result = buffer.read(buffer.end - 1, Clamp, Linear);
 ```
@@ -174,12 +178,11 @@ In typed formulas, math functions use promoted argument types; integer arguments
 | Area | Functions |
 | --- | --- |
 | Magnitude and limits | [abs](#abs), [sign](#sign), [min](#min), [max](#max), [clamp](#clamp) |
-| Powers and logarithms | [sqrt](#sqrt), [pow](#pow), [exp](#exp), [expm1](#expm1), [log](#log), [log2](#log2), [log10](#log10), [log1p](#log1p) |
+| Powers and logarithms | [sqrt](#sqrt), [root](#root), [pow](#pow), [exp](#exp), [expm1](#expm1), [log](#log), [log2](#log2), [log10](#log10), [log1p](#log1p) |
 | Trigonometry | [sin](#sin), [cos](#cos), [tan](#tan), [asin](#asin), [acos](#acos), [atan](#atan), [atan2](#atan2) |
 | Hyperbolic functions | [sinh](#sinh), [cosh](#cosh), [tanh](#tanh), [asinh](#asinh), [acosh](#acosh), [atanh](#atanh) |
 | Rounding and interpolation | [floor](#floor), [ceil](#ceil), [round](#round), [mix](#mix) |
 | Signal and random values | [sineWave](#sinewave), [rand](#rand) |
-| Buffer access | [buffer.read](#buffer-read) |
 
 ### abs
 
@@ -192,6 +195,12 @@ In typed formulas, math functions use promoted argument types; integer arguments
 ### sqrt
 
 `sqrt(value)` returns the square root; negative input produces NaN.
+
+### root
+
+`root(value, degree)` returns the degree-th real root: `root(16, 2)` = 4 and `root(-8, 3)` = -2. Degree must be finite and nonzero. Negative values require an odd integer degree; an even or noninteger degree gives NaN. Positive values also support noninteger degrees.
+
+A negative degree gives the reciprocal root: `root(16, -2)` = 0.25. Zero with a positive degree gives zero, with a negative degree positive infinity. Invalid degrees or NaN input give NaN. Use `sqrt(value)` for a square root, or `pow(value, exponent)` for a power.
 
 ### sin
 
@@ -257,6 +266,8 @@ In typed formulas, math functions use promoted argument types; integer arguments
 
 `log(value)` returns the natural logarithm. Positive input gives finite results; zero gives negative infinity, negative input NaN.
 
+`log(value, base)` returns the logarithm to a chosen base: `log(8, 2)` = 3. value must be positive and base finite, positive and unequal to 1; otherwise the result is NaN. Bases between 0 and 1 are supported.
+
 ### log2
 
 `log2(value)` returns the base-2 logarithm; input must be positive for a finite result.
@@ -308,9 +319,5 @@ In typed formulas, math functions use promoted argument types; integer arguments
 ### rand
 
 `rand(minimum, maximum[, seed])` returns a reproducible uniform float random value per evaluation. The optional seed selects the sequence; otherwise the node seed is used. Reversed bounds are exchanged.
-
-### buffer-read
-
-`buffer.read(position[, mode[, interpolation]])` returns a float sample at an absolute sample position. Modes: Clamp (default), Wrap, Zero; interpolation: Linear (default), Nearest. Empty buffers return zero. Legacy version-1 boolean arguments retain physical-index semantics.
 
 [Formula Group](../../nodes/en/formula-group.md) · [Manual](index.md) · [Deutsch](../de/formula-language.md)

@@ -234,9 +234,10 @@ final class TypedFormulaCompiler {
             E wrap=constant(K.BOOL,"0"),linear=constant(K.BOOL,"1");if(take(",")){wrap=expression(0);requireBool(wrap);if(take(",")){linear=expression(0);requireBool(linear);}}expect(")");return operation(K.FLOAT,K.FLOAT,"context.read("+slot+", "+pos.cpp()+", "+wrap.cpp()+", "+linear.cpp()+")","bufferRead",pos.reg(),wrap.reg(),linear.reg(),""+slot);
         }
         E function(String name){
-            Token call=ts.get(Math.max(0,at-1));expect("(");var args=new ArrayList<E>();if(!peek(")"))do{args.add(expression(0));}while(take(","));expect(")");if(args.size()!=FUNCTIONS.get(name)&&!(name.equals("rand")&&args.size()==3))throw new Failure(call,"Wrong argument count for "+name);
+            Token call=ts.get(Math.max(0,at-1));expect("(");var args=new ArrayList<E>();if(!peek(")"))do{args.add(expression(0));}while(take(","));expect(")");if(!acceptsArguments(name,args.size()))throw new Failure(call,"Wrong argument count for "+name);
             if(name.equals("sineWave")){E phase=cast(args.get(0),K.DOUBLE);return operation(K.FLOAT,K.FLOAT,"context.sineWave("+phase.cpp()+")","sineWave",phase.reg(),0,0,"0");}
             if(name.equals("rand")){contextual=true;int site=serial++;for(int i=0;i<args.size();i++)args.set(i,cast(args.get(i),K.FLOAT));String code="context.random("+site+", "+String.join(", ",args.stream().map(E::cpp).toList())+")";return operation(K.FLOAT,K.FLOAT,code,args.size()==3?"randSeed":"rand",args.get(0).reg(),args.get(1).reg(),args.size()==3?args.get(2).reg():0,""+site);}
+            if(name.equals("log")&&args.size()==2)name="logBase";
             K k=args.get(0).kind();for(int i=1;i<args.size();i++)k=common(k,args.get(i).kind());numeric(k);if(k==K.BOOL)k=K.INT;
             if(!Set.of("min","max","clamp","abs","sign").contains(name)&&k.integer())k=K.DOUBLE;
             for(int i=0;i<args.size();i++)args.set(i,cast(args.get(i),k));
