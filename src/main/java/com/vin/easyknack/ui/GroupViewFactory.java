@@ -29,6 +29,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
         private final Map<String,com.vingame.glswing.component.GLContainer> publicControls=new LinkedHashMap<>();
         private final Map<GLControl,String> controlledTooltips=new IdentityHashMap<>();
         private com.vin.easyknack.nodes.Editor.Control countControl;
+        private String formulaWarning="";
         private boolean updating;private NodeKind kind;private GLTheme cachedTheme;private GLNodeStyle cachedStyle;
         GroupView(GLGraphNode node){
             super(catalog.find(node.typeId()).map(GLNodeCatalogEntry::displayName).orElse("Group"));
@@ -126,7 +127,18 @@ final class GroupViewFactory implements GLNodeViewFactory {
             }finally{updating=false;}
             var next=groupKind();if(kind!=next){kind=next;cachedTheme=null;invalidateRecording();}
             setTitle(catalog.find(node.typeId()).map(GLNodeCatalogEntry::displayName).orElse("Group"));
+            refreshFormulaState();
         }
+        void refreshFormulaState(){
+            var formula=groups.findAsset(descriptor.assetId()).orElseThrow();
+            if(!FormulaGroups.isFormula(formula))return;
+            var edit=FormulaGroups.editState(formula);String warning=edit.valid()?"":AppText.text("formula.invalidDraft")+" — "+edit.error();
+            if(Objects.equals(warning,formulaWarning))return;formulaWarning=warning;
+            setTitleSuffix(warning.isEmpty()?"":"  !");GLToolTipManager.leave(this);
+        }
+
+        @Override public void mouseEntered(com.vingame.glswing.input.GLMouseEvent event){super.mouseEntered(event);if(!formulaWarning.isEmpty())GLToolTipManager.hover(this,event,formulaWarning,null);}
+        @Override public void mouseMoved(com.vingame.glswing.input.GLMouseEvent event){super.mouseMoved(event);if(!formulaWarning.isEmpty())GLToolTipManager.hover(this,event,formulaWarning,null);}
         @Override public void setContentHidden(boolean hidden){
             if(isContentHidden()==hidden)return;
             clearPreferredGLSize();super.setContentHidden(hidden);

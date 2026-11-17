@@ -17,6 +17,15 @@ final class FormulaGroups {
     static boolean isFormula(GLNodeGraphAsset a){return a!=null&&new NodeState(a.metadata()).flag(MARKER,false);}
     static String source(GLNodeGraphAsset a){return new NodeState(a.metadata()).text(SOURCE,"result = signal;\n");}
     static String draft(GLNodeGraphAsset a){return new NodeState(a.metadata()).text(DRAFT,source(a));}
+    record EditState(boolean applied,String error){boolean valid(){return error.isEmpty();}}
+    static EditState editState(GLNodeGraphAsset a){
+        try{
+            var ports=ports(a);String text=draft(a),key="draft:"+version(a)+":"+text+ports;
+            var program=programs.computeIfAbsent(key,k->FormulaCompiler.compile(text,ports,version(a)));
+            FormulaRatePlan.resolve(program,ProcessingRate.fromId(new NodeState(a.metadata()).text(RATE,"auto")),Map.of());
+            return new EditState(text.equals(source(a))&&ports.equals(acceptedPorts(a)),"");
+        }catch(RuntimeException error){return new EditState(false,Objects.toString(error.getMessage(),"Invalid formula"));}
+    }
     static GLNodeId kernelId(GLNodeGraphAsset a){return new GLNodeId(UUID.nameUUIDFromBytes((a.id()+"/formula").getBytes(java.nio.charset.StandardCharsets.UTF_8)));}
     static String portId(GLCompositePortMapping p){return new NodeState(p.presentation().editorOptions()).text(ID,p.publicPort().id());}
     static String codeName(GLCompositePortMapping p){return new NodeState(p.presentation().editorOptions()).text(NAME,identifier(p.publicPort().id()));}

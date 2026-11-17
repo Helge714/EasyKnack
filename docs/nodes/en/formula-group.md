@@ -58,6 +58,8 @@ Opening Formula while background preparation is still running shows a loading me
 
 Completion appears while typing identifiers (or with Ctrl+Space). Hover, signature help and inline parameter labels describe built-in and user-defined functions. Enter and Format indent single-statement if/else bodies even without braces.
 
+The editor distinguishes Applied, Not applied yet and Invalid draft, separately from native optimization progress. An invalid draft keeps the last applied program running and shows ! on every Formula node using that asset, with the error available on hover. Built-in and user-defined function names use the theme's semantic function color. Backspace does not open completion.
+
 ### User functions and bounded loops
 
 Define numeric/bool functions with typed parameters and a return type, before or after their calls. Every execution path must return a value. Functions have local variables and parameters, can read input ports/context and call other functions, but cannot write output ports, capture caller locals/state, declare persistent state or recurse. At most 16 parameters are allowed. Use the return value to assign an output.

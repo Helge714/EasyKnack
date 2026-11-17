@@ -107,6 +107,15 @@ public final class FormulaLanguage implements GLCodeLanguage {
             return CompletableFuture.completedFuture(List.of());
         }
         @Override public void close(){index=null;}
+        @Override public CompletableFuture<List<GLCodeSemanticToken>> semanticTokens(GLCodeDocument d){
+            var symbols=index(d);var tokens=new ArrayList<GLCodeSemanticToken>();
+            for(int i=0;i<symbols.tokens.size();i++){
+                var token=symbols.tokens.get(i);
+                if((symbols.functions.containsKey(token.text())||FormulaCompiler.FUNCTIONS.containsKey(token.text()))&&i+1<symbols.tokens.size()&&symbols.tokens.get(i+1).text().equals("("))
+                    tokens.add(new GLCodeSemanticToken(token.start(),token.end(),"function",Set.of()));
+            }
+            return CompletableFuture.completedFuture(List.copyOf(tokens));
+        }
         @Override public CompletableFuture<List<GLCodeInlayHint>> inlayHints(GLCodeDocument d){
             var symbols=index(d);var ts=symbols.tokens;var hints=new ArrayList<GLCodeInlayHint>();boolean typed=version>=3||symbols.typed();
             for(int i=1;i<ts.size();i++)if(ts.get(i).text().equals("(")){

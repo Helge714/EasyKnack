@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Show Formula draft validity and applied state, mark invalid Formula nodes with !,
+  color user/built-in functions semantically, and avoid completion on Backspace.
+
 - Improve Formula diagnostics, automatic completion, persistent parameter hints
   and indentation for braceless if/else bodies. Allow implicit double-to-float
   assignments, typed user functions and fixed-bound for loops (up to 1,024

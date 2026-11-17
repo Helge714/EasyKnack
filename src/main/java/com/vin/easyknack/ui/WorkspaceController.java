@@ -624,6 +624,7 @@ final class WorkspaceController implements AutoCloseable {
                             ? n.withProperty(com.vin.easyknack.nodes.ProcessingRate.EFFECTIVE,rates.get(n.id())) : n).map(this::withPortRates).ifPresent(n->{if(connectionsChanged||!n.equals(presented.get(basic))){basic.update(n);presented.put(basic,n);}});
                 }else if(view instanceof GroupViewFactory.GroupView group){
                     group.controlledByGroup(coupledProperties(group.nodeId()));
+                    group.refreshFormulaState();
                 }
         }
         refreshGraphDiagnostics();

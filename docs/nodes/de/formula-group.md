@@ -58,6 +58,8 @@ Beim Öffnen während der laufenden Hintergrundvorbereitung erscheint eine Ladea
 
 Vervollständigung, Hover- und Signaturhilfe erklären Definitionsbereiche und Argumentdetails.
 
+Der Editor unterscheidet Übernommen, Noch nicht übernommen und Ungültiger Entwurf, getrennt vom Stand der nativen Optimierung. Ein ungültiger Entwurf erhält das letzte übernommene Programm und zeigt ! am zugehörigen Formula-Node; Hover zeigt den Fehler. Eingebaute und eigene Funktionsnamen verwenden die semantische Funktionsfarbe des Themes. Backspace öffnet keine Vervollständigung.
+
 ### Eigene Funktionen und begrenzte Schleifen
 
 Numerische/boolesche Funktionen besitzen typisierte Parameter und einen Rückgabetyp und dürfen vor oder nach ihrem Aufruf stehen. Jeder Ausführungspfad muss einen Wert zurückgeben. Funktionen haben lokale Variablen und Parameter, dürfen Eingänge/Kontext lesen und andere Funktionen aufrufen. Sie dürfen keine Ausgangsports beschreiben, Aufrufer-Lokale/Zustände übernehmen, persistenten Zustand deklarieren oder rekursiv aufrufen. Höchstens 16 Parameter sind erlaubt. Ausgänge werden mit dem Rückgabewert gesetzt.

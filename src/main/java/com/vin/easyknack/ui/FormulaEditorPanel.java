@@ -41,7 +41,7 @@ final class FormulaEditorPanel extends GLContainer implements AutoCloseable {
         schema=List.copyOf(initial.compositeDescriptor().portMappings());
         apply.addActionListener(e->apply());format.addActionListener(e->code.formatCode());
         live.addActionListener(e->{if(updating)return;var a=asset();var meta=new HashMap<>(a.metadata());meta.put(FormulaGroups.LIVE,GLNodeValue.of(live.isSelected()));groups.replaceAsset(FormulaGroups.metadata(a,meta));if(live.isSelected())debounce.restart();else debounce.stop();changed.run();});
-        code.getDocument().addDocumentListener((d,c)->{if(updating)return;var a=asset();var meta=new HashMap<>(a.metadata());meta.put(FormulaGroups.DRAFT,GLNodeValue.of(code.getText()));groups.replaceAsset(FormulaGroups.metadata(a,meta));if(live.isSelected())debounce.restart();});
+        code.getDocument().addDocumentListener((d,c)->{if(updating)return;error="";var a=asset();var meta=new HashMap<>(a.metadata());meta.put(FormulaGroups.DRAFT,GLNodeValue.of(code.getText()));groups.replaceAsset(FormulaGroups.metadata(a,meta));if(live.isSelected())debounce.restart();refresh();changed.run();});
         refresh();
     }
     private GLNodeGraphAsset asset(){return groups.findAsset(assetId).orElseThrow();}
@@ -51,7 +51,10 @@ final class FormulaEditorPanel extends GLContainer implements AutoCloseable {
         String draft=FormulaGroups.draft(a);if(!code.getText().equals(draft))code.setText(draft);
         live.setSelected(new NodeState(a.metadata()).flag(FormulaGroups.LIVE,true));
         String names=current.stream().map(p->FormulaGroups.codeName(p)+" ("+p.publicPort().id()+")").collect(java.util.stream.Collectors.joining("  ·  "));
-        ports.setText(names);ports.setToolTipText(names);status.setText(error.isEmpty()?runtime.status(a):error);status.setToolTipText(status.getText());
+        ports.setText(names);ports.setToolTipText(names);var edit=FormulaGroups.editState(a);
+        String state=!edit.valid()?AppText.text("formula.invalidDraft"):edit.applied()?AppText.text("formula.applied"):AppText.text("formula.notApplied");
+        status.setText(state+" — "+(!error.isEmpty()?error:!edit.valid()?edit.error():runtime.status(a)));status.setToolTipText(status.getText());
+        apply.setEnabled(edit.valid()&&!edit.applied());
     }finally{updating=false;}}
     void apply(){
         if(closed||code==null)return;
