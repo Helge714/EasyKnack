@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.0
 
+- Enable Ctrl+click definition navigation for Formula functions, locals and
+  parameters; remove empty code-editor component-name tooltips.
+
 - Standardize Formula call/definition spacing and merge duplicate argument hints.
   Improve warning contrast with a filled badge; node title length no longer
   changes minimum width, while editor/content minimum widths remain respected.

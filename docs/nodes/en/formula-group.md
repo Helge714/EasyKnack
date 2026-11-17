@@ -60,6 +60,8 @@ Completion appears while typing identifiers (or with Ctrl+Space). Hover, signatu
 
 The editor distinguishes Applied, Not applied yet and Invalid draft, separately from native optimization progress. An invalid draft keeps the last applied program running and shows a right-aligned red badge with contrasting ! in a reserved title slot on every Formula node using that asset, with the error available on hover. Built-in and user-defined function names, variables, parameters and read-only input ports use the theme's corresponding semantic colors. Long titles are truncated before the warning badge, which remains visible. Backspace does not open completion. Format uses `name(...)` for calls, `name(...) {` for definitions and `if (...)` / `for (...)` for control headers, with one space after argument commas. Comments remain unchanged. Temporary and persistent parameter hints share a single label per argument.
 
+Ctrl+left-click (or Go to Definition) jumps to a user function, local variable or parameter declaration in the same Formula document, including forward function calls. Built-in math functions retain their hover/signature help; they have no editable Formula declaration. Empty editor areas show no component-name tooltip.
+
 ### User functions and bounded loops
 
 Define numeric/bool functions with typed parameters and a return type, before or after their calls. Every execution path must return a value. Functions have local variables and parameters, can read input ports/context and call other functions, but cannot write output ports, capture caller locals/state, declare persistent state or recurse. At most 16 parameters are allowed. Use the return value to assign an output.

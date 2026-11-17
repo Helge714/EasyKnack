@@ -7,6 +7,25 @@ import org.junit.jupiter.api.Test;
 import com.vingame.glswing.ui.*;
 
 class FormulaEditorHelpTest {
+    @Test void definitionsResolveForwardFunctionsParametersAndLocalsButNotCommentsOrBuiltins(){
+        String source="// shape(signal)\r\nresult=shape(signal);\r\nfloat shape(float x){float local=x*2;return local;}";var d=doc(source);
+        try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){
+            var function=session.definitions(d,source.indexOf("shape",source.indexOf("result="))).toCompletableFuture().join().get(0);
+            assertEquals(d.uri(),function.uri());assertEquals(2,function.line());assertEquals(6,function.character());
+            var parameter=session.definitions(d,source.indexOf("x*2")).toCompletableFuture().join().get(0);assertEquals(18,parameter.character());
+            var local=session.definitions(d,source.lastIndexOf("local")).toCompletableFuture().join().get(0);assertEquals(source.indexOf("local=")-source.lastIndexOf('\n',source.indexOf("local="))-1,local.character());
+            assertTrue(session.definitions(d,5).toCompletableFuture().join().isEmpty());
+        }
+        var builtin=doc("result=sin(signal);");try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(builtin,r->{})){assertTrue(session.definitions(builtin,8).toCompletableFuture().join().isEmpty());}
+    }
+    @Test void coreNavigationMovesTheCaretToTheFormulaFunctionDeclaration()throws Exception {
+        String text="result=shape(signal);\nfloat shape(float x){return x*2;}";var editor=new java.util.concurrent.atomic.AtomicReference<GLCodeEditor>();
+        java.awt.EventQueue.invokeAndWait(()->{
+            var language=new FormulaLanguage(ports,3);var code=new GLCodeEditor(new GLTextDocument(text),false,language);editor.set(code);
+            code.configureDocument(URI.create("easyknack-formula:/navigation"),language);code.setCaretPosition(text.indexOf("shape"));code.goToDefinition();
+        });
+        java.awt.EventQueue.invokeAndWait(()->{assertEquals(text.lastIndexOf("shape"),editor.get().getCaretPosition());editor.get().clearDiagnosticProvider();});
+    }
     @Test void builtinAndUserFunctionsUseSemanticFunctionColors(){
         String text="float shape(float x){return sin(x);} result=shape(signal);";var d=doc(text);
         try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){

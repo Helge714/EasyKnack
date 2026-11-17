@@ -107,6 +107,20 @@ public final class FormulaLanguage implements GLCodeLanguage {
             return CompletableFuture.completedFuture(List.of());
         }
         @Override public void close(){index=null;}
+        @Override public CompletableFuture<List<GLCodeLocation>> definitions(GLCodeDocument d,int requested){
+            var symbols=index(d);int offset=clamp(requested,d.text());
+            if(offset>0&&(offset==d.text().length()||!Character.isJavaIdentifierPart(d.text().charAt(offset)))&&Character.isJavaIdentifierPart(d.text().charAt(offset-1)))offset--;
+            if(symbols.inComment(offset))return CompletableFuture.completedFuture(List.of());
+            for(var token:symbols.tokens)if(offset>=token.start()&&offset<token.end()){
+                Integer target=null;var function=symbols.functions.get(token.text());
+                if(function!=null)target=function.start();
+                else {var symbol=symbols.symbol(token.text(),token.start()).orElse(null);if(symbol!=null)target=symbol.start();}
+                if(target==null)return CompletableFuture.completedFuture(List.of());
+                String before=d.text().substring(0,target);int line=(int)before.chars().filter(c->c=='\n').count();
+                return CompletableFuture.completedFuture(List.of(new GLCodeLocation(d.uri(),line,target-before.lastIndexOf('\n')-1)));
+            }
+            return CompletableFuture.completedFuture(List.of());
+        }
         @Override public CompletableFuture<List<GLCodeSemanticToken>> semanticTokens(GLCodeDocument d){
             var symbols=index(d);var tokens=new ArrayList<GLCodeSemanticToken>();
             for(int i=0;i<symbols.tokens.size();i++){
