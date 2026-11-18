@@ -45,3 +45,9 @@ initial issues, successful reruns and remaining manual acceptance.
 Clean-system install/upgrade/uninstall, physical WASAPI/ASIO/MIDI and extended
 manual project acceptance remain open. No new clean-machine or physical-device
 acceptance is claimed. Official release CI and signing remain future work.
+
+## Additional example content - 2026-11-18
+
+A separate collection of sixteen learning projects and its checksum were added
+without replacing the original six assets or installer. See the
+[example content validation and provenance](EXAMPLES-2026-11-18.md).
