@@ -64,3 +64,12 @@ node.border=#00000000
 @COLOR easyknack.signal.PARTIALS=#E87575
 @COLOR easyknack.node.PARTIALS.title.light=${easyknack.signal.PARTIALS}
 @COLOR easyknack.node.PARTIALS.title.dark=#854343
+
+# Variables share the normal code foreground; qualifiers use font emphasis.
+@COLOR codeEditor.semantic.variable=${codeEditor.text}
+@COLOR codeEditor.semantic.variable.declaration=${codeEditor.text}
+@COLOR codeEditor.semantic.variable.readonly=${codeEditor.text}
+@COLOR codeEditor.semantic.variable.static=${codeEditor.text}
+@COLOR codeEditor.semantic.parameter=${codeEditor.text}
+@COLOR codeEditor.semantic.parameter.declaration=${codeEditor.text}
+@COLOR codeEditor.semantic.parameter.readonly=${codeEditor.text}

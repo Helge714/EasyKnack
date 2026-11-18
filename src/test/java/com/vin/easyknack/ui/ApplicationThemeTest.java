@@ -19,6 +19,14 @@ class ApplicationThemeTest {
                 assertEquals(theme.color("node.AUDIO.title." + suffix), theme.color("node.HISTORY.title." + suffix), choice.name());
         }
     }
+    @Test void variableRolesAndQualifiersKeepOneForegroundInEveryTheme() {
+        for (var choice : BundledThemes.available()) {
+            var values = ApplicationTheme.loadSelection(choice.id()).theme().values();
+            for (String role : java.util.List.of("variable", "variable.declaration", "variable.readonly", "variable.static", "parameter", "parameter.declaration", "parameter.readonly"))
+                assertEquals(values.getColor("codeEditor.text"), values.getColor("codeEditor.semantic." + role), choice.name() + ": " + role);
+        }
+        assertEquals(NodeKind.AUDIO, new DelayNode().registration().kind());
+    }
     @Test void selectedColorsDoNotRequireTheSameKeyInTheFallback()throws Exception{
         var file=directory.resolve("selected-only.gltheme");
         Files.writeString(file,"theme.extends=default\n@COLOR easyknack.selected.only=#123456\n");

@@ -7,6 +7,14 @@ import org.junit.jupiter.api.Test;
 import com.vingame.glswing.ui.*;
 
 class FormulaEditorHelpTest {
+    @Test void variablesUsePlainLexicalColorBeforeSemanticResultsArrive() {
+        var language = new FormulaLanguage(ports, 3);
+        String source = "state double phase=0;const double base=2;final double gain=signal;result=phase+base+gain+sampleRate;";
+        for (var token : language.tokenize(source)) {
+            String word = source.substring(token.start(), token.end());
+            if (Set.of("phase", "base", "gain", "signal", "result", "sampleRate").contains(word)) assertEquals(GLCodeToken.Type.PLAIN, token.type(), word);
+        }
+    }
     @Test void qualifiersHaveCompletionHoverAndPersistentOrReadonlyEmphasis(){
         String text="state float phase=0;float f(final float x){return x;}const float lo=0.5;final float gain=signal;result=f(gain)+lo+phase+sampleRate;";
         var d=doc(text);var language=new FormulaLanguage(ports,3);
@@ -48,7 +56,7 @@ class FormulaEditorHelpTest {
             assertTrue(tokens.stream().anyMatch(t->t.start()==text.lastIndexOf("shape")));
         }
     }
-    @Test void variablesParametersAndPortsReceiveSemanticColors(){
+    @Test void variablesParametersAndPortsReceiveSemanticRoles(){
         String text="float shape(float x){float amount=x*2;return amount;}float gain=1;result=shape(signal)*gain;";var d=doc(text);
         try(var session=new FormulaLanguage(ports,3).codeIntelligenceProvider().open(d,r->{})){
             var tokens=session.semanticTokens(d).toCompletableFuture().join();

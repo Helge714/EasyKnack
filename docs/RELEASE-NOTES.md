@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.1
 
+- Classify Delay as an Audio node and retain the visible graph center on window resize.
+- Use one Formula variable color for declarations, parameters and read-only values;
+  retain bold read-only and italic persistent-state emphasis.
 - Restore Audio colors for Buffer ports, connections and node titles in all bundled themes.
 - Auto-arrange example graphs and inner groups, centering their saved cameras.
 - Replace the bundled examples with sixteen self-contained learning projects covering

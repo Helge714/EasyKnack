@@ -19,7 +19,7 @@ public final class FormulaLanguage implements GLCodeLanguage {
         var result=new ArrayList<GLCodeToken>();
         var pattern=java.util.regex.Pattern.compile("//[^\\r\\n]*|[A-Za-z_][A-Za-z0-9_]*|(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?");
         var m=pattern.matcher(source);while(m.find()){
-            String s=m.group();var type=s.startsWith("//")?GLCodeToken.Type.COMMENT:TypedFormulaCompiler.TYPES.contains(s)?GLCodeToken.Type.TYPE:Character.isDigit(s.charAt(0))||s.charAt(0)=='.'?GLCodeToken.Type.NUMBER:Set.of("state","final","const","if","else","for","return","true","false","pi","tau").contains(s)||FormulaCompiler.CONTEXT.contains(s)||FormulaCompiler.FUNCTIONS.containsKey(s)?GLCodeToken.Type.KEYWORD:GLCodeToken.Type.PLAIN;
+            String s=m.group();var type=s.startsWith("//")?GLCodeToken.Type.COMMENT:TypedFormulaCompiler.TYPES.contains(s)?GLCodeToken.Type.TYPE:Character.isDigit(s.charAt(0))||s.charAt(0)=='.'?GLCodeToken.Type.NUMBER:Set.of("state","final","const","if","else","for","return","true","false","pi","tau").contains(s)||FormulaCompiler.FUNCTIONS.containsKey(s)?GLCodeToken.Type.KEYWORD:GLCodeToken.Type.PLAIN;
             result.add(new GLCodeToken(m.start(),m.end(),type));
         }return List.copyOf(result);
     }
