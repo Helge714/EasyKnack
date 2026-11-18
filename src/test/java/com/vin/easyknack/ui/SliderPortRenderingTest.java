@@ -38,12 +38,13 @@ class SliderPortRenderingTest {
                 assertColor(hovered,30,35,GLNodeStyle.fromTheme(port.getGLTheme()).portHover());
                 assertSame(port, renderer.readPickResult(gl,30,35).getTarget());
                 port.mouseExited(null); draw(gl,renderer,root); assertColor(pixels(gl),30,35,Color.ORANGE);
+                // Borderless event ports retain a node-colored center hole, not a decorative border.
                 port.setShape(GLNodePort.Shape.DOUBLE_DIAMOND);draw(gl,renderer,root);
-                assertColor(pixels(gl),30,35,GLNodeStyle.fromTheme(port.getGLTheme()).portBorder());
+                assertColor(pixels(gl),30,35,GLNodeStyle.fromTheme(port.getGLTheme()).background());
                 assertColor(pixels(gl),30,28,Color.ORANGE);
                 assertSame(port,renderer.readPickResult(gl,30,35).getTarget());
                 port.mouseEntered(null);draw(gl,renderer,root);
-                assertColor(pixels(gl),30,35,GLNodeStyle.fromTheme(port.getGLTheme()).portBorder());
+                assertColor(pixels(gl),30,35,GLNodeStyle.fromTheme(port.getGLTheme()).background());
                 assertColor(pixels(gl),30,28,GLNodeStyle.fromTheme(port.getGLTheme()).portHover());
                 port.mouseExited(null);
                 editing.setUnit(""); draw(gl,renderer,root); var withoutUnit = pixels(gl);
