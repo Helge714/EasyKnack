@@ -50,7 +50,14 @@ class AutomaticRatesTest {
             assertEquals(GLNodePort.Shape.CIRCLE,view(c,ids.get(2)).findPort("audio-out").getShape());
             c.actions().openSelectedComposite();
             c.setNodeProperty(ids.get(1),MapRangeNode.RATE,GLNodeValue.of("auto"));
-            assertTrue(c.audioGraph().replaceAll(" ![0-9a-f]{16} "," ").contains("@ a caccc"));
+            // Grouping the manual-rate node captured explicit Audio boundary rates.
+            // Returning its internal processor to Auto must not override that public contract.
+            var grouped=c.snapshotDocument().embeddedAssets().values().iterator().next();
+            for(var port:grouped.compositeDescriptor().portMappings())if(port.publicPort().direction()==GLPortDirection.INPUT){
+                assertEquals(SignalCategory.VALUE.valueTypeId(),port.publicPort().valueTypeId());
+                assertEquals(ProcessingRate.AUDIO,GroupInputSettings.selectedRate(port));
+            }
+            assertTrue(c.audioGraph().replaceAll(" ![0-9a-f]{16} "," ").contains("@ a aaccc"),c.audioGraph());
             assertEquals(GLNodePort.Shape.CIRCLE,view(c,ids.get(1)).findPort("audio-out").getShape());
         }catch(java.io.IOException error){throw new AssertionError(error);}});
     }
