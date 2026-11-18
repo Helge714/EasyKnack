@@ -52,8 +52,6 @@ class HarmonizerTest {
         assertEquals(List.of("Out","In","Target","Strength","Glide","Confidence","Mix","Hysteresis","Mode","Root","Scale"),asset.compositeDescriptor().portMappings().stream().map(p->p.publicPort().id()).toList());
         String command=patch(reloaded);for(String processor:List.of("pitchhold","scalequantizer","slew","positionreader"))assertTrue(command.contains(" "+processor+" "),command);
         assertEquals("audio",new SlewNode().defaults().get("rate").toJavaValue());
-        var dir=Path.of("target/examples");Files.createDirectories(dir);
-        try(var files=new NodeDocuments()){files.write(dir.resolve("Harmonizer.knack"),doc).toCompletableFuture().get();}
     }
     static boolean experimentalAudio(){return Boolean.getBoolean("easyknack.test.audio")&&Boolean.getBoolean("easyknack.test.experimental");}
     @Test @org.junit.jupiter.api.condition.EnabledIf("experimentalAudio")

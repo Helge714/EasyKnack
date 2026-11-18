@@ -14,21 +14,6 @@ import com.vingame.glswing.node.model.*;
 
 /** Authored example composed entirely of existing nodes; regeneration is opt-in. */
 class StochasticBinWidthExampleTest {
-    @Test void installsInMenuFolderAndPreservesUserChanges()throws Exception{
-        var root=Files.createTempDirectory("stochastic-examples-");
-        ExampleLibrary.installStochasticBinWidth(root);
-        var folders=ExampleLibrary.scan(root);
-        assertEquals("Spectral",folders.get(0).name());
-        var entry=folders.get(0).children().get(0);
-        assertEquals("Stochastic Bin Width",entry.name());
-        try(var in=Files.newInputStream(entry.path())){
-            var codec=new KnackDocumentCodec();var document=codec.read(in,codec.currentSchemaVersion());
-            assertTrue(document.embeddedAssets().containsKey("example.stochastic-bin-width"));
-        }
-        Files.writeString(entry.path(),"user edit");
-        ExampleLibrary.installStochasticBinWidth(root);
-        assertEquals("user edit",Files.readString(entry.path()));
-    }
     @Test void existingNodesCompileImportAndPersistTheExample()throws Exception{
         var fixture=StochasticBinWidthExample.fixture(0.25,true);var codec=new KnackDocumentCodec();var bytes=new java.io.ByteArrayOutputStream();codec.write(fixture.document(),bytes);
         var restored=NodeDocuments.prepare(codec.read(new java.io.ByteArrayInputStream(bytes.toByteArray()),codec.currentSchemaVersion()));
@@ -36,7 +21,6 @@ class StochasticBinWidthExampleTest {
         assertTrue(flat.isValid(),flat.diagnostics().toString());assertDoesNotThrow(()->com.vin.easyknack.audio.AudioGraphEncoder.encode(flat.graph().orElseThrow()));
         assertEquals(3,GroupImport.copyMany(restored,List.of(fixture.assetId()),"Stochastic Bin Width").assets().size());
         javax.swing.SwingUtilities.invokeAndWait(()->{try(var controller=new WorkspaceController()){controller.openDocument("Stochastic Bin Width",restored);assertTrue(controller.workspace().openComposite(fixture.assetId()));assertDoesNotThrow(controller::audioGraph);}});
-        if(Boolean.getBoolean("easyknack.writeExamples"))try(var out=Files.newOutputStream(Path.of("examples/stochastic-bin-width.knack"))){codec.write(restored,out);}
     }
     @Test @EnabledIfSystemProperty(named="easyknack.test.audio",matches="true")
     void nativeKernelReadsSingleNearbyBinsAndKeepsPhaseAcrossFrames()throws Exception{

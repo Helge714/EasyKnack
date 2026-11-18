@@ -22,7 +22,7 @@ class WorkspaceFilesTest {
     @Test void seededExamplesRoundTripAndExistingFilesArePreserved()throws Exception{
         String previous=System.getProperty("easyknack.examples");System.setProperty("easyknack.examples",temp.toString());
         try{
-            ExampleLibrary.initialize();var path=temp.resolve("Harmonizer.knack");
+            ExampleLibrary.initialize();var path=temp.resolve("01 Basics/01 First tone.knack");
             try(var files=new NodeDocuments()){assertDoesNotThrow(()->files.read(path).toCompletableFuture().join());}
             Files.writeString(path,"user-edited");ExampleLibrary.initialize();assertEquals("user-edited",Files.readString(path));
         }finally{if(previous==null)System.clearProperty("easyknack.examples");else System.setProperty("easyknack.examples",previous);}

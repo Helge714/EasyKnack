@@ -1,10 +1,18 @@
 # Examples
 
-This directory contains versioned example documents and test fixtures.
-See [reference-v1](../src/test/resources/reference-projects/README.md) for reference-project validation.
+The application generates a numbered collection of sixteen self-contained projects
+from `LearningExamples.java`, both during packaging and on development startup.
+Open **Examples** in EasyKnack; the installed files live next to the application,
+not in the user's Documents folder. Save your own variations under Projects.
 
-The application's editable example library is generated separately in
-`Documents/EasyKnack/Beispiele`; existing user files are preserved.
-Tests use isolated folders under `target`.
+- [Deutsche Anleitung](../docs/user/de/examples.md)
+- [English guide](../docs/user/en/examples.md)
 
-See [build storage](../docs/development/BUILD-STORAGE.md) for ownership and cleanup.
+The six categories cover Basics (including buffers and ordinary grouping), MIDI,
+Instance Groups, Spectral Groups, Formula Groups and Feedback. MIDI uses the built-in
+keyboard by default; no example needs external audio or plugins.
+
+The old standalone documents have been retired. Older generated copies in a
+writable development Examples folder are moved to `.previous-examples`; unrelated
+user documents and edits to the new examples are preserved. Reference fixtures
+under `src/test/resources/reference-projects` are separate developer test data.

@@ -38,9 +38,9 @@ class DeferredExamplesTest {
             });
             release.countDown();worker.submit(()->{}).get(30,TimeUnit.SECONDS);
             SwingUtilities.invokeAndWait(()->{
-                assertTrue(menu[0].getItems().stream().anyMatch(item->item.getText().equals("Spectral")));
+                assertTrue(menu[0].getItems().stream().anyMatch(item->item.getText().equals("04 Spectral Groups")));
                 assertTrue(menu[0].getItems().stream().anyMatch(item->item.getText().equals(AppText.text("examples.refresh"))));
-                assertTrue(Files.exists(directory.resolve("examples/Spectral/Stochastic Bin Width.knack")));
+                assertTrue(Files.exists(directory.resolve("examples/04 Spectral Groups/02 Bin lowpass.knack")));
             });
         } finally {
             release.countDown();

@@ -1,5 +1,12 @@
 # Release notes
 
+## Unreleased - 0.3.1
+
+- Replace the bundled examples with sixteen self-contained learning projects covering
+  basics, buffers, MIDI, Instance/Spectral/Formula Groups and delayed feedback.
+- Include German and English listening exercises; retire the earlier examples
+  while preserving edited development copies in a hidden backup.
+
 ## 0.3.0 - 2026-11-18
 
 - Expand Formula with typed user functions, bounded for loops, final locals and
