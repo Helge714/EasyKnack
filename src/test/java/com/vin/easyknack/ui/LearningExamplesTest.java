@@ -73,6 +73,17 @@ class LearningExamplesTest {
         assertEquals(before.root().metadata(), after.root().metadata());
         assertEquals(before.externalAssets(), after.externalAssets());
     }
+    @Test void packageVerificationRequiresAllExamplesAndGuidesWithoutRegenerating()throws Exception {
+        ExampleLibrary.main(new String[]{directory.toString()});
+        String[] verify={"--verify",directory.toString()};ExampleLibrary.main(verify);
+        var file=directory.resolve(LearningExamples.entries().get(0).path());var bytes=Files.readAllBytes(file);
+        Files.delete(file);assertThrows(IOException.class,()->ExampleLibrary.main(verify));assertFalse(Files.exists(file));
+        Files.write(file,bytes);Files.writeString(file,"broken document");assertThrows(IOException.class,()->ExampleLibrary.main(verify));
+        Files.write(file,bytes);var guide=directory.resolve("README-en.md");var text=Files.readString(guide);
+        Files.delete(guide);assertThrows(IOException.class,()->ExampleLibrary.main(verify));assertFalse(Files.exists(guide));
+        Files.writeString(guide,text);Files.write(directory.resolve("Retired example.knack"),bytes);
+        assertThrows(IOException.class,()->ExampleLibrary.main(verify));
+    }
     @Test void installRetiresOldGeneratedFilesPreservesEditsAndKeepsBackupsOutOfMenu() throws Exception {
         Files.writeString(directory.resolve(".easyknack-examples-v1"), "old marker");
         Files.createDirectories(directory.resolve("Spectral"));

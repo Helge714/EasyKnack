@@ -8,12 +8,11 @@ New-Item -ItemType Directory -Force -Path $work, "$work/home", "$work/classes" |
 $jars = @(Get-ChildItem -LiteralPath "$Image/app" -Filter 'easy-knack-*.jar')
 if ($jars.Count -ne 1) { throw 'Expected exactly one packaged application JAR.' }
 $classpath = "$($jars[0].FullName);$Image/app/lib/*"
-foreach ($example in @('Harmonizer.knack','Buffer/Sampler.knack','Spectral/Processing.knack','Spectral/Resynthesis.knack','Spectral/Stochastic Bin Width.knack')) {
-    if (!(Test-Path -LiteralPath "$Image/app/Examples/$example" -PathType Leaf)) { throw "Missing bundled example: $example" }
-}
 . "$PSScriptRoot/windows/JavaPrerequisite.ps1"
 if (!$JdkHome) { $JdkHome = Find-EasyKnackJdk }
 if (!(Test-EasyKnackJdk $JdkHome)) { throw 'A working Windows x64 JDK 25 is required for package tests.' }
+& "$JdkHome/bin/java.exe" '-Deasyknack.language=en' -cp $classpath com.vin.easyknack.ui.ExampleLibrary --verify "$Image/app/Examples" *> "$work/examples.log"
+if ($LASTEXITCODE -ne 0) { throw "Bundled example validation failed: $work/examples.log" }
 if (Test-Path -LiteralPath "$Image/runtime") { throw 'Unexpected bundled runtime in Java-external image.' }
 $oldPath = $env:PATH
 $oldJavaHome = $env:JAVA_HOME

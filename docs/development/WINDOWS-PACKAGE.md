@@ -44,8 +44,11 @@ DLLs are copied into new EasyKnack images. This is an application folder, not a
 single-file executable. Its size includes development tools for Bake and plugins.
 
 Plugin sources, compiled plugins, Formula caches and media caches belong in the
-user profile, not the installation. Built-in examples are installed into the
-user's example library without replacing existing files. An empty plugin library
+user profile, not the installation. The sixteen built-in examples and German/English guides are generated into
+`app/Examples` at build time and included recursively in the installer. Installed
+runtime only reads that folder; users save variations under Projects. Both the
+package build and package smoke run `ExampleLibrary --verify` against the bundled
+files, rejecting missing, corrupt or retired projects and missing guides. An empty plugin library
 does not trigger compilation at startup. Existing source plugins may need a
 one-time rebuild after upgrading the application or relocating its compiler.
 

@@ -2,6 +2,7 @@
 
 ## Unreleased - 0.3.1
 
+- Include and validate the current learning examples and bilingual guides in installer builds.
 - Classify Delay as an Audio node and retain the visible graph center on window resize.
 - Use one Formula variable color for declarations, parameters and read-only values;
   retain bold read-only and italic persistent-state emphasis.
