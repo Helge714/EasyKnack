@@ -1,8 +1,9 @@
 # Release readiness
 
-Current release: [0.2.0 - published 2026-11-14](source-audit/RELEASE-0.2.0.md).
-Frozen source `6132264`; development continues at `0.2.1-SNAPSHOT`.
-Matching sources/checksums and exact automated validation evidence accompany it.
+Current release: [0.3.0 - publicly published 2026-11-18](source-audit/RELEASE-0.3.0.md).
+Frozen source `1c837ca`; development continues at `0.3.1-SNAPSHOT`.
+Matching sources/checksums and automated validation evidence accompany it.
+The report distinguishes the full regression from corrected/configured reruns.
 Clean-machine and physical-device manual acceptance remain open; official CI and
 signing remain future work. The November 10 audit below is historical.
 
