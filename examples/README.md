@@ -17,5 +17,5 @@ writable development Examples folder are moved to `.previous-examples`; unrelate
 user documents and edits to the new examples are preserved. Reference fixtures
 under `src/test/resources/reference-projects` are separate developer test data.
 
-[Download the collection for EasyKnack 0.3.0 or newer](https://github.com/Helge714/EasyKnack/releases/download/v0.3.0/EasyKnack-Examples-2026-11-18.zip).
+[Download the collection for EasyKnack 0.3.0 or newer](https://github.com/Helge714/EasyKnack/releases/download/v0.3.0/EasyKnack-Examples-2026-11-18-v2.zip).
 Unzip and open a document through File > Open; no reinstall is required.

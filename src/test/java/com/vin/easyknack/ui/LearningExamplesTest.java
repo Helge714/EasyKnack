@@ -29,16 +29,49 @@ class LearningExamplesTest {
             assertEquals(NodeDocuments.comparable(original), NodeDocuments.comparable(restored), entry.path());
             SwingUtilities.invokeAndWait(() -> {
                 try (var c = new WorkspaceController()) {
+                    c.workspace().setGLTheme(ApplicationTheme.loadSelection(BundledThemes.available().get(0).id()).theme());
+                    c.workspace().setBounds(0, 0, 1200, 800);
                     c.openDocument(entry.path(), restored);
+                    assertCentered(c, restored.root(), entry.path());
                     assertTrue(c.audioGraph().startsWith("GRAPH "), entry.path());
                     for (var asset : restored.embeddedAssets().values()) {
                         assertTrue(c.workspace().openComposite(asset.id()), entry.path() + ": " + asset.id());
                         assertDoesNotThrow(c::audioGraph, entry.path());
+                        assertCentered(c, asset, entry.path());
                         c.workspace().navigateToDepth(0);
                     }
                 }
             });
         }
+    }
+    private static void assertCentered(WorkspaceController c, GLNodeGraphAsset asset, String name) {
+        assertNotNull(asset.viewState().camera(), name);
+        assertEquals(0, asset.viewState().camera().x(), .01, name);
+        assertEquals(0, asset.viewState().camera().y(), .01, name);
+        for (var view : asset.viewState().nodes().values()) {
+            assertEquals(0, view.width(), name); assertEquals(0, view.height(), name);
+        }
+        var editor = c.workspace().editor(); var nodes = editor.getNodes();
+        if (nodes.isEmpty()) return;
+        double left = nodes.stream().mapToDouble(n -> n.getX()).min().orElseThrow();
+        double right = nodes.stream().mapToDouble(n -> n.getX() + n.getWidth()).max().orElseThrow();
+        double top = nodes.stream().mapToDouble(n -> n.getY()).min().orElseThrow();
+        double bottom = nodes.stream().mapToDouble(n -> n.getY() + n.getHeight()).max().orElseThrow();
+        assertEquals(0, (left + right) / 2, 1, name);
+        assertEquals(0, (top + bottom) / 2, 1, name);
+        assertEquals(0, editor.getWidth() / 2 - editor.getPanX() / editor.getZoom(), 1, name);
+        assertEquals(0, editor.getHeight() / 2 - editor.getPanY() / editor.getZoom(), 1, name);
+        for (int i = 0; i < nodes.size(); i++) for (int j = i + 1; j < nodes.size(); j++) {
+            var a = nodes.get(i); var b = nodes.get(j);
+            assertFalse(a.getX() < b.getX()+b.getWidth() && a.getX()+a.getWidth() > b.getX()
+                && a.getY() < b.getY()+b.getHeight() && a.getY()+a.getHeight() > b.getY(), name + " has overlapping nodes");
+        }
+    }
+    @Test void arrangementRetainsGraphsAndMetadata() {
+        var before = StarterDocument.create(); var after = ExampleLayout.arrange(before);
+        assertEquals(before.root().graph(), after.root().graph());
+        assertEquals(before.root().metadata(), after.root().metadata());
+        assertEquals(before.externalAssets(), after.externalAssets());
     }
     @Test void installRetiresOldGeneratedFilesPreservesEditsAndKeepsBackupsOutOfMenu() throws Exception {
         Files.writeString(directory.resolve(".easyknack-examples-v1"), "old marker");

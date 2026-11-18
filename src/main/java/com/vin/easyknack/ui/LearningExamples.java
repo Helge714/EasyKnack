@@ -10,7 +10,12 @@ import com.vingame.glswing.node.model.*;
 
 /** Small, self-contained teaching graphs. No files, device IDs or native caches are stored. */
 final class LearningExamples {
-    record Entry(String path, Supplier<GLNodeGraphDocument> document) {}
+    record Entry(String path, Supplier<GLNodeGraphDocument> document) {
+        Entry {
+            var authored = document;
+            document = () -> ExampleLayout.arrange(authored.get());
+        }
+    }
     static List<Entry> entries() {
         return List.of(
             new Entry("01 Basics/01 First tone.knack", LearningExamples::tone),
