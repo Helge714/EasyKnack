@@ -2,7 +2,7 @@
 
 ## Übersicht
 
-Verzögert ein Signal und sichert Feedbackschleifen ab.
+Verzögert ein Audiosignal und sichert Feedbackschleifen ab.
 
 ## Eingänge
 

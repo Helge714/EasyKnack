@@ -2,7 +2,7 @@
 
 ## Overview
 
-Delays a signal and protects feedback cycles.
+Delays an audio signal and protects feedback cycles.
 
 ## Inputs
 
