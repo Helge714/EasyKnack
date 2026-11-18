@@ -2,6 +2,7 @@
 
 ## Unreleased - 0.3.1
 
+- Restore Audio colors for Buffer ports, connections and node titles in all bundled themes.
 - Auto-arrange example graphs and inner groups, centering their saved cameras.
 - Replace the bundled examples with sixteen self-contained learning projects covering
   basics, buffers, MIDI, Instance/Spectral/Formula Groups and delayed feedback.

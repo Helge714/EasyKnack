@@ -10,6 +10,15 @@ import com.vingame.glswing.ui.GLThemeLoader;
 
 class ApplicationThemeTest {
     @TempDir Path directory;
+    @Test void buffersShareAudioColorsInEveryBundledTheme() {
+        for (var choice : BundledThemes.available()) {
+            var theme = ApplicationTheme.loadSelection(choice.id());
+            assertEquals(theme.signal(SignalCategory.AUDIO), theme.signal(SignalCategory.HISTORY), choice.name());
+            assertEquals(theme.title(NodeKind.AUDIO), theme.title(NodeKind.HISTORY), choice.name());
+            for (String suffix : java.util.List.of("light", "dark"))
+                assertEquals(theme.color("node.AUDIO.title." + suffix), theme.color("node.HISTORY.title." + suffix), choice.name());
+        }
+    }
     @Test void selectedColorsDoNotRequireTheSameKeyInTheFallback()throws Exception{
         var file=directory.resolve("selected-only.gltheme");
         Files.writeString(file,"theme.extends=default\n@COLOR easyknack.selected.only=#123456\n");
