@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "sourceCommit": "0ff0c027079a177880f24851e2c2e83b753f92a7",
+  "version": "0.2.0-SNAPSHOT",
+  "tests": {
+    "tests": 205,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sourceJarMatchedEntries": 535,
+  "buildInputCount": 786,
+  "comparison": {
+    "binarySha256": "88138963c1db664cacd2effc82d257722edeb747768e200264084cf771e931d5",
+    "rebuiltSha256": "deeecb834b75ccc6ab012e6950ec57870d1a4549f002ec142c27adf4549b1e04",
+    "classCount": 967,
+    "differences": [
+      "META-INF/glswing/build.properties"
+    ],
+    "classDifferences": []
+  },
+  "artifacts": {
+    "comparison.json": "85d6167717bf31646ed5323e2b31d38bc69cfa6d4ddc648b589170f692308740",
+    "glswing-0.2.0-SNAPSHOT-build-inputs.zip": "9f74a07eb1d1ad9bd8e9d34db8cae15399c80244551cec3797f7483e56a40dca",
+    "glswing-0.2.0-SNAPSHOT-sources.jar": "d7865ab96f145e51a2a21878b341a6b7ed770ba26af0fcec084636e196bc15fb",
+    "glswing-0.2.0-SNAPSHOT.jar": "88138963c1db664cacd2effc82d257722edeb747768e200264084cf771e931d5",
+    "glswing-parent-0.2.0-SNAPSHOT.pom": "31405f2c4ef8a565978f4b24f0171f6c0cdc54faabf690e1886ad76b248ff995",
+    "review.json": "6cb17f4524fc5f536204515a3ac5ca5f87a122bcfd175d7c138fa1e8b746d871"
+  }
+}

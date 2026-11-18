@@ -1,131 +1,36 @@
 # Release notes
 
-## Unreleased - 0.3.0
+## 0.3.0 - 2026-11-18
 
-- Add Formula log(value, base) and real root(value, degree), including negative
-  values with odd integer degrees. The new root function name is reserved; older
-  identifiers named root must be renamed. Keep buffer.read documentation with Buffer members.
+- Expand Formula with typed user functions, bounded for loops, final locals and
+  parameters, input-independent const expressions, chosen-base log and real root.
+- Improve Formula completion, diagnostics, parameter hints, formatting and
+  declaration navigation. Show applied/draft/error state and persistent node warnings.
+- Add a standalone bilingual Formula language reference and a linked function index.
+  Built-in function navigation opens the relevant entry in the selected help language.
+- Share Find across text, code and documentation, with marked matches, matching
+  options and forward/backward navigation. Remove empty component-name tooltips.
+- Speed up eligible Instance Group oscillator Bakes, including Formula weights and
+  audio-rate modulation. Reuse unchanged Bakes and show progress and fallback status.
+- Give Envelope separate Attack, Decay and Release durations, editable start/end
+  values and selectable retrigger behavior. Show curve controls on hover/focus only.
+- Hold MIDI Note Frequency and Velocity after note-off for release tails; add Voice.
+  Muted Digital Noise forwards Frequency and emits neutral Factor 1.
+- Preserve connected port types when grouping; keep graph arrangement compact while
+  respecting rough placement. Restore focused/error connection outlines and export geometry.
+- Edit recording names directly, number takes only on collision, and use dedicated
+  Projects/Recordings folders. Bundled examples stay in the installation.
+- Improve Sine Cloud frequency placement, maximum bin spacing and period reporting.
 
-- Add documentation Find using the shared Core text/code search dialog, with
-  match highlighting and navigation; remove component-name documentation tooltips.
+Compatibility:
 
-- Separate the bilingual Formula language reference from group controls, with
-  detailed state/final/const lifetimes and examples; built-in help opens it directly.
-
-- Add Formula final locals/parameters and input-independent const expressions,
-  bold read-only names and italic state names. Ctrl+click built-ins opens their
-  localized function reference. The new keywords final/const are reserved and
-  require renaming any older identifiers with those names.
-
-- Enable Ctrl+click definition navigation for Formula functions, locals and
-  parameters; remove empty code-editor component-name tooltips.
-
-- Standardize Formula call/definition spacing and merge duplicate argument hints.
-  Improve warning contrast with a filled badge; node title length no longer
-  changes minimum width, while editor/content minimum widths remain respected.
-
-- Keep Formula warnings red and right-aligned in a reserved title slot, visible
-  with long names; color variables, parameters and read-only inputs semantically.
-
-- Show Formula draft validity and applied state, mark invalid Formula nodes with !,
-  color user/built-in functions semantically, and avoid completion on Backspace.
-
-- Improve Formula diagnostics, automatic completion, persistent parameter hints
-  and indentation for braceless if/else bodies. Allow implicit double-to-float
-  assignments, typed user functions and fixed-bound for loops (up to 1,024
-  iterations); preserve interpreted/native parity and existing document formats.
-
-- Place Sine Cloud tones at interior interval subdivisions instead of its endpoints;
-  two tones in 0-24 kHz now produce 8 and 16 kHz (changed stimulus behavior).
-- Compact Sine Cloud tables before synthesis when occupied frequencies permit
-  exact sample repetition, preserving their phases, frequencies and waveform.
-
-- Sine Cloud now sizes its IFFT from Max Bin Spacing (default 0.01 Hz),
-  including non-power-of-two tables. Narrow bands cap Actual count instead of
-  increasing resolution. Gaussian density is removed; old documents remain
-  readable but their stimulus frequencies, tone count and period may change.
-
-- Correct Sine Cloud Period to report the common waveform period of its active
-  tones instead of the stored table duration; single tones report 1 / actual Hz.
-
-- Render eligible Instance Bakes in one synthesis loop: share matching input/math/
-  unit calculations across partials and avoid per-instance audio modulation buffers.
-  Preserve independent phases, control-rate semantics and native fallback state.
-  Bake caches remain local; document formats are unchanged.
-
-- Keep unwired manual inputs mono in Instance Bakes and fuse supported pure
-  audio-rate math/unit modulation while retaining native fallbacks for stateful DSP.
-
-- Re-enable unchanged, loaded Bakes without compiling again. Keep nested Formula
-  warmup DLL paths out of portable Bake sources so cold/warm cache identity agrees.
-
-- Fix a rendering crash when the Bake progress bar reads the theme accent.
-  Resolve selected colors before consulting defaults; legacy themes retain a fallback.
-
-- Show theme-accent Bake progress through compilation, validation and activation,
-  then hide the bar. Distinguish available oscillator optimization from a standard
-  bake and explain fallback limits. Avoid redundant generated C++ compilation.
-
-- Retain fast Instance Group rendering with audio-rate frequency and phase
-  modulation, including input-rate changes.
-
-- Keep optimized Instance Group oscillator summation and Bake scalar caching when
-  stateless Formula Groups compute harmonic weights. Dynamic formulas retain the
-  general execution path; document formats and sound semantics are unchanged.
-
-- Preserve semantic input types when grouping connected nodes, including nested
-  groups. Value inputs no longer become Audio inputs; existing interfaces remain unchanged.
-
-- Respect Envelope curve endpoints: the first Attack starts at the drawn value,
-  and Release holds its drawn endpoint, including nonzero values. Retriggers
-  default to continuous; an Inspector switch can instead restart from the drawn
-  first point. The default zero-ended curve retains its usual behavior.
-
-- Hold MIDI Note Velocity and Frequency per voice after note-off so envelope
-  release tails are not cut off. Gate still releases immediately; panic clears
-  Velocity. Patches that used Velocity as a gate should use Gate instead.
-
-- Show curve modes with round Bezier, square Linear and diamond Step points.
-  Envelope phases occupy equal, edge-aligned thirds without an extra Hold marker.
-- Muted Digital Noise passes Frequency unchanged, outputs Factor 1 and emits no
-  Trigger, including inside Instance Groups.
-- Add a stable zero-based Voice output to MIDI Note. Clarify Pitch-bend range;
-  its default remains 2 semitones and requires MIDI pitch-wheel messages.
-
-- Give Envelope separate Attack, Decay and Release duration inputs and vertically
-  movable curve points. Hold stays at the end of Decay. Older combined times are
-  split; existing duration wires now drive Attack. Sustain-position wires and
-  copied bindings are retired, so older modulated patches can sound different.
-- Reveal curve points and Bezier controls only on hover or editor focus; clicking
-  outside returns to the curve-only editing display.
-
-- Restore visible connection outlines for selection, insertion targets, warnings
-  and errors in all four themes, while keeping ordinary wires borderless.
-
-- Prevent position-aware Arrange from spreading complex graphs into artificial
-  global rows and columns. Compact connected nodes by signal flow while retaining
-  branch order and rough placement of independent components.
-
-- Arrange preserves rough user rows and columns while resolving overlaps and
-  retaining signal flow, group boundaries and one-step Undo.
-
-- Let recorder Browse choose both folder and filename in a save dialog, while
-  keeping direct filename editing. Selecting a target does not create a file.
-
-- Bundle examples with the installation instead of copying them into Documents.
-  Default new projects to EasyKnack/Projects and new recordings to
-  EasyKnack/Recordings in the system Documents folder. Preserve existing targets
-  and remembered dialog locations; leave previous user example copies untouched.
-
-- Add an inline recording filename field grouped with a folder button using
-  the shared Core folder icon at a readable size. Enter accepts the filename and
-  leaves the text field. Keep
-  existing document paths compatible. Without Overwrite, first takes use the
-  selected name; collisions move the existing take into a numbered series and
-  create the next index. This changes output filename behavior; existing numbered
-  takes remain untouched and series continue across recorder restarts.
-
-- Preserve the live graph connection curvature in image exports and previews.
+- Older Envelope timing is migrated; existing duration wires drive Attack and retired
+  sustain-position bindings are removed. Review older modulated Envelope patches.
+- MIDI patches using Velocity as a gate should use Gate instead.
+- Sine Cloud frequency placement, tone count and periods can differ from older
+  versions; Gaussian density is removed. Review saved research stimuli.
+- Formula identifiers named final, const or root must be renamed because these names
+  are now reserved. Existing document formats remain readable.
 
 ## 0.2.0 - 2026-11-14
 

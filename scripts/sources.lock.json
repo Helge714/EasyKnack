@@ -41,7 +41,7 @@
       "id": "glswing-0.2.0-SNAPSHOT",
       "file": "glswing-0.2.0-SNAPSHOT-sources.jar",
       "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-sources.jar",
-      "sha256": "26ac2d65bbd562884bbb0d857aa5773289cb24ff6bc46496db748e4f3dd6e834"
+      "sha256": "d7865ab96f145e51a2a21878b341a6b7ed770ba26af0fcec084636e196bc15fb"
     },
     {
       "id": "mingw-w64",
@@ -82,7 +82,7 @@
     {
       "id": "glswing-build-inputs",
       "file": "glswing-0.2.0-SNAPSHOT-build-inputs.zip",
-      "sha256": "a3da906bf689df54c52455b20d67ec87a6f8ad583b36bbdf6beffd9add7ead3d",
+      "sha256": "9f74a07eb1d1ad9bd8e9d34db8cae15399c80244551cec3797f7483e56a40dca",
       "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-build-inputs.zip"
     },
     {
@@ -99,7 +99,7 @@
     },
     {
       "file": "glswing-0.2.0-SNAPSHOT.jar",
-      "sha256": "fe8390eb3a83e9ae9a7bd4e45e6772ad200048064fc637c6431840d279bd0a23"
+      "sha256": "88138963c1db664cacd2effc82d257722edeb747768e200264084cf771e931d5"
     },
     {
       "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",
@@ -133,7 +133,7 @@
   "pendingDistributionChecks": [
     "Clean Windows installation without Java, including interactive JDK installation/cancellation/offline handling.",
     "Installer upgrade and uninstall on a clean test system; verify shortcuts, file association and installed notices.",
-    "Publish matching source-material downloads alongside the binary; no publication has been performed."
+    "Publish matching source-material downloads alongside this release binary."
   ],
   "installerTools": {
     "version": "3.14.1",
