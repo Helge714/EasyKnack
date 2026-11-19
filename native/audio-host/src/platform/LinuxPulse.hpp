@@ -43,8 +43,8 @@ struct PulseApi {
  * All waits are bounded and release the event-loop lock. Audio callbacks never wait. */
 class PulseSession {
 public:
-    struct Sink {std::uint32_t index;std::string name,label,monitor;pa_cvolume volume;bool muted,hardware;};
-    struct Source {std::uint32_t index;std::string name,label;bool monitor,hardware;};
+    struct Sink {std::uint32_t index;std::string name,label,monitor;pa_cvolume volume;bool muted,hardware;pa_channel_map map;};
+    struct Source {std::uint32_t index;std::string name,label;bool monitor,hardware;pa_channel_map map;};
     struct Application {std::uint32_t index,sink;std::string identity,name;};
     struct Snapshot {std::string defaultSink,defaultSource;std::vector<Sink> sinks;std::vector<Source> sources;std::vector<Application> applications;};
     PulseApi api;
@@ -89,8 +89,8 @@ public:
         Guard lock(*this);auto now=std::chrono::steady_clock::now();if(!force&&now-refreshed<std::chrono::milliseconds(100))return cached;
         Snapshot next;
         operation(api.pa_context_get_server_info(context,[](pa_context*,const pa_server_info* info,void* data){if(info){auto& s=*static_cast<Snapshot*>(data);if(info->default_sink_name)s.defaultSink=info->default_sink_name;if(info->default_source_name)s.defaultSource=info->default_source_name;}},&next));
-        operation(api.pa_context_get_sink_info_list(context,[](pa_context*,const pa_sink_info* info,int,void* data){if(info)static_cast<Snapshot*>(data)->sinks.push_back({info->index,info->name?info->name:"",info->description?info->description:info->name,info->monitor_source_name?info->monitor_source_name:"",info->volume,bool(info->mute),bool(info->flags&PA_SINK_HARDWARE)});},&next));
-        operation(api.pa_context_get_source_info_list(context,[](pa_context*,const pa_source_info* info,int,void* data){if(info)static_cast<Snapshot*>(data)->sources.push_back({info->index,info->name?info->name:"",info->description?info->description:info->name,info->monitor_of_sink!=PA_INVALID_INDEX,bool(info->flags&PA_SOURCE_HARDWARE)});},&next));
+        operation(api.pa_context_get_sink_info_list(context,[](pa_context*,const pa_sink_info* info,int,void* data){if(info)static_cast<Snapshot*>(data)->sinks.push_back({info->index,info->name?info->name:"",info->description?info->description:info->name,info->monitor_source_name?info->monitor_source_name:"",info->volume,bool(info->mute),bool(info->flags&PA_SINK_HARDWARE),info->channel_map});},&next));
+        operation(api.pa_context_get_source_info_list(context,[](pa_context*,const pa_source_info* info,int,void* data){if(info)static_cast<Snapshot*>(data)->sources.push_back({info->index,info->name?info->name:"",info->description?info->description:info->name,info->monitor_of_sink!=PA_INVALID_INDEX,bool(info->flags&PA_SOURCE_HARDWARE),info->channel_map});},&next));
         struct ApplicationQuery {PulseSession* session;Snapshot* snapshot;} query{this,&next};
         operation(api.pa_context_get_sink_input_info_list(context,[](pa_context*,const pa_sink_input_info* info,int,void* data){
             if(!info)return;auto& q=*static_cast<ApplicationQuery*>(data);
@@ -102,7 +102,23 @@ public:
         },&query));
         cached=std::move(next);refreshed=now;return cached;
     }
-    static std::string sinkName(const Snapshot& snapshot,const std::string& id){return id=="default"?snapshot.defaultSink:id.rfind("out:pulse:",0)==0?id.substr(10):std::string{};}
+    template<class Endpoints> static std::pair<std::string,unsigned> selection(const Endpoints& endpoints,const std::string& body){
+        for(auto& endpoint:endpoints)if(endpoint.name==body)return {body,0};
+        auto split=body.rfind(":channels:");if(split==std::string::npos)return {};
+        auto name=body.substr(0,split),number=body.substr(split+10);if(number.empty())return {};
+        unsigned first=0;for(char c:number){if(c<'0'||c>'9'||first>=PA_CHANNELS_MAX)return {};first=first*10+unsigned(c-'0');}
+        if(first%2||first>=PA_CHANNELS_MAX)return {};
+        for(auto& endpoint:endpoints)if(endpoint.name==name)return {name,first};return {};
+    }
+    static std::pair<std::string,unsigned> sinkSelection(const Snapshot& snapshot,const std::string& id){return id=="default"?std::make_pair(snapshot.defaultSink,0u):id.rfind("out:pulse:",0)==0?selection(snapshot.sinks,id.substr(10)):std::pair<std::string,unsigned>{};}
+    static std::pair<std::string,unsigned> sourceSelection(const Snapshot& snapshot,const std::string& id){return id=="in:default"?std::make_pair(snapshot.defaultSource,0u):id.rfind("in:pulse:",0)==0?selection(snapshot.sources,id.substr(9)):std::pair<std::string,unsigned>{};}
+    static std::string sinkName(const Snapshot& snapshot,const std::string& id){return sinkSelection(snapshot,id).first;}
+    static pa_channel_map channels(pa_channel_map native,unsigned first=0){
+        if(!native.channels){native.channels=2;native.map[0]=PA_CHANNEL_POSITION_FRONT_LEFT;native.map[1]=PA_CHANNEL_POSITION_FRONT_RIGHT;}
+        pa_channel_map result{};if(first>=native.channels)return result;
+        result.channels=static_cast<std::uint8_t>(std::min<unsigned>(2,native.channels-first));
+        for(unsigned i=0;i<result.channels;i++)result.map[i]=native.map[first+i];return result;
+    }
     DeviceVolumeService::Value volume(const std::string& id){
         auto state=snapshot();auto name=sinkName(state,id);for(auto& sink:state.sinks)if(sink.name==name){double sum=0;for(unsigned i=0;i<sink.volume.channels;i++)sum+=sink.volume.values[i];return {true,sink.volume.channels?float(sum/sink.volume.channels/PA_VOLUME_NORM):0,sink.muted};}return {};
     }

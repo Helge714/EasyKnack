@@ -42,5 +42,21 @@ int main(){
         audio.prepare({{"out:pulse:missing",false}});CHECK(!audio.status().empty());CHECK(server.streams.size()==1);
     }
     CHECK(server.streams.empty()&&server.operations==0);
+    server.channelCounts={{"first",4},{"second",1},{"microphone",4},{"player",1}};session->snapshot(true);
+    {
+        LinuxAudio audio(*engine,session);CHECK(audio.enumerateOutputs().size()==4);
+        const std::string rear="out:pulse:first:channels:2",mic="in:pulse:microphone:channels:2";
+        audio.prepare({{"out:pulse:first",false},{rear,false},{"out:pulse:second",false},{mic,true},{"app:pulse:player",true},{"in:pulse:second.monitor",true}});
+        CHECK(server.streams.size()==6);
+        CHECK(std::count_if(server.streams.begin(),server.streams.end(),[](auto* s){return s->device=="microphone"&&s->map.map[0]==PA_CHANNEL_POSITION_REAR_LEFT;})==1);
+        engine->publish(AudioGraph::parse("GRAPH 5 a value 0.25 @ c - b value 0.5 @ c - x deviceout 0 "+hex("out:pulse:first")+" @ a a y deviceout 1 "+hex(rear)+" @ a a z deviceout 0 "+hex("out:pulse:second")+" @ a a"));
+        for(int i=0;i<40;i++)server.tick();
+        CHECK(std::abs(server.last("second")-.05f)<.001f);
+        bool routed=false;for(auto* stream:server.streams)if(!stream->input&&stream->device=="first"&&stream->map.map[0]==PA_CHANNEL_POSITION_REAR_LEFT)routed=!stream->played.empty()&&std::abs(stream->played.back()-.1f)<.001f;
+        CHECK(routed);CHECK(std::abs(session->volume(rear).scalar-session->volume("out:pulse:first").scalar)<.0001f);
+        engine->publish(AudioGraph::parse("GRAPH 2 input input "+hex("in:pulse:second.monitor")+" copy stereo @ a - out deviceout 0 "+hex("out:pulse:second")+" @ a a"));
+        for(int i=0;i<24;i++){server.capture(.2f);server.tick();}CHECK(std::abs(server.last("second")-.04f)<.002f);
+    }
+    CHECK(server.streams.empty()&&server.operations==0);
     std::cout<<"Linux audio routing, process monitoring, volume, clock and lifecycle tests passed\n";
 }

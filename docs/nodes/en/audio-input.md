@@ -26,6 +26,8 @@ Linux uses PulseAudio or PipeWire-Pulse for device, sink-monitor and per-applica
 capture. Applications appear while they expose an audio stream; EasyKnack's own
 streams are excluded. Exclusive rerouting remains external, through the desktop's
 audio routing tools. Saved Windows device IDs must be reselected on Linux.
+Multichannel sources and monitors expose separate channel pairs; mono hardware
+is duplicated for stereo processing or retained by the node's Mono option.
 
 ## Mute
 

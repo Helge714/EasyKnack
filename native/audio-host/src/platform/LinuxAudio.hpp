@@ -14,6 +14,7 @@ class LinuxAudio final : public HostAudioBackend {
         std::vector<std::string> aliases;
         std::string device;
         bool input=false,master=false;
+        unsigned channels=2;
         pa_stream* handle=nullptr;
         StereoRing<131072> ring;
         std::array<float,blockSize*2> block{};
@@ -39,7 +40,12 @@ class LinuxAudio final : public HostAudioBackend {
     static void capture(pa_stream* handle,std::size_t,void* data){
         auto& stream=*static_cast<Stream*>(data);auto& api=stream.owner->session->api;
         for(;;){const void* samples=nullptr;std::size_t bytes=0;if(api.pa_stream_peek(handle,&samples,&bytes)<0||!bytes)break;
-            auto frames=bytes/(2*sizeof(float));stream.ring.write(static_cast<const float*>(samples),frames);
+            auto frames=bytes/(stream.channels*sizeof(float));
+            if(stream.channels==2)stream.ring.write(static_cast<const float*>(samples),frames);
+            else{
+                std::array<float,blockSize*2> stereo{};auto* mono=static_cast<const float*>(samples);
+                for(std::size_t offset=0;offset<frames;offset+=blockSize){auto count=std::min<std::size_t>(blockSize,frames-offset);for(std::size_t i=0;i<count;i++)stereo[i*2]=stereo[i*2+1]=mono?mono[offset+i]:0;stream.ring.write(stereo.data(),count);}
+            }
             stream.frames.fetch_add(frames,std::memory_order_relaxed);stream.packet.store(std::max(stream.packet.load(),static_cast<unsigned>(frames)));
             if(api.pa_stream_drop(handle)<0)break;
         }
@@ -51,23 +57,29 @@ class LinuxAudio final : public HostAudioBackend {
     static void playback(pa_stream* handle,std::size_t bytes,void* data){
         auto& stream=*static_cast<Stream*>(data);auto& self=*stream.owner;
         std::array<float,blockSize*2> output{};
-        while(bytes>=2*sizeof(float)){
-            unsigned frames=static_cast<unsigned>(std::min<std::size_t>(blockSize,bytes/(2*sizeof(float))));
+        std::array<float,blockSize> mono{};
+        const auto frameBytes=stream.channels*sizeof(float);
+        while(bytes>=frameBytes){
+            unsigned frames=static_cast<unsigned>(std::min<std::size_t>(blockSize,bytes/frameBytes));
             if(stream.master){
                 if(self.renderAhead.active())self.renderAhead.read(output.data(),frames);
                 else{renderQueued(&self,output.data(),frames);if(RenderCadence::period>1)self.renderAhead.enable(RenderCadence::period);}
             }else stream.ring.readAdaptive(output.data(),frames);
-            if(self.session->api.pa_stream_write(handle,output.data(),frames*2*sizeof(float),nullptr,0,PA_SEEK_RELATIVE)<0)break;
-            stream.frames.fetch_add(frames,std::memory_order_relaxed);bytes-=frames*2*sizeof(float);
+            if(stream.channels==1)for(unsigned i=0;i<frames;i++)mono[i]=(output[i*2]+output[i*2+1])*.5f;
+            if(self.session->api.pa_stream_write(handle,stream.channels==1?mono.data():output.data(),frames*frameBytes,nullptr,0,PA_SEEK_RELATIVE)<0)break;
+            stream.frames.fetch_add(frames,std::memory_order_relaxed);bytes-=frames*frameBytes;
         }
     }
-    std::unique_ptr<Stream> open(bool input,const std::string& device,std::uint32_t monitor=PA_INVALID_INDEX){
+    std::unique_ptr<Stream> open(bool input,const std::string& device,std::uint32_t monitor=PA_INVALID_INDEX,const pa_channel_map* map=nullptr){
         auto stream=std::make_unique<Stream>(*this);stream->input=input;stream->device=device;
-        pa_sample_spec format{PA_SAMPLE_FLOAT32LE,sampleRate,2};auto& api=session->api;
-        stream->handle=api.pa_stream_new(session->context,input?"EasyKnack capture":"EasyKnack output",&format,nullptr);
+        stream->channels=map?map->channels:2;
+        pa_sample_spec format{PA_SAMPLE_FLOAT32LE,sampleRate,static_cast<std::uint8_t>(stream->channels)};auto& api=session->api;
+        stream->handle=api.pa_stream_new(session->context,input?"EasyKnack capture":"EasyKnack output",&format,map);
         if(!stream->handle)throw std::runtime_error("Cannot create PulseAudio stream");
-        pa_buffer_attr buffer{static_cast<std::uint32_t>(-1),blockSize*2*sizeof(float)*3,static_cast<std::uint32_t>(-1),blockSize*2*sizeof(float),blockSize*2*sizeof(float)};
+        auto period=static_cast<std::uint32_t>(blockSize*stream->channels*sizeof(float));
+        pa_buffer_attr buffer{static_cast<std::uint32_t>(-1),period*3,static_cast<std::uint32_t>(-1),period,period};
         auto flags=static_cast<pa_stream_flags_t>(PA_STREAM_ADJUST_LATENCY|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
+        if(map)flags=static_cast<pa_stream_flags_t>(flags|PA_STREAM_NO_REMIX_CHANNELS);
         int result;
         if(input){
             if(monitor!=PA_INVALID_INDEX&&api.pa_stream_set_monitor_stream(stream->handle,monitor)<0)throw std::runtime_error("Application monitoring unavailable");
@@ -87,40 +99,50 @@ public:
     std::string bufferDescription()const override{return "256-frame graph blocks; server-negotiated device latency";}
     std::vector<AudioEndpoint> enumerateOutputs()override{
         auto state=session->snapshot();std::vector<AudioEndpoint> result{{"default","System Default",AudioEndpointType::HardwareOutput,!state.defaultSink.empty(),false}};
-        for(auto& sink:state.sinks)result.push_back({"out:pulse:"+sink.name,sink.label,sink.hardware?AudioEndpointType::HardwareOutput:AudioEndpointType::VirtualOutput,true,false});return result;
+        for(auto& sink:state.sinks){
+            result.push_back({"out:pulse:"+sink.name,sink.label+(sink.map.channels>2?" [1/2]":""),sink.hardware?AudioEndpointType::HardwareOutput:AudioEndpointType::VirtualOutput,true,false});
+            for(unsigned first=2;first<sink.map.channels;first+=2)result.push_back({"out:pulse:"+sink.name+":channels:"+std::to_string(first),sink.label+" ["+std::to_string(first+1)+(first+1<sink.map.channels?"/"+std::to_string(first+2):"")+"]",sink.hardware?AudioEndpointType::HardwareOutput:AudioEndpointType::VirtualOutput,true,false});
+        }return result;
     }
     std::vector<AudioEndpoint> enumerateInputs()override{
         auto state=session->snapshot();std::vector<AudioEndpoint> result{{"in:default","System Default",AudioEndpointType::HardwareInput,!state.defaultSource.empty(),false},{"system","System Audio",AudioEndpointType::SystemMix,!state.defaultSink.empty(),false}};
-        for(auto& source:state.sources)result.push_back({"in:pulse:"+source.name,source.label,source.monitor?AudioEndpointType::SystemMix:source.hardware?AudioEndpointType::HardwareInput:AudioEndpointType::VirtualInput,true,false});
+        for(auto& source:state.sources){
+            auto type=source.monitor?AudioEndpointType::SystemMix:source.hardware?AudioEndpointType::HardwareInput:AudioEndpointType::VirtualInput;
+            result.push_back({"in:pulse:"+source.name,source.label+(source.map.channels>2?" [1/2]":""),type,true,false});
+            for(unsigned first=2;first<source.map.channels;first+=2)result.push_back({"in:pulse:"+source.name+":channels:"+std::to_string(first),source.label+" ["+std::to_string(first+1)+(first+1<source.map.channels?"/"+std::to_string(first+2):"")+"]",type,true,false});
+        }
         std::set<std::string> seen;for(auto& app:state.applications)if(seen.insert(app.identity).second)result.push_back({"app:pulse:"+app.identity,app.name,AudioEndpointType::Application,true,false});return result;
     }
     void prepare(const std::vector<AudioRoute>& selected)override{
         auto state=session->snapshot();std::map<std::pair<bool,std::string>,AudioRoute> unique;
         for(auto& route:selected){if(route.mode!=AudioCaptureMode::Copy)throw std::runtime_error("ROUTE requires an external routing backend");unique[{route.input,route.endpoint}]=route;}
         if(unique.size()>32)throw std::runtime_error("Maximum 32 simultaneous audio endpoints");
-        struct Desired {bool input;std::string device;std::uint32_t monitor;std::vector<std::string> aliases;};
+        struct Desired {bool input;std::string device;std::uint32_t monitor;pa_channel_map map;std::vector<std::string> aliases;};
         std::map<std::string,Desired> desired;std::string missing;
-        auto add=[&](bool input,const std::string& device,std::uint32_t monitor,const std::string& alias){
-            if(device.empty()){missing="Audio endpoint unavailable: "+alias;return;}
+        auto add=[&](bool input,const std::string& device,std::uint32_t monitor,const std::string& alias,pa_channel_map map){
+            if(device.empty()||!map.channels){missing="Audio endpoint unavailable: "+alias;return;}
             auto key=(input?"i:":"o:")+device+":"+std::to_string(monitor);
-            auto& entry=desired[key];entry.input=input;entry.device=device;entry.monitor=monitor;entry.aliases.push_back(alias);
+            for(unsigned i=0;i<map.channels;i++)key+=":"+std::to_string(map.map[i]);
+            auto& entry=desired[key];entry.input=input;entry.device=device;entry.monitor=monitor;entry.map=map;entry.aliases.push_back(alias);
         };
         for(auto& [key,route]:unique){
-            if(!route.input){auto name=PulseSession::sinkName(state,route.endpoint);auto found=std::find_if(state.sinks.begin(),state.sinks.end(),[&](auto& sink){return sink.name==name;});add(false,found==state.sinks.end()?"":name,PA_INVALID_INDEX,route.endpoint);}
+            if(!route.input){auto [name,first]=PulseSession::sinkSelection(state,route.endpoint);auto found=std::find_if(state.sinks.begin(),state.sinks.end(),[&](auto& sink){return sink.name==name;});add(false,found==state.sinks.end()?"":name,PA_INVALID_INDEX,route.endpoint,found==state.sinks.end()?pa_channel_map{}:PulseSession::channels(found->map,first));}
             else if(route.endpoint.rfind("app:pulse:",0)==0){
                 bool found=false;for(auto& app:state.applications)if(app.identity==route.endpoint.substr(10)){
                     auto sink=std::find_if(state.sinks.begin(),state.sinks.end(),[&](auto& sink){return sink.index==app.sink;});
-                    if(sink!=state.sinks.end()){add(true,sink->monitor,app.index,route.endpoint);found=true;}
+                    // Direct monitor chunks use the sink's layout, including
+                    // for mono applications rendered into a stereo sink.
+                    if(sink!=state.sinks.end()){add(true,sink->monitor,app.index,route.endpoint,PulseSession::channels(sink->map));found=true;}
                 }if(!found)missing="Application audio unavailable: "+route.endpoint;
             }else if(route.endpoint=="system"){
-                auto sink=std::find_if(state.sinks.begin(),state.sinks.end(),[&](auto& sink){return sink.name==state.defaultSink;});add(true,sink==state.sinks.end()?"":sink->monitor,PA_INVALID_INDEX,route.endpoint);
+                auto sink=std::find_if(state.sinks.begin(),state.sinks.end(),[&](auto& sink){return sink.name==state.defaultSink;});add(true,sink==state.sinks.end()?"":sink->monitor,PA_INVALID_INDEX,route.endpoint,sink==state.sinks.end()?pa_channel_map{}:PulseSession::channels(sink->map));
             }else{
-                auto name=route.endpoint=="in:default"?state.defaultSource:route.endpoint.rfind("in:pulse:",0)==0?route.endpoint.substr(9):std::string{};
-                auto source=std::find_if(state.sources.begin(),state.sources.end(),[&](auto& source){return source.name==name;});add(true,source==state.sources.end()?"":name,PA_INVALID_INDEX,route.endpoint);
+                auto [name,first]=PulseSession::sourceSelection(state,route.endpoint);
+                auto source=std::find_if(state.sources.begin(),state.sources.end(),[&](auto& source){return source.name==name;});add(true,source==state.sources.end()?"":name,PA_INVALID_INDEX,route.endpoint,source==state.sources.end()?pa_channel_map{}:PulseSession::channels(source->map,first));
             }
         }
         bool hasOutput=std::any_of(desired.begin(),desired.end(),[](auto& entry){return !entry.second.input;});
-        if(!hasOutput)add(false,state.defaultSink,PA_INVALID_INDEX,"");
+        if(!hasOutput){auto sink=std::find_if(state.sinks.begin(),state.sinks.end(),[&](auto& s){return s.name==state.defaultSink;});add(false,state.defaultSink,PA_INVALID_INDEX,"",sink==state.sinks.end()?pa_channel_map{}:PulseSession::channels(sink->map));}
         if(desired.size()>64)throw std::runtime_error("Maximum 64 simultaneous audio streams");
         std::string key;for(auto& [id,d]:desired){key+=id+";";for(auto& alias:d.aliases)key+=alias+";";}key+="|"+missing;
         PulseSession::Guard lock(*session);
@@ -129,7 +151,7 @@ public:
         std::vector<std::unique_ptr<Stream>> next;Stream* primary=nullptr;
         bool failed=false;
         for(auto& [id,d]:desired){
-            try{auto stream=open(d.input,d.device,d.monitor);stream->aliases=d.aliases;if(!d.input&&!primary)primary=stream.get();next.push_back(std::move(stream));}
+            try{auto stream=open(d.input,d.device,d.monitor,&d.map);stream->aliases=d.aliases;if(!d.input&&!primary)primary=stream.get();next.push_back(std::move(stream));}
             catch(const std::runtime_error& error){failed=true;if(!missing.empty())missing+=" | ";missing+=error.what();}
         }
         if(!primary){

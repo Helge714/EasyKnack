@@ -27,6 +27,8 @@ Anwendungsaufnahme. Anwendungen erscheinen, solange sie einen Audiostream
 bereitstellen; EasyKnacks eigene Streams werden ausgeblendet. Ausschließliche
 Weiterleitung erfolgt weiterhin extern über die Audiowerkzeuge des Desktops.
 Gespeicherte Windows-Gerätekennungen müssen unter Linux neu ausgewählt werden.
+Mehrkanalquellen und Monitore bieten einzelne Kanalpaare an. Mono-Hardware wird
+für Stereo-Verarbeitung dupliziert oder über die Mono-Option des Nodes verwendet.
 
 ## Mute
 

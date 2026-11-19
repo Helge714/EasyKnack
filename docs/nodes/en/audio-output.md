@@ -6,6 +6,8 @@ Sends audio to an output device.
 
 Linux uses PulseAudio or PipeWire-Pulse for device selection and volume controls.
 Without that service, the fallback supports only the default audio devices.
+Multichannel Linux devices expose separate channel pairs (1/2, 3/4, etc.); a final
+single channel uses mono conversion. Device volume applies to the physical sink.
 
 ## Inputs
 

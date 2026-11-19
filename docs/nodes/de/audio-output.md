@@ -6,6 +6,8 @@ Sendet Audio an ein Ausgabegerät.
 
 Linux verwendet PulseAudio oder PipeWire-Pulse für Gerätewahl und Lautstärke.
 Ohne diesen Dienst unterstützt der Rückfallpfad nur die Standard-Audiogeräte.
+Mehrkanalgeräte bieten unter Linux einzelne Kanalpaare (1/2, 3/4 usw.); ein letzter
+einzelner Kanal wird mono bedient. Gerätelautstärke gilt für den gesamten Ausgang.
 
 ## Eingänge
 
