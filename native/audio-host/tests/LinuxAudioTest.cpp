@@ -35,6 +35,9 @@ int main(){
         server.failingDevice.clear();audio.refresh();CHECK(server.streams.size()==2&&audio.status().empty());
         // Alias selections share a physical stream and do not duplicate routing.
         audio.prepare({{"default",false},{"out:pulse:first",false}});CHECK(server.streams.size()==1);
+        engine->publish(AudioGraph::parse("GRAPH 2 value value 0.25 @ c - out deviceout 0 "+hex("default")+" @ a a"));for(int i=0;i<12;i++)server.tick();
+        audio.beginPeakRead();auto defaultPeak=audio.takePeak("default"),namedPeak=audio.takePeak("out:pulse:first");audio.endPeakRead();
+        CHECK(defaultPeak>.04f&&defaultPeak==namedPeak);CHECK(audio.takePeak("default")==0);
         LinuxVolume volume(session);volume.links({"out:pulse:first","out:pulse:second"});
         server.levels["first"]=.6f;session->snapshot(true);volume.poll();
         CHECK(std::abs(server.levels["second"]-.3f)<.0001f);CHECK(volume.keysActive());CHECK(volume.keyEvent().rfind("1 ",0)==0);

@@ -19,6 +19,7 @@ class LinuxAudio final : public HostAudioBackend {
         StereoRing<131072> ring;
         std::array<float,blockSize*2> block{};
         std::atomic<float> peak{0};
+        float reportedPeak=0;
         std::atomic<std::uint64_t> frames{0};
         std::atomic<unsigned> packet{0};
         explicit Stream(LinuxAudio& owner):owner(&owner){}
@@ -34,6 +35,7 @@ class LinuxAudio final : public HostAudioBackend {
     std::uint64_t revision=1;
     bool running=false;
     bool incomplete=false;
+    bool readingPeaks=false;
     AudioRenderAhead renderAhead;
     float* directOutput=nullptr;
     std::size_t directOffset=0;
@@ -164,7 +166,9 @@ public:
     void refresh()override{session->snapshot(true);prepare(routes);}
     void setRunning(bool value)override{if(value!=running){running=value;++revision;}}
     std::string status()const override{return problem;}
-    float takePeak(const std::string& id)noexcept override{for(auto& stream:streams)if(!stream->input&&stream->matches(id))return stream->peak.exchange(0);return 0;}
+    void beginPeakRead()noexcept override{for(auto& stream:streams)stream->reportedPeak=stream->peak.exchange(0);readingPeaks=true;}
+    void endPeakRead()noexcept override{readingPeaks=false;}
+    float takePeak(const std::string& id)noexcept override{for(auto& stream:streams)if(!stream->input&&stream->matches(id))return readingPeaks?stream->reportedPeak:stream->peak.exchange(0);return 0;}
     AudioIOStatistics statistics()const override{
         AudioIOStatistics result;for(auto& stream:streams){if(stream->input){result.capturedFrames+=stream->frames.load();result.captureUnder+=stream->ring.underruns.load();result.captureOver+=stream->ring.overruns.load();}else{result.playedFrames+=stream->frames.load();result.playbackUnder+=stream->ring.underruns.load();result.playbackOver+=stream->ring.overruns.load();}result.priming+=stream->ring.priming.load();}result.underruns=result.captureUnder+result.playbackUnder;result.overruns=result.captureOver+result.playbackOver;return result;
     }

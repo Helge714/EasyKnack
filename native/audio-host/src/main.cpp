@@ -68,7 +68,9 @@ int main(int argc, char** argv) {
                     sendLine(client,"OK "+volume.keyEvent()); continue;
                 } else if(line=="VOLUMES") {
                     std::string response="OK "+std::string(volume.keysActive()?"1":"0");
-                    for(const auto& endpoint:backend.enumerateOutputs()) {
+                    auto endpoints=backend.enumerateOutputs();
+                    struct PeakRead {easyknack::HostAudioBackend& backend;explicit PeakRead(easyknack::HostAudioBackend& b):backend(b){backend.beginPeakRead();}~PeakRead(){backend.endPeakRead();}} peakRead(backend);
+                    for(const auto& endpoint:endpoints) {
                         auto value=volume.get(endpoint.id);
                         if(value.available) response+=" "+easyknack::hexText(endpoint.id)+" "+std::to_string(value.scalar)+" "+(value.muted?"1":"0")+" "+std::to_string(backend.takePeak(endpoint.id));
                     }

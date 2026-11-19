@@ -13,6 +13,8 @@ public:
     virtual float takePeak(const std::string&) noexcept=0;
     virtual std::string clockDescription() const=0;
     virtual std::string bufferDescription() const=0;
+    virtual void beginPeakRead() noexcept {}
+    virtual void endPeakRead() noexcept {}
 };
 class HostMidiSource : public MidiSource {
 public:
