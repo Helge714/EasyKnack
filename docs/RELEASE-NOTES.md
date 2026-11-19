@@ -2,6 +2,8 @@
 
 ## Unreleased - 0.4.0
 
+- Provide a Linux x86_64 cross-build and portable test package with Java, examples
+  and target-side diagnostics; fix Unix audio-import paths. Linux device/GUI acceptance is pending.
 - Separate native host services from Windows APIs; prepare default-device Linux
   audio and portable control transport, keyboard MIDI and Formula loading.
 - Centralize Windows/Linux/macOS executable, library and compiler policy.

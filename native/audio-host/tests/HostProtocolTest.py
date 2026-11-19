@@ -6,6 +6,23 @@ import sys
 import threading
 import time
 import uuid
+import tempfile
+import wave
+from pathlib import Path
+
+
+def check_decoder(executable):
+    with tempfile.TemporaryDirectory() as directory:
+        source = Path(directory) / "import-ä.wav"
+        output = Path(directory) / "decoded-ä.pcm"
+        with wave.open(str(source), "wb") as audio:
+            audio.setparams((1, 2, 48000, 0, "NONE", "not compressed"))
+            audio.writeframes(b"\x00\x10" * 32)
+        result = subprocess.run([executable, "--decode-audio", str(source).encode("utf-8").hex(),
+                                 str(output).encode("utf-8").hex()], capture_output=True, timeout=15)
+        assert result.returncode == 0, result.stderr.decode(errors="replace")
+        data = output.read_bytes()
+        assert data[:8] == b"EKPCM001" and len(data) == 24 + 32 * 4
 
 
 def check_host(executable):
@@ -56,5 +73,6 @@ def check_host(executable):
 
 
 if __name__ == "__main__":
+    check_decoder(sys.argv[1])
     check_host(sys.argv[1])
     print("Host protocol tests passed")

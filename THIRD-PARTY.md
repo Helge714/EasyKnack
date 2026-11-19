@@ -18,7 +18,9 @@ that all corresponding-source obligations have already been fulfilled.
 | Loris (Kelly Fitz and Lippold Haken) | GPL-2.0-or-later, used under GPLv3. Pinned upstream sources implement partial analysis; COPYING, AUTHORS, provenance and the bundled Ooura FFT permission notice are retained in the SDK and Windows package. No FFTW dependency. |
 | dr_mp3 0.7.4 | MIT-0 option, copyright David Reid; includes minimp3 under CC0. Exact revision and checksum are in the native third-party README; complete upstream license statements are retained and packaged. |
 | JogAmp JOGL / GlueGen and transitive JARs | Preserve the notices/licenses from each exact artifact; review bundled native components too. |
-| External JDK | New packages do not distribute Java. Users install a Windows x64 JDK 25 separately under its provider terms; the launcher can assist via winget. |
+| External Windows JDK | Windows packages do not distribute Java. Users install a Windows x64 JDK 25 separately under its provider terms; the launcher can assist via winget. |
+| Linux test-package JRE | The Linux test archive bundles an unmodified Eclipse Temurin JRE 25. Preserve its complete `runtime/legal` directory; the exact asset metadata/checksum and matching OpenJDK source archive are included in the package. OpenJDK uses GPL-2.0 with the Classpath Exception plus its retained third-party terms. |
+| Linux cross-build C++ runtime | Zig 0.15.2 statically links LLVM libc++, libc++abi and libunwind into the Linux host/tests. Their Apache-2.0 with LLVM Exceptions notices are retained under `licenses/zig-runtime`; the compiler itself is not bundled. Linux glibc and audio-service libraries are supplied by the target system. |
 | LLVM-MinGW toolchain | LLVM Apache-2.0 with LLVM exceptions plus separately licensed toolchain components; retain all supplied notices, not only the top-level LICENSE.TXT. |
 | GNU Make 4.4.1 and MinGW gendef (older full compiler bundles) | GPL-3.0-or-later; omitted from the current reduced x64 profile. Their matching sources/recipes/notices remain in the provenance materials. |
 | Python, libffi and LLDB-MI (older full compiler bundles) | The Python/LLDB-MI programs and separate libffi runtime are omitted from the current reduced x64 profile; their pinned sources and notices remain in the provenance materials. |
@@ -37,7 +39,7 @@ license and this overview under META-INF.
 For each published binary, assemble a corresponding-source download from its exact
 source revision, including local modifications, build scripts and required materials.
 Provide exact required source/build materials for bundled copyleft components too,
-including the compiler toolchain (and JDK only for older images that bundled it). Preserve upstream notices for permissively licensed components.
+including the compiler toolchain and any bundled Java runtime. Preserve upstream notices for permissively licensed components.
 
 Project repository: https://github.com/Helge97/EasyKnack
 

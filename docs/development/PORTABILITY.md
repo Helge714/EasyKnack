@@ -80,8 +80,11 @@ pass on Windows. Native Formula compilation/execution and platform policy tests
 also pass. These checks do not execute POSIX branches or physical audio devices.
 Java SDK packaging, host-client/service and routing checks pass as well; four
 device/broader audio cases remain disabled in the focused host-client run.
-A real Linux build, GUI launch and audio/MIDI device
-acceptance are still required before advertising Linux support. macOS additionally
+The Linux host and test executables now also cross-compile on Windows for
+`x86_64-linux-gnu.2.28`. The resulting ELF architecture/dependencies and the transfer
+archive are checked without executing Linux code. See [the transfer-package build](LINUX-TEST-PACKAGE.md).
+Execution on Linux, GUI launch and audio/MIDI device acceptance are still required
+before advertising Linux support. macOS additionally
 needs a real SDK build on Intel/Apple Silicon, GUI/OpenGL validation, device
 acceptance and distribution signing/notarization. CMake/framework and dylib policy
 are prepared, not evidence that those checks have passed.
