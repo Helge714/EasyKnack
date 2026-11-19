@@ -1,90 +1,96 @@
 # Native platform boundary
 
-Linux is the first additional target. macOS follows the same boundary; neither
-platform is a released or hardware-validated distribution yet.
+Linux is the first additional target. Functional Linux support is implemented;
+GUI/physical-device acceptance still requires Linux. macOS follows the same
+boundary and remains unvalidated.
 
 ## Ownership
 
-1. Java / external GLSwing owns the interface, documents and graph compilation.
-   `NativePlatform` selects artifact names, architecture/cache identity and compiler
-   policy; GUI widgets do not invoke platform audio APIs.
-2. The C++ host owns graph execution, DSP and the authenticated loopback protocol.
-   DSP borrows `AudioIO` and `MidiSource`; host control code uses `HostServices`.
-3. Platform services own device callbacks, MIDI discovery, endpoint volume, control
-   sockets, native module loading and worker thread policy. Selection happens in
-   `native/audio-host/src/platform/HostPlatform.hpp`.
+1. Java / external GLSwing owns interface, documents and graph compilation.
+   `NativePlatform` selects artifact/toolchain names and platform cache identity.
+2. The C++ host owns DSP and authenticated loopback protocol. DSP borrows `AudioIO`
+   and `MidiSource`; control code uses `HostServices`.
+3. Platform services own devices, MIDI, volume, transport, loading and priority.
+   `src/platform/HostPlatform.hpp` selects implementations.
 
-This is a service boundary inside the existing host, not another process or a
-replacement rendering toolkit. GLSwing still uses OpenGL. A future Metal renderer
-belongs in GLSwing and is independent of the audio device backend.
+GLSwing still uses OpenGL; a future Metal renderer is independent of audio.
+No OS audio calls belong in GUI widgets or DSP node implementations.
 
-`WindowsHostServices` adapts the existing WASAPI/ASIO routing, Windows MIDI and
-volume implementations. `DefaultAudio` uses miniaudio's platform backend selection
-(e.g. Linux audio services or Core Audio). `KeyboardMidi` provides portable computer
-keyboard events. `ControlSocket`, `SharedLibrary` and `ThreadPriority` isolate the
-other host OS calls. Existing guarded recording/codec implementations remain;
-MP3 recording still depends on Windows Media Foundation.
+## Feature mapping
 
-## Current capability boundary
-
-| Capability | Windows backend | Initial portable backend |
+| Capability | Windows | Linux |
 | --- | --- | --- |
-| Audio playback/capture | Existing endpoint routing | Default stereo output and optional default stereo input |
-| Sample rate / graph block | 48 kHz / 256 frames | Same; miniaudio converts device formats/rates |
-| MIDI | Windows devices and computer keyboard | Computer keyboard only |
-| Process/system capture, ASIO | Existing support | Not advertised; unsupported routes are rejected |
-| Endpoint volume / media keys | Existing support | Unavailable; Windows volume controls hidden |
-| Formula native modules | DLL | Linux SO / macOS dylib; ABI checked before use |
-| Worker priority | Existing Windows policy | Default OS policy; no implicit realtime permission changes |
-| Device refresh | Existing support | No automatic device reselection/hotplug recovery yet |
+| Device selection / multiple endpoints | WASAPI/ASIO | PulseAudio / PipeWire-Pulse |
+| Graph rate / block | 48 kHz / 256 frames | Same; server handles device conversion |
+| Bursts / secondary clocks | Render-ahead / adaptive rings | Same shared primitives |
+| Hardware/virtual MIDI, keyboard, Learn | WinMM / keyboard | ALSA sequencer / keyboard; `MidiPortBank` slots |
+| System/application capture | Windows process loopback | Sink monitors / individual stream monitors; own PID excluded |
+| Exclusive application rerouting | External tools; Copy in node | External desktop tools; Copy in node |
+| Endpoint volume / meter | Windows endpoint | Pulse/PipeWire sink |
+| Linked volume keys | Global keyboard hook | Follows desktop default-volume changes, including menu changes; preserves selected proportions |
+| MP3 recording | Media Foundation | Replaceable bundled LAME 3.100 library |
+| Formula / Bake / source plugins | Compiler and JDK | Bundled Linux Zig C++ wrapper and JDK with javac |
+| Worker priority | Existing Windows policy | OS scheduling; no implicit privilege/RTKit changes |
 
-The portable device callback renders the graph directly; Windows render-ahead is
-unchanged. Real-device latency, CPU load and capture/playback synchronisation need
-Linux acceptance measurements. No multiple-device clock bridging is implemented
-in this initial backend. WAV recording and existing portable decoders remain;
-portable MP3 encoding is a separate task.
+Multichannel sources/sinks expose consecutive channel pairs with explicit native
+positions and no server remixing into other channels. A final singleton uses mono
+conversion. Alias selections share a physical stream. Application monitor data uses
+the parent sink's layout, as required by the PulseAudio direct-monitor protocol.
 
-Host protocol 13, Formula ABI 6, document format and plugin contracts are unchanged.
-Native caches are platform/architecture-specific and must not be copied between
-operating systems. Old Windows endpoint/MIDI selections can be unavailable on
-Linux; select the default devices/computer keyboard explicitly.
+ASIO vendor drivers and global hooks are OS-specific. Linux supplies corresponding
+workflows through native services; latency, scheduling and MP3 bitstreams need not
+be identical. Linked Linux keys observe desktop volume rather than intercepting
+arbitrary Wayland global shortcuts. Windows overlays retain existing behavior.
 
-## Build and checks
+`LinuxPulse` loads system `libpulse.so.0`; `LinuxAudio` owns topology/callbacks and
+`LinuxVolume` owns volume policy. Only control operations wait (bounded to three
+seconds); callbacks use prepared buffers/rings. Handover stops the DSP helper before
+releasing streams. Application streams are grouped by binary and unavailable sources
+are retried on refresh. Copy never suppresses original playback.
 
-On Linux install a JDK compatible with the Maven project (Java 17+), Maven, Python
-3, CMake 3.20+ and a C++17 compiler. Provide the external GLSwing Maven dependency
-as for the Windows development build. No sibling GLSwing source checkout is used.
+`LinuxMidi` loads `libasound.so.2` and uses a nonblocking ALSA sequencer reader.
+Disconnect/overrun produces panic. Learn subscriptions refresh outside DSP. The
+kernel sequencer must be accessible; missing ALSA never disables the keyboard.
 
-Run `sh scripts/build-posix.sh` from the checkout. It generates contracts with
-Maven, configures/builds CMake, runs CTest and places the host beside the development
-Java classes at `target/native/easyknack-audio-host`. `MVN`, `CXX` and `BUILD_JOBS`
-can select tools/parallelism. Native runtime audio libraries/services must be
-available on the machine. This script builds/checks the host; it does not produce
-a Linux installer, bundle a JRE or validate the GUI/display dependencies.
+Without the desktop audio service, startup reports the reason and falls back to
+miniaudio default-device audio. That fallback has no device choice, loopback or
+volume service and is not full desktop acceptance. Null-device tests deliberately
+use it without hardware access.
 
-CTest includes the existing DSP and command reader suites plus portable default
-device/MIDI lifecycle, native library loading and a real protocol handshake/graph
-exchange through `--null`. The Python registry generator replaces PowerShell in
-CMake builds. `python3 scripts/test-native-generator.py` tests malformed and
-duplicate registrations and deterministic output.
+MP3 uses 128 kbit/s mono / 192 kbit/s stereo, clipped input and a finalized gapless
+tag. Shared upstream tables are serialized on recording workers; DSP only queues
+packets. Original sources/config/notices accompany the separate library.
+`GaplessMp3Decoder` supports UTF-8 and Windows wide paths.
 
-On Windows the regular `scripts/build-audio-host.ps1` path remains. CMake option
-`EASYKNACK_PORTABLE_HOST=ON` exercises the portable audio/MIDI backend on Windows;
-it does not test POSIX socket/loader code. The null backend needs no audio hardware.
+Host protocol 13, Formula ABI 6, document and plugin contracts are unchanged.
+Caches stay platform-specific. Reselect Windows device IDs on Linux. Formula builds
+allow five minutes for initial portable-toolchain bootstrap, matching plugin builds.
 
-Local validation on 2026-11-19 uses Windows; Linux/WSL is not installed on the
-development machine. Both host variants pass the null-device protocol check;
-the existing Windows WASAPI, ASIO, DSP, shared transport and driver bridge suites
-pass. CMake configuration/build and portable-platform/command-reader CTest checks
-pass on Windows. Native Formula compilation/execution and platform policy tests
-also pass. These checks do not execute POSIX branches or physical audio devices.
-Java SDK packaging, host-client/service and routing checks pass as well; four
-device/broader audio cases remain disabled in the focused host-client run.
-The Linux host and test executables now also cross-compile on Windows for
-`x86_64-linux-gnu.2.28`. The resulting ELF architecture/dependencies and the transfer
-archive are checked without executing Linux code. See [the transfer-package build](LINUX-TEST-PACKAGE.md).
-Execution on Linux, GUI launch and audio/MIDI device acceptance are still required
-before advertising Linux support. macOS additionally
-needs a real SDK build on Intel/Apple Silicon, GUI/OpenGL validation, device
-acceptance and distribution signing/notarization. CMake/framework and dylib policy
-are prepared, not evidence that those checks have passed.
+## Build and validation
+
+On Linux use Java 17+ JDK, Maven, Python 3, CMake 3.20+, C/C++17 and the external
+GLSwing Maven dependency. `sh scripts/build-posix.sh` builds/checks host and LAME,
+then copies them to `target/native`. Use `LD_LIBRARY_PATH=target/native` to launch
+a development JAR if LAME is not installed system-wide. Package scripts set it.
+Windows retains `scripts/build-audio-host.ps1`. The [cross-build/package path](LINUX-TEST-PACKAGE.md)
+creates Linux ELF artifacts and a permission-preserving JDK/compiler/examples/source
+archive without a VM or GitHub push.
+
+- `MidiPortBankTest`: hardware-slot queues, keyboard, Learn and panic.
+- `LinuxAudioTest` / `FakePulse`: actual adapter with deterministic server API;
+  separate outputs, captured samples, app selection, aliases, volume and teardown.
+- `LameRecordingTest`: real mono/stereo encoding, gapless decode/import, Unicode
+  paths and collision protection, executable on Windows and Linux.
+- `LinuxDesktopTest`: real server, temporary null sinks, independent producer,
+  monitor/application capture and volume. Also tests an ALSA virtual subscription
+  when available. CTest skips with 77 without a desktop server; package diagnostics
+  report missing desktop acceptance instead of claiming a complete pass.
+- `NativeCompilationCheck.java`: target Formula build/load/result/cache and real
+  javac/source-plugin/Bake pipeline, including host handshake and build cache.
+- Existing DSP, command, host, routing and SDK regressions remain.
+
+`Check-Linux.sh` prints live progress and records diagnostics. This Windows machine
+has no Linux runtime: Linux binaries are cross-built, not executed here. Pure
+adapter/codec tests run on Windows. Desktop, physical MIDI/audio, latency, GUI/OpenGL
+and long-running stability require target acceptance. macOS still needs its own
+device/MIDI adapters, SDK builds, GUI validation and distribution work.

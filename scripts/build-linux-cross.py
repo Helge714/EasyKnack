@@ -35,6 +35,18 @@ def build(zig, destination, contracts):
                "-I", str(native / "third_party"), "-I", str(native / "src"),
                "-I", str(generated), "-I", str(contracts)]
     libraries = ["-l" + library for library in policy["linux.libraries"].split()]
+    # The MP3 codec stays a replaceable LGPL library; it is not linked into DSP
+    # kernels or Formula modules. Build the portable upstream C encoder only.
+    lame=native / "third_party/lame"
+    lame_objects=[]
+    for source in sorted((lame / "libmp3lame").glob("*.c")):
+        output=destination / ("lame-"+source.stem+".o")
+        flags=[str(zig),"cc","-target",TARGET,"-std=gnu99","-O2","-fPIC","-DHAVE_CONFIG_H",
+               "-I",str(lame/"easyknack"),"-I",str(lame/"include"),"-I",str(lame/"libmp3lame")]
+        subprocess.run([*flags,"-c",str(source),"-o",str(output)],check=True)
+        lame_objects.append(str(output))
+    subprocess.run([str(zig),"cc","-target",TARGET,"-shared","-Wl,-soname,libmp3lame.so.0",
+                    *lame_objects,"-lm","-o",str(destination/"libmp3lame.so.0")],check=True)
     def run(arguments, name):
         print("Building Linux " + name, flush=True)
         with (destination / (name + ".log")).open("w", encoding="utf-8") as log:
@@ -52,7 +64,8 @@ def build(zig, destination, contracts):
     tests = destination / "tests"
     tests.mkdir(exist_ok=True)
     for name, graph in [("PortablePlatformTest", True), ("AudioGraphTest", True),
-                        ("CommandReaderTest", False)]:
+                        ("CommandReaderTest", False), ("MidiPortBankTest", False), ("LameRecordingTest", False),
+                        ("LinuxAudioTest", True), ("LinuxDesktopTest", True)]:
         run([str(native / "tests" / (name + ".cpp")), *(objects if graph else []),
              "-o", str(tests / name), *libraries], name)
     run(["-shared", "-fPIC", str(native / "tests/PlatformLibraryFixture.cpp"),

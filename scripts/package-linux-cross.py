@@ -58,10 +58,13 @@ def package(args):
     if digest(args.runtime) != runtime["binary"]["package"]["checksum"]:
         raise ValueError("Linux runtime checksum mismatch")
     binary = runtime["binary"]
-    if (binary["os"], binary["architecture"], binary["image_type"]) != ("linux", "x64", "jre"):
-        raise ValueError("Runtime is not a Linux x64 JRE")
+    if (binary["os"], binary["architecture"], binary["image_type"]) != ("linux", "x64", "jdk"):
+        raise ValueError("Runtime is not a Linux x64 JDK (javac is required)")
     if digest(args.runtime_sources) != runtime["source"]["checksum"]:
         raise ValueError("Runtime source checksum mismatch")
+    compiler=json.loads(args.compiler_metadata.read_text(encoding="utf-8-sig"))
+    if "zig-x86_64-linux-0.15.2.tar.xz" not in compiler["tarball"] or digest(args.compiler)!=compiler["shasum"]:
+        raise ValueError("Linux C++ compiler identity/checksum mismatch")
     namespace = {"m": "http://maven.apache.org/POM/4.0.0"}
     version = ET.parse(ROOT / "pom.xml").findtext("m:version", namespaces=namespace)
     jar_name = "easy-knack-" + version + ".jar"
@@ -105,16 +108,20 @@ def package(args):
                         target = stage / "licenses" / path.stem / re.sub(r"[^a-zA-Z0-9._-]", "_", entry.filename)
                         target.parent.mkdir(parents=True, exist_ok=True)
                         target.write_bytes(archive.read(entry))
-        for name in ("easyknack-audio-host", "tests/CommandReaderTest", "tests/AudioGraphTest",
-                     "tests/PortablePlatformTest", "tests/libplatform-fixture.so"):
+        for name in ("easyknack-audio-host", "libmp3lame.so.0", "tests/CommandReaderTest", "tests/AudioGraphTest",
+                     "tests/PortablePlatformTest", "tests/MidiPortBankTest", "tests/LameRecordingTest",
+                     "tests/LinuxAudioTest", "tests/LinuxDesktopTest", "tests/libplatform-fixture.so"):
             path = args.native / name
             require_elf(path.read_bytes()[:64], name)
-            put(path, "native/easyknack-audio-host" if name == "easyknack-audio-host" else name)
+            put(path, "native/"+name if not name.startswith("tests/") else name)
         put(args.native / "cross-build.json", "cross-build.json")
         put(ROOT / "native/audio-host/tests/HostProtocolTest.py", "tests/HostProtocolTest.py")
+        put(ROOT / "native/audio-host/tests/PlatformLibraryFixture.cpp", "tests/PlatformLibraryFixture.cpp")
+        put(ROOT / "scripts/linux/NativeCompilationCheck.java", "tests/NativeCompilationCheck.java")
+        put(ROOT / "scripts/linux/clang++", "tools/zig/bin/clang++")
         for source, name in [("start-easyknack.sh", "Start-EasyKnack.sh"), ("check-linux.sh", "Check-Linux.sh")]:
             put(ROOT / "scripts/linux" / source, name)
-        (stage / "application-jar.txt").write_text(jar_name + "\n", encoding="utf-8")
+        (stage / "application-jar.txt").write_text(jar_name + "\n", encoding="utf-8", newline="\n")
         (stage / "installation.properties").write_text("format=1\nplatform=linux-x86_64\njava=bundled\n", encoding="ascii")
         put(ROOT / "LICENSE", "LICENSE")
         put(ROOT / "THIRD-PARTY.md", "THIRD-PARTY.md")
@@ -132,6 +139,11 @@ def package(args):
             put(args.zig_directory / relative, "licenses/zig-runtime/" + relative.replace("/", "_"))
         for name in ("COPYING", "AUTHORS", "PROVENANCE.md", "OOURA-LICENSE.txt"):
             put(ROOT / "native/audio-host/third_party/loris" / name, "licenses/loris/" + name)
+        for name in ("alsa","pulse","lame"):
+            for notice in ("COPYING","LICENSE","LGPL","GPL"):
+                path=ROOT / "native/audio-host/third_party" / name / notice
+                if path.is_file():put(path,"licenses/"+name+"/"+notice)
+            put(ROOT / "native/audio-host/third_party" / name / "PROVENANCE.json", "licenses/"+name+"/PROVENANCE.json")
         java = args.java.resolve()
         classpath = str(jar.resolve()) + os.pathsep + str((args.java_build / "lib/*").resolve())
         for arguments in ([str(stage / "Examples")], ["--verify", str(stage / "Examples")]):
@@ -148,40 +160,49 @@ def package(args):
         put(args.runtime_sources, "sources/" + runtime["source"]["name"])
         metadata = {"version": version, "sourceCommit": commit, "buildIdentity": identity,
                     "platform": "linux-x86_64", "linuxExecution": "not performed; run Check-Linux.sh on target",
-                    "runtime": runtime, "libraries": selected,
+                    "runtime": runtime, "compiler":compiler, "libraries": selected,
                     "glswingSourceSha256": digest(args.glswing_sources)}
         (stage / "package-build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         if snapshot != sources():
             raise RuntimeError("Sources changed while packaging; build again from a stable source state")
         archive_path = args.output / ("EasyKnack-" + version + "-linux-x86_64-test.tar.gz")
+        written=set()
         def clean(info):
             info.uid = info.gid = 0
             info.uname = info.gname = ""
             relative = info.name.removeprefix("EasyKnack/")
-            info.mode = 0o755 if info.isdir() or relative.endswith(".sh") or relative == "native/easyknack-audio-host" or relative in ("tests/CommandReaderTest", "tests/AudioGraphTest", "tests/PortablePlatformTest") else 0o644
+            info.mode = 0o755 if info.isdir() or relative.endswith(".sh") or relative in ("native/easyknack-audio-host","tools/zig/bin/clang++") or relative.startswith("tests/") and "." not in relative.rsplit("/",1)[-1] else 0o644
+            written.add(info.name.rstrip("/"))
             return info
         with tarfile.open(archive_path, "w:gz") as output:
             output.add(stage, arcname="EasyKnack", filter=clean)
-            with tarfile.open(args.runtime, "r:gz") as source:
+            for source_archive,prefix,elfs in [(args.runtime,"EasyKnack/runtime",{"bin/java","bin/javac"}),
+                                               (args.compiler,"EasyKnack/tools/zig",{"zig"})]:
+              with tarfile.open(source_archive, "r:*") as source:
                 for original in source:
                     parts = PurePosixPath(original.name).parts
                     if not parts or PurePosixPath(original.name).is_absolute() or ".." in parts:
                         raise ValueError("Unsafe runtime archive path")
                     entry = copy.copy(original)
-                    entry.name = "EasyKnack/runtime" + ("/" + "/".join(parts[1:]) if len(parts)>1 else "")
+                    relative="/".join(parts[1:])
+                    entry.name = prefix + ("/" + relative if relative else "")
+                    if entry.name.rstrip("/") in written:
+                        if entry.isdir():continue
+                        raise ValueError("Duplicate dependency archive entry: "+entry.name)
+                    written.add(entry.name.rstrip("/"))
                     entry.uid = entry.gid = 0
                     entry.uname = entry.gname = ""
                     if entry.issym():
                         target = posixpath.normpath(posixpath.join(posixpath.dirname(entry.name), entry.linkname))
-                        if not target.startswith("EasyKnack/runtime/"):
-                            raise ValueError("Runtime symlink escapes runtime")
+                        if not target.startswith(prefix+"/"):
+                            raise ValueError("Dependency symlink escapes its archive root")
                     elif entry.islnk():
-                        entry.linkname = "EasyKnack/runtime/" + "/".join(PurePosixPath(entry.linkname).parts[1:])
+                        entry.linkname = prefix+"/" + "/".join(PurePosixPath(entry.linkname).parts[1:])
                     elif not (entry.isfile() or entry.isdir()):
                         raise ValueError("Unsupported runtime archive entry")
                     data = source.extractfile(original) if entry.isfile() else None
-                    if entry.name == "EasyKnack/runtime/bin/java":
-                        require_elf(data.read(64), "runtime/bin/java")
+                    if relative in elfs:
+                        require_elf(data.read(64), entry.name)
                         data.seek(0)
                     output.addfile(entry, data)
         checksum = digest(archive_path)
@@ -193,6 +214,6 @@ def package(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("java-build", "native", "runtime", "runtime-sources", "runtime-metadata", "zig-directory", "java", "glswing-sources", "output"):
+    for name in ("java-build", "native", "runtime", "runtime-sources", "runtime-metadata", "compiler", "compiler-metadata", "zig-directory", "java", "glswing-sources", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
     package(parser.parse_args())

@@ -15,4 +15,5 @@ cmake --build "target/native-$platform" --parallel "${BUILD_JOBS:-2}"
 ctest --test-dir "target/native-$platform" --output-on-failure
 mkdir -p target/native
 cp "target/native-$platform/easyknack-audio-host" target/native/easyknack-audio-host
+if [ "$platform" = linux ]; then cp -L "target/native-$platform/libmp3lame.so.0" target/native/libmp3lame.so.0; fi
 echo "Native host installed in target/native/easyknack-audio-host; run Maven package for the Java distribution."

@@ -14,7 +14,9 @@ if [ -z "${DISPLAY:-}" ]; then
   echo 'Kein X11/XWayland-Display gefunden. Bitte in einer grafischen Sitzung starten.' >&2
   exit 1
 fi
-jar=$(cat "$base/application-jar.txt")
+jar=$(tr -d '\r\n' < "$base/application-jar.txt")
+LD_LIBRARY_PATH="$base/native${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
 exec "$java" --enable-native-access=ALL-UNNAMED \
   --add-opens=java.base/java.lang=ALL-UNNAMED \
   --add-opens=java.desktop/sun.awt=ALL-UNNAMED \

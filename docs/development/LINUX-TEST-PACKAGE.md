@@ -12,8 +12,8 @@ on Linux. Keep it labelled as a test package until device/GUI acceptance succeed
   SHA256 `3a0ed1e8799a2f8ce2a6e6290a9ff22e6906f8227865911fb7ddedc3cc14cb0c`.
   Extract into ignored `.local/tools`. Its C++ frontend/library/linker target
   `x86_64-linux-gnu.2.28`; no host CPU-specific optimisation is requested.
-- An official Linux x64 Temurin JRE 25 `.tar.gz` and the corresponding asset JSON
-  from `https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=x64&image_type=jre&os=linux&vendor=eclipse`.
+- An official Linux x64 Temurin JDK 25 `.tar.gz` and the corresponding asset JSON
+  from `https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=x64&image_type=jdk&os=linux&vendor=eclipse`.
   Save one asset object as UTF-8 JSON, not the enclosing response array. The packager
   checks its platform and SHA256, preserves the runtime archive's executable modes
   and symlinks, and retains the exact asset metadata in the finished package.
@@ -23,8 +23,12 @@ on Linux. Keep it labelled as a test package until device/GUI acceptance succeed
   runtime asset JSON; obtain it from the official feature-release API and source
   asset checksum file. The packager includes and checks the source archive too.
 
-Do not extract the Linux JRE on Windows: permission bits and symlinks can be lost.
+Do not extract the Linux JDK on Windows: permission bits and symlinks can be lost.
 Do not substitute a musl/static host: miniaudio and Formula need dynamic loading.
+
+The matching Linux Zig archive from the official download index is also required
+for the transfer package. Save its URL/SHA256/size metadata as UTF-8 JSON and pass
+`--compiler` / `--compiler-metadata`; its unmodified contents and notices are retained.
 
 ## Build
 
@@ -37,19 +41,19 @@ Do not substitute a musl/static host: miniaudio and Formula need dynamic loading
    python scripts/build-linux-cross.py --zig .local/tools/zig-linux-cross/zig-x86_64-windows-0.15.2/zig.exe --contracts target/linux-java/native/generated
    ```
 
-   Output defaults to `target/native-linux-cross`. Host and three native test
+   Output defaults to `target/native-linux-cross`. Host, LAME and seven native test
    executables plus a shared-library fixture are built sequentially. Logs and
    target/compiler metadata remain beside them. Tests are not executed on Windows.
 3. Create a fresh transfer archive:
 
    ```powershell
-   python scripts/package-linux-cross.py --java-build target/linux-java --native target/native-linux-cross --runtime target/linux-cross/runtime.tar.gz --runtime-sources target/linux-cross/runtime-sources.tar.gz --runtime-metadata target/linux-cross/runtime-download.json --zig-directory .local/tools/zig-linux-cross/zig-x86_64-windows-0.15.2 --java C:/path/to/jdk/bin/java.exe --glswing-sources C:/path/to/glswing-0.2.0-SNAPSHOT-sources.jar --output dist/linux-test-new
+   python scripts/package-linux-cross.py --java-build target/linux-java --native target/native-linux-cross --runtime target/linux-cross/runtime.tar.gz --runtime-sources target/linux-cross/runtime-sources.tar.gz --runtime-metadata target/linux-cross/runtime-download.json --compiler target/linux-parity/zig-linux.tar.xz --compiler-metadata target/linux-parity/zig-linux-download.json --zig-directory .local/tools/zig-linux-cross/zig-x86_64-windows-0.15.2 --java C:/path/to/jdk/bin/java.exe --glswing-sources C:/path/to/glswing-0.2.0-SNAPSHOT-sources.jar --output dist/linux-test-new
    ```
 
 The product version comes from Maven. A new destination is required; existing
 packages are never overwritten. Only manifest-declared dependencies and Linux
 amd64 JogAmp natives are included. Sixteen examples are generated and verified;
-licenses, EasyKnack working-tree sources, external Core sources and build identity
+Linux JDK/compiler, licenses, EasyKnack working-tree sources, external Core sources and build identity
 are included. `.tar.gz` retains the Unix permissions needed for direct startup.
 The packager checks the archive's ELF architecture, modes, runtime links, selected
 libraries, examples, sources and SHA256. Rerun independently with
@@ -64,6 +68,8 @@ results. Python 3 is optional on the target, but needed for the protocol/Unicode
 audio-import check. GUI and physical audio acceptance remain manual.
 
 This package assumes a glibc-based Linux x86_64 desktop, X11/XWayland and OpenGL 3.
-It is not for ARM, Alpine/musl or a headless GUI session. The included JRE avoids a
-Java installation requirement; source plugins need a separately installed JDK and
-Linux C++ compiler. Existing platform limitations are in [PORTABILITY.md](PORTABILITY.md).
+It is not for ARM, Alpine/musl or a headless GUI session. The included JDK and Zig C++ wrapper support
+Formula, Bake and source plugins without separate compiler installation. Desktop
+audio/capture requires PulseAudio or PipeWire-Pulse; hardware MIDI requires ALSA.
+`Check-Linux.sh` includes real desktop integration and compilation/cache tests.
+Its first compiler run can take several minutes and prints live progress. Existing platform limitations are in [PORTABILITY.md](PORTABILITY.md).

@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.4.0
 
+- Add Linux hardware/virtual MIDI and Learn, multiple audio devices, system/application
+  capture and endpoint volume through ALSA and PulseAudio/PipeWire-Pulse.
+- Add portable MP3 recording with gapless import; bundle a Linux JDK and C++ compiler
+  for Formula, Bake and source-plugin testing. Desktop/hardware acceptance is pending.
+- Fix Linux launcher paths in archives created on Windows.
 - Provide a Linux x86_64 cross-build and portable test package with Java, examples
   and target-side diagnostics; fix Unix audio-import paths. Linux device/GUI acceptance is pending.
 - Separate native host services from Windows APIs; prepare default-device Linux

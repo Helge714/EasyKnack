@@ -22,19 +22,21 @@ def verify(path):
                 raise ValueError("Unsafe package entry: " + entry.name)
             if entry.issym():
                 target = posixpath.normpath(posixpath.join(posixpath.dirname(entry.name), entry.linkname))
-                if not target.startswith("EasyKnack/runtime/") or target not in entries:
+                if not target.startswith(("EasyKnack/runtime/","EasyKnack/tools/zig/")) or target not in entries:
                     raise ValueError("Broken/escaping runtime symlink: " + entry.name)
-        def data(name):
-            return archive.extractfile("EasyKnack/" + name).read()
+        def data(name,limit=-1):
+            return archive.extractfile("EasyKnack/" + name).read(limit)
         for name in ("Start-EasyKnack.sh", "Check-Linux.sh", "native/easyknack-audio-host",
-                     "runtime/bin/java", "tests/CommandReaderTest", "tests/AudioGraphTest", "tests/PortablePlatformTest"):
+                     "runtime/bin/java", "runtime/bin/javac", "tools/zig/zig", "tools/zig/bin/clang++",
+                     "tests/CommandReaderTest", "tests/AudioGraphTest", "tests/PortablePlatformTest",
+                     "tests/MidiPortBankTest", "tests/LameRecordingTest", "tests/LinuxAudioTest", "tests/LinuxDesktopTest"):
             if not entries["EasyKnack/" + name].mode & 0o111:
                 raise ValueError("Missing executable permissions: " + name)
-            if name.endswith(".sh"):
+            if name.endswith(".sh") or name.endswith("/clang++"):
                 if b"\r" in data(name):
                     raise ValueError("Windows line endings in shell script: " + name)
             else:
-                content = data(name)
+                content = data(name,64)
                 if content[:6] != b"\x7fELF\x02\x01" or content[18:20] != b"\x3e\x00":
                     raise ValueError("Not x86_64 Linux ELF: " + name)
         jars = [name for name in entries if name.startswith("EasyKnack/lib/") and name.endswith(".jar")]
@@ -42,6 +44,8 @@ def verify(path):
         if len(native_jars) != 2 or any("-natives-linux-amd64" not in name for name in native_jars):
             raise ValueError("Expected exactly the two Linux amd64 JogAmp native JARs")
         jar = data("application-jar.txt").decode().strip()
+        if b"\r" in data("application-jar.txt"):
+            raise ValueError("Windows line endings in the shell launcher JAR marker")
         with zipfile.ZipFile(io.BytesIO(data(jar))) as java:
             if "META-INF/easyknack/build.properties" not in java.namelist():
                 raise ValueError("Missing build identity")
@@ -56,6 +60,10 @@ def verify(path):
         if not any(name.startswith("EasyKnack/sources/glswing-") and name.endswith("-sources.jar") for name in entries):
             raise ValueError("Missing external GLSwing sources")
         info = json.loads(data("package-build.json"))
+        if info["runtime"]["binary"]["image_type"]!="jdk" or "x86_64-linux-0.15.2" not in info["compiler"]["tarball"]:
+            raise ValueError("Missing target JDK/compiler metadata")
+        if data("native/libmp3lame.so.0",6)!=b"\x7fELF\x02\x01":
+            raise ValueError("Missing Linux MP3 encoder")
         runtime_source = info["runtime"]["source"]
         if hashlib.sha256(data("sources/" + runtime_source["name"])).hexdigest() != runtime_source["checksum"]:
             raise ValueError("Missing or mismatched Java sources")

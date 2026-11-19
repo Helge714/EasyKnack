@@ -52,7 +52,9 @@ public final class FormulaNativeCompiler {
         command.addAll(List.of(cpp.toString(),"-o",built.toString()));
         Process process=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
         try{
-            if(!process.waitFor(60,TimeUnit.SECONDS)){process.destroyForcibly().waitFor();throw new IOException("Formula compilation timed out; log: "+log);}
+            // A bundled portable toolchain may bootstrap its standard libraries
+            // on the first build. Match the source-plugin build's bounded budget.
+            if(!process.waitFor(300,TimeUnit.SECONDS)){process.destroyForcibly().waitFor();throw new IOException("Formula compilation timed out; log: "+log);}
             if(process.exitValue()!=0)throw new IOException("Formula compilation failed; log: "+log+"\n"+Files.readString(log));
             try{Files.move(built,library,StandardCopyOption.ATOMIC_MOVE);}catch(AtomicMoveNotSupportedException e){Files.move(built,library,StandardCopyOption.REPLACE_EXISTING);}
             return new Result(library,false,elapsed(start));
