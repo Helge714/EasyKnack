@@ -90,6 +90,24 @@
       "file": "wix3-wix3141rtm.tar.gz",
       "sha256": "374ec1923954c0df5874964d845c09d887012fbab5aa13d000201d0b9f789d96",
       "url": "https://codeload.github.com/wixtoolset/wix3/tar.gz/refs/tags/wix3141rtm"
+    },
+    {
+      "id": "alsa-lib-1.2.14",
+      "url": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
+      "file": "alsa-lib-1.2.14.tar.bz2",
+      "sha256": "be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32"
+    },
+    {
+      "id": "pulseaudio-17.0",
+      "url": "https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.xz",
+      "file": "pulseaudio-17.0.tar.xz",
+      "sha256": "053794d6671a3e397d849e478a80b82a63cb9d8ca296bd35b73317bb5ceb87b5"
+    },
+    {
+      "id": "lame-3.100",
+      "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+      "file": "lame-3.100.tar.gz",
+      "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
     }
   ],
   "binaries": [

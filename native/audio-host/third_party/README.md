@@ -30,3 +30,19 @@ See [provenance, local access patches and license](loris/PROVENANCE.md).
 COPYING (GPL-2.0-or-later, GPLv3 option), AUTHORS and the bundled Ooura FFT
 permission statement are included in SDKs and Windows packages. File hashes are
 recorded in loris/SHA256SUMS.json; no FFTW or Python dependency is introduced.
+
+# Linux desktop APIs
+
+`alsa/` and `pulse/` contain upstream ALSA 1.2.14 / PulseAudio 17.0 public headers,
+COPYING and exact source URL/SHA256 provenance. Runtime libraries are supplied by
+the Linux system and loaded dynamically. Pulse `version.h` is instantiated from
+the upstream template; other public headers remain unchanged.
+
+# LAME
+
+`lame/` contains the unmodified LAME 3.100 portable encoder sources, public header,
+COPYING (LGPL-2.0-or-later) and source URL/SHA256 provenance. The EasyKnack config
+is separate in `lame/easyknack/config.h`. Build only the portable encoder as a
+replaceable shared library; no upstream decoder, assembler or SIMD sources are
+compiled. The application uses this for Linux MP3 recording; Windows retains
+Media Foundation. The complete retained sources/configuration accompany packages.
