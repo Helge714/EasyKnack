@@ -119,6 +119,11 @@ For a small fix, locate the nearest existing regression test first. Run focused
 checks, then any required broader check once after the changes are assembled.
 Documentation-only navigation changes do not need a Maven/native rebuild.
 
+- Linux distribution evidence: `scripts/audit-linux-licenses.py` checks immutable
+  package/source hashes, upstream runtime/compiler preservation and isolated Core
+  reconstruction. Release-specific component ledgers live under `source-audit/`;
+  Linux source/build supplements are published beside the matching binary archive.
+
 ## Core navigation
 
 In a separate GLSwingNext checkout, start with `docs/CODE-MAP.md`.

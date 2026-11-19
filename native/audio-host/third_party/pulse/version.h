@@ -1,3 +1,5 @@
+/* EasyKnack modification, 2026-11-19: generated from PulseAudio 17.0's
+ * version.h.in by substituting the upstream release's version values. */
 #ifndef fooversionhfoo /*-*-C-*-*/
 #define fooversionhfoo
 

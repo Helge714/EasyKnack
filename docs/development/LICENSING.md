@@ -36,6 +36,12 @@ matching source downloads; private release permissions must not exclude recipien
 
 ## Historical / future bundled runtimes
 
+Linux experimental test 1 bundles a Linux JDK and Zig compiler, unlike the Windows
+external-JDK packages described below. Its exact runtime, source/build materials,
+notice review and remaining scope limits are recorded in
+[the Linux-specific report](source-audit/LINUX-TEST-1-2026-11-19.md).
+The Linux archive contains no Windows VC/UCRT binaries or Windows installer.
+
 FFmpeg/JavaCPP are removed. Current images neither bundle Java nor its Microsoft
 DLLs. The [Temurin/Microsoft review](source-audit/MICROSOFT-RUNTIME.md) therefore
 is not a blocker for these external-JDK images; resolve its downstream terms if

@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Review Linux test-package notices and source correspondence; provide matching
+  JDK/Core build materials, a component ledger and machine-readable evidence.
+
 - Add Linux hardware/virtual MIDI and Learn, multiple audio devices, system/application
   capture and endpoint volume through ALSA and PulseAudio/PipeWire-Pulse.
 - Add portable MP3 recording with gapless import; bundle a Linux JDK and C++ compiler

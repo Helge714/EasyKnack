@@ -73,3 +73,14 @@ Formula, Bake and source plugins without separate compiler installation. Desktop
 audio/capture requires PulseAudio or PipeWire-Pulse; hardware MIDI requires ALSA.
 `Check-Linux.sh` includes real desktop integration and compilation/cache tests.
 Its first compiler run can take several minutes and prints live progress. Existing platform limitations are in [PORTABILITY.md](PORTABILITY.md).
+
+## Distribution license review
+
+An experimental label does not waive redistribution terms. Before publishing a new
+archive, collect the exact JDK build metadata and Temurin build-source revision,
+matching Core build inputs and any updated notices. Run `scripts/audit-linux-licenses.py`
+against the immutable binary archive, exact upstream JDK/Zig archives, Core inputs
+and isolated rebuilt Core JAR; use `--help` for its required paths. Publish the
+resulting evidence and source/build materials beside the binary download. The
+OpenJDK source archive already inside the binary archive must remain available too.
+See [test 1's component ledger and remediation](source-audit/LINUX-TEST-1-2026-11-19.md).

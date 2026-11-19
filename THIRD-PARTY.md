@@ -9,6 +9,12 @@ GLSwing is a separately distributed Apache-2.0 library. Its license is unchanged
 This inventory identifies components for distribution review; it is not a claim
 that all corresponding-source obligations have already been fulfilled.
 
+The Linux experimental test 1 archive and its matching source/license supplement
+are reviewed separately in [the Linux distribution report](docs/development/source-audit/LINUX-TEST-1-2026-11-19.md).
+That report records exact artifact hashes, preserved notices, JDK build materials
+and the isolated reconstruction of the current GLSwing runtime. It is a technical
+distribution review, not a legal clearance certificate.
+
 | Component | License / distribution notes |
 |---|---|
 | EasyKnack Java application, native host and original SDK code | GPL-3.0-only; provide corresponding source and build scripts for the distributed version. |
