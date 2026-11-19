@@ -22,6 +22,11 @@ Captures audio from a selected source.
 
 Capture can use a device, the system mix or an application. Copy captures the signal without suppressing the original playback. For exclusive rerouting, select a virtual routing device and route the source application to that device in Windows. Mono combines channels; Stereo preserves left and right.
 
+Linux uses PulseAudio or PipeWire-Pulse for device, sink-monitor and per-application
+capture. Applications appear while they expose an audio stream; EasyKnack's own
+streams are excluded. Exclusive rerouting remains external, through the desktop's
+audio routing tools. Saved Windows device IDs must be reselected on Linux.
+
 ## Mute
 
 | [Mutable](../../user/en/muting.md) | [Input](../../user/en/reference-tables.md#input-output) | [Output](../../user/en/reference-tables.md#input-output) |

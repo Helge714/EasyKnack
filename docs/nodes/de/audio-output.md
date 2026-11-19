@@ -4,8 +4,8 @@
 
 Sendet Audio an ein Ausgabegerät.
 
-Das erste portable Backend bietet nur das Standardgerät an. Gerätelautstärke und
-gekoppelte Medientasten sind nur unter Windows verfügbar.
+Linux verwendet PulseAudio oder PipeWire-Pulse für Gerätewahl und Lautstärke.
+Ohne diesen Dienst unterstützt der Rückfallpfad nur die Standard-Audiogeräte.
 
 ## Eingänge
 
@@ -13,9 +13,9 @@ gekoppelte Medientasten sind nur unter Windows verfügbar.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Audio-Eingang (Audio In) | [Audio](../../user/de/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/de/rates.md#audio) | Immer |
 | Gerät (Device) | [Editor](../../user/de/reference-tables.md) | Verfügbare Ausgabegeräte | — | Standardgerät | — | — | Immer |
-| Gerätelautstärke (Device volume) | [Editor](../../user/de/reference-tables.md) | 0–100 % | — | Aktuelle Windows-Lautstärke | [%](../../user/de/units.md) | — | Windows-Ausgang |
-| Lautstärketasten koppeln (Link volume keys) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Windows-Ausgang |
-| Signal | [Editor](../../user/de/reference-tables.md) | Pegelanzeige | — | — | — | — | Windows-Ausgang |
+| Gerätelautstärke (Device volume) | [Editor](../../user/de/reference-tables.md) | 0–100 % | — | Aktuelle Gerätelautstärke | [%](../../user/de/units.md) | — | Windows- oder Linux-Ausgang |
+| Lautstärketasten koppeln (Link volume keys) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Windows- oder Linux-Ausgang |
+| Signal | [Editor](../../user/de/reference-tables.md) | Pegelanzeige | — | — | — | — | Windows- oder Linux-Ausgang |
 
 ## Ausgänge
 
@@ -26,6 +26,12 @@ gekoppelte Medientasten sind nur unter Windows verfügbar.
 ## Verhalten
 
 MIDI-Stimmen werden automatisch summiert. Gerätelautstärke steuert den Windows-Endpunkt und übernimmt externe Änderungen; sie ist kein zusätzlicher Signal-Gain. Gekoppelte Lautstärketasten verändern die gewählten Endpunkte proportional. Mute unterdrückt das EasyKnack-Signal, ohne das Windows-Gerät stummzuschalten.
+
+Unter Linux wird die Lautstärke des Pulse-/PipeWire-Ausgangs gesteuert. Gekoppelte
+Tasten folgen Änderungen der Desktop-Standardlautstärke, auch Änderungen im
+Lautstärkemenü, und erhalten die relativen Pegel der gewählten Ausgänge. Dafür
+werden Desktop-Lautstärkeänderungen statt eines globalen Windows-Tastaturhooks
+verwendet. ASIO-Endpunkte bleiben Windows-spezifisch.
 
 Gekoppelte Lautstärketasten zeigen kurz eine Einblendung auf dem Desktop, auch über anderen Programmen. Bei mehreren gekoppelten Ausgängen entspricht die Prozentanzeige dem höchsten Ausgangspegel; die relativen Lautstärkeverhältnisse bleiben erhalten.
 

@@ -34,7 +34,7 @@ recorded in loris/SHA256SUMS.json; no FFTW or Python dependency is introduced.
 # Linux desktop APIs
 
 `alsa/` and `pulse/` contain upstream ALSA 1.2.14 / PulseAudio 17.0 public headers,
-COPYING and exact source URL/SHA256 provenance. Runtime libraries are supplied by
+license texts and exact source URL/SHA256 provenance. Runtime libraries are supplied by
 the Linux system and loaded dynamically. Pulse `version.h` is instantiated from
 the upstream template; other public headers remain unchanged.
 

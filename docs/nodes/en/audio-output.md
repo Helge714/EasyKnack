@@ -4,8 +4,8 @@
 
 Sends audio to an output device.
 
-The initial portable backend offers only the default device. Device volume and
-linked media keys are Windows-only controls.
+Linux uses PulseAudio or PipeWire-Pulse for device selection and volume controls.
+Without that service, the fallback supports only the default audio devices.
 
 ## Inputs
 
@@ -13,9 +13,9 @@ linked media keys are Windows-only controls.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Audio In | [Audio](../../user/en/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/en/rates.md#audio) | Always |
 | Device | [Editor](../../user/en/reference-tables.md) | Available output devices | — | Default device | — | — | Always |
-| Device volume | [Editor](../../user/en/reference-tables.md) | 0–100 % | — | Current Windows volume | [%](../../user/en/units.md) | — | Windows output |
-| Link volume keys | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Windows output |
-| Signal | [Editor](../../user/en/reference-tables.md) | Level display | — | — | — | — | Windows output |
+| Device volume | [Editor](../../user/en/reference-tables.md) | 0–100 % | — | Current device volume | [%](../../user/en/units.md) | — | Windows or Linux output |
+| Link volume keys | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Windows or Linux output |
+| Signal | [Editor](../../user/en/reference-tables.md) | Level display | — | — | — | — | Windows or Linux output |
 
 ## Outputs
 
@@ -26,6 +26,11 @@ linked media keys are Windows-only controls.
 ## Behavior
 
 MIDI voices are summed automatically. Device volume controls the Windows endpoint volume and reflects external changes; it is not an additional signal gain. Linked volume keys change selected endpoints proportionally. Muting this node suppresses its EasyKnack signal without muting the Windows device.
+
+On Linux, device volume controls the Pulse/PipeWire sink. Linked keys follow changes
+to the desktop's default volume, including changes in the desktop volume menu,
+and preserve the selected sinks' relative levels. This uses desktop volume events
+rather than Windows' global keyboard hook. ASIO endpoints remain Windows-only.
 
 Linked volume keys show a brief desktop overlay, including over other applications. For several linked outputs, the percentage is the highest output volume; their relative levels remain unchanged.
 

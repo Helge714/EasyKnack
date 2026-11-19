@@ -25,7 +25,7 @@ public record DeviceVolumeEditor(String endpoint) implements Editor {
                 try {
                     var value=AudioDeviceVolumes.get(endpoint);
                     setEnabled(value!=null);
-                    setText(value==null?NodeText.text("volume.unavailable","Windows · unavailable"):value.muted()?NodeText.text("volume.muted","Windows · muted"):label);
+                    setText(value==null?NodeText.text("volume.unavailable","Device · unavailable"):value.muted()?NodeText.text("volume.muted","Device · muted"):label);
                     if(value!=null) setValue(Math.round(value.scalar()*100));
                 } finally { updating=false; }
             }

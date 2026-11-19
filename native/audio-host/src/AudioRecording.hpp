@@ -1,6 +1,6 @@
 #pragma once
 #include "Analysis.hpp"
-#include "WindowsMp3Recording.hpp"
+#include "platform/Mp3Recording.hpp"
 #include <thread>
 #include <chrono>
 #include <filesystem>
@@ -32,7 +32,7 @@ class AudioRecording {
     bool overwrite; unsigned digits,channels,sampleRate;
     std::shared_ptr<AnalysisMailbox> mailbox;
     FILE* file=nullptr;
-    std::unique_ptr<WindowsMp3Recording> mp3;
+    std::unique_ptr<platform::Mp3Recording> mp3;
     std::uint64_t frames=0,pendingIndex=0;
     std::filesystem::path pendingRename;
     unsigned state=0,error=0;
@@ -119,7 +119,7 @@ class AudioRecording {
             for(;;){
                 auto path=overwrite?base:chooseTarget(base);
                 if(compressed){
-                    auto encoder=std::make_unique<WindowsMp3Recording>();
+                    auto encoder=std::make_unique<platform::Mp3Recording>();
                     if(encoder->open(path,overwrite,channels,sampleRate)){mp3=std::move(encoder);actualPath=path.u8string();activeFiles()[actualPath]=this;break;}
                     if(encoder->exists)continue;if(encoder->codecFailure)error=5;throw std::runtime_error("Cannot create MP3");
                 }

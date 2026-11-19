@@ -23,6 +23,10 @@ Empfängt MIDI von einem Gerät oder der Computertastatur.
 
 Wähle einen Hardware-Eingang oder Keyboard. Ein Klick auf die Tastatursteuerung aktiviert die musikalischen Tasten; ein Klick außerhalb gibt den Fokus frei. Ohne Transposition spielt A den Ton C4. Alle Noten aus beendet aktive Noten und leert wartende MIDI-Verzögerungen.
 
+Hardware- und virtuelle Linux-Eingänge verwenden den ALSA-Sequencer. Dafür werden
+`libasound.so.2` und ein zugängliches Sequencer-Gerät benötigt. Fehlende oder
+getrennte Eingänge werden gemeldet; die Computertastatur bleibt verfügbar.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |

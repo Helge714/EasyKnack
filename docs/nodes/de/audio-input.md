@@ -22,6 +22,12 @@ Erfasst Audio von einer gewählten Quelle.
 
 Die Aufnahme kann ein Gerät, den Systemmix oder eine Anwendung verwenden. Kopieren erfasst das Signal, ohne die ursprüngliche Wiedergabe zu unterdrücken. Für eine ausschließliche Weiterleitung wähle ein virtuelles Routinggerät und leite die Quellanwendung in Windows dorthin. Mono fasst die Kanäle zusammen; Stereo erhält links und rechts.
 
+Linux verwendet PulseAudio oder PipeWire-Pulse für Geräte-, Ausgangsmonitor- und
+Anwendungsaufnahme. Anwendungen erscheinen, solange sie einen Audiostream
+bereitstellen; EasyKnacks eigene Streams werden ausgeblendet. Ausschließliche
+Weiterleitung erfolgt weiterhin extern über die Audiowerkzeuge des Desktops.
+Gespeicherte Windows-Gerätekennungen müssen unter Linux neu ausgewählt werden.
+
 ## Mute
 
 | [Mutable](../../user/de/muting.md) | [Eingang](../../user/de/reference-tables.md#input-output) | [Ausgang](../../user/de/reference-tables.md#input-output) |
