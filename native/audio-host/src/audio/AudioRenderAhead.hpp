@@ -4,12 +4,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-#if defined(_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
-#endif
+#include "../platform/ThreadPriority.hpp"
 
 namespace easyknack {
 /** A single DSP producer, driven by device consumption rather than a second clock.
@@ -42,9 +37,7 @@ public:
     void start(Render render,void* context){
         stop();queue->reset();enabled.store(false);stopping.store(false);requested.store(0);completed.store(0);reserve.store(0);
         worker=std::thread([this,render,context]{
-#if defined(_WIN32)
-            SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
-#endif
+            platform::prioritizeAudioWorker();
             std::uint64_t produced=0;std::array<float,block*2> samples{};
             while(!stopping.load(std::memory_order_acquire)){
                 if(!active()||requested.load(std::memory_order_acquire)-produced<block){

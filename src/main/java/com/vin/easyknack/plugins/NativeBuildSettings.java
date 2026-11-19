@@ -10,8 +10,14 @@ import java.util.Properties;
 /** Compiler policy shared with developer, CMake and installer builds. */
 final class NativeBuildSettings {
     private final Properties values = new Properties();
+    private final com.vin.easyknack.NativePlatform platform;
 
     NativeBuildSettings(Path sdk) throws IOException {
+        this(sdk, com.vin.easyknack.NativePlatform.current());
+    }
+
+    NativeBuildSettings(Path sdk, com.vin.easyknack.NativePlatform platform) throws IOException {
+        this.platform = platform;
         try (var input = Files.newInputStream(sdk.resolve("build.properties"))) {
             values.load(input);
         }
@@ -32,7 +38,13 @@ final class NativeBuildSettings {
         return result;
     }
 
+    List<String> link() {
+        return arguments(platform.windows()?"plugin.link.flags":platform.policyKey()+".plugin.link.flags");
+    }
     List<String> libraries() {
-        return arguments("windows.libraries").stream().map(name -> "-l" + name).toList();
+        var result=new ArrayList<>(arguments(platform.policyKey()+".libraries").stream().map(name -> "-l" + name).toList());
+        if(platform.os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)
+            for(String framework:arguments("macos.frameworks")){result.add("-framework");result.add(framework);}
+        return result;
     }
 }

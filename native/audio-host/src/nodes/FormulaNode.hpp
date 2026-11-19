@@ -5,9 +5,7 @@
 #include "../BufferRead.hpp"
 #include "../Wavetables.hpp"
 #include <array>
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include "../platform/SharedLibrary.hpp"
 namespace easyknack {
 struct FormulaNode : NodeProcessor {
     const float* sineTable=nullptr;
@@ -19,10 +17,7 @@ struct FormulaNode : NodeProcessor {
     using Block=void(*)(const float* const*,const unsigned*,float* const*,unsigned,const FormulaContext*);
     struct Module {
         Sample sample=nullptr;Block block=nullptr;
-#ifdef _WIN32
-        HMODULE handle=nullptr;
-        ~Module(){if(handle)FreeLibrary(handle);}
-#endif
+        platform::SharedLibrary library;
     };
     std::shared_ptr<Module> module;
     bool supportsControlRate()const noexcept override{return true;}
@@ -57,18 +52,16 @@ struct FormulaNode : NodeProcessor {
         sineTable=needsSine?Wavetables::builtinTables().waves[0][0].data():nullptr;
         sampleContext=program.typed.sampleContext||!program.states.empty()||std::any_of(program.code.begin(),program.code.end(),[](const auto& i){return i.op==FormulaProgram::sampleIndex||i.op==FormulaProgram::samplePosition||i.op==FormulaProgram::rand_||i.op==FormulaProgram::randSeed||i.op==FormulaProgram::bufferRead||i.op==FormulaProgram::bufferTimeline||(i.op==FormulaProgram::bufferInfo&&unsigned(i.value)%4!=3);});
         module.reset();
-#ifdef _WIN32
         if(path!="-"){
-            auto utf8=formulaUnhex(path);int length=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),int(utf8.size()),nullptr,0);
-            if(length>0){std::wstring wide(length,L'\0');MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),int(utf8.size()),wide.data(),length);
-                auto loaded=std::make_shared<Module>();loaded->handle=LoadLibraryW(wide.c_str());
-                if(loaded->handle){auto abi=reinterpret_cast<unsigned(*)()>(GetProcAddress(loaded->handle,"easyknack_formula_abi"));
-                    loaded->sample=reinterpret_cast<Sample>(GetProcAddress(loaded->handle,"easyknack_formula_sample"));loaded->block=reinterpret_cast<Block>(GetProcAddress(loaded->handle,"easyknack_formula_block"));
-                    if(abi&&abi()==6&&loaded->sample&&loaded->block)module=std::move(loaded);
-                }
+            auto loaded=std::make_shared<Module>();
+            if(loaded->library.open(formulaUnhex(path))){
+                auto abi=loaded->library.symbol<unsigned(*)()>("easyknack_formula_abi");
+                loaded->sample=loaded->library.symbol<Sample>("easyknack_formula_sample");
+                loaded->block=loaded->library.symbol<Block>("easyknack_formula_block");
+                if(abi&&abi()==6&&loaded->sample&&loaded->block)module=std::move(loaded);
             }
         }
-#endif
+
     }
     /** Exported subclasses replace this with the checked expression, without a DLL. */
     virtual void evaluate(const float* input,float* output,const FormulaContext& context)noexcept{if(module)module->sample(input,output,&context);else program.evaluate(input,output,context);}

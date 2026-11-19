@@ -1,7 +1,10 @@
 # Release notes
 
-## Unreleased - 0.3.1
+## Unreleased - 0.4.0
 
+- Separate native host services from Windows APIs; prepare default-device Linux
+  audio and portable control transport, keyboard MIDI and Formula loading.
+- Centralize Windows/Linux/macOS executable, library and compiler policy.
 - Include and validate the current learning examples and bilingual guides in installer builds.
 - Classify Delay as an Audio node and retain the visible graph center on window resize.
 - Use one Formula variable color for declarations, parameters and read-only values;

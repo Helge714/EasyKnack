@@ -4,6 +4,9 @@
 
 Sendet Audio an ein Ausgabegerät.
 
+Das erste portable Backend bietet nur das Standardgerät an. Gerätelautstärke und
+gekoppelte Medientasten sind nur unter Windows verfügbar.
+
 ## Eingänge
 
 | [Bezeichnung](../../user/de/reference-tables.md#name) | [Datentyp](../../user/de/data-types.md) | [Reglerbereich](../../user/de/reference-tables.md#editor-range) | [Signalbereich](../../user/de/reference-tables.md#signal-range) | [Standardwert](../../user/de/reference-tables.md#default) | [Einheit](../../user/de/units.md) | [Rate](../../user/de/rates.md) | [Sichtbarkeit](../../user/de/reference-tables.md#visibility) |

@@ -18,7 +18,7 @@ public final class InstallationPaths {
     }
 
     public static Path audioHost() {
-        return applicationDirectory().resolve("native/easyknack-audio-host.exe");
+        return applicationDirectory().resolve("native").resolve(NativePlatform.current().hostExecutable());
     }
 
     public static List<Path> compilerRoots() {

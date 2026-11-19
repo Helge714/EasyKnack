@@ -359,7 +359,8 @@ final class DocumentActions implements AutoCloseable {
     }
     void configurePluginCompiler() {
         if(busy||closed)return;busy=true;
-        var request=GLFileDialogRequest.open().title(com.vin.easyknack.i18n.AppText.literal("Select LLVM-MinGW clang++.exe")).filter(com.vin.easyknack.i18n.AppText.literal("C++ compiler"), "exe");
+        var request=GLFileDialogRequest.open().title(com.vin.easyknack.i18n.AppText.literal("Select C++ compiler"));
+        if(com.vin.easyknack.NativePlatform.current().windows())request.filter(com.vin.easyknack.i18n.AppText.literal("C++ compiler"), "exe");
         onUi(dialogs.show("compiler.select",request.build(),owner),(selection,failure)->{
             busy=false;
             if(failure!=null){error(GLDocumentOperation.OPEN,null,failure);return;}
