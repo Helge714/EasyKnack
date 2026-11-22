@@ -13,7 +13,7 @@ def sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def audit(app, output):
+def audit(app, output, jdk):
     base = app / 'Contents/app'
     runtime = app / 'Contents/runtime/Contents/Home'
     metadata = json.loads((base / 'macos-build.json').read_text())
@@ -38,6 +38,15 @@ def audit(app, output):
                      'native/audio-host/third_party/lame/COPYING']:
             assert name in snapshot['files'], name
     upstream = metadata['runtime']
+    assert sha(jdk) == upstream['binary']['package']['checksum']
+    legal_verified = 0
+    with tarfile.open(jdk) as archive:
+        for entry in archive:
+            if '/Contents/Home/legal/' in entry.name and entry.isfile():
+                relative = entry.name.split('/Contents/Home/', 1)[1]
+                assert (runtime / relative).read_bytes() == archive.extractfile(entry).read(), relative
+                legal_verified += 1
+    assert legal_verified > 10, 'Upstream legal tree missing'
     assert sha(sources / upstream['source']['name']) == upstream['source']['sha256']
     assert sha(sources / 'temurin-build.tar.gz') == upstream['buildSources']['sha256']
     assert (sources / 'jdk-build-metadata.json').stat().st_size > 0
@@ -52,6 +61,7 @@ def audit(app, output):
     jars = []
     for path in sorted((base / 'lib').glob('*.jar')):
         with zipfile.ZipFile(path) as archive:
+            assert not any('oculusvr' in n.lower() or 'libovr' in n.lower() for n in archive.namelist()), 'Unreviewed Oculus component'
             notices = [n for n in archive.namelist() if any(w in n.lower() for w in ('license', 'notice', 'copying'))]
         # JogAmp supplemental release texts above also cover native JARs.
         assert notices or path.name.startswith(('jogl', 'gluegen', 'antlr')), path.name
@@ -63,6 +73,7 @@ def audit(app, output):
     report = {'scope': 'Technical distribution review, not legal clearance',
               'sourceCommit': snapshot['commit'], 'build': metadata,
               'projectSourceFilesVerified': len(snapshot['files']), 'jars': jars,
+              'unchangedUpstreamJavaLegalFiles': legal_verified,
               'requiredNotices': required,
               'legalFiles': {str(p.relative_to(runtime)): sha(p) for p in sorted((runtime / 'legal').rglob('*')) if p.is_file()},
               'limitations': ['Physical hardware acceptance pending', 'Ad-hoc signed; not notarized',
@@ -86,5 +97,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--jdk', type=Path, required=True)
     args = parser.parse_args()
-    audit(args.app, args.output)
+    audit(args.app, args.output, args.jdk)

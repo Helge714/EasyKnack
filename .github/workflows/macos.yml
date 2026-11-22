@@ -69,7 +69,7 @@ jobs:
             -cp "$app/Contents/app/$jar:$app/Contents/app/lib/*" scripts/macos/GuiSmoke.java
           hdiutil verify dist/macos-test/*.dmg
       - name: Audit installed notices and matching source materials
-        run: python3 scripts/audit-macos-package.py --app dist/macos-test/image/EasyKnack.app --output dist/macos-test
+        run: python3 scripts/audit-macos-package.py --app dist/macos-test/image/EasyKnack.app --output dist/macos-test --jdk target/macos-inputs/jdk.tar.gz
       - uses: actions/upload-artifact@v4
         if: always()
         with:
