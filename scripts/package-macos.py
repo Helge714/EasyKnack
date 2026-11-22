@@ -96,7 +96,7 @@ def package(args):
                         if entry.endswith(('.jnilib', '.dylib', '.so')):
                             extracted = Path(temp) / Path(entry).name
                             extracted.write_bytes(natives.read(entry))
-                            run('/usr/bin/lipo', '-verify_arch', arch, extracted)
+                            run('/usr/bin/lipo', extracted, '-verify_arch', arch)
         if len(list((stage / 'lib').glob('*-natives-*.jar'))) != 2:
             raise ValueError('Expected two macOS universal JogAmp native JARs')
         put(args.native / 'easyknack-audio-host', 'native/easyknack-audio-host')
@@ -109,7 +109,7 @@ def package(args):
         put(ROOT / 'scripts/macos/clang++', 'tools/apple/bin/clang++')
         for path in (stage / 'native').iterdir():
             path.chmod(0o755)
-            run('/usr/bin/lipo', '-verify_arch', arch, path)
+            run('/usr/bin/lipo', path, '-verify_arch', arch)
         for path in (stage / 'tests').iterdir():
             if path.suffix not in ('.java', '.cpp', '.py'):
                 path.chmod(0o755)
