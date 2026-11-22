@@ -29,11 +29,22 @@ class DocumentLaunchTest {
 
     @Test void aSeparateJvmForwardsInsteadOfOwningTheApplication() throws Exception {
         try (var owner = DocumentLaunch.start(directory, new String[0])) {
-            var process = new ProcessBuilder(Path.of(System.getProperty("java.home"), "bin", "java.exe").toString(),
+            var process = new ProcessBuilder(Path.of(System.getProperty("java.home"), "bin", NativePlatform.current().executable("java")).toString(),
                     "-cp", System.getProperty("java.class.path"), Sender.class.getName(), directory.toString()).inheritIO().start();
             assertTrue(process.waitFor(15, java.util.concurrent.TimeUnit.SECONDS));
             assertEquals(0, process.exitValue());
             assertEquals(java.util.List.of(directory.resolve("A B ü.knack")), owner.poll());
+        }
+    }
+
+    @Test void finderOpenRequestsUseTheExistingAtomicInbox() throws Exception {
+        try(var owner=DocumentLaunch.start(directory,new String[0])){
+            var file=directory.resolve("Finder ä.knack");
+            owner.submit(java.util.List.of(file));
+            assertEquals(java.util.List.of(file),owner.poll());
+            owner.submit(java.util.List.of());
+            assertEquals(java.util.List.of(),owner.poll());
+            assertNull(owner.poll());
         }
     }
 

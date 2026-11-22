@@ -49,6 +49,17 @@ public final class DocumentLaunch implements AutoCloseable {
     }
 
     /** Called only by the owning application's UI once it can handle another request. */
+    public void submit(List<Path> paths) throws IOException {
+        if(paths.size()>1000)throw new IOException("Too many documents in launch request");
+        var data=new Properties();data.setProperty("count",Integer.toString(paths.size()));
+        for(int i=0;i<paths.size();i++)data.setProperty("path."+i,paths.get(i).toAbsolutePath().normalize().toString());
+        Path temporary=Files.createTempFile(inbox,"launch-",".tmp");
+        try{try(var output=Files.newOutputStream(temporary)){data.store(output,"EasyKnack desktop open request");}
+            Files.move(temporary,inbox.resolve(String.format(Locale.ROOT,"%019d-%s.request",System.currentTimeMillis(),UUID.randomUUID())),StandardCopyOption.ATOMIC_MOVE);
+        }finally{Files.deleteIfExists(temporary);}
+    }
+
+    /** Called only by the owning application's UI once it can handle another request. */
     public List<Path> poll() throws IOException {
         try (var entries = Files.list(inbox)) {
             var next = entries.filter(p -> p.getFileName().toString().endsWith(".request")).sorted().findFirst();
