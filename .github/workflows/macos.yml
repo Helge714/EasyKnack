@@ -68,6 +68,8 @@ jobs:
           "$app/Contents/runtime/Contents/Home/bin/java" --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED \
             -cp "$app/Contents/app/$jar:$app/Contents/app/lib/*" scripts/macos/GuiSmoke.java
           hdiutil verify dist/macos-test/*.dmg
+      - name: Audit installed notices and matching source materials
+        run: python3 scripts/audit-macos-package.py --app dist/macos-test/image/EasyKnack.app --output dist/macos-test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -84,3 +86,5 @@ jobs:
           path: |
             dist/macos-test/*.dmg
             dist/macos-test/*.sha256
+            dist/macos-test/*-license-materials.zip
+            dist/macos-test/*-license-materials.json
