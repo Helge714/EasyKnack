@@ -125,6 +125,9 @@ Documentation-only navigation changes do not need a Maven/native rebuild.
   Java `MacDesktop` forwards Finder/Quit events. `scripts/prepare-macos-inputs.py`,
   `package-macos.py`, `scripts/macos/` and `.github/workflows/macos.yml` own Mac
   inputs, app/DMG, signing and runner checks; [acceptance](MACOS.md).
+  `scripts/audit-macos-package.py` checks packaged notices, source hashes and the
+  unchanged upstream Java legal tree; it emits per-architecture source/license
+  supplements and machine-readable distribution evidence.
 
 - Linux distribution evidence: `scripts/audit-linux-licenses.py` checks immutable
   package/source hashes, upstream runtime/compiler preservation and isolated Core

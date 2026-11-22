@@ -67,6 +67,9 @@ prerequisites, not redistributed files. Developer ID/ad-hoc re-signing changes
 runtime signature metadata; the upstream source and legal texts are retained.
 Review each actual Mac artifact before publication; the Linux-specific audit does
 not certify a different platform package. See `docs/development/MACOS.md`.
+The first Mac test distribution's package/source checks are recorded in
+[the Mac distribution report](docs/development/source-audit/MACOS-EXPERIMENTAL-1-2026-11-22.md).
+Its per-architecture license/source supplements accompany the DMG downloads.
 
 For download distribution, give binary recipients equivalent access to the matching
 project and dependency sources. An inaccessible private repository link does not
