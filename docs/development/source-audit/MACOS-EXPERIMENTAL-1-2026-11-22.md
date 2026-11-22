@@ -9,6 +9,15 @@ Experimental status does not relax license requirements. Matching source access
 is supplied beside the downloads, consistent with the
 [GNU distribution guidance](https://www.gnu.org/licenses/gpl-faq.html#SourceAndBinaryOnDifferentSites).
 
+Both architecture jobs passed all build/package checks and the distribution audit.
+Each project snapshot verifies 1,782 source-file hashes; all 252 regular Java
+legal files compare unchanged against the exact upstream runtime archive.
+
+| DMG architecture | SHA-256 |
+| --- | --- |
+| arm64 | `2b4e3a25b2e456ce60bda6c3c5e5817e11c5d778950abf141e1ccf968649f170` |
+| x86_64 | `641092f950414e80999a392ed1508a3617f1579103d57f99f1ea4076b2758821` |
+
 ## Materials and checks
 
 - EasyKnack GPL-3.0-only sources, native dependency sources, local modifications,
