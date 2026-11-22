@@ -15,6 +15,12 @@ That report records exact artifact hashes, preserved notices, JDK build material
 and the isolated reconstruction of the current GLSwing runtime. It is a technical
 distribution review, not a legal clearance certificate.
 
+Linux test 2 supersedes the test 1 release page. Its source/license supplement
+retains the complete original test 1 supplement under `legacy/` and supplies the
+replacement GLSwing sources/build inputs and updated diagnostic scripts. The full
+test 2 program archive includes this supplement as well. See the test 2 release
+for the current downloads; test 1's historical Git tag remains available.
+
 | Component | License / distribution notes |
 |---|---|
 | EasyKnack Java application, native host and original SDK code | GPL-3.0-only; provide corresponding source and build scripts for the distributed version. |

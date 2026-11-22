@@ -21,6 +21,20 @@ def fetch(url):
         return response.read()
 
 
+def unpack_core(inputs, output):
+    with zipfile.ZipFile(io.BytesIO(inputs)) as archive:
+        for entry in archive.infolist():
+            path = Path(entry.filename)
+            if path.is_absolute() or '..' in path.parts or not path.parts or path.parts[0] != 'glswing':
+                raise ValueError('Unsafe Core source path')
+            destination = output / Path(*path.parts[1:])
+            if entry.is_dir():
+                destination.mkdir(parents=True, exist_ok=True)
+            else:
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(archive.read(entry))
+
+
 def prepare(output):
     if platform.system() != 'Darwin':
         raise RuntimeError('Run on the target macOS runner')
@@ -61,18 +75,13 @@ def prepare(output):
     for item in release['assets']:
         if item['name'].startswith('OpenJDK25U-sbom_' + architecture + '_mac_hotspot_') and item['name'].endswith('.json'):
             (output / item['name']).write_bytes(fetch(item['browser_download_url']))
-    core_url = 'https://github.com/Helge714/EasyKnack/releases/download/v0.4.0-linux-experimental.1/EasyKnack-Linux-test-1-license-materials.zip'
+    core_url = 'https://github.com/Helge714/EasyKnack/releases/download/v0.4.0-linux-experimental.2/EasyKnack-Linux-test-2-license-materials.zip'
     core = fetch(core_url)
-    assert hashlib.sha256(core).hexdigest() == '153f29bd434c2b5c07e4accaa047249480b10573c6c5505c9c3580d14c1ca291'
+    assert hashlib.sha256(core).hexdigest() == 'd296f032ccffa2c635f90c74963c7f352175af64fc78471c35eafd37ee2639ef'
     with zipfile.ZipFile(io.BytesIO(core)) as supplement:
-        inputs = supplement.read('sources/glswing-linux-test-1-build-inputs.zip')
+        inputs = supplement.read('sources/glswing-build-inputs.zip')
     (output / 'glswing-build-inputs.zip').write_bytes(inputs)
-    with zipfile.ZipFile(io.BytesIO(inputs)) as archive:
-        for entry in archive.infolist():
-            path = Path(entry.filename)
-            if path.is_absolute() or '..' in path.parts:
-                raise ValueError('Unsafe Core source path')
-        archive.extractall(output / 'core')
+    unpack_core(inputs, output / 'core')
     (output / 'runtime-metadata.json').write_text(json.dumps(asset, indent=2) + '\n')
     (output / 'java-home.txt').write_text(str(home) + '\n')
     print('JAVA_HOME=' + str(home))

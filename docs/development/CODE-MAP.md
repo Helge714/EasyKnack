@@ -133,6 +133,9 @@ Documentation-only navigation changes do not need a Maven/native rebuild.
   package/source hashes, upstream runtime/compiler preservation and isolated Core
   reconstruction. Release-specific component ledgers live under `source-audit/`;
   Linux source/build supplements are published beside the matching binary archive.
+  `scripts/package-linux-update.py` assembles a complete archive from an immutable
+  base and reviewed UI update, verifies unchanged file hashes and supplies the
+  replacement dependency sources plus retained base source materials.
 
 ## Core navigation
 

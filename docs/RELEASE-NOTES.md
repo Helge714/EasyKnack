@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.4.0
 
+- Replace the Linux test 1 download with a complete experimental test 2 package
+  containing the renderer-cache fix and improved diagnostics. Retain matching
+  and historical source/license materials with the replacement distribution.
+
 - Rebuild UI recordings after OpenGL renderer changes through the external Core
   dependency, including monitor transitions. Fix the bundled Linux compiler's
   version query and retain command/exit-code diagnostics for native acceptance.

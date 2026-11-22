@@ -1,5 +1,15 @@
 # Linux test package from Windows
 
+The current public package is
+[Linux experimental test 2](https://github.com/Helge714/EasyKnack/releases/tag/v0.4.0-linux-experimental.2).
+It is a complete archive containing the renderer-cache fix and improved compiler
+diagnostics; no separate UI patch is needed. It reuses test 1's unchanged native,
+Java application and toolchain binaries. `scripts/package-linux-update.py` records
+the replacement Core source identity and verifies all other regular file hashes.
+The matching source supplement is included and available separately. Test 1's
+source/build materials are retained inside that supplement after its release page
+is removed. Target-side acceptance of the updated GUI/compiler remains pending.
+
 This path creates Linux x86_64 ELF executables and a transfer archive without WSL,
 a Linux VM, a remote runner or a push to GitHub. It is a cross-build, not execution
 on Linux. Keep it labelled as a test package until device/GUI acceptance succeeds.
