@@ -2,6 +2,7 @@
 """Build an architecture-specific app/DMG on macOS; never publish or overwrite a release."""
 import argparse
 import hashlib
+import io
 import json
 import os
 import platform
@@ -78,6 +79,11 @@ def package(args):
         with zipfile.ZipFile(stage / jar_name) as jar:
             manifest = jar.read('META-INF/MANIFEST.MF').decode().replace('\r\n ', '').replace('\n ', '')
             dependencies = re.search(r'(?m)^Class-Path: (.+)$', manifest).group(1).strip().split()
+            with zipfile.ZipFile(io.BytesIO(jar.read('easyknack/plugin-sdk.zip'))) as sdk:
+                for name in sdk.namelist():
+                    source = ROOT / 'native/audio-host' / name
+                    if name.startswith(('src/', 'third_party/')) and source.is_file() and sdk.read(name) != source.read_bytes():
+                        raise ValueError('Stale embedded SDK; rerun Maven package: ' + name)
         for name in dependencies:
             if not re.fullmatch(r'lib/[^/\\]+\.jar', name):
                 raise ValueError('Unsafe manifest dependency')
