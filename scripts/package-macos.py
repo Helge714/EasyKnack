@@ -58,6 +58,12 @@ def package(args):
         raise ValueError('Unsupported Mac architecture')
     namespace = {'m': 'http://maven.apache.org/POM/4.0.0'}
     version = ET.parse(ROOT / 'pom.xml').findtext('m:version', namespaces=namespace)
+    product_version = version.removesuffix('-SNAPSHOT')
+    # jpackage rejects a zero-leading macOS app-version. CFBundleVersion is a
+    # separate build identity, while CFBundleShortVersionString stays Maven's
+    # product version. Local 1.0 is deliberately non-unique, never a CI number.
+    run_number = os.environ.get('GITHUB_RUN_NUMBER')
+    bundle_version = str(int(run_number)) + '.' + str(int(os.environ.get('GITHUB_RUN_ATTEMPT', '1'))) if run_number else '1.0'
     jar_name = 'easy-knack-' + version + '.jar'
     metadata = json.loads((args.inputs / 'runtime-metadata.json').read_text())
     if metadata['binary']['os'] != 'mac' or digest(args.inputs / 'jdk.tar.gz') != metadata['binary']['package']['checksum']:
@@ -146,14 +152,14 @@ def package(args):
         classpath = str(stage / jar_name) + ':' + str(stage / 'lib/*')
         for parameters in ([str(stage / 'Examples')], ['--verify', str(stage / 'Examples')]):
             run(home / 'bin/java', '-Deasyknack.language=en', '-cp', classpath, 'com.vin.easyknack.ui.ExampleLibrary', *parameters)
-        (stage / 'macos-build.json').write_text(json.dumps({'version': version, 'architecture': arch, 'runtime': metadata, 'hardwareAcceptance': 'not performed; test on physical Mac', 'signing': 'ad-hoc test' if args.sign_identity == '-' else 'Developer ID'}, indent=2) + '\n')
+        (stage / 'macos-build.json').write_text(json.dumps({'version': version, 'bundleBuildVersion': bundle_version, 'architecture': arch, 'runtime': metadata, 'hardwareAcceptance': 'not performed; test on physical Mac', 'signing': 'ad-hoc test' if args.sign_identity == '-' else 'Developer ID'}, indent=2) + '\n')
         iconset = Path(temp) / 'EasyKnack.iconset';iconset.mkdir()
         for size in (16, 32, 128, 256, 512):
             for scale in (1, 2):
                 run('/usr/bin/sips', '-z', size*scale, size*scale, ROOT / 'src/main/resources/branding/EKIcon.png', '--out', iconset / ('icon_' + str(size) + 'x' + str(size) + ('@2x' if scale == 2 else '') + '.png'))
         icon = Path(temp) / 'EasyKnack.icns'
         run('/usr/bin/iconutil', '-c', 'icns', iconset, '-o', icon)
-        run(home / 'bin/jpackage', '--type', 'app-image', '--name', 'EasyKnack', '--app-version', version.removesuffix('-SNAPSHOT'), '--vendor', 'EasyKnack', '--input', stage,
+        run(home / 'bin/jpackage', '--type', 'app-image', '--name', 'EasyKnack', '--app-version', bundle_version, '--vendor', 'EasyKnack', '--input', stage,
             '--main-jar', jar_name, '--runtime-image', home, '--dest', args.output,
             '--java-options', '--enable-native-access=ALL-UNNAMED', '--java-options', '--add-opens=java.base/java.lang=ALL-UNNAMED',
             '--java-options', '-Dapple.awt.application.name=EasyKnack',
@@ -162,6 +168,7 @@ def package(args):
         app = args.output / 'EasyKnack.app'
         info = app / 'Contents/Info.plist'
         plist = plistlib.loads(info.read_bytes())
+        plist.update({'CFBundleShortVersionString': product_version, 'CFBundleVersion': bundle_version})
         plist.update({'LSMinimumSystemVersion': '14.2', 'NSHighResolutionCapable': True, 'CFBundleDevelopmentRegion': 'en', 'CFBundleLocalizations': ['en', 'de'],
                       'NSMicrophoneUsageDescription': 'EasyKnack uses microphone and audio-interface inputs only when selected in your graph.',
                       'NSAudioCaptureUsageDescription': 'EasyKnack captures system or application audio only when selected in your graph.',

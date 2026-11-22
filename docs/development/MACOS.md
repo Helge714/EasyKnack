@@ -72,6 +72,9 @@ window's close request and unsaved-document flow. The Info.plist provides Retina
 minimum-system and Microphone/Audio Capture descriptions. No App Store sandbox is
 enabled. Entitlements permit HotSpot JIT, user-built JNI/Formula modules and audio
 input. These choices need real signed-package acceptance, not just a build pass.
+The public CFBundleShortVersionString derives from Maven. Because jpackage rejects
+a zero-leading Mac version, its internal CFBundleVersion uses the real CI run and
+attempt, or explicitly non-unique local 1.0; neither changes the product version.
 Common Command editing/file shortcuts map to the existing Control bindings only
 inside the GL canvas; native dialogs and Command-Q retain native handling.
 
