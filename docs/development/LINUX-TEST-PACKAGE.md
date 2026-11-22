@@ -61,6 +61,28 @@ libraries, examples, sources and SHA256. Rerun independently with
 
 ## Test on the other computer
 
+### Renderer changes and compiler diagnostics
+
+The first EndeavourOS/Wayland report passed desktop audio capture/routing and
+virtual ALSA MIDI tests, but exposed cached Core recordings belonging to a previous
+renderer. External GLSwing commit `0530106` rebuilds recordings on renderer changes
+and invalidates scene/picking buffers on context initialization. A local GPU
+regression reproduces the original exception with the old Core and passes with
+the corrected dependency, including stable-frame cache reuse. Real monitor
+transitions on Linux still require target testing.
+
+The bundled Zig wrapper now omits the glibc-suffixed target for `--version` only;
+actual compilation retains the glibc 2.28 deployment target. The reported native
+Formula acceptance failure is not diagnosed from the original empty exception.
+Updated diagnostics retain command, exit status, loader errors and log paths.
+The Formula/module/cache and source-plugin/Bake/host checks pass locally on
+Windows; that does not establish a Linux pass.
+
+A small local GUI/diagnostic update can replace the matching Core JAR, wrapper
+and diagnostic source in an extracted test 1 package without rebuilding the native
+audio host. Keep its matching Core sources/build inputs and notices with it;
+the original published test archive is never overwritten.
+
 Transfer the `.tar.gz` and checksum. Extract the complete archive into a writable
 local folder. Run `./Check-Linux.sh`, then `./Start-EasyKnack.sh` in the `EasyKnack`
 folder. Return `linux-diagnostics.txt`, startup output if needed, and the listening

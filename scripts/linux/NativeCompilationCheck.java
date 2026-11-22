@@ -10,7 +10,8 @@ class NativeCompilationCheck {
     static void check(boolean value,String message){if(!value)throw new IllegalStateException(message);}
     static void run(List<String> command,Path log)throws Exception{
         var process=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
-        try{check(process.waitFor(300,TimeUnit.SECONDS),"Compiler timed out: "+log);check(process.exitValue()==0,Files.readString(log));}
+        try{check(process.waitFor(300,TimeUnit.SECONDS),"Command timed out after 300 seconds: "+command+"; log: "+log);
+            check(process.exitValue()==0,"Command failed (exit "+process.exitValue()+"): "+command+"\nLog: "+log+"\n"+Files.readString(log));}
         finally{if(process.isAlive())process.destroyForcibly();}
     }
     static void perform(Path compiler,Path root)throws Exception{
@@ -25,10 +26,17 @@ class NativeCompilationCheck {
         Files.writeString(source,"""
             #include "platform/SharedLibrary.hpp"
             #include "FormulaContext.hpp"
-            #include <cassert>
-            int main(){easyknack::platform::SharedLibrary library;assert(library.open("%s"));
-              auto sample=library.symbol<void(*)(const float*,float*,const easyknack::FormulaContext*)>("easyknack_formula_sample");assert(sample);
-              easyknack::FormulaContext context;float input[]{3},output[]{0};sample(input,output,&context);assert(output[0]==6);}
+            #include <iostream>
+            int main(){easyknack::platform::SharedLibrary library;
+              if(!library.open("%s")){std::cerr<<"Formula module could not be loaded";
+            #ifndef _WIN32
+                if(const char* error=dlerror())std::cerr<<": "<<error;
+            #endif
+                std::cerr<<std::endl;return 2;}
+              auto sample=library.symbol<void(*)(const float*,float*,const easyknack::FormulaContext*)>("easyknack_formula_sample");
+              if(!sample){std::cerr<<"Formula sample entry point missing"<<std::endl;return 3;}
+              easyknack::FormulaContext context;float input[]{3},output[]{0};sample(input,output,&context);
+              if(output[0]!=6){std::cerr<<"Formula result mismatch: "<<output[0]<<std::endl;return 4;}}
             """.formatted(library));
         var command=new ArrayList<>(List.of(compiler.toString(),"-std=c++17","-O2","-I",sdk.resolve("src").toString(),source.toString(),"-o",executable.toString()));
         command.addAll(platform.compilerArchitectureFlags());

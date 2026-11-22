@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.4.0
 
+- Rebuild UI recordings after OpenGL renderer changes through the external Core
+  dependency, including monitor transitions. Fix the bundled Linux compiler's
+  version query and retain command/exit-code diagnostics for native acceptance.
+
 - Add macOS Core Audio/CoreMIDI adapters, system/application taps and app/DMG build
   packages for Apple Silicon and Intel. Automated Mac build/package checks pass;
   physical-device and interactive permission acceptance remain pending;
