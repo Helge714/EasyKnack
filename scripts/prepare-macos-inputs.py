@@ -4,15 +4,20 @@ import argparse
 import hashlib
 import io
 import json
+import os
 import platform
 from pathlib import Path
 import tarfile
 import urllib.request
+from urllib.parse import urlsplit
 import zipfile
 
 
 def fetch(url):
-    with urllib.request.urlopen(url, timeout=120) as response:
+    headers = {'User-Agent': 'EasyKnack-macOS-build'}
+    if urlsplit(url).hostname == 'api.github.com' and os.environ.get('GH_TOKEN'):
+        headers['Authorization'] = 'Bearer ' + os.environ['GH_TOKEN']
+    with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=120) as response:
         return response.read()
 
 
@@ -23,9 +28,16 @@ def prepare(output):
         raise ValueError('Use a fresh input directory')
     output.mkdir(parents=True)
     architecture = 'aarch64' if platform.machine() == 'arm64' else 'x64'
-    assets = json.loads(fetch('https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=' + architecture + '&image_type=jdk&os=mac&vendor=eclipse'))
-    asset = assets[0]
-    package = asset['binary']['package']
+    # The Adoptium API may reject shared CI IPs. Its official GitHub release
+    # provides the same signed archives, checksum sidecars and build metadata.
+    release = json.loads(fetch('https://api.github.com/repos/adoptium/temurin25-binaries/releases/latest'))
+    runtime_asset = next(a for a in release['assets'] if a['name'].startswith('OpenJDK25U-jdk_' + architecture + '_mac_hotspot_') and a['name'].endswith('.tar.gz'))
+    runtime_url = runtime_asset['browser_download_url']
+    metadata_url = runtime_url + '.json'
+    package = {'name': runtime_asset['name'], 'link': runtime_url, 'metadata_link': metadata_url,
+               'checksum': fetch(runtime_url + '.sha256.txt').decode().split()[0]}
+    asset = {'release_link': release['html_url'], 'release_name': release['tag_name'],
+             'binary': {'os': 'mac', 'architecture': architecture, 'image_type': 'jdk', 'package': package}}
     runtime = fetch(package['link'])
     assert hashlib.sha256(runtime).hexdigest() == package['checksum']
     (output / 'jdk.tar.gz').write_bytes(runtime)
@@ -33,8 +45,6 @@ def prepare(output):
         archive.extractall(output / 'runtime', filter='data')
     java = next((output / 'runtime').glob('*/Contents/Home/bin/java'))
     home = java.parent.parent.resolve()
-    release_url = asset['release_link'].replace('https://github.com/', 'https://api.github.com/repos/').replace('/releases/tag/', '/releases/tags/')
-    release = json.loads(fetch(release_url))
     source = next(a for a in release['assets'] if a['name'].startswith('OpenJDK25U-jdk-sources_') and a['name'].endswith('.tar.gz'))
     source_bytes = fetch(source['browser_download_url'])
     checksum = fetch(source['browser_download_url'] + '.sha256.txt').decode().split()[0]

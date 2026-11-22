@@ -28,6 +28,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Collect exact JDK, build sources and external Core inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/prepare-macos-inputs.py --output target/macos-inputs
           echo "JAVA_HOME=$(cat target/macos-inputs/java-home.txt)" >> "$GITHUB_ENV"
