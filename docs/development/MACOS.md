@@ -91,7 +91,26 @@ and uploads experimental DMGs plus diagnostics. It has contents-read permission
 only and never publishes releases, notarizes or uses signing secrets. A push to
 `codex/macos-port` starts it; pushing requires user scope under AGENTS.md.
 
-## Required acceptance
+## Verified experimental builds — 2026-11-22
+
+[CI run 4, attempt 1](https://github.com/Helge714/EasyKnack/actions/runs/45016301898)
+built commit `ad1710f6854bcac14f730f745976821f02383c32` successfully on both
+macOS 15 arm64 and x86_64 runners. Each architecture passed 11 Java tests without
+skips and all 10 native CTests, including the real virtual-source CoreMIDI test.
+Formula compilation/loading/cache and source-plugin/Bake compilation/host/cache
+checks passed both before and after packaging. JOGL/AWT created an OpenGL 4.1
+APPLE-21.1.1 context from both layouts. Strict ad-hoc signature verification and
+DMG verification passed. This does not establish macOS 14.2 or physical-device
+acceptance. These are Actions test artifacts, not a published stable release.
+
+Downloaded DMGs were independently checked against their SHA-256 sidecars:
+
+| Architecture | Bytes | SHA-256 |
+| --- | ---: | --- |
+| arm64 | 240637506 | `a9d9cb72044837241a7c526f3d788735c276810f83216bc5f72a3b3fcc940d34` |
+| x86_64 | 222408383 | `8b1690094ac58a330351d0697a90c8bdf0800f5a8154373676ce28d03822b252` |
+
+## Remaining acceptance
 
 Local Windows checks cover `RoutedAudioTest`, MIDI byte decoding, Java platform/
 compiler policy and document launch forwarding. They do not compile Apple APIs.
@@ -106,4 +125,5 @@ devices/clock drift, latency, disconnect/reconnect, physical MIDI/Learn, both
 permission grant/deny paths, system/app capture samples and exclusion of own audio,
 MP3 round trips, baked playback, Retina/theme/editor rendering, Finder open and
 Quit with unsaved documents. Check unsigned/ad-hoc and Developer ID notarized
-downloads separately. No macOS execution or hardware pass is claimed from Windows.
+downloads separately. Automated macOS execution above does not establish physical
+hardware, permission-dialog or interactive desktop acceptance.

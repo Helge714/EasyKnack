@@ -3,7 +3,8 @@
 ## Unreleased - 0.4.0
 
 - Add macOS Core Audio/CoreMIDI adapters, system/application taps and app/DMG build
-  preparation for Apple Silicon and Intel. Mac build/device acceptance is pending;
+  packages for Apple Silicon and Intel. Automated Mac build/package checks pass;
+  physical-device and interactive permission acceptance remain pending;
   native Formula/Bake/plugin compilation requires Apple's Command Line Tools.
 
 - Review Linux test-package notices and source correspondence; provide matching
