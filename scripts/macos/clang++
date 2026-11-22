@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+if ! /usr/bin/xcode-select -p >/dev/null 2>&1; then
+  echo 'Native Formula/Bake/plugin builds require Apple Command Line Tools. Install with xcode-select --install, then retry.' >&2
+  exit 1
+fi
+sdk=$(/usr/bin/xcrun --sdk macosx --show-sdk-path 2>/dev/null) || {
+  echo 'Native Formula/Bake/plugin builds require Apple Command Line Tools. Install with xcode-select --install, then retry.' >&2
+  exit 1
+}
+export MACOSX_DEPLOYMENT_TARGET=14.2
+exec /usr/bin/xcrun --sdk macosx clang++ -isysroot "$sdk" "$@"

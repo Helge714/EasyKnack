@@ -119,6 +119,13 @@ For a small fix, locate the nearest existing regression test first. Run focused
 checks, then any required broader check once after the changes are assembled.
 Documentation-only navigation changes do not need a Maven/native rebuild.
 
+- macOS: `native/audio-host/src/platform/MacPlatform.mm` owns Objective-C++ Core Audio,
+  process taps, permissions and CoreMIDI. `platform/RoutedAudio` / `RoutedVolume`
+  isolate routing from Apple APIs; tests: `RoutedAudioTest`, `MacMidiTest`.
+  Java `MacDesktop` forwards Finder/Quit events. `scripts/prepare-macos-inputs.py`,
+  `package-macos.py`, `scripts/macos/` and `.github/workflows/macos.yml` own Mac
+  inputs, app/DMG, signing and runner checks; [acceptance](MACOS.md).
+
 - Linux distribution evidence: `scripts/audit-linux-licenses.py` checks immutable
   package/source hashes, upstream runtime/compiler preservation and isolated Core
   reconstruction. Release-specific component ledgers live under `source-audit/`;

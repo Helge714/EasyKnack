@@ -2,7 +2,8 @@
 
 Linux is the first additional target. Functional Linux support is implemented;
 GUI/physical-device acceptance still requires Linux. macOS follows the same
-boundary and remains unvalidated.
+boundary; its Core Audio/CoreMIDI/tap adapters and package workflow are implemented
+but still require a real macOS build and device acceptance. See [macOS](MACOS.md).
 
 ## Ownership
 
@@ -92,5 +93,6 @@ archive without a VM or GitHub push.
 `Check-Linux.sh` prints live progress and records diagnostics. This Windows machine
 has no Linux runtime: Linux binaries are cross-built, not executed here. Pure
 adapter/codec tests run on Windows. Desktop, physical MIDI/audio, latency, GUI/OpenGL
-and long-running stability require target acceptance. macOS still needs its own
-device/MIDI adapters, SDK builds, GUI validation and distribution work.
+and long-running stability require target acceptance. The macOS adapters and
+app/DMG workflow now exist; actual SDK builds, GUI, signing and physical-device
+acceptance remain pending. See [Mac build and acceptance](MACOS.md).

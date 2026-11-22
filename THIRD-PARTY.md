@@ -26,6 +26,7 @@ distribution review, not a legal clearance certificate.
 | JogAmp JOGL / GlueGen and transitive JARs | Preserve the notices/licenses from each exact artifact; review bundled native components too. |
 | External Windows JDK | Windows packages do not distribute Java. Users install a Windows x64 JDK 25 separately under its provider terms; the launcher can assist via winget. |
 | Linux test-package JDK | The Linux test archive bundles an unmodified Eclipse Temurin JDK 25, including javac. Preserve its complete `runtime/legal` directory; exact asset metadata/checksums and matching OpenJDK sources are included. OpenJDK uses GPL-2.0 with the Classpath Exception plus its retained third-party terms. |
+| macOS test-package JDK and launcher | Temurin JDK 25 and the OpenJDK jpackage launcher retain their GPL-2.0/ClassPath Exception, Assembly Exception and third-party notices. Full OpenJDK sources and exact Temurin build inputs accompany the package. macOS re-signing changes signature metadata; do not describe signed binaries as byte-identical to the upstream download. Apple's compiler/SDK remains an external prerequisite. |
 | Linux C++ toolchain/runtime | Zig 0.15.2 is bundled for Formula/Bake/source plugins. Its MIT license and supplied library notices remain in `tools/zig`; LLVM libc++, libc++abi and libunwind use Apache-2.0 with LLVM Exceptions, also retained under `licenses/zig-runtime`. Native host/tests link the LLVM C++ runtime statically. Linux glibc and audio-service libraries come from the target system. |
 | LAME 3.100 | LGPL-2.0-or-later. Linux MP3 encoding uses a separately replaceable `libmp3lame.so.0`, built from the retained upstream portable encoder sources. The original sources, custom build configuration, provenance checksum and COPYING are distributed; the decoder and assembler paths are not built. Windows retains Media Foundation. |
 | ALSA 1.2.14 public headers | LGPL-2.1-or-later. Original header notices, COPYING and provenance remain under `native/audio-host/third_party/alsa`; Linux loads the system `libasound.so.2` dynamically for MIDI. |
@@ -59,6 +60,13 @@ New installer builds include project and upstream source-material archives with
 checksums and a REVIEW.json report. Remaining provenance checks are documented in
 `docs/development/SOURCE-PACKAGES.md`; review them before public distribution.
 The detailed native findings are in `docs/development/source-audit/NATIVE-RUNTIMES.md`.
+
+The macOS package path includes matching OpenJDK/Temurin and Core build materials
+and native notices. Apple frameworks and the SDK remain system/developer-tool
+prerequisites, not redistributed files. Developer ID/ad-hoc re-signing changes
+runtime signature metadata; the upstream source and legal texts are retained.
+Review each actual Mac artifact before publication; the Linux-specific audit does
+not certify a different platform package. See `docs/development/MACOS.md`.
 
 For download distribution, give binary recipients equivalent access to the matching
 project and dependency sources. An inaccessible private repository link does not
