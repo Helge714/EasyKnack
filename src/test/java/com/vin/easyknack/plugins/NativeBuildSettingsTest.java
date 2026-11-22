@@ -18,5 +18,11 @@ class NativeBuildSettingsTest {
         assertTrue(mac.libraries().contains("CoreAudio"));
         assertFalse(mac.libraries().contains("-ldl"));
         assertEquals(windows.compile(), linux.compile());
+        assertEquals(java.util.List.of("-x", "objective-c++", "-fobjc-arc"),mac.sourceArguments(Path.of("MacPlatform.mm")));
+        assertTrue(mac.sourceArguments(Path.of("LorisLibrary.cpp")).isEmpty());
+        assertTrue(linux.sourceArguments(Path.of("MacPlatform.mm")).isEmpty());
+        assertTrue(mac.libraries().contains("CoreMIDI"));
+        assertTrue(mac.compile().containsAll(java.util.List.of("-arch","arm64")));
+        assertTrue(mac.link().containsAll(java.util.List.of("-arch","arm64")));
     }
 }

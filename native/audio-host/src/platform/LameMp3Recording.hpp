@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cerrno>
+#include <cstdlib>
 #include <fcntl.h>
 #ifdef _WIN32
 #include <io.h>
@@ -31,7 +32,10 @@ class LameMp3Recording {
 #ifdef _WIN32
             if(!library.open("libmp3lame.dll"))return false;
 #elif defined(__APPLE__)
-            if(!library.open("libmp3lame.dylib"))return false;
+            // Hardened-runtime launches may strip DYLD_* variables. Plugin hosts
+            // live outside the application, so use an explicit installation path.
+            const char* directory=std::getenv("EASYKNACK_NATIVE_LIBDIR");
+            if(!library.open(directory?(std::filesystem::path(directory)/"libmp3lame.dylib").string():"@executable_path/libmp3lame.dylib"))return false;
 #else
             if(!library.open("libmp3lame.so.0"))return false;
 #endif

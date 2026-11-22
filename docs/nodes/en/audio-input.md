@@ -4,6 +4,12 @@
 
 Captures audio from a selected source.
 
+On macOS 14.2 or newer, Core Audio provides hardware input and system/application
+taps. Grant Microphone or Audio Capture permission when requested, then refresh
+devices. System capture excludes EasyKnack's audio host. Copy does not mute the
+source application; exclusive routing requires external tools. Hardware channel
+pairs are selectable; stored device IDs from other operating systems need changing.
+
 ## Inputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |

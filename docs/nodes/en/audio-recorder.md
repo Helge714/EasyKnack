@@ -4,6 +4,10 @@
 
 Records triggered audio takes as WAV or MP3 files.
 
+On macOS, MP3 uses the bundled replaceable LAME library, as on Linux: 128 kbit/s
+mono or 192 kbit/s stereo, with finalized gapless delay/padding metadata. The
+bundled library is also available to locally compiled Bake/plugin hosts.
+
 ## Inputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |

@@ -39,7 +39,8 @@ public final class FormulaNativeCompiler {
     public synchronized Result compile(FormulaCompiler.Program program)throws IOException,InterruptedException{
         long start=System.nanoTime();String source=translationUnit(program);
         var platform=com.vin.easyknack.NativePlatform.current();
-        String identity=platform.cacheKey()+":"+compiler+":"+Files.size(compiler)+":"+Files.getLastModifiedTime(compiler)+":-O3:-ffp-contract=off:abi6:"+source;
+        String identity=platform.cacheKey()+":"+compiler+":"+Files.size(compiler)+":"+Files.getLastModifiedTime(compiler)+":-O3:-ffp-contract=off:abi6:"
+                +(platform.compilerArchitectureFlags().isEmpty()?"":String.join(" ",platform.compilerArchitectureFlags())+":")+source;
         String key;
         try{key=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(identity.getBytes(StandardCharsets.UTF_8)));}catch(java.security.NoSuchAlgorithmException e){throw new AssertionError(e);}
         Files.createDirectories(cache);
@@ -49,6 +50,7 @@ public final class FormulaNativeCompiler {
         Files.writeString(cpp,source,StandardCharsets.UTF_8);
         var command=new ArrayList<>(List.of(compiler.toString(),"-std=c++17","-O3","-ffp-contract=off"));
         command.addAll(platform.sharedLibraryFlags());
+        command.addAll(platform.compilerArchitectureFlags());
         command.addAll(List.of(cpp.toString(),"-o",built.toString()));
         Process process=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
         try{

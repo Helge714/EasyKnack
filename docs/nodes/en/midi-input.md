@@ -1,5 +1,9 @@
 # MIDI Input
 
+On macOS, hardware and virtual MIDI inputs use CoreMIDI. Device identities follow
+CoreMIDI's unique IDs. Refresh devices after hotplug; unavailable devices do not
+disable keyboard MIDI. Learn and MIDI event routing use the same controls.
+
 ## Overview
 
 Receives MIDI from a device or the computer keyboard.

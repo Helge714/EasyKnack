@@ -23,6 +23,7 @@ public record NativePlatform(OperatingSystem os, String architecture) {
     public String libraryExtension() { return windows() ? ".dll" : os == OperatingSystem.MACOS ? ".dylib" : ".so"; }
     public List<String> sharedLibraryFlags() { return windows() ? List.of("-shared", "-static") : os == OperatingSystem.MACOS ? List.of("-dynamiclib", "-fPIC") : List.of("-shared", "-fPIC"); }
     public List<String> compilerNames() { return windows() ? List.of("clang++.exe") : List.of("clang++", "g++"); }
+    public List<String> compilerArchitectureFlags() { return os==OperatingSystem.MACOS ? List.of("-arch",architecture) : List.of(); }
     public List<Path> systemCompilers() { return windows() ? List.of() : List.of(Path.of("/usr/bin/clang++"), Path.of("/usr/bin/g++"), Path.of("/usr/local/bin/clang++")); }
     public boolean supportsHostBuild() { return architecture.equals("x86_64") || !windows() && architecture.equals("arm64"); }
 }

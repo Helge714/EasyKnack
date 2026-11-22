@@ -41,6 +41,7 @@ class FormulaNativeCompilerTest {
             }
             """.formatted(library,program.bytecode()));
         var command=new ArrayList<>(List.of(compiler.toString(),"-std=c++17","-O2","-I",Path.of("native/audio-host/src").toAbsolutePath().toString(),source.toString(),"-o",exe.toString()));
+        command.addAll(platform.compilerArchitectureFlags());
         if(platform.windows())command.add("-static");
         else if(platform.os()==com.vin.easyknack.NativePlatform.OperatingSystem.LINUX)command.add("-ldl");
         run(command,log);

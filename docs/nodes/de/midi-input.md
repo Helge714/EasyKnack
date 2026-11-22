@@ -1,5 +1,10 @@
 # MIDI-Eingang (MIDI Input)
 
+Unter macOS verwenden Hardware- und virtuelle MIDI-Eingänge CoreMIDI mit dessen
+eindeutigen Gerätekennungen. Nach Gerätewechsel die Liste aktualisieren;
+nicht verfügbare Geräte deaktivieren Tastatur-MIDI nicht. Lernen und MIDI-Routing
+verwenden die gleichen Bedienelemente.
+
 ## Übersicht
 
 Empfängt MIDI von einem Gerät oder der Computertastatur.

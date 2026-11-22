@@ -1,5 +1,11 @@
 # Audio-Eingang (Audio Input)
 
+Unter macOS ab 14.2 verwendet der Node Core Audio für Hardware-Eingänge sowie
+System- und Anwendungsaufnahme. Mikrofon- bzw. Audioaufnahme-Berechtigung erteilen
+und danach die Geräte aktualisieren. Systemaufnahme schließt EasyKnacks Audiohost
+aus. Kopieren lässt die Quellanwendung hörbar; exklusives Routing erfolgt extern.
+Hardware-Kanalpaare sind wählbar; Gerätekennungen anderer Betriebssysteme neu wählen.
+
 ## Übersicht
 
 Erfasst Audio von einer gewählten Quelle.

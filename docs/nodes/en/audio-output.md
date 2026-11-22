@@ -4,6 +4,11 @@
 
 Sends audio to an output device.
 
+macOS uses Core Audio, including selectable hardware channel pairs and multiple
+devices. Volume controls are available only where the device exposes hardware
+volume. Linked controls follow desktop default-volume changes proportionally;
+they do not intercept global keys. Windows ASIO drivers are not used on macOS.
+
 Linux uses PulseAudio or PipeWire-Pulse for device selection and volume controls.
 Without that service, the fallback supports only the default audio devices.
 Multichannel Linux devices expose separate channel pairs (1/2, 3/4, etc.); a final
@@ -15,9 +20,9 @@ single channel uses mono conversion. Device volume applies to the physical sink.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Audio In | [Audio](../../user/en/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/en/rates.md#audio) | Always |
 | Device | [Editor](../../user/en/reference-tables.md) | Available output devices | — | Default device | — | — | Always |
-| Device volume | [Editor](../../user/en/reference-tables.md) | 0–100 % | — | Current device volume | [%](../../user/en/units.md) | — | Windows or Linux output |
-| Link volume keys | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Windows or Linux output |
-| Signal | [Editor](../../user/en/reference-tables.md) | Level display | — | — | — | — | Windows or Linux output |
+| Device volume | [Editor](../../user/en/reference-tables.md) | 0–100 % | — | Current device volume | [%](../../user/en/units.md) | — | Windows, Linux or macOS output |
+| Link volume keys | [Editor](../../user/en/reference-tables.md) | Off / On | — | Off | — | — | Windows, Linux or macOS output |
+| Signal | [Editor](../../user/en/reference-tables.md) | Level display | — | — | — | — | Windows, Linux or macOS output |
 
 ## Outputs
 

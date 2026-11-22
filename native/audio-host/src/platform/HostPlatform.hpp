@@ -1,6 +1,11 @@
 #pragma once
 #if defined(_WIN32) && !defined(EASYKNACK_PORTABLE_HOST)
 #include "WindowsHostServices.hpp"
+#elif defined(__APPLE__)
+#include "MacHost.hpp"
+namespace easyknack::platform {
+inline HostServices createHostServices(AudioEngine& engine,bool nullDevice){return createMacHostServices(engine,nullDevice);}
+}
 #else
 #include "DefaultAudio.hpp"
 #include "KeyboardMidi.hpp"

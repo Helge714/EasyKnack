@@ -35,11 +35,20 @@ final class NativeBuildSettings {
         var result = new ArrayList<String>();
         result.add("-std=c++" + values.getProperty("cpp.standard"));
         result.addAll(arguments("plugin.compile.flags"));
+        result.addAll(platform.compilerArchitectureFlags());
+        if(platform.os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)
+            result.addAll(arguments("macos.plugin.compile.flags"));
         return result;
     }
 
     List<String> link() {
-        return arguments(platform.windows()?"plugin.link.flags":platform.policyKey()+".plugin.link.flags");
+        var result=new ArrayList<>(arguments(platform.windows()?"plugin.link.flags":platform.policyKey()+".plugin.link.flags"));
+        result.addAll(platform.compilerArchitectureFlags());return result;
+    }
+    List<String> sourceArguments(Path source) {
+        return platform.os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS
+                && source.getFileName().toString().equals("MacPlatform.mm")
+                ? List.of("-x", "objective-c++", "-fobjc-arc") : List.of();
     }
     List<String> libraries() {
         var result=new ArrayList<>(arguments(platform.policyKey()+".libraries").stream().map(name -> "-l" + name).toList());

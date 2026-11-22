@@ -5,7 +5,9 @@
 #define MA_NO_NODE_GRAPH
 #define MA_NO_ENGINE
 #define MA_NO_GENERATION
+#ifndef __APPLE__
 #define MINIAUDIO_IMPLEMENTATION
+#endif
 #include "miniaudio.h"
 #include "audio/AudioFileDecode.hpp"
 #include "AudioGraph.hpp"
@@ -54,7 +56,7 @@ int main(int argc, char** argv) {
             std::string line;
             try {
                 line=readLine(client,commands);
-                volume.poll();
+                backend.poll();midi->poll();volume.poll();
                 if(line.rfind("VOLUME ",0)==0) {
                     std::istringstream args(line.substr(7)); std::string token,extra; float scalar;
                     if(!(args>>token>>scalar) || args>>extra || !std::isfinite(scalar) || scalar<0 || scalar>1)

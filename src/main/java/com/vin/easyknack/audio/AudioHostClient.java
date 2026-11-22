@@ -17,6 +17,8 @@ public final class AudioHostClient implements AutoCloseable {
     public void start(Path executable, boolean nullDevice) throws Exception {
         String token = UUID.randomUUID().toString();
         var builder = new ProcessBuilder(executable.toAbsolutePath().toString(), token);
+        if(com.vin.easyknack.NativePlatform.current().os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)
+            builder.environment().put("EASYKNACK_NATIVE_LIBDIR",com.vin.easyknack.InstallationPaths.audioHost().getParent().toString());
         if (nullDevice) builder.command().add("--null");
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         process = builder.start();

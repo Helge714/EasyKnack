@@ -1,5 +1,10 @@
 # Audioaufnahme (Audio Recorder)
 
+Unter macOS verwendet MP3 wie unter Linux die mitgelieferte austauschbare
+LAME-Bibliothek: 128 kbit/s Mono oder 192 kbit/s Stereo mit abschließenden
+Gapless-Metadaten für Verzögerung und Padding. Auch lokal gebaute Bake-/Plugin-Hosts
+verwenden die mitgelieferte Bibliothek.
+
 ## Übersicht
 
 Nimmt triggergesteuerte Audiodurchläufe als WAV- oder MP3-Dateien auf.

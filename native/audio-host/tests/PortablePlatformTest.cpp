@@ -5,14 +5,19 @@
 #define MA_NO_NODE_GRAPH
 #define MA_NO_ENGINE
 #define MA_NO_GENERATION
+#ifndef __APPLE__
 #define MINIAUDIO_IMPLEMENTATION
+#endif
 #include "miniaudio.h"
 #include "../src/platform/HostPlatform.hpp"
+#include "../src/platform/KeyboardMidi.hpp"
+#include "../src/AudioGraph.hpp"
 #include "../src/platform/SharedLibrary.hpp"
 #include <thread>
 #include <iostream>
 
-static void require(bool value) { if (!value) throw std::runtime_error("Portable platform assertion failed"); }
+static void requireAt(bool value,int line) { if (!value) throw std::runtime_error("Portable platform assertion failed at "+std::to_string(line)); }
+#define require(value) requireAt((value),__LINE__)
 int main(int argc, char** argv) {
     using namespace easyknack;
     using namespace easyknack::platform;

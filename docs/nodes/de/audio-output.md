@@ -4,6 +4,11 @@
 
 Sendet Audio an ein Ausgabegerät.
 
+macOS verwendet Core Audio mit wählbaren Hardware-Kanalpaaren und mehreren Geräten.
+Lautstärke ist nur regelbar, wenn das Gerät Hardware-Lautstärke bereitstellt.
+Gekoppelte Regler folgen Änderungen der Desktop-Standardlautstärke proportional;
+globale Tasten werden nicht abgefangen. Windows-ASIO-Treiber werden nicht verwendet.
+
 Linux verwendet PulseAudio oder PipeWire-Pulse für Gerätewahl und Lautstärke.
 Ohne diesen Dienst unterstützt der Rückfallpfad nur die Standard-Audiogeräte.
 Mehrkanalgeräte bieten unter Linux einzelne Kanalpaare (1/2, 3/4 usw.); ein letzter
@@ -15,9 +20,9 @@ einzelner Kanal wird mono bedient. Gerätelautstärke gilt für den gesamten Aus
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Audio-Eingang (Audio In) | [Audio](../../user/de/data-types.md#audio) | — | ±∞ | — | — | [Audio](../../user/de/rates.md#audio) | Immer |
 | Gerät (Device) | [Editor](../../user/de/reference-tables.md) | Verfügbare Ausgabegeräte | — | Standardgerät | — | — | Immer |
-| Gerätelautstärke (Device volume) | [Editor](../../user/de/reference-tables.md) | 0–100 % | — | Aktuelle Gerätelautstärke | [%](../../user/de/units.md) | — | Windows- oder Linux-Ausgang |
-| Lautstärketasten koppeln (Link volume keys) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Windows- oder Linux-Ausgang |
-| Signal | [Editor](../../user/de/reference-tables.md) | Pegelanzeige | — | — | — | — | Windows- oder Linux-Ausgang |
+| Gerätelautstärke (Device volume) | [Editor](../../user/de/reference-tables.md) | 0–100 % | — | Aktuelle Gerätelautstärke | [%](../../user/de/units.md) | — | Windows-, Linux- oder macOS-Ausgang |
+| Lautstärketasten koppeln (Link volume keys) | [Editor](../../user/de/reference-tables.md) | Aus / Ein | — | Aus | — | — | Windows-, Linux- oder macOS-Ausgang |
+| Signal | [Editor](../../user/de/reference-tables.md) | Pegelanzeige | — | — | — | — | Windows-, Linux- oder macOS-Ausgang |
 
 ## Ausgänge
 

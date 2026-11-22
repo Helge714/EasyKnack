@@ -177,12 +177,15 @@ public final class PluginManager {
             generateRegistry(sourceRoot.resolve("nodes"), generated, all);
             run(List.of(cxx, "--version"), work, log);
             var nativeSources = new ArrayList<Path>();nativeSources.add(sourceRoot.resolve("main.cpp"));
+            if(com.vin.easyknack.NativePlatform.current().os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)
+                nativeSources.add(sourceRoot.resolve("platform/MacPlatform.mm"));
             for (var source : files(sourceRoot.resolve("nodes"))) if (source.toString().endsWith(".cpp")) nativeSources.add(source);
             var objects = new ArrayList<String>();
             var nativeBuild = new NativeBuildSettings(sdkRoot);
             for (int i=0;i<nativeSources.size();i++) {
                 var source=nativeSources.get(i);var object=work.resolve("host-"+i+".o");objects.add(object.toString());
                 command = new ArrayList<>(List.of(cxx));command.addAll(nativeBuild.compile());
+                command.addAll(nativeBuild.sourceArguments(source));
                 command.addAll(List.of("-I",sdkRoot.resolve("third_party").toString(),
                         "-I",sourceRoot.toString(),"-I",generated.toString(),"-c",source.toString(),"-o",object.toString()));
                 String stage="C++ "+(i+1)+"/"+nativeSources.size()+": "+sourceRoot.relativize(source)+(i==0?" + nodes":"");

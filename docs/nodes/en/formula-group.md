@@ -1,5 +1,9 @@
 # Formula Group
 
+On macOS, native optimization requires Apple's Command Line Tools or Xcode. The
+interpreter remains available without a native compiler. Build errors provide a
+log; after installing the tools, retry native optimization.
+
 ## Overview
 
 Computes custom formulas through a configurable group interface.

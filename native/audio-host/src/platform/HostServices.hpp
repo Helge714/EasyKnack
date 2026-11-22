@@ -15,6 +15,7 @@ public:
     virtual std::string bufferDescription() const=0;
     virtual void beginPeakRead() noexcept {}
     virtual void endPeakRead() noexcept {}
+    virtual void poll() {}
 };
 class HostMidiSource : public MidiSource {
 public:
@@ -28,6 +29,7 @@ public:
     virtual void panic() noexcept=0;
     virtual void keyboardEvent(std::uint32_t) noexcept=0;
     virtual std::string status() const=0;
+    virtual void poll() {}
 };
 class DeviceVolumeService {
 public:
