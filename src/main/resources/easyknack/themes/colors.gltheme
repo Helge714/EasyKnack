@@ -32,6 +32,7 @@ node.border=#00000000
 @COLOR easyknack.diagnostics.peak=#E6BC6A
 @COLOR easyknack.diagnostics.error=#EF7272
 @COLOR easyknack.analysis.triggerLow=#F0AA41
+@COLOR easyknack.analysis.curve=#94DEC9
 @COLOR easyknack.analysis.triggerHigh=#50C3F0
 @COLOR easyknack.signal.HISTORY=${easyknack.signal.AUDIO}
 @COLOR easyknack.signal.ANALYSIS=#E7C84B

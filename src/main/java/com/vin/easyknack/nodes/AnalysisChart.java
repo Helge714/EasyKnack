@@ -138,7 +138,7 @@ public final class AnalysisChart {
         }
         p.clip(left,top,w,h);
         for(var segment:geometry(s,Math.max(1,(int)Math.ceil(w*pixelScale))))
-            p.line(left+segment.x1()*w,top+h*s.yPosition(segment.y1()),left+segment.x2()*w,top+h*s.yPosition(segment.y2()),colors.curve(),1.3f);
+            p.line(left+segment.x1()*w,top+h*s.yPosition(segment.y1()),left+segment.x2()*w,top+h*s.yPosition(segment.y2()),colors.curve(),2f);
         if(s.triggers())for(int i=0;i<2;i++){
             double v=i==0?s.low():s.high(),y=top+h*s.yPosition(v);
             if(y<top||y>top+h)continue;Color color=i==0?colors.low():colors.high();

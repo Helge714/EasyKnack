@@ -2,6 +2,15 @@
 
 ## Unreleased - 0.4.0
 
+- Use dedicated, contrasting analysis-trace colors in Mint/Amber dark and light
+  themes and thicker trace strokes; preserve signal values and display scaling.
+- Prefer opaque themed Linux dialogs through the external Core to avoid the
+  translucent compositor path; target-side flicker acceptance remains pending.
+
+- Keep standalone native diagnostics compatible with the original Linux
+  application JAR; validate them against the exact packaged dependencies before
+  accepting full and update archives.
+
 - Replace the Linux test 1 download with a complete experimental test 2 package
   containing the renderer-cache fix and improved diagnostics. Retain matching
   and historical source/license materials with the replacement distribution.

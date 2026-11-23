@@ -166,7 +166,8 @@ public record AnalysisEditor(boolean correlation,boolean resource) implements Ed
             var style=getGLTheme().sliderStyle();int w=(int)getWidth(),h=(int)Math.max(1,getHeight()-(preview?0:22));
             c.fillUIRoundRect(0,0,w,getHeight(),style.cornerRadius(),style.background());
             var font=getGLFont(getGLTheme().labelStyle().font());
-            var palette=new AnalysisChart.Palette(style.borderColor(),getGLTheme().labelStyle().textColor(),style.progressLightColor(),
+            var palette=new AnalysisChart.Palette(style.borderColor(),getGLTheme().labelStyle().textColor(),
+                getGLTheme().values().getColor("easyknack.analysis.curve",com.vin.easyknack.ui.ApplicationTheme.current().color("analysis.curve")),
                 getGLTheme().values().getColor("easyknack.analysis.triggerLow",com.vin.easyknack.ui.ApplicationTheme.current().color("analysis.triggerLow")),
                 getGLTheme().values().getColor("easyknack.analysis.triggerHigh",com.vin.easyknack.ui.ApplicationTheme.current().color("analysis.triggerHigh")));
             var old=c.getStroke();

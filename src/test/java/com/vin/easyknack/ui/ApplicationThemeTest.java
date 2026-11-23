@@ -57,6 +57,13 @@ class ApplicationThemeTest {
             assertTrue(contrast(values.getColor("nodeEditor.selectedConnectionBorder"),values.getColor("nodeEditor.background"))>=3,choice.toString());
         }
     }
+    @Test void analysisTraceIsReadableInEveryBundledTheme(){
+        for(var choice:BundledThemes.available()){
+            var selected=ApplicationTheme.loadSelection(choice.id());
+            assertTrue(contrast(selected.color("analysis.curve"),selected.theme().sliderStyle().background())>=3,
+                choice.toString()+": analysis trace must contrast with its actual plot background");
+        }
+    }
     @Test void lightWorkspaceAndCurveHaveReadableContrast(){
         var theme=ApplicationTheme.loadSelection("classpath:/easyknack-light.gltheme").theme();
         assertTrue(contrast(theme.labelStyle().textColor(),theme.values().getColor("node.background"))>=7);
