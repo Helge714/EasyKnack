@@ -48,13 +48,19 @@ final class NodeDocumentation {
     }
     static void attach(GLNode node,String id){
         identities.put(node,id);
-        var menu=node.getContextMenu();menu.addSeparator();
-        var item=menu.addItem(AppText.text("help.nodeDocumentation"),event->{
-            try{String page=reference(id,ApplicationSettings.documentationLocale());if(page!=null)open(node,page);}
-            catch(IOException failure){HelpMenu.show(node,"help.nodeDocumentation",failure.getMessage());}
-        });
-        try{item.setEnabled(reference(id,ApplicationSettings.documentationLocale())!=null);}
-        catch(IOException failure){item.setEnabled(false);}
+        // GLSwing creates its built-in menu items on first access, before the node is
+        // parented. Use the app language explicitly so GLSwing's English default does
+        // not leak into items it never refreshes, such as Reset name.
+        node.setGLLocalizer(com.vingame.glswing.ui.GLLocalizer.forLocale(ApplicationSettings.locale()));
+        try{
+            var menu=node.getContextMenu();menu.addSeparator();
+            var item=menu.addItem(AppText.text("help.nodeDocumentation"),event->{
+                try{String page=reference(id,ApplicationSettings.documentationLocale());if(page!=null)open(node,page);}
+                catch(IOException failure){HelpMenu.show(node,"help.nodeDocumentation",failure.getMessage());}
+            });
+            try{item.setEnabled(reference(id,ApplicationSettings.documentationLocale())!=null);}
+            catch(IOException failure){item.setEnabled(false);}
+        }finally{node.clearGLLocalizer();}
     }
     static void openIndex(GLContainer owner){open(owner,"nodes/"+language(ApplicationSettings.documentationLocale())+"/index.md");}
     static String activeReference(GLNode active,Locale locale)throws IOException{

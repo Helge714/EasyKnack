@@ -19,10 +19,10 @@ public final class KeyboardMidiEditor implements Editor {
     public static final class Keyboard extends GLButton {
         private final Map<Integer,Integer> held=new LinkedHashMap<>();
         private int transpose;
-        public Keyboard(){super("Click to play");setToolTipText("Click to capture keyboard input. A W S E D F T G Y/Z H U J K O L P play C4 upward. Escape or click elsewhere to leave. Fixed velocity: 100/127.");}
+        public Keyboard(){super(com.vin.easyknack.i18n.AppText.literal("Click to play"));setToolTipText(com.vin.easyknack.i18n.AppText.literal("Click to capture keyboard input. A W S E D F T G Y/Z H U J K O L P play C4 upward. Escape or click elsewhere to leave. Fixed velocity: 100/127."));}
         public void setTranspose(int value){if(value!=transpose){releaseNotes();transpose=value;}}
         @Override public boolean isKeyboardInputExclusive(){return true;}
-        @Override protected void controlFocusChanged(boolean focused){super.controlFocusChanged(focused);if(!focused)releaseNotes();setText(focused?"Playing · Esc to leave":"Click to play");invalidateRecording();}
+        @Override protected void controlFocusChanged(boolean focused){super.controlFocusChanged(focused);if(!focused)releaseNotes();setText(focused?com.vin.easyknack.i18n.AppText.literal("Playing · Esc to leave"):com.vin.easyknack.i18n.AppText.literal("Click to play"));invalidateRecording();}
         @Override protected void controlEnabledChanged(boolean enabled){if(!enabled)releaseNotes();}
         @Override protected void detached(GLParent parent){releaseNotes();super.detached(parent);}
         private void releaseNotes(){for(int note:held.values())MidiDevices.keyboardEvent(0x80|(note<<8));held.clear();}

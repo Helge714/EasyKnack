@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.3.1
 
+- Complete German translations for node context menus, MIDI keyboard controls,
+  analysis trigger-line actions, editor-template labels and revised Envelope/MIDI
+  tooltips.
 - Auto-arrange example graphs and inner groups, centering their saved cameras.
 - Replace the bundled examples with sixteen self-contained learning projects covering
   basics, buffers, MIDI, Instance/Spectral/Formula Groups and delayed feedback.
