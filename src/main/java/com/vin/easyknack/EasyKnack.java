@@ -10,6 +10,7 @@ public final class EasyKnack {
     private EasyKnack() { }
 
     public static void main(String[] args) {
+        GraphicsDiagnostics.startIfEnabled();
         final DocumentLaunch launches;
         try {
             launches = DocumentLaunch.start(LaunchArguments.decode(args));

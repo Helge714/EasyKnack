@@ -11,6 +11,18 @@ Windows für Linux kompiliert. Es ist noch kein unter Linux geprüfter Release.
 4. `./Start-EasyKnack.sh` ausführen. Zum Mitschreiben von Startfehlern:
    `./Start-EasyKnack.sh > linux-start.txt 2>&1`.
 
+Für den Bildschirmwechsel-Test stattdessen `./Start-Graphics-Test.sh` starten.
+Das Fenster mehrmals zwischen den Monitoren verschieben, Größe ändern sowie die
+Dokumentation öffnen und scrollen. Anschließend normal schließen und die erzeugte
+`graphics-diagnostics-*.txt` zusammen mit `linux-diagnostics.txt` weitergeben.
+Der Grafiklog enthält Prozess-, Fenster- und OpenGL-Kontextkennungen, Monitore,
+Skalierung und Grafiktreiberangaben. Er wird lokal gespeichert und nicht versendet.
+
+Zum gezielten Vergleich des Doku-Flackerns kann man danach
+`./Start-Graphics-Test.sh --translucent-dialogs` ausführen. Dies aktiviert nur für
+diesen Start den bisherigen transparenten Dialogpfad. Ohne diese Option nutzt
+Linux undurchsichtige Dialoge. Beim normalen Start ist der Grafik-Diagnosemodus aus.
+
 Es wird nichts installiert. Eine grafische Linux-Sitzung mit X11 beziehungsweise
 XWayland, funktionierendem OpenGL 3 und den üblichen X11-/OpenGL-/Fontbibliotheken
 wird benötigt. Der Audiohost benötigt glibc 2.28 oder neuer; Java und Grafiktreiber
