@@ -39,7 +39,9 @@ class NativeCompilationCheck {
               if(output[0]!=6){std::cerr<<"Formula result mismatch: "<<output[0]<<std::endl;return 4;}}
             """.formatted(library));
         var command=new ArrayList<>(List.of(compiler.toString(),"-std=c++17","-O2","-I",sdk.resolve("src").toString(),source.toString(),"-o",executable.toString()));
-        command.addAll(platform.compilerArchitectureFlags());
+        // Keep this standalone diagnostic compatible with the original Linux JAR.
+        if(platform.os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)
+            command.addAll(List.of("-arch",platform.architecture()));
         if(platform.windows())command.add("-static");else if(platform.os()==com.vin.easyknack.NativePlatform.OperatingSystem.LINUX)command.add("-ldl");
         run(command,root.resolve("formula-check-build.log"));run(List.of(executable.toString()),root.resolve("formula-check-run.log"));
         System.out.println("PASS: Formula native build, module loading, result and cache");

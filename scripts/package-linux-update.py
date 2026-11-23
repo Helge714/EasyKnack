@@ -10,6 +10,8 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tarfile
 import zipfile
 
@@ -104,11 +106,13 @@ def package(args):
         with path.open('rb') as stream:
             digest = hashlib.file_digest(stream, 'sha256').hexdigest()
         Path(str(path) + '.sha256').write_text(digest + '  ' + path.name + '\n')
+    subprocess.run([sys.executable, str(Path(__file__).with_name('validate-linux-diagnostics.py')),
+                    '--archive', str(archive_path), '--javac', str(args.javac)], check=True)
     print('Complete Linux test 2 package verified:', archive_path, flush=True)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('base', 'update', 'core-inputs', 'legacy-materials', 'output'):
+    for name in ('base', 'update', 'core-inputs', 'legacy-materials', 'output', 'javac'):
         parser.add_argument('--' + name, type=Path, required=True)
     package(parser.parse_args())

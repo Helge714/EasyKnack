@@ -136,6 +136,8 @@ Documentation-only navigation changes do not need a Maven/native rebuild.
   `scripts/package-linux-update.py` assembles a complete archive from an immutable
   base and reviewed UI update, verifies unchanged file hashes and supplies the
   replacement dependency sources plus retained base source materials.
+  `scripts/validate-linux-diagnostics.py` compiles diagnostics against the exact
+  application/dependency JARs inside an archive to reject mixed API generations.
 
 ## Core navigation
 

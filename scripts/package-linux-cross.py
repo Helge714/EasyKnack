@@ -208,6 +208,9 @@ def package(args):
         checksum = digest(archive_path)
         archive_path.with_suffix(archive_path.suffix + ".sha256").write_text(checksum + "  " + archive_path.name + "\n", encoding="ascii")
         subprocess.run([sys.executable, str(ROOT / "scripts/verify-linux-package.py"), str(archive_path)], check=True)
+        javac = java.with_name("javac.exe" if java.suffix.lower() == ".exe" else "javac")
+        subprocess.run([sys.executable, str(ROOT / "scripts/validate-linux-diagnostics.py"),
+                        "--archive", str(archive_path), "--javac", str(javac)], check=True)
         print("Linux test package: " + str(archive_path.resolve()))
         print("SHA256: " + checksum)
 

@@ -15,6 +15,9 @@ trap 'exit 130' HUP INT TERM
   uname -a
   if [ -r /etc/os-release ]; then cat /etc/os-release; fi
   printf 'DISPLAY=%s WAYLAND_DISPLAY=%s\n' "${DISPLAY:-}" "${WAYLAND_DISPLAY:-}"
+  printf 'XDG_SESSION_TYPE=%s XDG_CURRENT_DESKTOP=%s\n' "${XDG_SESSION_TYPE:-}" "${XDG_CURRENT_DESKTOP:-}"
+  echo '--- Displays (optional X11/XWayland information) ---'
+  if command -v xrandr >/dev/null 2>&1; then xrandr --listmonitors 2>&1 || true; fi
   echo '--- Java ---'
   "$base/runtime/bin/java" -version || status=1
   "$base/runtime/bin/javac" -version || status=1

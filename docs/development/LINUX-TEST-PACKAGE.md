@@ -73,6 +73,31 @@ libraries, examples, sources and SHA256. Rerun independently with
 
 ### Renderer changes and compiler diagnostics
 
+Test 2's diagnostic source called a method absent from its retained application
+JAR and therefore failed before reaching the native compiler. The standalone
+diagnostic now uses the original platform API. `validate-linux-diagnostics.py`
+compiles it against the exact application/dependency JARs extracted from the
+finished archive; both packaging paths require this check. The update packager
+also requires `--javac /path/to/javac` (or `javac.exe` on Windows).
+
+The second report confirms startup/playback is possible but still reports visible
+window recreation on monitor changes. It contains no graphics exception or display
+configuration trace. Collect optional JOGL diagnostics from an extracted package:
+
+```sh
+JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djogl.debug.GLCanvas=true" ./Start-EasyKnack.sh > graphics-diagnostics.txt 2>&1
+```
+
+Move the window between displays, then close it normally and retain that output.
+`Check-Linux.sh` also records session type and optional XRandR monitor geometry.
+Do not label the monitor issue fixed from the successful renderer-cache test.
+
+External Core defaults themed Linux dialogs to an opaque Canvas instead of the
+translucent GLJPanel/compositor path as a flicker mitigation. Platform-policy and
+owned/nested opaque themed-dialog tests pass locally; actual XWayland acceptance
+remains pending. `glswing.dialog.translucent=true` can explicitly restore the
+translucent path for comparison.
+
 The first EndeavourOS/Wayland report passed desktop audio capture/routing and
 virtual ALSA MIDI tests, but exposed cached Core recordings belonging to a previous
 renderer. External GLSwing commit `0530106` rebuilds recordings on renderer changes
