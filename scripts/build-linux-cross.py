@@ -47,10 +47,11 @@ def build(zig, destination, contracts):
         lame_objects.append(str(output))
     subprocess.run([str(zig),"cc","-target",TARGET,"-shared","-Wl,-soname,libmp3lame.so.0",
                     *lame_objects,"-lm","-o",str(destination/"libmp3lame.so.0")],check=True)
-    def run(arguments, name):
+    def run(arguments, name, assertions=False):
         print("Building Linux " + name, flush=True)
         with (destination / (name + ".log")).open("w", encoding="utf-8") as log:
-            process = subprocess.run(command + arguments, stdout=log, stderr=subprocess.STDOUT)
+            # Zig's optimized C++ mode defines NDEBUG. Test assertions must run.
+            process = subprocess.run(command + (["-UNDEBUG"] if assertions else []) + arguments, stdout=log, stderr=subprocess.STDOUT)
         if process.returncode:
             print((destination / (name + ".log")).read_text(encoding="utf-8", errors="replace"))
             raise RuntimeError("Cross compilation failed: " + name)
@@ -67,7 +68,7 @@ def build(zig, destination, contracts):
                         ("CommandReaderTest", False), ("MidiPortBankTest", False), ("LameRecordingTest", False),
                         ("LinuxAudioTest", True), ("LinuxDesktopTest", True)]:
         run([str(native / "tests" / (name + ".cpp")), *(objects if graph else []),
-             "-o", str(tests / name), *libraries], name)
+             "-o", str(tests / name), *libraries], name, assertions=True)
     run(["-shared", "-fPIC", str(native / "tests/PlatformLibraryFixture.cpp"),
          "-o", str(tests / "libplatform-fixture.so"), *libraries], "platform-library")
     (destination / "cross-build.json").write_text(json.dumps({

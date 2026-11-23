@@ -8,5 +8,5 @@ if [ "${1:-}" = '--translucent-dialogs' ]; then
   shift
 fi
 export JAVA_TOOL_OPTIONS
-printf 'Graphics test: move the window between displays, open documentation, then close EasyKnack.\nLog: %s\n' "$log"
+printf 'Close any running EasyKnack instance before this test.\nGraphics test: move the window between displays, open documentation, then close EasyKnack.\nLog: %s\n' "$log"
 "$base/Start-EasyKnack.sh" "$@" > "$log" 2>&1

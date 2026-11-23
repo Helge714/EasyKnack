@@ -105,10 +105,12 @@ public final class GraphicsDiagnostics implements AutoCloseable {
         output.println("[graphics " + Instant.now() + " pid=" + ProcessHandle.current().pid()
                 + " uptimeMs=" + ManagementFactory.getRuntimeMXBean().getUptime() + "] " + event + " " + detail);
     }
-    @Override public synchronized void close() {
-        if (closed) return;
-        log("session.trace-closed", "");
-        closed = true;
+    @Override public void close() {
+        synchronized (this) {
+            if (closed) return;
+            log("session.trace-closed", "");
+            closed = true;
+        }
         Toolkit.getDefaultToolkit().removeAWTEventListener(events);
         EventQueue.invokeLater(() -> { moves.values().forEach(Timer::stop); moves.clear(); });
     }

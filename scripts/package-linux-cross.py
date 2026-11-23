@@ -52,6 +52,8 @@ def sources():
 
 
 def package(args):
+    if args.test_revision < 1:
+        raise ValueError('Test revision must be positive')
     if args.output.exists():
         raise ValueError("Choose a fresh output directory; packages are never overwritten")
     runtime = json.loads(args.runtime_metadata.read_text(encoding="utf-8-sig"))
@@ -63,6 +65,14 @@ def package(args):
     if digest(args.runtime_sources) != runtime["source"]["checksum"]:
         raise ValueError("Runtime source checksum mismatch")
     compiler=json.loads(args.compiler_metadata.read_text(encoding="utf-8-sig"))
+    with zipfile.ZipFile(args.materials) as materials:
+        with zipfile.ZipFile(io.BytesIO(materials.read('sources/glswing-build-inputs.zip'))) as inputs, zipfile.ZipFile(args.glswing_sources) as supplied:
+            for name in supplied.namelist():
+                if name.endswith('/') or name.startswith('META-INF/'):
+                    continue
+                candidates = [p for p in inputs.namelist() if p.endswith('/src/main/java/' + name) or p.endswith('/src/main/resources/' + name)]
+                if len(candidates) != 1 or supplied.read(name) != inputs.read(candidates[0]):
+                    raise ValueError('Core source/build materials disagree: ' + name)
     if "zig-x86_64-linux-0.15.2.tar.xz" not in compiler["tarball"] or digest(args.compiler)!=compiler["shasum"]:
         raise ValueError("Linux C++ compiler identity/checksum mismatch")
     namespace = {"m": "http://maven.apache.org/POM/4.0.0"}
@@ -121,6 +131,7 @@ def package(args):
         put(ROOT / "scripts/linux/clang++", "tools/zig/bin/clang++")
         for source, name in [("start-easyknack.sh", "Start-EasyKnack.sh"), ("check-linux.sh", "Check-Linux.sh")]:
             put(ROOT / "scripts/linux" / source, name)
+        put(ROOT / 'scripts/linux/start-graphics-test.sh', 'Start-Graphics-Test.sh')
         (stage / "application-jar.txt").write_text(jar_name + "\n", encoding="utf-8", newline="\n")
         (stage / "installation.properties").write_text("format=1\nplatform=linux-x86_64\njava=bundled\n", encoding="ascii")
         put(ROOT / "LICENSE", "LICENSE")
@@ -158,14 +169,17 @@ def package(args):
             archive.writestr("source-snapshot.json", json.dumps({"commit": commit, "files": snapshot}, indent=2))
         put(args.glswing_sources, "sources/" + args.glswing_sources.name)
         put(args.runtime_sources, "sources/" + runtime["source"]["name"])
+        put(args.materials, 'sources/' + args.materials.name)
         metadata = {"version": version, "sourceCommit": commit, "buildIdentity": identity,
                     "platform": "linux-x86_64", "linuxExecution": "not performed; run Check-Linux.sh on target",
                     "runtime": runtime, "compiler":compiler, "libraries": selected,
-                    "glswingSourceSha256": digest(args.glswing_sources)}
+                    "glswingSourceSha256": digest(args.glswing_sources),
+                    "testRevision": args.test_revision, "sourceMaterialsSha256": digest(args.materials)}
         (stage / "package-build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         if snapshot != sources():
             raise RuntimeError("Sources changed while packaging; build again from a stable source state")
-        archive_path = args.output / ("EasyKnack-" + version + "-linux-x86_64-test.tar.gz")
+        suffix = '' if args.test_revision == 1 else '-' + str(args.test_revision)
+        archive_path = args.output / ("EasyKnack-" + version + "-linux-x86_64-test" + suffix + ".tar.gz")
         written=set()
         def clean(info):
             info.uid = info.gid = 0
@@ -174,7 +188,7 @@ def package(args):
             info.mode = 0o755 if info.isdir() or relative.endswith(".sh") or relative in ("native/easyknack-audio-host","tools/zig/bin/clang++") or relative.startswith("tests/") and "." not in relative.rsplit("/",1)[-1] else 0o644
             written.add(info.name.rstrip("/"))
             return info
-        with tarfile.open(archive_path, "w:gz") as output:
+        with tarfile.open(archive_path, "w:gz", compresslevel=3) as output:
             output.add(stage, arcname="EasyKnack", filter=clean)
             for source_archive,prefix,elfs in [(args.runtime,"EasyKnack/runtime",{"bin/java","bin/javac"}),
                                                (args.compiler,"EasyKnack/tools/zig",{"zig"})]:
@@ -219,4 +233,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("java-build", "native", "runtime", "runtime-sources", "runtime-metadata", "compiler", "compiler-metadata", "zig-directory", "java", "glswing-sources", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument('--materials', type=Path, required=True)
+    parser.add_argument('--test-revision', type=int, default=1)
     package(parser.parse_args())

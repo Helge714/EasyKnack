@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.4.0
 
+- Add an optional Linux graphics-test launcher with process, window, OpenGL
+  context and display-scale traces; normal launches do not enable these listeners.
+- Build optimized Linux C++ test executables with assertions enabled. Replace
+  assertion-dependent Formula library loading with explicit diagnostic checks.
+
 - Use dedicated, contrasting analysis-trace colors in Mint/Amber dark and light
   themes and thicker trace strokes; preserve signal values and display scaling.
 - Prefer opaque themed Linux dialogs through the external Core to avoid the

@@ -1,6 +1,24 @@
 # Linux test package from Windows
 
-The current public package is
+For test 3, run `./Check-Linux.sh` followed by `./Start-Graphics-Test.sh`.
+The graphics launcher enables process/window/context identities, display geometry,
+scaling, renderer/capability information and JOGL Canvas debug output. Move between
+monitors, open/scroll documentation, then close normally. Retain
+`graphics-diagnostics-*.txt` and `linux-diagnostics.txt`. Optional
+`./Start-Graphics-Test.sh --translucent-dialogs` restores the old translucent dialog
+path for a controlled comparison. `Start-EasyKnack.sh` retains normal logging.
+
+Zig 0.15.2 defines NDEBUG in optimized C++ builds. Test 1's Formula probe put the
+library-open call inside assert, so optimization removed that call and left a null
+sample function pointer. Explicit checks now preserve all side effects regardless
+of NDEBUG. Cross-built C++ test executables additionally use `-UNDEBUG`; production
+host optimization is unchanged. Preprocessor verification records this distinction.
+
+Full packaging now requires `--materials <matching-source-supplement.zip>` and
+accepts `--test-revision 3`. The supplement's Core build inputs are checked against
+the supplied Core source JAR, and the supplement is copied into the final archive.
+
+The earlier complete package is
 [Linux experimental test 2](https://github.com/Helge714/EasyKnack/releases/tag/v0.4.0-linux-experimental.2).
 It is a complete archive containing the renderer-cache fix and improved compiler
 diagnostics; no separate UI patch is needed. It reuses test 1's unchanged native,

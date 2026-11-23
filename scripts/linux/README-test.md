@@ -11,7 +11,8 @@ Windows für Linux kompiliert. Es ist noch kein unter Linux geprüfter Release.
 4. `./Start-EasyKnack.sh` ausführen. Zum Mitschreiben von Startfehlern:
    `./Start-EasyKnack.sh > linux-start.txt 2>&1`.
 
-Für den Bildschirmwechsel-Test stattdessen `./Start-Graphics-Test.sh` starten.
+Für den Bildschirmwechsel-Test vorher alle EasyKnack-Fenster schließen und
+stattdessen `./Start-Graphics-Test.sh` starten.
 Das Fenster mehrmals zwischen den Monitoren verschieben, Größe ändern sowie die
 Dokumentation öffnen und scrollen. Anschließend normal schließen und die erzeugte
 `graphics-diagnostics-*.txt` zusammen mit `linux-diagnostics.txt` weitergeben.

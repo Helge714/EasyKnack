@@ -21,6 +21,12 @@ replacement GLSwing sources/build inputs and updated diagnostic scripts. The ful
 test 2 program archive includes this supplement as well. See the test 2 release
 for the current downloads; test 1's historical Git tag remains available.
 
+Linux test 3 supplies fresh Java/native binaries, the exact current Core build
+inputs and an independently checked Core reconstruction, alongside matching
+OpenJDK/Temurin/LAME materials. The source supplement is included in the main
+archive and offered separately. Cross-build and local graphics evidence do not
+establish target-side Linux hardware acceptance.
+
 | Component | License / distribution notes |
 |---|---|
 | EasyKnack Java application, native host and original SDK code | GPL-3.0-only; provide corresponding source and build scripts for the distributed version. |
