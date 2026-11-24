@@ -13,6 +13,11 @@ builds reuse `target/source-materials` after checking every SHA-256. The lock fi
 it is not silently substituted by a newer snapshot. GLSwing remains an external
 Maven dependency.
 
+For ordinary application builds, run `python scripts/bootstrap-glswing.py` once;
+the public SDK includes the matching source JAR. The large source-materials ZIP
+is distribution evidence, not a prerequisite for compiling a checkout. Platform
+packaging obtains Core build sources from the public hash-pinned source ZIP.
+
 ## What is reproducible
 
 For identical input bytes and the same ZIP implementation, source entries have

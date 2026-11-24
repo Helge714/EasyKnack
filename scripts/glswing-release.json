@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "sdk": {
+    "file": "GLSwing-0.2.0-SDK.zip",
+    "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-SDK.zip",
+    "sha256": "61fbd1cbfbba62e3e3c11cc7a742dc3b0c334a2195bb8c90c24d5b0421a2fbfb"
+  },
+  "source": {
+    "file": "GLSwing-0.2.0-source.zip",
+    "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-source.zip",
+    "sha256": "5e171e4304090a74b1456cb2cd604d3b61555121324af094f79be5a9132d647f"
+  }
+}
