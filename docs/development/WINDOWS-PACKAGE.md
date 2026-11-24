@@ -77,11 +77,13 @@ installer-owned files.
 Signing and clean-machine upgrade/uninstall testing remain separate.
 
 Before copying application files, EXE setup runs an embedded Java prerequisite
-helper; standalone MSI runs the same helper before `InstallValidate` (and before removal of an older product). Both share
+helper; standalone MSI runs the same helper in check-only mode before `InstallValidate` (and before removal of an older product). Both share
 `JavaPrerequisite.ps1` with the application launcher: Windows x64 JDK 25, compiler
-presence and successful `javac -version` validation. A missing compatible JDK offers
-folder selection or an explicitly approved external JDK installation; cancellation
-stops setup before file installation. Quiet/passive installation never prompts or
+presence and successful `javac -version` validation. In the Setup EXE, a missing compatible JDK offers
+folder selection or an explicitly approved external JDK installation before the application MSI starts; cancellation
+stops setup before file installation. Direct MSI installation instead directs users to
+the Setup EXE or a separately installed JDK, avoiding nested MSI installations.
+Quiet/passive installation never prompts or
 downloads Java and fails if no compatible JDK is found. Removal skips the check.
 The JDK remains separately installed and is never removed with EasyKnack.
 
