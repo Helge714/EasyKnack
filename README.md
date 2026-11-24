@@ -37,6 +37,18 @@ sharing documents that depend on local media or plugins.
 
 ## Development
 
+With JDK 25, Maven and Python 3 installed, bootstrap the public GLSwing SDK once:
+
+```sh
+python scripts/bootstrap-glswing.py
+mvn package
+```
+
+Use `python3` where appropriate, or `--maven /path/to/mvn` if Maven is not on
+PATH. The script verifies the [published SDK](https://github.com/Helge714/GLSwing/releases/tag/v0.2.0)
+before installing it in your local Maven repository. No private repository,
+Sonatype account or large source-materials archive is needed.
+
 See [developer documentation](docs/development/README.md) for builds, architecture
 and technical references. GLSwing is an external Maven dependency. Product changes
 are recorded separately in [release notes](docs/RELEASE-NOTES.md).

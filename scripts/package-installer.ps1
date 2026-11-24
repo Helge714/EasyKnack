@@ -165,7 +165,7 @@ $xml = @"
 <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOX' Value='1'/>
 $compilerActions
 <Binary Id='JavaPrerequisite' SourceFile='$(Xml $javaSetup)'/>
-<CustomAction Id='CheckJavaBeforeInstall' BinaryKey='JavaPrerequisite' ExeCommand='/ui [UILevel]' Execute='immediate' Impersonate='yes' Return='check'/>
+<CustomAction Id='CheckJavaBeforeInstall' BinaryKey='JavaPrerequisite' ExeCommand='/check /ui [UILevel]' Execute='immediate' Impersonate='yes' Return='check'/>
 <InstallExecuteSequence><Custom Action='CheckJavaBeforeInstall' Before='InstallValidate'>NOT (REMOVE~="ALL") AND NOT EK_BUNDLE</Custom></InstallExecuteSequence>
 <CustomAction Id='LaunchEasyKnack' FileKey='$launcher' ExeCommand='' Execute='immediate' Impersonate='yes' Return='asyncNoWait'/>
 <UIRef Id='WixUI_FeatureTree'/>

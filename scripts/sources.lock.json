@@ -38,10 +38,10 @@
       "sha256": "b1340378b9ed62b32acfacd012dd069ec2b9d940fc39d3c73f32142d64e89713"
     },
     {
-      "id": "glswing-0.2.0-SNAPSHOT",
-      "file": "glswing-0.2.0-SNAPSHOT-sources.jar",
-      "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-sources.jar",
-      "sha256": "d7865ab96f145e51a2a21878b341a6b7ed770ba26af0fcec084636e196bc15fb"
+      "id": "glswing-0.2.0",
+      "file": "glswing-0.2.0-sources.jar",
+      "localMavenPath": "io/github/helge714/glswing/0.2.0/glswing-0.2.0-sources.jar",
+      "sha256": "c7a07eb12e0c8b87dd8dab0c009d7e36faa9b0aaa9acc1f61a6dd62dbe7d1a62"
     },
     {
       "id": "mingw-w64",
@@ -81,9 +81,9 @@
     },
     {
       "id": "glswing-build-inputs",
-      "file": "glswing-0.2.0-SNAPSHOT-build-inputs.zip",
-      "sha256": "9f74a07eb1d1ad9bd8e9d34db8cae15399c80244551cec3797f7483e56a40dca",
-      "localMavenPath": "com/vingame/glswing/0.2.0-SNAPSHOT/glswing-0.2.0-SNAPSHOT-build-inputs.zip"
+      "file": "GLSwing-0.2.0-source.zip",
+      "sha256": "5e171e4304090a74b1456cb2cd604d3b61555121324af094f79be5a9132d647f",
+      "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-source.zip"
     },
     {
       "id": "wix-3.14.1",
@@ -98,8 +98,8 @@
       "sha256": "88fbda4b912596b9f56e8e12e580cc954bacfb51776ecfddd3e18fc1cf56dc4c"
     },
     {
-      "file": "glswing-0.2.0-SNAPSHOT.jar",
-      "sha256": "88138963c1db664cacd2effc82d257722edeb747768e200264084cf771e931d5"
+      "file": "glswing-0.2.0.jar",
+      "sha256": "e3c92887c4036f84c079ccd99d3c3a68dc683ae1f3b4223eb038535774b56477"
     },
     {
       "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",
