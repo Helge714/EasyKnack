@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Keep Java installation outside the application MSI transaction. Direct MSI
+  installation validates Java and directs missing-JDK users to the Setup EXE.
+
 - Use the public GLSwing 0.2.0 SDK with a checksum-verified build bootstrap.
   Fresh checkouts no longer require a private Core artifact or source-materials ZIP.
 
