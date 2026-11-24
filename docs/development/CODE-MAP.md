@@ -110,6 +110,9 @@ Paths below are relative to `native/audio-host/src/`.
 - `native/audio-host/tests/`, `native/audio-host/benchmarks/`: native validation and performance cases.
 - `docs/user/`: user instructions; `docs/development/`: contributor references.
 - `docs/releases/`: concise user-facing GitHub release descriptions.
+- `ui/ConnectionPickingTest`: real EasyKnack GPU picking, connection deletion and
+  Undo under every bundled theme, for straight and curved connections. Core hit
+  geometry must remain pickable when its visible border is transparent.
 - `GraphicsDiagnostics.java` and `scripts/linux/start-graphics-test.sh`: opt-in
   process/window/OpenGL lifecycle and display-scale traces. `GraphicsDiagnosticsTest`
   recreates a Canvas context inside one window and verifies distinct lifecycle IDs.

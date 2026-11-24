@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Restore selection and deletion of connections in borderless themes through
+  pick-only hit borders in the external Core; retain Delete and Undo behavior.
+
 - Add an optional Linux graphics-test launcher with process, window, OpenGL
   context and display-scale traces; normal launches do not enable these listeners.
 - Build optimized Linux C++ test executables with assertions enabled. Replace
