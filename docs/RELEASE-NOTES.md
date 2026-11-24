@@ -652,7 +652,7 @@ rebuild/re-export older Bakes and source plugins with the matching application.
   units use one grouped default-unit menu; the default unit cannot be disabled.
 
 - Copied group editors inherit their style, bounds and allowed units, while
-  exposing their source, coupling targets and permitted defaults. ìNo editorî removes an editor and releases
+  exposing their source, coupling targets and permitted defaults. ‚ÄúNo editor‚Äù removes an editor and releases
   its coupled internal controls without deleting the group port.
 
 - Quick-created group ports snap to the boundary preview and inherit semantic
@@ -680,7 +680,7 @@ rebuild/re-export older Bakes and source plugins with the matching application.
   frame triggers and portable runtime/bake/export execution. File/delay Buffer
   inputs and dependencies on generated per-sample audio are rejected in this domain.
 
-- Spectral Groups add Bin Memory with a 0ñ1 per-frame Update input, independent
+- Spectral Groups add Bin Memory with a 0‚Äì1 per-frame Update input, independent
   state per bin/channel, and runtime/export support.
 - Filter adds orders 2/4/6/8 and optional bounded RMS level compensation. Existing
   documents and old native parameter payloads retain order 2 with compensation off.
@@ -692,7 +692,7 @@ rebuild/re-export older Bakes and source plugins with the matching application.
   fluctuation below one physical frequency cell. Tiny nonzero widths approach the
   original signal continuously instead of switching immediately to full noise.
   No parameter/document format changes; existing narrow-width Noise settings sound gentler.
-- IFFT adds optional Stability (0ñ1), a bounded continuous RMS correction after
+- IFFT adds optional Stability (0‚Äì1), a bounded continuous RMS correction after
   overlap-add for narrow-band noise. Default zero preserves existing sound.
   Correction adds no latency but can reduce intentional dynamics and broaden spectra.
   Previous compiled IFFT contracts remain accepted with stability disabled.
