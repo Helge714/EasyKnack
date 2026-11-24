@@ -8,7 +8,9 @@ using System.Windows.Forms;
 // Installer prerequisite only: shares discovery/validation with the application launcher.
 internal static class JavaSetup {
     [STAThread] static int Main(string[] args) {
-        bool quiet = args.Length == 2 && args[0] == "/ui" && args[1] != "4" && args[1] != "5";
+        int ui = Array.IndexOf(args, "/ui");
+        bool quiet = ui >= 0 && ui + 1 < args.Length && args[ui + 1] != "4" && args[ui + 1] != "5";
+        bool checkOnly = Array.IndexOf(args, "/check") >= 0;
         string temporary = Path.Combine(Path.GetTempPath(), "EasyKnack-Java-" + Guid.NewGuid().ToString("N"));
         try {
             Directory.CreateDirectory(temporary);
@@ -19,7 +21,7 @@ internal static class JavaSetup {
                     input.CopyTo(output);
                 }
             }
-            string command = "& '" + Path.Combine(temporary,"JavaSetup.ps1").Replace("'", "''") + "'" + (quiet ? " -Quiet" : "");
+            string command = "& '" + Path.Combine(temporary,"JavaSetup.ps1").Replace("'", "''") + "'" + (quiet ? " -Quiet" : "") + (checkOnly ? " -CheckOnly" : "") + "; exit $LASTEXITCODE";
             var info = new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),
                 "WindowsPowerShell", "v1.0", "powershell.exe"),
                 "-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand " +
