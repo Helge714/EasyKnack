@@ -18,7 +18,7 @@ def entries(path):
         return {name: archive.read(name) for name in names if not name.endswith('/')}
 
 a, b = entries(args.distributed), entries(args.rebuilt)
-allowed = {'META-INF/glswing/build.properties', 'META-INF/maven/com.vingame/glswing/pom.properties'}
+allowed = {'META-INF/glswing/build.properties', 'META-INF/maven/com.vingame/glswing/pom.properties', 'META-INF/maven/io.github.helge714/glswing/pom.properties'}
 changed = [name for name in sorted(a.keys() | b.keys()) if a.get(name) != b.get(name)]
 classes = sum(name.endswith('.class') for name in a)
 report = dict(binarySha256=hashlib.sha256(args.distributed.read_bytes()).hexdigest(),

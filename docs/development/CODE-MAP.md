@@ -147,7 +147,9 @@ Documentation-only navigation changes do not need a Maven/native rebuild.
 
 ## Core navigation
 
-In a separate GLSwingNext checkout, start with `docs/CODE-MAP.md`.
+In a separate GLSwing checkout, start with `docs/CODE-MAP.md`.
+`scripts/bootstrap-glswing.py` and `scripts/glswing-release.json` own the public
+SDK prerequisite and its checksums; the application keeps an external Maven dependency.
 For group boundary wiring specifically: GLNodeWorkspace -> composite interface
 transactions/descriptors -> GLCompositeGraphFlattener / GLCompositeForwarding.
 For sliders, picking, tabs or labels: start in Core ui/, not AudioNodeFactory.

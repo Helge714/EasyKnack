@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Use the public GLSwing 0.2.0 SDK with a checksum-verified build bootstrap.
+  Fresh checkouts no longer require a private Core artifact or source-materials ZIP.
+
 - Let the external Core refresh the Reset name menu item during language changes,
   including node menus created before attachment; no application workaround needed.
 
