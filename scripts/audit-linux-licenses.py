@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import io
 import json
+import re
 from pathlib import Path
 import tarfile
 import zipfile
@@ -98,10 +99,15 @@ def audit(args):
                 continue
             candidates = [p for p in build.namelist() if p.endswith('/src/main/java/' + name) or p.endswith('/src/main/resources/' + name)]
             assert len(candidates) == 1 and source.read(name) == build.read(candidates[0]), 'Core source mismatch: ' + name
-    with zipfile.ZipFile(args.core_rebuilt) as rebuilt, zipfile.ZipFile(io.BytesIO(saved['lib/glswing-0.2.0-SNAPSHOT.jar'])) as original:
+    core_jars = [name for name in saved if re.fullmatch(r'lib/glswing-\d[^/]*\.jar', name)]
+    assert len(core_jars) == 1, 'Expected exactly one Core JAR'
+    with zipfile.ZipFile(args.core_rebuilt) as rebuilt, zipfile.ZipFile(io.BytesIO(saved[core_jars[0]])) as original:
         names = set(rebuilt.namelist()) | set(original.namelist())
         differences = [n for n in sorted(names) if not n.endswith('/') and (n not in rebuilt.namelist() or n not in original.namelist() or rebuilt.read(n) != original.read(n))]
-        allowed = {'META-INF/glswing/build.properties', 'META-INF/maven/com.vingame/glswing/pom.properties', 'META-INF/maven/com.vingame/glswing/pom.xml'}
+        allowed = {'META-INF/glswing/build.properties'} | {
+            'META-INF/maven/' + group + '/glswing/' + file
+            for group in ('com.vingame', 'io.github.helge714')
+            for file in ('pom.properties', 'pom.xml')}
         assert set(differences) <= allowed, 'Core runtime rebuild mismatch: ' + str(differences)
     jdk_build = json.loads(args.jdk_metadata.read_text())
     assert jdk_build['sha256'] == metadata['runtime']['binary']['package']['checksum']
