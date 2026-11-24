@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Let the external Core refresh the Reset name menu item during language changes,
+  including node menus created before attachment; no application workaround needed.
+
 - Restore selection and deletion of connections in borderless themes through
   pick-only hit borders in the external Core; retain Delete and Undo behavior.
 

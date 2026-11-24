@@ -32,10 +32,12 @@ class LiveSettingsTest {
                     assertTrue(labels(controller.workspace()).contains("Audioausgang"));
                     assertEquals("Datei",heading.getText());assertEquals("Neu",item.getText());
                     assertTrue(controller.workspace().editor().getNodes().stream().anyMatch(n->n.getTitle().equals("Oszillator")));
+                    assertTrue(controller.workspace().editor().getNodes().stream().allMatch(n->n.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Namen zurücksetzen"))));
                     assertFalse(controller.selectedNodeIds().isEmpty());
                     assertEquals(before,NodeDocuments.comparable(controller.snapshotDocument()));
-                    System.setProperty("easyknack.language","en");AppText.reload();com.vin.easyknack.nodes.NodeText.reload();controller.refreshAppearance();LiveLanguage.refresh(container);
+                    System.setProperty("easyknack.language","en");AppText.reload();com.vin.easyknack.nodes.NodeText.reload();controller.workspace().setGLLocalizer(GLLocalizer.ENGLISH);controller.refreshAppearance();LiveLanguage.refresh(container);
                     assertEquals("New",label.getText());assertTrue(controller.workspace().editor().getNodes().stream().anyMatch(n->n.getTitle().equals("Oscillator")));
+                    assertTrue(controller.workspace().editor().getNodes().stream().allMatch(n->n.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Reset name"))));
                     assertEquals("File",heading.getText());assertEquals("New",item.getText());
                     LiveLanguage.refresh(controller.workspace());
                     assertEquals("Audio Output",portLabel.getText());assertEquals("Audio Out",customPortLabel.getText());
