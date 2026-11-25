@@ -24,8 +24,40 @@ public final class ExampleLibrary {
     }
     /** Build-time entry point: installed examples are read-only at runtime. */
     public static void main(String[] args)throws IOException{
-        if(args.length!=1)throw new IllegalArgumentException("Expected example output directory");
+        if(args.length==2&&args[0].equals("--verify")){
+            verifyBundle(Path.of(args[1]));
+            System.out.println("Bundled examples verified: "+LearningExamples.entries().size()+" projects and both language guides.");
+            return;
+        }
+        if(args.length!=1)throw new IllegalArgumentException("Expected example output directory, or --verify <directory>");
         installExamples(Path.of(args[0]));
+    }
+    /** Package gate: validate the installed content, never regenerate missing files. */
+    private static void verifyBundle(Path root)throws IOException{
+        var expected=new TreeSet<String>();var actual=new TreeSet<String>();
+        var codec=new KnackDocumentCodec();
+        for(var entry:LearningExamples.entries()){
+            expected.add(entry.path());var path=root.resolve(entry.path());
+            if(!Files.isRegularFile(path,LinkOption.NOFOLLOW_LINKS))throw new IOException("Missing bundled example: "+entry.path());
+            try(var input=Files.newInputStream(path)){
+                var document=NodeDocuments.prepare(codec.read(input,codec.currentSchemaVersion()));
+                if(!document.externalAssets().isEmpty())throw new IOException("External assets in bundled example: "+entry.path());
+                for(var asset:NodeDocuments.assets(document))
+                    if(asset.viewState().camera()==null)throw new IOException("Missing saved camera in bundled example: "+entry.path());
+            }catch(IllegalArgumentException invalid){throw new IOException("Invalid bundled example: "+entry.path(),invalid);}
+        }
+        try(var paths=Files.walk(root)){
+            for(var path:paths.filter(p->Files.isRegularFile(p,LinkOption.NOFOLLOW_LINKS)&&p.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".knack")).toList()){
+                var relative=root.relativize(path);boolean hidden=false;
+                for(var part:relative)hidden|=part.toString().startsWith(".");
+                if(!hidden)actual.add(relative.toString().replace('\\','/'));
+            }
+        }
+        if(!expected.equals(actual))throw new IOException("Unexpected bundled example files: "+actual.stream().filter(p->!expected.contains(p)).toList());
+        for(String language:List.of("de","en")){
+            var guide=root.resolve("README-"+language+".md");
+            if(!Files.isRegularFile(guide,LinkOption.NOFOLLOW_LINKS)||Files.size(guide)==0)throw new IOException("Missing bundled example guide: "+guide.getFileName());
+        }
     }
     private static void installExamples(Path root)throws IOException{
         Files.createDirectories(root);

@@ -3,6 +3,11 @@
 ## Unreleased - 0.3.2
 
 - Display Delay with the Audio node palette, matching its audio inputs and output.
+- Restore Audio colors for Buffer nodes and signals in every bundled theme.
+- Use one Formula variable color while preserving qualifier font emphasis.
+- Improve analysis-curve contrast and line width across dark and light themes.
+- Verify all sixteen packaged examples and both language guides, including saved
+  cameras, document readability and the absence of external asset dependencies.
 
 ## 0.3.1 - 2026-11-24
 

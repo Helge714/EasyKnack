@@ -68,6 +68,8 @@ try {
     Write-Host 'Preparing bundled examples...'
     & $java '-Deasyknack.language=en' -cp "$inputDir/$jar;$inputDir/lib/*" com.vin.easyknack.ui.ExampleLibrary "$inputDir/Examples" *> "$work/examples.log"
     if ($LASTEXITCODE -ne 0) { throw "Example generation failed: $work/examples.log" }
+    & $java '-Deasyknack.language=en' -cp "$inputDir/$jar;$inputDir/lib/*" com.vin.easyknack.ui.ExampleLibrary --verify "$inputDir/Examples" *>> "$work/examples.log"
+    if ($LASTEXITCODE -ne 0) { throw "Bundled example validation failed: $work/examples.log" }
     Write-Host 'Bundling the native Windows x64 compiler profile, headers, libraries and license notices...'
     [EasyKnackPackageFiles]::CopyCompiler($Toolchain, "$inputDir/tools/llvm-mingw")
     # Local LLDB/Python runs can leave bytecode caches in the compiler directory.
