@@ -1,6 +1,6 @@
 package com.vin.easyknack.nodes;
 
-@RegisterNode(id = "easyknack.audio.delay", title = "Delay", category=NodeCategory.EFFECT, kind = NodeKind.VALUE)
+@RegisterNode(id = "easyknack.audio.delay", title = "Delay", category=NodeCategory.EFFECT, kind = NodeKind.AUDIO)
 public final class DelayNode extends BasicNode {
     @Override public boolean supportsSampleFeedback(){return true;}
 
