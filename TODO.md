@@ -51,6 +51,13 @@
 
 # EasyKnack backlog
 
+- [ ] Expose Core socket hit padding as an application preference (the theme
+  already provides `node.portHitPaddingX`). Keep embedded editors pickable in
+  overlapping areas; leave vertical hit areas compact for resizing.
+- [ ] Consider mirrored node orientation for feedback layouts: inputs right,
+  outputs left, with context-menu/inspector controls, persistent Undo-aware view
+  state and matching Core connection/layout behavior. DSP direction stays unchanged.
+
 Current work only. Historical implementation notes, superseded plans and original
 bug reports are preserved in [the October archive](docs/development/history/TODO-2026-10.md).
 

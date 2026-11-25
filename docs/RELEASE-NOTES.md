@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Let embedded editors receive clicks ahead of overlapping socket hit padding;
+  outward connection targets remain available.
+
 - Keep sockets hoverable and clickable after resize-edge hover and color-only
   redraws, through corrected output-mask recording in the external Core.
 - Repack group height after removing public ports, including navigation and
