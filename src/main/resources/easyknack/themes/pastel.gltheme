@@ -23,7 +23,7 @@ node.activeSelectedBorder=${easyknack.accent.focus}
 @COLOR easyknack.signal.SPECTRUM=${easyknack.signal.ANALYSIS}
 @COLOR easyknack.signal.VECTOR=#71BDCF
 @COLOR easyknack.signal.TRIGGER=#DBA16B
-@COLOR easyknack.signal.HISTORY=#CF8DBD
+@COLOR easyknack.signal.HISTORY=${easyknack.signal.AUDIO}
 @COLOR easyknack.signal.PARTIALS=#DF8B91
 
 # Separate type hues with restrained brightness preserve white title text contrast.
@@ -43,8 +43,8 @@ node.activeSelectedBorder=${easyknack.accent.focus}
 @COLOR easyknack.node.VECTOR.title.dark=${easyknack.node.VECTOR.title.light}
 @COLOR easyknack.node.TRIGGER.title.light=#946039
 @COLOR easyknack.node.TRIGGER.title.dark=${easyknack.node.TRIGGER.title.light}
-@COLOR easyknack.node.HISTORY.title.light=#915784
-@COLOR easyknack.node.HISTORY.title.dark=${easyknack.node.HISTORY.title.light}
+@COLOR easyknack.node.HISTORY.title.light=${easyknack.node.AUDIO.title.light}
+@COLOR easyknack.node.HISTORY.title.dark=${easyknack.node.AUDIO.title.dark}
 @COLOR easyknack.node.PARTIALS.title.light=#995259
 @COLOR easyknack.node.PARTIALS.title.dark=${easyknack.node.PARTIALS.title.light}
 

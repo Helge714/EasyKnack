@@ -6,6 +6,7 @@ theme.colors=/easyknack/themes/pastel.gltheme
 theme.metrics=/easyknack/themes/borderless.gltheme
 
 palette.accent=#79613C
+@COLOR easyknack.analysis.curve=#FFD28A
 palette.selection=#79613CBF
 @COLOR easyknack.accent.focus=#D0AE79
 slider.progressLight=#79613C

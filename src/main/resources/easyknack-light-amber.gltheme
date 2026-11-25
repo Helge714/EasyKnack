@@ -5,6 +5,7 @@ theme.extends=/easyknack-light-mint.gltheme
 palette.accent=#E8D4AD
 palette.selection=#C8A46777
 @COLOR easyknack.accent.focus=#815D26
+@COLOR easyknack.analysis.curve=#83570F
 slider.progressLight=#E8D4AD
 slider.progressDark=#E8D4AD
 slider.focusProgressLight=#DFC591
