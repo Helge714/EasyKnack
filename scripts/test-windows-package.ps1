@@ -8,7 +8,26 @@ New-Item -ItemType Directory -Force -Path $work, "$work/home", "$work/classes" |
 $jars = @(Get-ChildItem -LiteralPath "$Image/app" -Filter 'easy-knack-*.jar')
 if ($jars.Count -ne 1) { throw 'Expected exactly one packaged application JAR.' }
 $classpath = "$($jars[0].FullName);$Image/app/lib/*"
-foreach ($example in @('Harmonizer.knack','Buffer/Sampler.knack','Spectral/Processing.knack','Spectral/Resynthesis.knack','Spectral/Stochastic Bin Width.knack')) {
+foreach ($example in @(
+    '01 Basics/01 First tone.knack',
+    '01 Basics/02 Filtered noise.knack',
+    '01 Basics/03 Tremolo.knack',
+    '01 Basics/04 Live buffer - speed.knack',
+    '01 Basics/05 Live buffer - position.knack',
+    '01 Basics/06 Group with controls.knack',
+    '02 MIDI/01 Mono instrument.knack',
+    '02 MIDI/02 Poly instrument.knack',
+    '03 Instance Groups/01 Harmonic bank.knack',
+    '03 Instance Groups/02 Odd harmonics.knack',
+    '04 Spectral Groups/01 FFT round trip.knack',
+    '04 Spectral Groups/02 Bin lowpass.knack',
+    '05 Formula Groups/01 Logarithmic mapping.knack',
+    '05 Formula Groups/02 Function waveshaper.knack',
+    '06 Feedback/01 Echo.knack',
+    '06 Feedback/02 Resonator.knack',
+    'README-de.md',
+    'README-en.md'
+)) {
     if (!(Test-Path -LiteralPath "$Image/app/Examples/$example" -PathType Leaf)) { throw "Missing bundled example: $example" }
 }
 . "$PSScriptRoot/windows/JavaPrerequisite.ps1"
