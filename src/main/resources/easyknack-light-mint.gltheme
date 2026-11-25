@@ -39,8 +39,8 @@ node.selectedBorder=${easyknack.accent.focus}
 @COLOR easyknack.node.TRIGGER.title.light=#ECC9A8
 @COLOR easyknack.signal.TRIGGER=#986036
 
-@COLOR easyknack.node.HISTORY.title.light=#E2BCDA
-@COLOR easyknack.signal.HISTORY=#915180
+@COLOR easyknack.node.HISTORY.title.light=${easyknack.node.AUDIO.title.light}
+@COLOR easyknack.signal.HISTORY=${easyknack.signal.AUDIO}
 
 @COLOR easyknack.node.PARTIALS.title.light=#EDBFC4
 @COLOR easyknack.signal.PARTIALS=#A14B59

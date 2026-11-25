@@ -16,6 +16,7 @@ node.activeSelectedBorder=${palette.accent}
 @COLOR curve.handle=#49315F
 @COLOR curve.marker=#916114
 @COLOR easyknack.analysis.triggerLow=#976018
+@COLOR easyknack.analysis.curve=#1C6A55
 @COLOR easyknack.analysis.triggerHigh=#176890
 @COLOR easyknack.diagnostics.mean=#24745B
 @COLOR easyknack.diagnostics.peak=#8F6600

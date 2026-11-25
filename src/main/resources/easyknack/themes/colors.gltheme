@@ -32,8 +32,9 @@ node.border=#00000000
 @COLOR easyknack.diagnostics.peak=#E6BC6A
 @COLOR easyknack.diagnostics.error=#EF7272
 @COLOR easyknack.analysis.triggerLow=#F0AA41
+@COLOR easyknack.analysis.curve=#94DEC9
 @COLOR easyknack.analysis.triggerHigh=#50C3F0
-@COLOR easyknack.signal.HISTORY=#B595D6
+@COLOR easyknack.signal.HISTORY=${easyknack.signal.AUDIO}
 @COLOR easyknack.signal.ANALYSIS=#E7C84B
 @COLOR easyknack.signal.SPECTRUM=${easyknack.signal.ANALYSIS}
 @COLOR easyknack.node.ANALYSIS.title.light=${easyknack.signal.ANALYSIS}
@@ -46,8 +47,8 @@ node.border=#00000000
 @COLOR easyknack.node.VECTOR.title.dark=#365A78
 @COLOR easyknack.node.TRIGGER.title.light=${easyknack.signal.TRIGGER}
 @COLOR easyknack.node.TRIGGER.title.dark=#8C6332
-@COLOR easyknack.node.HISTORY.title.light=${easyknack.signal.HISTORY}
-@COLOR easyknack.node.HISTORY.title.dark=#655078
+@COLOR easyknack.node.HISTORY.title.light=${easyknack.node.AUDIO.title.light}
+@COLOR easyknack.node.HISTORY.title.dark=${easyknack.node.AUDIO.title.dark}
 @COLOR easyknack.node.SPECTRUM.title.light=${easyknack.signal.SPECTRUM}
 @COLOR easyknack.node.SPECTRUM.title.dark=${easyknack.node.ANALYSIS.title.dark}
 
@@ -64,3 +65,12 @@ node.border=#00000000
 @COLOR easyknack.signal.PARTIALS=#E87575
 @COLOR easyknack.node.PARTIALS.title.light=${easyknack.signal.PARTIALS}
 @COLOR easyknack.node.PARTIALS.title.dark=#854343
+
+# Variables share the normal code foreground; qualifiers use font emphasis.
+@COLOR codeEditor.semantic.variable=${codeEditor.text}
+@COLOR codeEditor.semantic.variable.declaration=${codeEditor.text}
+@COLOR codeEditor.semantic.variable.readonly=${codeEditor.text}
+@COLOR codeEditor.semantic.variable.static=${codeEditor.text}
+@COLOR codeEditor.semantic.parameter=${codeEditor.text}
+@COLOR codeEditor.semantic.parameter.declaration=${codeEditor.text}
+@COLOR codeEditor.semantic.parameter.readonly=${codeEditor.text}
