@@ -1,6 +1,8 @@
 # Release notes
 
-## Unreleased - 0.3.1
+## Unreleased - 0.3.2
+
+## 0.3.1 - 2026-11-24
 
 - Use the public GLSwing 0.2.0 SDK with a checksum-verified build bootstrap.
   Fresh checkouts no longer require a private Core artifact or source-materials ZIP.
