@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.4.0
 
+- Mirror nodes horizontally through the context menu or Inspector without
+  changing audio processing. Keep orientation through Undo, copy and group
+  navigation; arrange mirrored chains right to left. Newly saved documents use
+  Core schema 11 and require a reader supporting that schema; older files still load.
+
 - Let embedded editors receive clicks ahead of overlapping socket hit padding;
   outward connection targets remain available.
 

@@ -54,7 +54,7 @@ final class ExampleLayout {
     }
     private static <K> Map<K, GLNodeViewState> preferred(Map<K, GLNodeViewState> captured) {
         var result = new LinkedHashMap<K, GLNodeViewState>();
-        captured.forEach((id, view) -> result.put(id, new GLNodeViewState(view.x(), view.y(), 0, 0, view.customTitle())));
+        captured.forEach((id, view) -> result.put(id, new GLNodeViewState(view.x(), view.y(), 0, 0, view.customTitle(), view.mirrored())));
         return result;
     }
     private static GLNodeGraphAsset withView(GLNodeGraphAsset asset, GLNodeEditorViewState view) {

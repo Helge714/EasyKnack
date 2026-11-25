@@ -29,3 +29,8 @@ The documentation window remembers **Same as application / Deutsch / English** i
 The default project folder is `Documents/EasyKnack/Projects`; recordings use `Documents/EasyKnack/Recordings`. Built-in examples are installed with EasyKnack. Save your own variations in Projects. Previously created example copies in Documents are left untouched.
 
 Arrange (**Ctrl+Shift+L**) uses rough placement and branch order while compacting connected nodes and resolving overlaps. Place related nodes beside or above each other first; signal flow and group boundaries take priority. Undo restores the previous positions.
+
+For feedback layouts, choose **Mirror horizontally** in a node's context menu or
+enable **Mirrored** in the Inspector. Inputs then face right and outputs left;
+signal direction and processing stay unchanged. The setting is saved with the
+document and supports Undo. Arrange follows mirrored chains from right to left.

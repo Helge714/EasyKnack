@@ -29,3 +29,9 @@ Die Dokuansicht speichert **Wie Anwendung / Deutsch / English** unabhängig von 
 Standardordner für Projekte ist `Dokumente/EasyKnack/Projects`, für Aufnahmen `Dokumente/EasyKnack/Recordings`. Mitgelieferte Beispiele liegen bei der Installation. Eigene Varianten speicherst du unter Projects. Früher im Dokumenteordner angelegte Beispielkopien bleiben unangetastet.
 
 Anordnen (**Strg+Umschalt+L**) berücksichtigt die grobe Anordnung und Zweigreihenfolge, rückt verbundene Nodes kompakt zusammen und bereinigt Überschneidungen. Platziere zusammengehörige Nodes vorher neben- oder übereinander; Signalfluss und Gruppenränder haben Vorrang. Undo stellt die vorherigen Positionen wieder her.
+
+Für Feedback-Schleifen wähle **Horizontal spiegeln** im Node-Kontextmenü oder
+aktiviere **Gespiegelt** im Inspektor. Eingänge liegen dann rechts und Ausgänge
+links; Signalrichtung und Verarbeitung bleiben unverändert. Die Einstellung wird
+im Dokument gespeichert und unterstützt Undo. Anordnen platziert gespiegelte
+Ketten von rechts nach links.
