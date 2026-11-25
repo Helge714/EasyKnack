@@ -37,6 +37,15 @@ class ConnectionPickingTest {
                         var frame = renderer.beginFrame(gl,1100,650,Projection2D.TOP_LEFT_PIXELS.create(1100,650));
                         try { workspace.renderComponent(frame); assertTrue(frame.isColorRenderingEnabled(),"Pick-only stroke must restore the color mask"); }
                         finally { renderer.endFrame(); }
+                        for(var port:java.util.List.of(wire.getOutput(),wire.getInput())) {
+                            var bounds=port.getLastRenderedScreenBounds();float scale=bounds[3]/port.getHeight();
+                            float cx=bounds[0]+bounds[2]/2,cy=bounds[1]+bounds[3]/2;
+                            float side=port==wire.getOutput()?1:-1;
+                            var expanded=renderer.readPickResult(gl,Math.round(cx+side*(port.getWidth()/2+4)*scale),Math.round(cy));
+                            assertSame(port,expanded.getTarget(),theme+" horizontal socket hit padding");
+                            var above=renderer.readPickResult(gl,Math.round(cx),Math.round(cy-(port.getHeight()/2+4)*scale));
+                            assertNotSame(port,above.getTarget(),theme+" vertical resize area stays clear");
+                        }
                         var a=wire.getOutput().getLastRenderedScreenBounds();var b=wire.getInput().getLastRenderedScreenBounds();
                         int x=Math.round((a[0]+a[2]/2+b[0]+b[2]/2)/2),y=Math.round((a[1]+a[3]/2+b[1]+b[3]/2)/2);
                         var pick=renderer.readPickResult(gl,x,y);

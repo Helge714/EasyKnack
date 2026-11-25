@@ -352,6 +352,11 @@ final class WorkspaceController implements AutoCloseable {
                     if(key.equals(interfaceValidationKeys.get(asset.id())))continue;
                     var clean=GroupInterfaceValidity.clean(asset,composites);
                     if(clean.equals(asset)){interfaceValidationKeys.put(asset.id(),key);continue;}
+                    var removedBindings=descriptor.portMappings().stream().flatMap(p->p.internalEndpoints().stream()
+                        .filter(e->clean.compositeDescriptor().portMappings().stream().filter(q->q.publicPort().id().equals(p.publicPort().id()))
+                            .noneMatch(q->q.internalEndpoints().contains(e))).map(e->p.publicPort().id()+" -> "+e)).toList();
+                    if(!removedBindings.isEmpty())java.util.logging.Logger.getLogger(WorkspaceController.class.getName()).warning(
+                        "Removing stale group bindings in asset "+asset.id()+": "+removedBindings);
                     var repaired=GroupInputs.materialize(clean,composites);
                     history.perform("Update group bindings",()->applyGroupRepair(repaired),()->applyGroupRepair(asset));
                     changed = true;
@@ -363,6 +368,9 @@ final class WorkspaceController implements AutoCloseable {
                     var after = GroupInterfaceValidity.connections(nodes.normalize(before),composites);
                     connectionValidationKeys.put(dependent,key);
                     if (before.connections().equals(after.connections()) && before.nodes().equals(after.nodes())) continue;
+                    var removedWires=before.connections().stream().filter(w->!after.connections().contains(w)).toList();
+                    if(!removedWires.isEmpty())java.util.logging.Logger.getLogger(WorkspaceController.class.getName()).warning(
+                        "Removing incompatible or stale connections in graph "+before.graphId()+": "+removedWires);
                     replaceProperties(dependent, "Update composite connections", after);
                     history.record("Update composite connections", () -> replaceProperties(dependent, "Restore composite connections", before),
                             () -> replaceProperties(dependent, "Update composite connections", after));

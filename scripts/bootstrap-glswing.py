@@ -29,7 +29,10 @@ def main():
     root=Path(__file__).resolve().parents[1]
     pin=json.loads((root/'scripts/glswing-release.json').read_text())
     version=ET.parse(root/'pom.xml').findtext('{*}properties/{*}glswing.version')
-    if version!=pin['version']:raise ValueError('Maven version and GLSwing pin disagree')
+    if version!=pin['version']:
+        if version.endswith('-SNAPSHOT'):
+            raise SystemExit('This branch requires external GLSwing '+version+'. Install it from a separate GLSwing checkout with mvn -pl glswing-core -am install. The public SDK bootstrap remains pinned to '+pin['version']+'.')
+        raise ValueError('Maven version and GLSwing pin disagree')
     archive=fetch(pin['sdk']['url'],pin['sdk']['sha256'],root/'target/glswing-sdk'/pin['sdk']['file'])
     destination=root/'target/glswing-sdk/extracted'
     with zipfile.ZipFile(archive) as z:

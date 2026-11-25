@@ -2,6 +2,13 @@
 
 ## Unreleased - 0.4.0
 
+- Preserve enclosing group port bindings when grouping and unpacking feedback
+  graphs; log stale bindings and incompatible connections removed by repair.
+- Enlarge socket hit areas horizontally and highlight hovered/target sockets
+  with a theme accent outline through external GLSwing 0.3.0-SNAPSHOT. This
+  development dependency requires a separate local Maven installation until
+  the next public SDK is published; released 0.2.0 artifacts remain unchanged.
+
 - Keep Java installation outside the application MSI transaction. Direct MSI
   installation validates Java and directs missing-JDK users to the Setup EXE.
 

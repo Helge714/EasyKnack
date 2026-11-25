@@ -7,7 +7,7 @@
   </licenses>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>17</maven.compiler.release><glswing.version>0.2.0</glswing.version>
+    <maven.compiler.release>17</maven.compiler.release><glswing.version>0.3.0-SNAPSHOT</glswing.version>
     <audio.cxx>clang++</audio.cxx>
     <easyknack.test.audio>false</easyknack.test.audio>
     <easyknack.buildDirectory>${project.basedir}/target</easyknack.buildDirectory>

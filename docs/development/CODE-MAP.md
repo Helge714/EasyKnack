@@ -155,6 +155,10 @@ SDK prerequisite and its checksums; the application keeps an external Maven depe
 helper: direct MSI checks Java only; the Setup EXE can install it before MSI starts.
 For group boundary wiring specifically: GLNodeWorkspace -> composite interface
 transactions/descriptors -> GLCompositeGraphFlattener / GLCompositeForwarding.
+Nested extraction must include boundary-only endpoints; `DelayGroupingTest`
+covers enclosing bindings and grouping/ungrouping history, with an optional
+`easyknack.test.reverbDocument` path for a read-only local document regression.
+Workspace interface repairs log removed endpoints and connections.
 For sliders, picking, tabs or labels: start in Core ui/, not AudioNodeFactory.
 
 - Language and preferences: `i18n/AppText`, `app/ApplicationSettings`; old public `ui` names delegate for compatibility. Preferences retain their original node.
