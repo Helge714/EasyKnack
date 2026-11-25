@@ -1,4 +1,5 @@
 # Bugs
+- [ ] Beim Gruppieren und Entpacken von Graphen mit Delay/Feedback gehen Verbindungen verloren. Bestehende interne, externe und gruppenübergreifende Verbindungen erhalten; beide Aktionen einschließlich Undo/Redo und verschachtelter Gruppen gezielt nachstellen. Zusammenhang mit der Feedback-Ausführung über Gruppengrenzen prüfen, Ursache noch offen.
 - [ ] Experimentell: Pitch-Hold-Akzeptanz und Frequenzgenauigkeit verbessern. Bekannte Einschränkung im Harmonizer; Pitch Hold und abhängige Funktionen sind seit 2026-11-11 standardmäßig verborgen und über die Experimental-Einstellung freischaltbar. Siehe [Nachprüfung](docs/development/source-audit/RELEASE-FIXES-2026-11-11.md).
 - [x] Gruppieren bei außerhalb verbleibendem stummgeschaltetem Delay erhält den internen Ersatzwert und das bisherige Audio. `FeedbackWarningAudioTest` besteht; [Nachprüfung](docs/development/source-audit/RELEASE-FIXES-2026-11-11.md).
 - [x] Wenn man einen Step Switch innerhalb einer Gruppe von Trigger auf Index umstellt, verschwindet er, bis man die Gruppe verlässt und neu öffnet.
@@ -88,6 +89,15 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   ordinary/Multiple Group Bakes; Step Switch mode changes and named inputs.
 
 ## Next technical work
+
+- [ ] Preserve Delay feedback boundaries across group interfaces. Analyze actual
+  input-to-output dependencies recursively: a delayed parallel branch must not
+  legitimize an instantaneous bypass. Plan feedback execution at the internal
+  Delay across ordinary/nested group boundaries; retain equivalent behavior in
+  Bake/export, including separate delayed-output read and input-write phases
+  where required. Recompute after rewiring, delay changes and mute; verify safe
+  loops, unsafe bypasses and grouped two-delay reverb networks without a manual
+  "allow feedback" override. Track connection loss separately under Bugs above.
 
 - [ ] Add optional Formula Group oversampling (Off/default, 2x, 4x, 8x) as a host
   execution feature: filtered upsampling, formula execution at the effective
