@@ -35,3 +35,8 @@ aktiviere **Gespiegelt** im Inspektor. Eingänge liegen dann rechts und Ausgäng
 links; Signalrichtung und Verarbeitung bleiben unverändert. Die Einstellung wird
 im Dokument gespeichert und unterstützt Undo. Anordnen platziert gespiegelte
 Ketten von rechts nach links.
+
+Ein Spiegel-Symbol neben dem Titel kennzeichnet gespiegelte Nodes. Anordnen
+berücksichtigt die tatsächlichen Portseiten: Verbindungen auf derselben Seite
+wechseln in die nächste Zeile, gespiegelte Rückführungen können unter dem Hinweg
+liegen. Ausrichtung und Signalverbindungen bleiben dabei unverändert.

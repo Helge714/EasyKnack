@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.4.0
 
+- Compact mixed mirrored feedback paths by their physical port sides while
+  preserving semantic feedback regions. Same-side connections turn vertically;
+  mirrored nodes carry a themed vector reflection icon beside the title.
+
 - Mirror nodes horizontally through the context menu or Inspector without
   changing audio processing. Keep orientation through Undo, copy and group
   navigation; arrange mirrored chains right to left. Newly saved documents use

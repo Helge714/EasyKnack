@@ -34,3 +34,8 @@ For feedback layouts, choose **Mirror horizontally** in a node's context menu or
 enable **Mirrored** in the Inspector. Inputs then face right and outputs left;
 signal direction and processing stay unchanged. The setting is saved with the
 document and supports Undo. Arrange follows mirrored chains from right to left.
+
+A reflection symbol beside the title marks mirrored nodes. Arrange uses the
+actual port sides: same-side connections turn into the next row, and mirrored
+feedback paths can return below the forward path. It preserves node orientation
+and never changes the signal connections.

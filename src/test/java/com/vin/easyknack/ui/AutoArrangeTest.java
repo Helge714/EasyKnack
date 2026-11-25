@@ -5,6 +5,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AutoArrangeTest {
+    @Test void mirroredFeedbackUsesTwoCompactRowsAndOneArrangeUndo()throws Exception{
+        SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
+            var graph=new com.vingame.glswing.node.model.GLNodeGraph();
+            var gain=new com.vin.easyknack.nodes.GainNode();var delay=new com.vin.easyknack.nodes.DelayNode();
+            var ids=java.util.stream.IntStream.range(0,4).mapToObj(i->com.vingame.glswing.node.model.GLNodeId.random()).toList();
+            graph.edit("Feedback",e->{for(int i=0;i<4;i++){
+                var definition=i==3?delay:gain;
+                e.addNode(new com.vingame.glswing.node.model.GLGraphNode(ids.get(i),definition.registration().id(),definition.defaults()));
+            }for(int i=0;i<4;i++){
+                e.addConnection(new com.vingame.glswing.node.model.GLGraphConnection(com.vingame.glswing.node.model.GLNodeConnectionId.random(),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get(i),"audio-out"),new com.vingame.glswing.node.model.GLNodeEndpoint(ids.get((i+1)%4),"audio-in")));
+            }});
+            c.openDocument("Mirrored feedback",new com.vingame.glswing.node.document.GLNodeGraphDocument(new com.vingame.glswing.node.document.GLNodeGraphAsset("root",1,com.vingame.glswing.node.document.GLNodeGraphAssetKind.PROJECT,graph.snapshot(),com.vingame.glswing.node.binding.GLNodeEditorViewState.empty())));
+            var editor=c.workspace().editor();var nodes=editor.getNodes();
+            for(int i=0;i<4;i++)nodes.get(i).setLocation(i*400,i<2?0:400);
+            editor.setSelectedNodes(nodes.subList(2,4));editor.getEditingActions().setSelectedMirrored(true);
+            var before=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();var model=c.workspace().currentGraph().snapshot();
+            c.workspace().arrangeAll();
+            assertTrue(nodes.get(0).getX()<nodes.get(1).getX());assertTrue(nodes.get(2).getX()>nodes.get(3).getX());
+            for(int i=2;i<4;i++)assertTrue(nodes.get(i).getY()>=Math.max(nodes.get(0).getY()+nodes.get(0).getHeight(),nodes.get(1).getY()+nodes.get(1).getHeight())+editor.getVerticalNodeSpacing()-.01);
+            assertTrue(nodes.get(2).getX()<=nodes.get(1).getX()+1);assertTrue(nodes.get(3).getX()>=nodes.get(0).getX()-1);
+            var after=nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList();
+            assertEquals(model,c.workspace().currentGraph().snapshot());c.workspace().arrangeAll();assertEquals(after,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+            assertTrue(c.history().undo());assertEquals(before,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+            assertTrue(c.history().redo());assertEquals(after,nodes.stream().map(com.vingame.glswing.node.binding.GLNodeViewState::capture).toList());
+        }});
+    }
+
     @Test void workspaceArrangeRetainsRoughRowsAndColumnsAndCanBeUndone()throws Exception{
         SwingUtilities.invokeAndWait(()->{try(var c=new WorkspaceController()){
             var graph=new com.vingame.glswing.node.model.GLNodeGraph();var definition=new com.vin.easyknack.nodes.ValueNode();
