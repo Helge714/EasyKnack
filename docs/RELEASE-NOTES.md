@@ -2,6 +2,11 @@
 
 ## Unreleased - 0.4.0
 
+- Keep sockets hoverable and clickable after resize-edge hover and color-only
+  redraws, through corrected output-mask recording in the external Core.
+- Repack group height after removing public ports, including navigation and
+  Undo, while retaining manually chosen widths and custom analysis-node heights.
+
 - Preserve enclosing group port bindings when grouping and unpacking feedback
   graphs; log stale bindings and incompatible connections removed by repair.
 - Enlarge socket hit areas horizontally and highlight hovered/target sockets
