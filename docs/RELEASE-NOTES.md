@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Show Bitcrusher with the audio title palette and audio signal ports; its numeric
+  parameter ports and selectable processing rates remain unchanged.
+
 - Add Envelope Follower and Dynamics Curve building blocks, a sidechain-capable
   stereo compressor and a stereo-linked sample-peak limiter with 0-20 ms lookahead.
   Add first-/second-order Allpass and Delay Allpass effects. Limiter latency equals
