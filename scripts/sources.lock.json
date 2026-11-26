@@ -38,10 +38,10 @@
       "sha256": "b1340378b9ed62b32acfacd012dd069ec2b9d940fc39d3c73f32142d64e89713"
     },
     {
-      "id": "glswing-0.2.0",
-      "file": "glswing-0.2.0-sources.jar",
-      "localMavenPath": "io/github/helge714/glswing/0.2.0/glswing-0.2.0-sources.jar",
-      "sha256": "c7a07eb12e0c8b87dd8dab0c009d7e36faa9b0aaa9acc1f61a6dd62dbe7d1a62"
+      "id": "glswing-0.3.0",
+      "file": "glswing-0.3.0-sources.jar",
+      "localMavenPath": "io/github/helge714/glswing/0.3.0/glswing-0.3.0-sources.jar",
+      "sha256": "0320b7a7d227392c4de5a76941e7fd6f1b0399f8e7f628a5f32daffc285a5f94"
     },
     {
       "id": "mingw-w64",
@@ -81,9 +81,9 @@
     },
     {
       "id": "glswing-build-inputs",
-      "file": "GLSwing-0.2.0-source.zip",
-      "sha256": "5e171e4304090a74b1456cb2cd604d3b61555121324af094f79be5a9132d647f",
-      "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-source.zip"
+      "file": "GLSwing-0.3.0-source.zip",
+      "sha256": "c70c194a07b2139d2918233163c325a774ef6ead457d22c63a18f35888d8a9aa",
+      "url": "https://github.com/Helge714/GLSwing/releases/download/v0.3.0/GLSwing-0.3.0-source.zip"
     },
     {
       "id": "wix-3.14.1",
@@ -116,8 +116,8 @@
       "sha256": "88fbda4b912596b9f56e8e12e580cc954bacfb51776ecfddd3e18fc1cf56dc4c"
     },
     {
-      "file": "glswing-0.2.0.jar",
-      "sha256": "e3c92887c4036f84c079ccd99d3c3a68dc683ae1f3b4223eb038535774b56477"
+      "file": "glswing-0.3.0.jar",
+      "sha256": "3fed2d531b72312a309e1ac43085d943c84256e8c2d456e6f632812e5daf31f8"
     },
     {
       "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",

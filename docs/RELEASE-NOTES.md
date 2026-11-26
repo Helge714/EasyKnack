@@ -1,112 +1,18 @@
 # Release notes
 
-## Unreleased - 0.4.0
+## 0.4.0 - 2026-11-26
 
-- Show Bitcrusher with the audio title palette and audio signal ports; its numeric
-  parameter ports and selectable processing rates remain unchanged.
+- **Native Freeverb:** the stereo reverb network runs directly in C++, avoiding the overhead of a large processing group.
+- **Dynamics building blocks:** Envelope Follower, Dynamics Curve, Compressor with optional sidechain, and a stereo-linked sample-peak Limiter with adjustable lookahead.
+- **Allpass effects:** first-/second-order Allpass and Delay Allpass for phase processing and diffusion.
+- **Better graph editing:** mirrored nodes, layout that follows physical port sides, larger socket hit areas and clearer focus indicators.
+- **More reliable groups:** preserve boundary connections when grouping feedback graphs; keep group heights and viewer sizes consistent through edits and navigation.
+- **Windows fixes:** restore device-volume discovery and linked volume keys. Bitcrusher now uses Audio colors and signal ports.
+- German and English references describe every new node. The external GLSwing 0.3.0 SDK is available for source builds.
 
-- Add Envelope Follower and Dynamics Curve building blocks, a sidechain-capable
-  stereo compressor and a stereo-linked sample-peak limiter with 0-20 ms lookahead.
-  Add first-/second-order Allpass and Delay Allpass effects. Limiter latency equals
-  its lookahead; it does not perform oversampled true-peak limiting. All nodes have
-  German/English references and support Instance Groups.
+### Compatibility
 
-- Restore Windows output volume discovery and linked volume keys after platform
-  service startup changes. The volume service now owns its COM initialization.
-
-- Add a native stereo Freeverb effect with room size, damping, width and wet/dry
-  controls, direct delay processing and uninterrupted tails during live parameter changes.
-
-- Prevent Step Switch projection failures after returning from a group and
-  changing selection mode or data type in the Inspector. Core ignores obsolete
-  event snapshots after application normalization; valid wires and Undo remain intact.
-
-- Compact mixed mirrored feedback paths by their physical port sides while
-  preserving semantic feedback regions. Same-side connections turn vertically;
-  mirrored nodes carry a themed vector reflection icon beside the title.
-
-- Mirror nodes horizontally through the context menu or Inspector without
-  changing audio processing. Keep orientation through Undo, copy and group
-  navigation; arrange mirrored chains right to left. Newly saved documents use
-  Core schema 11 and require a reader supporting that schema; older files still load.
-
-- Let embedded editors receive clicks ahead of overlapping socket hit padding;
-  outward connection targets remain available.
-
-- Keep sockets hoverable and clickable after resize-edge hover and color-only
-  redraws, through corrected output-mask recording in the external Core.
-- Repack group height after removing public ports, including navigation and
-  Undo, while retaining manually chosen widths and custom analysis-node heights.
-
-- Preserve enclosing group port bindings when grouping and unpacking feedback
-  graphs; log stale bindings and incompatible connections removed by repair.
-- Enlarge socket hit areas horizontally and highlight hovered/target sockets
-  with a theme accent outline through external GLSwing 0.3.0-SNAPSHOT. This
-  development dependency requires a separate local Maven installation until
-  the next public SDK is published; released 0.2.0 artifacts remain unchanged.
-
-- Keep Java installation outside the application MSI transaction. Direct MSI
-  installation validates Java and directs missing-JDK users to the Setup EXE.
-
-- Use the public GLSwing 0.2.0 SDK with a checksum-verified build bootstrap.
-  Fresh checkouts no longer require a private Core artifact or source-materials ZIP.
-
-- Let the external Core refresh the Reset name menu item during language changes,
-  including node menus created before attachment; no application workaround needed.
-
-- Restore selection and deletion of connections in borderless themes through
-  pick-only hit borders in the external Core; retain Delete and Undo behavior.
-
-- Add an optional Linux graphics-test launcher with process, window, OpenGL
-  context and display-scale traces; normal launches do not enable these listeners.
-- Build optimized Linux C++ test executables with assertions enabled. Replace
-  assertion-dependent Formula library loading with explicit diagnostic checks.
-
-- Use dedicated, contrasting analysis-trace colors in Mint/Amber dark and light
-  themes and thicker trace strokes; preserve signal values and display scaling.
-- Prefer opaque themed Linux dialogs through the external Core to avoid the
-  translucent compositor path; target-side flicker acceptance remains pending.
-
-- Keep standalone native diagnostics compatible with the original Linux
-  application JAR; validate them against the exact packaged dependencies before
-  accepting full and update archives.
-
-- Replace the Linux test 1 download with a complete experimental test 2 package
-  containing the renderer-cache fix and improved diagnostics. Retain matching
-  and historical source/license materials with the replacement distribution.
-
-- Rebuild UI recordings after OpenGL renderer changes through the external Core
-  dependency, including monitor transitions. Fix the bundled Linux compiler's
-  version query and retain command/exit-code diagnostics for native acceptance.
-
-- Add macOS Core Audio/CoreMIDI adapters, system/application taps and app/DMG build
-  packages for Apple Silicon and Intel. Automated Mac build/package checks pass;
-  physical-device and interactive permission acceptance remain pending;
-  native Formula/Bake/plugin compilation requires Apple's Command Line Tools.
-
-- Review Linux test-package notices and source correspondence; provide matching
-  JDK/Core build materials, a component ledger and machine-readable evidence.
-
-- Add Linux hardware/virtual MIDI and Learn, multiple audio devices, system/application
-  capture and endpoint volume through ALSA and PulseAudio/PipeWire-Pulse.
-- Add portable MP3 recording with gapless import; bundle a Linux JDK and C++ compiler
-  for Formula, Bake and source-plugin testing. Desktop/hardware acceptance is pending.
-- Fix Linux launcher paths in archives created on Windows.
-- Provide a Linux x86_64 cross-build and portable test package with Java, examples
-  and target-side diagnostics; fix Unix audio-import paths. Linux device/GUI acceptance is pending.
-- Separate native host services from Windows APIs; prepare default-device Linux
-  audio and portable control transport, keyboard MIDI and Formula loading.
-- Centralize Windows/Linux/macOS executable, library and compiler policy.
-- Include and validate the current learning examples and bilingual guides in installer builds.
-- Classify Delay as an Audio node and retain the visible graph center on window resize.
-- Use one Formula variable color for declarations, parameters and read-only values;
-  retain bold read-only and italic persistent-state emphasis.
-- Restore Audio colors for Buffer ports, connections and node titles in all bundled themes.
-- Auto-arrange example graphs and inner groups, centering their saved cameras.
-- Replace the bundled examples with sixteen self-contained learning projects covering
-  basics, buffers, MIDI, Instance/Spectral/Formula Groups and delayed feedback.
-- Include German and English listening exercises; retire the earlier examples
-  while preserving edited development copies in a hidden backup.
+Existing projects can be opened. Keep a backup before saving: documents saved by this version use graph schema 11 and need a compatible reader. Source plugins may rebuild once after upgrading. The Limiter adds its selected lookahead as latency (5 ms by default); it is not an oversampled true-peak limiter.
 
 ## 0.3.2 - 2026-11-25
 
