@@ -2,6 +2,10 @@
 
 ## Unreleased - 0.4.0
 
+- Prevent Step Switch projection failures after returning from a group and
+  changing selection mode or data type in the Inspector. Core ignores obsolete
+  event snapshots after application normalization; valid wires and Undo remain intact.
+
 - Compact mixed mirrored feedback paths by their physical port sides while
   preserving semantic feedback regions. Same-side connections turn vertically;
   mirrored nodes carry a themed vector reflection icon beside the title.
