@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Restore Windows output volume discovery and linked volume keys after platform
+  service startup changes. The volume service now owns its COM initialization.
+
 - Add a native stereo Freeverb effect with room size, damping, width and wet/dry
   controls, direct delay processing and uninterrupted tails during live parameter changes.
 

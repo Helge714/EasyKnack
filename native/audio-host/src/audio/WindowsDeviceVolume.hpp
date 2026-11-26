@@ -19,6 +19,13 @@ class WindowsDeviceVolume {
 public:
     struct Value { bool available=false; float scalar=0; bool muted=false; };
 private:
+    // Volume discovery must not depend on another platform service initializing COM first.
+    // Keep our reference until after every endpoint/enumerator has been released.
+    struct ComApartment {
+        bool owned;
+        explicit ComApartment(bool enabled):owned(enabled&&SUCCEEDED(CoInitializeEx(nullptr,COINIT_MULTITHREADED))){}
+        ~ComApartment(){if(owned)CoUninitialize();}
+    } apartment;
 #ifdef EASYKNACK_AUDIO_TEST
     friend struct WindowsDeviceVolumeTest;
 #endif
@@ -70,7 +77,7 @@ private:
 public:
     explicit WindowsDeviceVolume(bool realDevices,
             std::function<Value(const std::string&)> read={},std::function<bool(const std::string&,float)> write={})
-            : readOverride(std::move(read)),writeOverride(std::move(write)) {
+            : apartment(realDevices),readOverride(std::move(read)),writeOverride(std::move(write)) {
         if(!realDevices) return;
         CoCreateInstance(__uuidof(MMDeviceEnumerator),nullptr,CLSCTX_ALL,__uuidof(IMMDeviceEnumerator),reinterpret_cast<void**>(&enumerator));
         std::promise<bool> ready; auto future=ready.get_future();
