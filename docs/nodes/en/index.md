@@ -25,6 +25,10 @@
 
 ## Effects
 
+- [Limiter](limiter.md)
+- [Compressor](compressor.md)
+- [Delay Allpass](delay-allpass.md)
+- [Allpass](allpass.md)
 - [Freeverb](freeverb.md)
 - [Hilbert](hilbert.md)
 
@@ -46,6 +50,9 @@
 - [Voice Merge](voice-merge.md)
 
 ## Math
+
+- [Dynamics Curve](dynamics-curve.md)
+
 
 - [Clamp](clamp.md)
 - [Comparator](comparator.md)
@@ -112,6 +119,9 @@
 - [Spectrum to Waveform](spectrum-to-waveform.md)
 
 ## Analysis
+
+- [Envelope Follower](envelope-follower.md)
+
 
 - [Analysis Average](analysis-average.md)
 - [Analysis Viewer](analysis-viewer.md)

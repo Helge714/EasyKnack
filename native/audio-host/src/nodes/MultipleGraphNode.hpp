@@ -14,6 +14,13 @@
 #include "HilbertNode.hpp"
 #include "BufferContextNode.hpp"
 #include "FilterNode.hpp"
+#include "AllpassNode.hpp"
+#include "DelayAllpassNode.hpp"
+#include "EnvelopeFollowerNode.hpp"
+#include "DynamicsCurveNode.hpp"
+#include "CompressorNode.hpp"
+#include "LimiterNode.hpp"
+#include "FreeverbNode.hpp"
 #include "DelayNode.hpp"
 #include "OscillatorNode.hpp"
 #include "AdditiveOscillatorNode.hpp"
@@ -227,6 +234,13 @@ struct MultipleGraphNode : NodeProcessor {
     DspResource* resourceOutput(std::size_t port)noexcept override{return state&&port<state->spectra.size()?state->spectra[port][primary?0:1].get():nullptr;}
     void shareChannelState(NodeProcessor& other)override{state=static_cast<MultipleGraphNode&>(other).state;primary=false;}
     static std::unique_ptr<NodeProcessor> factory(const std::string& id){
+        if(id=="allpass")return std::make_unique<AllpassNode>();
+        if(id=="delayallpass")return std::make_unique<DelayAllpassNode>();
+        if(id=="envelopefollower")return std::make_unique<EnvelopeFollowerNode>();
+        if(id=="dynamicscurve")return std::make_unique<DynamicsCurveNode>();
+        if(id=="compressor")return std::make_unique<CompressorNode>();
+        if(id=="limiter")return std::make_unique<LimiterNode>();
+        if(id=="freeverb")return std::make_unique<FreeverbNode>();
         if(id=="stepswitch")return std::make_unique<StepSwitchNode>();
         if(id=="formula")return std::make_unique<FormulaNode>();
         if(id=="spectrumblur")return std::make_unique<SpectrumBlurNode>();

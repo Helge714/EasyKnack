@@ -28,6 +28,9 @@ struct TestAudioIO : easyknack::AudioIO {
 };
 #include "UniversalDelayTest.hpp"
 int main() {
+    for(const auto* id:{"allpass","delayallpass","envelopefollower","dynamicscurve","compressor","limiter","freeverb"})
+        assert(easyknack::MultipleGraphNode::factory(id));
+
     std::cout<<std::unitbuf;
     using namespace easyknack;
     channel_tests::run();

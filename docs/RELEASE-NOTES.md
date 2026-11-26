@@ -2,6 +2,12 @@
 
 ## Unreleased - 0.4.0
 
+- Add Envelope Follower and Dynamics Curve building blocks, a sidechain-capable
+  stereo compressor and a stereo-linked sample-peak limiter with 0-20 ms lookahead.
+  Add first-/second-order Allpass and Delay Allpass effects. Limiter latency equals
+  its lookahead; it does not perform oversampled true-peak limiting. All nodes have
+  German/English references and support Instance Groups.
+
 - Restore Windows output volume discovery and linked volume keys after platform
   service startup changes. The volume service now owns its COM initialization.
 
