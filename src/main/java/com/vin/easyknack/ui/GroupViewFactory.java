@@ -38,7 +38,7 @@ final class GroupViewFactory implements GLNodeViewFactory {
             NodeDocumentation.attach(this,PartialGroups.partial(source)?"group:partial":FormulaGroups.isFormula(source)?"group:formula":SpectralGroups.spectral(source)?"group:spectral":MultipleGroups.multiple(source)?"group:instance":"group:ordinary");
             descriptor=source.compositeDescriptor();structure=structure(node);
             setGroupIndicatorVisible(true);
-            kind=groupKind();setTitleGradientEnabled(true);setPortOrder(GLNodePortOrder.OUTPUTS_FIRST);setResizeMode(GLNodeResizeMode.HORIZONTAL);setGLHistoryManager(history);
+            kind=groupKind();setTitleGradientEnabled(true);setPortOrder(GLNodePortOrder.OUTPUTS_FIRST);setResizeMode(GLNodeResizeMode.HORIZONTAL);setHeightFittedToContent(true);setGLHistoryManager(history);
             if(MultipleGroups.multiple(source)){
                 var countPort=descriptor.portMappings().stream().filter(MultipleGroups::countPort).findFirst().orElse(null);
                 String countKey=countPort==null?MultipleGroups.COUNT_PROPERTY:GroupUnits.key(countPort.publicPort().id());

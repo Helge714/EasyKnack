@@ -1,3 +1,5 @@
+/* EasyKnack modification, 2026-11-07: friend access for the streaming analyzer.
+ * Dated modification notice added 2026-11-19; upstream algorithms unchanged. */
 #ifndef INCLUDE_ANALYZER_H
 #define INCLUDE_ANALYZER_H
 /*

@@ -10,7 +10,8 @@ class PluginSdkTest {
 
     @Test void checkoutCompilerDiscoveryUsesDurableTools() {
         Path checkout = Path.of("").toAbsolutePath();
-        assertTrue(com.vin.easyknack.InstallationPaths.compilerRoots().contains(checkout.resolve(".local/tools")));
+        assertTrue(com.vin.easyknack.InstallationPaths.compilerRoots().stream()
+                .map(Path::toAbsolutePath).map(Path::normalize).toList().contains(checkout.resolve(".local/tools")));
     }
 
     @Test void developmentSdkMatchesPackagedSources() throws Exception {
@@ -22,8 +23,13 @@ class PluginSdkTest {
         PluginSdk.unpack(new java.io.ByteArrayInputStream(PluginSdk.bytes()), directory.resolve("unpacked"));
         assertTrue(Files.isRegularFile(directory.resolve("unpacked/src/NodeProcessor.hpp")));
         var build = new NativeBuildSettings(directory.resolve("unpacked"));
-        assertEquals(java.util.List.of("-std=c++17", "-O3", "-ffp-contract=off"), build.compile());
-        assertTrue(build.libraries().contains("-lws2_32"));
+        var expected=new java.util.ArrayList<>(java.util.List.of("-std=c++17", "-O3", "-ffp-contract=off"));
+        expected.addAll(com.vin.easyknack.NativePlatform.current().compilerArchitectureFlags());
+        if(com.vin.easyknack.NativePlatform.current().os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)expected.add("-mmacosx-version-min=14.2");
+        assertEquals(expected, build.compile());
+        assertTrue(Files.isRegularFile(directory.resolve("unpacked/src/platform/MacPlatform.mm")));
+        if(com.vin.easyknack.NativePlatform.current().windows())assertTrue(build.libraries().contains("-lws2_32"));
+        else assertFalse(build.libraries().contains("-lws2_32"));
         assertTrue(Files.isRegularFile(directory.resolve("unpacked/src/runtime/GraphNode.hpp")));
         assertTrue(Files.readString(directory.resolve("unpacked/src/GraphRuntime.hpp")).contains("runtime/GraphRuntime.hpp"));
         assertTrue(Files.readString(directory.resolve("unpacked/LICENSE")).contains("GNU GENERAL PUBLIC LICENSE"));

@@ -25,6 +25,11 @@
 
 ## Effekte
 
+- [Limiter](limiter.md)
+- [Kompressor](compressor.md)
+- [Delay-Allpass](delay-allpass.md)
+- [Allpass](allpass.md)
+- [Freeverb](freeverb.md)
 - [Hilbert](hilbert.md)
 
 - [Bitcrusher](bitcrusher.md)
@@ -46,6 +51,7 @@
 
 ## Mathematik
 
+- [Dynamikkennlinie](dynamics-curve.md)
 - [Begrenzung](clamp.md)
 - [Vergleicher](comparator.md)
 - [Kurvenabbildung](curve-mapping.md)
@@ -111,6 +117,9 @@
 - [Spektrum zu Wellenform](spectrum-to-waveform.md)
 
 ## Analyse
+
+- [Hüllkurvenfolger](envelope-follower.md)
+
 
 - [Analysemittelung](analysis-average.md)
 - [Analyseanzeige](analysis-viewer.md)

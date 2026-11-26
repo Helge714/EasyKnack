@@ -13,10 +13,10 @@ plans and investigations and is not an implementation contract.
 
 ## Build languages
 
-For a fresh checkout, install JDK 25, Maven and Python 3, then run
+Install JDK 25, Maven and Python 3, then run
 `python scripts/bootstrap-glswing.py` before `mvn package`. The bootstrap installs
-the checksum-pinned public GLSwing SDK; `--maven` selects a Maven executable and
-`--repository` selects a local Maven repository. See the root README for details.
+the checksum-pinned public GLSwing 0.3.0 SDK as an external Maven dependency.
+Use `--maven` and `--repository` to select Maven and its local repository.
 
 PowerShell orchestrates Windows/native builds, packaging and JDK selection. C#
 implements the small Windows launcher and packaging file helper. Python renders

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /** Transactional source installation and content-addressed, matched Java/native builds. */
 public final class PluginManager {
     public record Build(Path directory, List<BasicNode> definitions, Map<String,String> sources, boolean cached) {
-        public Path host() { return directory.resolve("easyknack-audio-host.exe"); }
+        public Path host() { return directory.resolve(com.vin.easyknack.NativePlatform.current().hostExecutable()); }
     }
     public record Installation(Build build, boolean restartRequired) { }
     private static final PluginManager DEFAULT = new PluginManager(Path.of(System.getProperty("easyknack.plugins",
@@ -131,13 +131,13 @@ public final class PluginManager {
     private Build build(Map<String,Path> candidates, Consumer<String> progress) throws Exception {
         progress.accept(com.vin.easyknack.i18n.AppText.literal("Checking build cache"));
         if (candidates.isEmpty()) throw new IOException(com.vin.easyknack.i18n.AppText.literal("No source plugins installed"));
-        if (!System.getProperty("os.name").startsWith("Windows") || !Set.of("amd64", "x86_64").contains(System.getProperty("os.arch")))
-            throw new IOException(com.vin.easyknack.i18n.AppText.literal("Plugin builds currently support Windows x64"));
+        if (!com.vin.easyknack.NativePlatform.current().supportsHostBuild())
+            throw new IOException("Unsupported native toolchain architecture: " + com.vin.easyknack.NativePlatform.current().cacheKey());
         String sdk = sdkKey(); var hashes = new TreeMap<String,String>();
         for (var entry : candidates.entrySet()) hashes.put(entry.getKey(), hash(entry.getValue()));
         var tools = readIfPresent(home.resolve("toolchain.properties"));
         String cxx=compiler(tools);
-        String javac=tools.getProperty("javac",Path.of(System.getProperty("java.home"),"bin","javac.exe").toString());
+        String javac=tools.getProperty("javac",Path.of(System.getProperty("java.home"),"bin",com.vin.easyknack.NativePlatform.current().executable("javac")).toString());
         String toolchain=cxx+":"+hash(Path.of(cxx))+":"+javac+":"+hash(Path.of(javac));
         String key = digest((sdk + hashes + toolchain).getBytes(StandardCharsets.UTF_8));
         var destination = cachePath(key);
@@ -177,31 +177,34 @@ public final class PluginManager {
             generateRegistry(sourceRoot.resolve("nodes"), generated, all);
             run(List.of(cxx, "--version"), work, log);
             var nativeSources = new ArrayList<Path>();nativeSources.add(sourceRoot.resolve("main.cpp"));
+            if(com.vin.easyknack.NativePlatform.current().os()==com.vin.easyknack.NativePlatform.OperatingSystem.MACOS)
+                nativeSources.add(sourceRoot.resolve("platform/MacPlatform.mm"));
             for (var source : files(sourceRoot.resolve("nodes"))) if (source.toString().endsWith(".cpp")) nativeSources.add(source);
             var objects = new ArrayList<String>();
             var nativeBuild = new NativeBuildSettings(sdkRoot);
             for (int i=0;i<nativeSources.size();i++) {
                 var source=nativeSources.get(i);var object=work.resolve("host-"+i+".o");objects.add(object.toString());
                 command = new ArrayList<>(List.of(cxx));command.addAll(nativeBuild.compile());
+                command.addAll(nativeBuild.sourceArguments(source));
                 command.addAll(List.of("-I",sdkRoot.resolve("third_party").toString(),
                         "-I",sourceRoot.toString(),"-I",generated.toString(),"-c",source.toString(),"-o",object.toString()));
                 String stage="C++ "+(i+1)+"/"+nativeSources.size()+": "+sourceRoot.relativize(source)+(i==0?" + nodes":"");
                 run(command,work,log,progress,stage);
             }
-            command=new ArrayList<>(List.of(cxx));command.addAll(nativeBuild.arguments("plugin.link.flags"));command.addAll(objects);
-            command.addAll(List.of("-o",work.resolve("easyknack-audio-host.exe").toString()));command.addAll(nativeBuild.libraries());
+            command=new ArrayList<>(List.of(cxx));command.addAll(nativeBuild.link());command.addAll(objects);
+            command.addAll(List.of("-o",work.resolve(com.vin.easyknack.NativePlatform.current().hostExecutable()).toString()));command.addAll(nativeBuild.libraries());
             run(command,work,log,progress,"Linking C++ audio host");
             // Start the actual isolated host and validate every Java/native parameter contract.
             progress.accept(com.vin.easyknack.i18n.AppText.literal("Checking audio host and parameter contracts"));
             try (var host = new AudioHostClient()) {
-                host.start(work.resolve("easyknack-audio-host.exe"), true);
+                host.start(work.resolve(com.vin.easyknack.NativePlatform.current().hostExecutable()), true);
                 for (var node : definitions) {
                     String rates = "a".repeat(node.processor().inputs().size());
                     host.command("GRAPH 1 plugin " + node.processor().id() + " !" + NativeContractGenerator.fingerprint(node) + " "
                             + node.encode(new NodeState(node.defaults()), p -> -1) + " @ a " + (rates.isEmpty() ? "-" : rates));
                 }
             }
-            var info = new Properties(); info.setProperty("sdk", sdk); info.setProperty("host", hash(work.resolve("easyknack-audio-host.exe")));
+            var info = new Properties(); info.setProperty("sdk", sdk); info.setProperty("host", hash(work.resolve(com.vin.easyknack.NativePlatform.current().hostExecutable())));
             info.setProperty("classes", hash(work.resolve("classes")));
             info.setProperty("toolchain",digest(toolchain.getBytes(StandardCharsets.UTF_8)));
             hashes.forEach((id, value) -> info.setProperty("source." + id, value));
@@ -238,10 +241,12 @@ public final class PluginManager {
         var roots=com.vin.easyknack.InstallationPaths.compilerRoots();
         for (Path root : roots) if (Files.isDirectory(root))
             try (var paths = Files.walk(root, 4)) {
-                var found = paths.filter(p -> p.getFileName().toString().equalsIgnoreCase("clang++.exe")).sorted().findFirst();
+                var found = paths.filter(p -> com.vin.easyknack.NativePlatform.current().compilerNames().contains(p.getFileName().toString())).sorted().findFirst();
                 if (found.isPresent()) return found.get().toAbsolutePath().toString();
             }
-        throw new IOException(com.vin.easyknack.i18n.AppText.literal("C++ toolchain not found. Configure cxx in plugins/toolchain.properties (LLVM-MinGW Windows x64)."));
+        for(var candidate:com.vin.easyknack.NativePlatform.current().systemCompilers())
+            if(Files.isExecutable(candidate))return candidate.toString();
+        throw new IOException("C++ toolchain not found. Configure cxx in plugins/toolchain.properties for " + com.vin.easyknack.NativePlatform.current().cacheKey());
     }
     public static String classpath() throws Exception {
         var paths = new LinkedHashSet<String>(List.of(System.getProperty("java.class.path").split(java.io.File.pathSeparator)));
@@ -284,7 +289,7 @@ public final class PluginManager {
         try {
             var info = read(path.resolve("build.properties"));
             if(!sdk.equals(info.getProperty("sdk")) || !hash(path.resolve("classes")).equals(info.getProperty("classes"))
-                    || !hash(path.resolve("easyknack-audio-host.exe")).equals(info.getProperty("host")))return false;
+                    || !hash(path.resolve(com.vin.easyknack.NativePlatform.current().hostExecutable())).equals(info.getProperty("host")))return false;
             for(var source:directories(path.resolve("sources")))if(!hash(source).equals(info.getProperty("source."+source.getFileName())))return false;
             return true;
         } catch (Exception e) { return false; }

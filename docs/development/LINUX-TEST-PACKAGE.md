@@ -1,0 +1,161 @@
+# Linux test package from Windows
+
+For test 3, run `./Check-Linux.sh` followed by `./Start-Graphics-Test.sh`.
+The graphics launcher enables process/window/context identities, display geometry,
+scaling, renderer/capability information and JOGL Canvas debug output. Move between
+monitors, open/scroll documentation, then close normally. Retain
+`graphics-diagnostics-*.txt` and `linux-diagnostics.txt`. Optional
+`./Start-Graphics-Test.sh --translucent-dialogs` restores the old translucent dialog
+path for a controlled comparison. `Start-EasyKnack.sh` retains normal logging.
+
+Zig 0.15.2 defines NDEBUG in optimized C++ builds. Test 1's Formula probe put the
+library-open call inside assert, so optimization removed that call and left a null
+sample function pointer. Explicit checks now preserve all side effects regardless
+of NDEBUG. Cross-built C++ test executables additionally use `-UNDEBUG`; production
+host optimization is unchanged. Preprocessor verification records this distinction.
+
+Full packaging now requires `--materials <matching-source-supplement.zip>` and
+accepts `--test-revision 3`. The supplement's Core build inputs are checked against
+the supplied Core source JAR, and the supplement is copied into the final archive.
+
+The earlier complete package is
+[Linux experimental test 2](https://github.com/Helge714/EasyKnack/releases/tag/v0.4.0-linux-experimental.2).
+It is a complete archive containing the renderer-cache fix and improved compiler
+diagnostics; no separate UI patch is needed. It reuses test 1's unchanged native,
+Java application and toolchain binaries. `scripts/package-linux-update.py` records
+the replacement Core source identity and verifies all other regular file hashes.
+The matching source supplement is included and available separately. Test 1's
+source/build materials are retained inside that supplement after its release page
+is removed. Target-side acceptance of the updated GUI/compiler remains pending.
+
+This path creates Linux x86_64 ELF executables and a transfer archive without WSL,
+a Linux VM, a remote runner or a push to GitHub. It is a cross-build, not execution
+on Linux. Keep it labelled as a test package until device/GUI acceptance succeeds.
+
+## Tools and inputs
+
+- Existing Windows Java/Maven setup and the external GLSwing Maven dependency.
+- Python 3.11+ (standard library only).
+- Official [Zig 0.15.2 Windows x86_64 archive](https://ziglang.org/download/0.15.2/zig-x86_64-windows-0.15.2.zip),
+  SHA256 `3a0ed1e8799a2f8ce2a6e6290a9ff22e6906f8227865911fb7ddedc3cc14cb0c`.
+  Extract into ignored `.local/tools`. Its C++ frontend/library/linker target
+  `x86_64-linux-gnu.2.28`; no host CPU-specific optimisation is requested.
+- An official Linux x64 Temurin JDK 25 `.tar.gz` and the corresponding asset JSON
+  from `https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=x64&image_type=jdk&os=linux&vendor=eclipse`.
+  Save one asset object as UTF-8 JSON, not the enclosing response array. The packager
+  checks its platform and SHA256, preserves the runtime archive's executable modes
+  and symlinks, and retains the exact asset metadata in the finished package.
+- The source JAR matching the external GLSwing binary used by Maven.
+- The matching Temurin OpenJDK source archive and its SHA256. Add the release's
+  `source` object (including `name`, `link` and verified `checksum`) to the saved
+  runtime asset JSON; obtain it from the official feature-release API and source
+  asset checksum file. The packager includes and checks the source archive too.
+
+Do not extract the Linux JDK on Windows: permission bits and symlinks can be lost.
+Do not substitute a musl/static host: miniaudio and Formula need dynamic loading.
+
+The matching Linux Zig archive from the official download index is also required
+for the transfer package. Save its URL/SHA256/size metadata as UTF-8 JSON and pass
+`--compiler` / `--compiler-metadata`; its unmodified contents and notices are retained.
+
+## Build
+
+1. Run Maven `package` with an isolated `easyknack.buildDirectory` such as
+   `target/linux-java`. Run relevant Java tests before packaging, or retain their
+   recorded evidence; `-Dmaven.test.skip=true` is only a packaging shortcut.
+2. Run the cross compiler (replace paths with the actual tools):
+
+   ```powershell
+   python scripts/build-linux-cross.py --zig .local/tools/zig-linux-cross/zig-x86_64-windows-0.15.2/zig.exe --contracts target/linux-java/native/generated
+   ```
+
+   Output defaults to `target/native-linux-cross`. Host, LAME and seven native test
+   executables plus a shared-library fixture are built sequentially. Logs and
+   target/compiler metadata remain beside them. Tests are not executed on Windows.
+3. Create a fresh transfer archive:
+
+   ```powershell
+   python scripts/package-linux-cross.py --java-build target/linux-java --native target/native-linux-cross --runtime target/linux-cross/runtime.tar.gz --runtime-sources target/linux-cross/runtime-sources.tar.gz --runtime-metadata target/linux-cross/runtime-download.json --compiler target/linux-parity/zig-linux.tar.xz --compiler-metadata target/linux-parity/zig-linux-download.json --zig-directory .local/tools/zig-linux-cross/zig-x86_64-windows-0.15.2 --java C:/path/to/jdk/bin/java.exe --glswing-sources C:/path/to/glswing-0.2.0-SNAPSHOT-sources.jar --output dist/linux-test-new
+   ```
+
+The product version comes from Maven. A new destination is required; existing
+packages are never overwritten. Only manifest-declared dependencies and Linux
+amd64 JogAmp natives are included. Sixteen examples are generated and verified;
+Linux JDK/compiler, licenses, EasyKnack working-tree sources, external Core sources and build identity
+are included. `.tar.gz` retains the Unix permissions needed for direct startup.
+The packager checks the archive's ELF architecture, modes, runtime links, selected
+libraries, examples, sources and SHA256. Rerun independently with
+`python scripts/verify-linux-package.py <archive>`.
+
+## Test on the other computer
+
+### Renderer changes and compiler diagnostics
+
+Test 2's diagnostic source called a method absent from its retained application
+JAR and therefore failed before reaching the native compiler. The standalone
+diagnostic now uses the original platform API. `validate-linux-diagnostics.py`
+compiles it against the exact application/dependency JARs extracted from the
+finished archive; both packaging paths require this check. The update packager
+also requires `--javac /path/to/javac` (or `javac.exe` on Windows).
+
+The second report confirms startup/playback is possible but still reports visible
+window recreation on monitor changes. It contains no graphics exception or display
+configuration trace. Collect optional JOGL diagnostics from an extracted package:
+
+```sh
+JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djogl.debug.GLCanvas=true" ./Start-EasyKnack.sh > graphics-diagnostics.txt 2>&1
+```
+
+Move the window between displays, then close it normally and retain that output.
+`Check-Linux.sh` also records session type and optional XRandR monitor geometry.
+Do not label the monitor issue fixed from the successful renderer-cache test.
+
+External Core defaults themed Linux dialogs to an opaque Canvas instead of the
+translucent GLJPanel/compositor path as a flicker mitigation. Platform-policy and
+owned/nested opaque themed-dialog tests pass locally; actual XWayland acceptance
+remains pending. `glswing.dialog.translucent=true` can explicitly restore the
+translucent path for comparison.
+
+The first EndeavourOS/Wayland report passed desktop audio capture/routing and
+virtual ALSA MIDI tests, but exposed cached Core recordings belonging to a previous
+renderer. External GLSwing commit `0530106` rebuilds recordings on renderer changes
+and invalidates scene/picking buffers on context initialization. A local GPU
+regression reproduces the original exception with the old Core and passes with
+the corrected dependency, including stable-frame cache reuse. Real monitor
+transitions on Linux still require target testing.
+
+The bundled Zig wrapper now omits the glibc-suffixed target for `--version` only;
+actual compilation retains the glibc 2.28 deployment target. The reported native
+Formula acceptance failure is not diagnosed from the original empty exception.
+Updated diagnostics retain command, exit status, loader errors and log paths.
+The Formula/module/cache and source-plugin/Bake/host checks pass locally on
+Windows; that does not establish a Linux pass.
+
+A small local GUI/diagnostic update can replace the matching Core JAR, wrapper
+and diagnostic source in an extracted test 1 package without rebuilding the native
+audio host. Keep its matching Core sources/build inputs and notices with it;
+the original published test archive is never overwritten.
+
+Transfer the `.tar.gz` and checksum. Extract the complete archive into a writable
+local folder. Run `./Check-Linux.sh`, then `./Start-EasyKnack.sh` in the `EasyKnack`
+folder. Return `linux-diagnostics.txt`, startup output if needed, and the listening
+results. Python 3 is optional on the target, but needed for the protocol/Unicode
+audio-import check. GUI and physical audio acceptance remain manual.
+
+This package assumes a glibc-based Linux x86_64 desktop, X11/XWayland and OpenGL 3.
+It is not for ARM, Alpine/musl or a headless GUI session. The included JDK and Zig C++ wrapper support
+Formula, Bake and source plugins without separate compiler installation. Desktop
+audio/capture requires PulseAudio or PipeWire-Pulse; hardware MIDI requires ALSA.
+`Check-Linux.sh` includes real desktop integration and compilation/cache tests.
+Its first compiler run can take several minutes and prints live progress. Existing platform limitations are in [PORTABILITY.md](PORTABILITY.md).
+
+## Distribution license review
+
+An experimental label does not waive redistribution terms. Before publishing a new
+archive, collect the exact JDK build metadata and Temurin build-source revision,
+matching Core build inputs and any updated notices. Run `scripts/audit-linux-licenses.py`
+against the immutable binary archive, exact upstream JDK/Zig archives, Core inputs
+and isolated rebuilt Core JAR; use `--help` for its required paths. Publish the
+resulting evidence and source/build materials beside the binary download. The
+OpenJDK source archive already inside the binary archive must remain available too.
+See [test 1's component ledger and remediation](source-audit/LINUX-TEST-1-2026-11-19.md).

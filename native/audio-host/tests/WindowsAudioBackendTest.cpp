@@ -6,7 +6,34 @@
 
 namespace easyknack {
 struct WindowsDeviceVolumeTest {
+    static bool apartmentLifecycle() {
+        bool valid=true;
+        std::thread control([&]{
+            auto noExplicitApartment=[] {
+                auto result=CoInitializeEx(nullptr,COINIT_MULTITHREADED);
+                if(SUCCEEDED(result))CoUninitialize();
+                return result==S_OK; // An implicit process MTA is allowed; no explicit reference is.
+            };
+            valid &= noExplicitApartment();
+            { WindowsDeviceVolume volume(false);valid &= noExplicitApartment(); }
+            { WindowsDeviceVolume volume(true);valid &= volume.enumerator!=nullptr; }
+            valid &= noExplicitApartment();
+            for(auto mode:{COINIT_MULTITHREADED,COINIT_APARTMENTTHREADED}) {
+                auto initialized=CoInitializeEx(nullptr,mode);
+                if(FAILED(initialized)){valid=false;continue;}
+                { WindowsDeviceVolume volume(true);valid &= volume.enumerator!=nullptr; }
+                // Destroying volume preserves the caller's apartment, including STA.
+                auto retained=CoInitializeEx(nullptr,mode);
+                valid &= retained==S_FALSE;
+                if(SUCCEEDED(retained))CoUninitialize();
+                CoUninitialize();
+                valid &= noExplicitApartment();
+            }
+        });
+        control.join();return valid;
+    }
     static bool run() {
+        if(!apartmentLifecycle())return false;
         std::map<std::string,float> devices{{"a",.4f},{"b",.8f},{"other",.9f}};
         unsigned writes=0;
         WindowsDeviceVolume volume(false,[&](const std::string& id) {

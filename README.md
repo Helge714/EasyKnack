@@ -6,7 +6,7 @@ signals as they run, and save your work as `.knack` documents.
 
 ## Get started
 
-Download the [Windows x64 release](https://github.com/Helge97/EasyKnack/releases/latest)
+Download the [Windows x64 release](https://github.com/Helge714/EasyKnack/releases/latest)
 with its matching sources and checksums. The installer is unsigned.
 
 Use the Windows x64 installer or portable application folder. Packaged builds
@@ -37,17 +37,16 @@ sharing documents that depend on local media or plugins.
 
 ## Development
 
-With JDK 25, Maven and Python 3 installed, bootstrap the public GLSwing SDK once:
+Install JDK 25, Maven and Python 3, then bootstrap the external, checksum-pinned
+[GLSwing 0.3.0 SDK](https://github.com/Helge714/GLSwing/releases/tag/v0.3.0):
 
 ```sh
 python scripts/bootstrap-glswing.py
 mvn package
 ```
 
-Use `python3` where appropriate, or `--maven /path/to/mvn` if Maven is not on
-PATH. The script verifies the [published SDK](https://github.com/Helge714/GLSwing/releases/tag/v0.2.0)
-before installing it in your local Maven repository. No private repository,
-Sonatype account or large source-materials archive is needed.
+EasyKnack consumes only the external Maven artifact. A GLSwing source checkout
+is not a project dependency.
 
 See [developer documentation](docs/development/README.md) for builds, architecture
 and technical references. GLSwing is an external Maven dependency. Product changes

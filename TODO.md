@@ -1,4 +1,5 @@
 # Bugs
+- [x] Verbindungsverlust beim Gruppieren und Entpacken von Delay-/Feedback-Graphen: Core berücksichtigt beim Gruppieren auch die getrennt gespeicherten Anschlüsse der umschließenden Gruppe und übernimmt beim Entpacken deren neue Zuordnungen vor der Node-Projektion. Regressionen für verschachtelte Gruppen und Undo/Redo in `DelayGroupingTest`, zusätzlich mit der gespeicherten Reverb-Datei geprüft. Die Ausführungsplanung für gruppenübergreifendes Feedback bleibt ein eigener offener Punkt unten.
 - [ ] Experimentell: Pitch-Hold-Akzeptanz und Frequenzgenauigkeit verbessern. Bekannte Einschränkung im Harmonizer; Pitch Hold und abhängige Funktionen sind seit 2026-11-11 standardmäßig verborgen und über die Experimental-Einstellung freischaltbar. Siehe [Nachprüfung](docs/development/source-audit/RELEASE-FIXES-2026-11-11.md).
 - [x] Gruppieren bei außerhalb verbleibendem stummgeschaltetem Delay erhält den internen Ersatzwert und das bisherige Audio. `FeedbackWarningAudioTest` besteht; [Nachprüfung](docs/development/source-audit/RELEASE-FIXES-2026-11-11.md).
 - [x] Wenn man einen Step Switch innerhalb einer Gruppe von Trigger auf Index umstellt, verschwindet er, bis man die Gruppe verlässt und neu öffnet.
@@ -21,6 +22,7 @@
 - [x] Doppelklick im Filechooser öffnet einen Ordner nur in der Seitenleiste, erst ein erneuter Doppelklick öffnet ihn im Hauptbereich. Die beiden sollten getrennt von einander sein, ein Doppelklick in der Seitenleiste öffnet den Ordner nur dort, ein Einfachklick im Seitenmenu öffnet den Ordner im Hauptbereich. Ein Doppelklick im Hauptbereich öffnet ihn nur dort.
 
 # Nice to have
+- [ ] Oscillator: separater FM-Eingang mit Modulationstiefe, damit die Grundfrequenz ohne zusätzlichen Math-Node erhalten bleibt (Frequency und Phase unterstützen bereits Audiorate).
 - [ ] Einordnung und Sichtbarkeit spezialisierter Forschungs-Nodes wie Sine Cloud festlegen.
 - [x] Step Switch sollte die Eingänge verschiebbar haben über den Inspector, ähnlich wie der Value-Viewer
 - [x] Namensänderungen sollten resetable sein.
@@ -48,6 +50,13 @@
 - [x] Build-Sprachen geprüft und in der Entwicklerübersicht erklärt: PowerShell/C#/Python bleiben aktive Werkzeuge; Assembly liegt als archivierte Compiler-Auswertung vor.
 
 # EasyKnack backlog
+
+- [ ] Expose Core socket hit padding as an application preference (the theme
+  already provides `node.portHitPaddingX`). Keep embedded editors pickable in
+  overlapping areas; leave vertical hit areas compact for resizing.
+- [x] Mirrored node orientation for feedback layouts: inputs right, outputs left,
+  with Core context-menu/inspector controls, persistent Undo-aware view state,
+  mirrored connection tangents, insertion spacing and automatic layout.
 
 Current work only. Historical implementation notes, superseded plans and original
 bug reports are preserved in [the October archive](docs/development/history/TODO-2026-10.md).
@@ -87,6 +96,15 @@ bug reports are preserved in [the October archive](docs/development/history/TODO
   ordinary/Multiple Group Bakes; Step Switch mode changes and named inputs.
 
 ## Next technical work
+
+- [ ] Preserve Delay feedback boundaries across group interfaces. Analyze actual
+  input-to-output dependencies recursively: a delayed parallel branch must not
+  legitimize an instantaneous bypass. Plan feedback execution at the internal
+  Delay across ordinary/nested group boundaries; retain equivalent behavior in
+  Bake/export, including separate delayed-output read and input-write phases
+  where required. Recompute after rewiring, delay changes and mute; verify safe
+  loops, unsafe bypasses and grouped two-delay reverb networks without a manual
+  "allow feedback" override. Track connection loss separately under Bugs above.
 
 - [ ] Add optional Formula Group oversampling (Off/default, 2x, 4x, 8x) as a host
   execution feature: filtered upsampling, formula execution at the effective

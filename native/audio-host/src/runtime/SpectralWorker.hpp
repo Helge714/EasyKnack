@@ -4,12 +4,7 @@
 #include <mutex>
 #include <thread>
 #include <memory>
-#if defined(_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
-#endif
+#include "../platform/ThreadPriority.hpp"
 namespace easyknack {
 /** One persistent helper shared by all spectral groups. Contention falls back to serial.
  * Construct/destruct outside rendering; a successful submit must be joined before
@@ -22,9 +17,7 @@ class SpectralWorker {
     void (*function)(void*)noexcept=nullptr;void* argument=nullptr;
     std::thread thread;
     void loop(){
-#if defined(_WIN32)
-        SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
-#endif
+        platform::prioritizeAudioWorker();
         std::unique_lock<std::mutex> lock(mutex);
         for(;;){
             ready.wait(lock,[&]{return pending||stopping;});if(stopping)return;

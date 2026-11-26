@@ -38,10 +38,10 @@
       "sha256": "b1340378b9ed62b32acfacd012dd069ec2b9d940fc39d3c73f32142d64e89713"
     },
     {
-      "id": "glswing-0.2.0",
-      "file": "glswing-0.2.0-sources.jar",
-      "localMavenPath": "io/github/helge714/glswing/0.2.0/glswing-0.2.0-sources.jar",
-      "sha256": "c7a07eb12e0c8b87dd8dab0c009d7e36faa9b0aaa9acc1f61a6dd62dbe7d1a62"
+      "id": "glswing-0.3.0",
+      "file": "glswing-0.3.0-sources.jar",
+      "localMavenPath": "io/github/helge714/glswing/0.3.0/glswing-0.3.0-sources.jar",
+      "sha256": "0320b7a7d227392c4de5a76941e7fd6f1b0399f8e7f628a5f32daffc285a5f94"
     },
     {
       "id": "mingw-w64",
@@ -81,15 +81,33 @@
     },
     {
       "id": "glswing-build-inputs",
-      "file": "GLSwing-0.2.0-source.zip",
-      "sha256": "5e171e4304090a74b1456cb2cd604d3b61555121324af094f79be5a9132d647f",
-      "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-source.zip"
+      "file": "GLSwing-0.3.0-source.zip",
+      "sha256": "c70c194a07b2139d2918233163c325a774ef6ead457d22c63a18f35888d8a9aa",
+      "url": "https://github.com/Helge714/GLSwing/releases/download/v0.3.0/GLSwing-0.3.0-source.zip"
     },
     {
       "id": "wix-3.14.1",
       "file": "wix3-wix3141rtm.tar.gz",
       "sha256": "374ec1923954c0df5874964d845c09d887012fbab5aa13d000201d0b9f789d96",
       "url": "https://codeload.github.com/wixtoolset/wix3/tar.gz/refs/tags/wix3141rtm"
+    },
+    {
+      "id": "alsa-lib-1.2.14",
+      "url": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
+      "file": "alsa-lib-1.2.14.tar.bz2",
+      "sha256": "be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32"
+    },
+    {
+      "id": "pulseaudio-17.0",
+      "url": "https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.xz",
+      "file": "pulseaudio-17.0.tar.xz",
+      "sha256": "053794d6671a3e397d849e478a80b82a63cb9d8ca296bd35b73317bb5ceb87b5"
+    },
+    {
+      "id": "lame-3.100",
+      "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+      "file": "lame-3.100.tar.gz",
+      "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
     }
   ],
   "binaries": [
@@ -98,8 +116,8 @@
       "sha256": "88fbda4b912596b9f56e8e12e580cc954bacfb51776ecfddd3e18fc1cf56dc4c"
     },
     {
-      "file": "glswing-0.2.0.jar",
-      "sha256": "e3c92887c4036f84c079ccd99d3c3a68dc683ae1f3b4223eb038535774b56477"
+      "file": "glswing-0.3.0.jar",
+      "sha256": "3fed2d531b72312a309e1ac43085d943c84256e8c2d456e6f632812e5daf31f8"
     },
     {
       "file": "gluegen-rt-2.6.0-natives-windows-amd64.jar",

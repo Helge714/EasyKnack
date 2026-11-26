@@ -9,7 +9,7 @@ Reduces amplitude precision and update frequency.
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Rate | [Editor](../../user/en/reference-tables.md) | Auto, Audio, Control | — | Auto | — | — | Inspector |
-| In | [Value](../../user/en/data-types.md#value) | ±1 | ±1 | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
+| In | [Audio](../../user/en/data-types.md#audio) | ±1 | ±1 | 0 | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Bits | [Value](../../user/en/data-types.md#value) | 1–24, integer | 1–24, rounded | 8 | — | [Auto](../../user/en/rates.md#auto) | Always |
 | Downsample | [Value](../../user/en/data-types.md#value) | 1–1024, integer | 1–1024, rounded | 1 | — | [Auto](../../user/en/rates.md#auto) | Always |
 
@@ -17,7 +17,7 @@ Reduces amplitude precision and update frequency.
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Range](../../user/en/reference-tables.md#range) | [Rate](../../user/en/rates.md) | [Channel](../../user/en/data-types.md#channels) |
 | --- | --- | --- | --- | --- |
-| Out | [Value](../../user/en/data-types.md#value) | ±1 | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
+| Out | [Audio](../../user/en/data-types.md#audio) | ±1 | [Auto](../../user/en/rates.md#auto) | [Auto](../../user/en/data-types.md#channels) |
 
 ## Behavior
 

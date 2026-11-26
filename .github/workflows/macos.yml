@@ -1,0 +1,90 @@
+name: macOS experimental build
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/macos-port]
+permissions:
+  contents: read
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '14.2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect exact JDK, build sources and external Core inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/prepare-macos-inputs.py --output target/macos-inputs
+          echo "JAVA_HOME=$(cat target/macos-inputs/java-home.txt)" >> "$GITHUB_ENV"
+          echo "$(cat target/macos-inputs/java-home.txt)/bin" >> "$GITHUB_PATH"
+      - name: Install the external Core Maven dependency from frozen sources
+        run: GIT_CEILING_DIRECTORIES="$PWD/target/macos-inputs" mvn -B -f target/macos-inputs/core/pom.xml -pl glswing-core -am -Dmaven.test.skip=true install
+      - name: Java platform, Formula, document and SDK checks
+        run: >-
+          mvn -B -Deasyknack.language=en -Deasyknack.test.audio=true
+          -Deasyknack.test.cxx=/usr/bin/clang++
+          -Dtest=NativePlatformTest,NativeBuildSettingsTest,DocumentLaunchTest,MacDesktopTest,FormulaNativeCompilerTest,PluginSdkTest test
+      - name: Build and run native regressions
+        run: |
+          cmake -S native/audio-host -B target/native-macos -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=14.2
+          cmake --build target/native-macos --parallel 2
+          ctest --test-dir target/native-macos --output-on-failure --output-junit "$PWD/target/macos-native-tests.xml"
+      - name: Assemble Java distribution
+        run: mvn -B -Dmaven.test.skip=true package
+      - name: Real macOS Formula and Bake/source-plugin build/cache acceptance
+        run: |
+          chmod +x scripts/macos/clang++
+          java --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED \
+            -cp "target/classes:target/lib/*" scripts/linux/NativeCompilationCheck.java "$PWD/scripts/macos/clang++"
+      - name: Real OpenGL/AWT render check
+        run: >-
+          java --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED
+          --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED
+          -cp 'target/classes:target/lib/*' scripts/macos/GuiSmoke.java
+      - name: Package app and DMG with full JDK, examples and source materials
+        run: python3 scripts/package-macos.py --java-build target --native target/native-macos --inputs target/macos-inputs --output dist/macos-test
+      - name: Verify signed package and compiler from its installed layout
+        run: |
+          sh scripts/macos/Check-Mac.command "$PWD/dist/macos-test/image/EasyKnack.app"
+          app="$PWD/dist/macos-test/image/EasyKnack.app"
+          jar=$(cat "$app/Contents/app/application-jar.txt")
+          "$app/Contents/runtime/Contents/Home/bin/java" --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED \
+            -cp "$app/Contents/app/$jar:$app/Contents/app/lib/*" scripts/macos/GuiSmoke.java
+          hdiutil verify dist/macos-test/*.dmg
+      - name: Audit installed notices and matching source materials
+        run: python3 scripts/audit-macos-package.py --app dist/macos-test/image/EasyKnack.app --output dist/macos-test --jdk target/macos-inputs/jdk.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macos-${{ matrix.arch }}-diagnostics
+          path: |
+            target/macos-native-tests.xml
+            target/native-macos/Testing/Temporary/LastTest.log
+            target/surefire-reports/*.xml
+            ~/Library/Logs/EasyKnack/*.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EasyKnack-macos-${{ matrix.arch }}-experimental
+          compression-level: 0
+          path: |
+            dist/macos-test/*.dmg
+            dist/macos-test/*.sha256
+            dist/macos-test/*-license-materials.zip
+            dist/macos-test/*-license-materials.json

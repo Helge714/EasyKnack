@@ -1,5 +1,10 @@
 # MIDI-Eingang (MIDI Input)
 
+Unter macOS verwenden Hardware- und virtuelle MIDI-Eingänge CoreMIDI mit dessen
+eindeutigen Gerätekennungen. Nach Gerätewechsel die Liste aktualisieren;
+nicht verfügbare Geräte deaktivieren Tastatur-MIDI nicht. Lernen und MIDI-Routing
+verwenden die gleichen Bedienelemente.
+
 ## Übersicht
 
 Empfängt MIDI von einem Gerät oder der Computertastatur.
@@ -22,6 +27,10 @@ Empfängt MIDI von einem Gerät oder der Computertastatur.
 ## Verhalten
 
 Wähle einen Hardware-Eingang oder Keyboard. Ein Klick auf die Tastatursteuerung aktiviert die musikalischen Tasten; ein Klick außerhalb gibt den Fokus frei. Ohne Transposition spielt A den Ton C4. Alle Noten aus beendet aktive Noten und leert wartende MIDI-Verzögerungen.
+
+Hardware- und virtuelle Linux-Eingänge verwenden den ALSA-Sequencer. Dafür werden
+`libasound.so.2` und ein zugängliches Sequencer-Gerät benötigt. Fehlende oder
+getrennte Eingänge werden gemeldet; die Computertastatur bleibt verfügbar.
 
 ## Mute
 

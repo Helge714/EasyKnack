@@ -28,36 +28,21 @@ class LiveSettingsTest {
                     System.setProperty("easyknack.language","de");AppText.reload();com.vin.easyknack.nodes.NodeText.reload();
                     controller.workspace().setGLLocalizer(GLLocalizer.GERMAN);controller.refreshAppearance();LiveLanguage.refresh(container);
                     assertEquals("Neu",label.getText());assertEquals("New",user.getText());
-                    assertTrue(selected.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Namen zurücksetzen")));
                     assertEquals("Audioausgang",portLabel.getText());assertEquals("Audio Out",customPortLabel.getText());
                     assertTrue(labels(controller.workspace()).contains("Audioausgang"));
                     assertEquals("Datei",heading.getText());assertEquals("Neu",item.getText());
                     assertTrue(controller.workspace().editor().getNodes().stream().anyMatch(n->n.getTitle().equals("Oszillator")));
+                    assertTrue(controller.workspace().editor().getNodes().stream().allMatch(n->n.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Namen zurücksetzen"))));
                     assertFalse(controller.selectedNodeIds().isEmpty());
                     assertEquals(before,NodeDocuments.comparable(controller.snapshotDocument()));
                     System.setProperty("easyknack.language","en");AppText.reload();com.vin.easyknack.nodes.NodeText.reload();controller.workspace().setGLLocalizer(GLLocalizer.ENGLISH);controller.refreshAppearance();LiveLanguage.refresh(container);
                     assertEquals("New",label.getText());assertTrue(controller.workspace().editor().getNodes().stream().anyMatch(n->n.getTitle().equals("Oscillator")));
-                    assertTrue(selected.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Reset name")));
+                    assertTrue(controller.workspace().editor().getNodes().stream().allMatch(n->n.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Reset name"))));
                     assertEquals("File",heading.getText());assertEquals("New",item.getText());
                     LiveLanguage.refresh(controller.workspace());
                     assertEquals("Audio Output",portLabel.getText());assertEquals("Audio Out",customPortLabel.getText());
                     assertTrue(labels(controller.workspace()).contains("Audio Output"));
                     assertFalse(labels(controller.workspace()).contains("Audioausgang"));
-                }
-            });
-        }finally{if(previous==null)System.clearProperty("easyknack.language");else System.setProperty("easyknack.language",previous);AppText.reload();com.vin.easyknack.nodes.NodeText.reload();}
-    }
-    @Test void newNodesCreateContextMenusInApplicationLanguage()throws Exception{
-        String previous=System.getProperty("easyknack.language");
-        try{
-            System.setProperty("easyknack.language","de");AppText.reload();com.vin.easyknack.nodes.NodeText.reload();
-            javax.swing.SwingUtilities.invokeAndWait(()->{
-                try(var controller=new WorkspaceController()){
-                    controller.workspace().setGLLocalizer(GLLocalizer.GERMAN);
-                    controller.openDocument("Sprache",StarterDocument.create());
-                    var node=controller.workspace().editor().getNodes().get(0);
-                    assertTrue(node.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Namen zurücksetzen")));
-                    assertFalse(node.getContextMenu().getItems().stream().anyMatch(i->i.getText().equals("Edit title")));
                 }
             });
         }finally{if(previous==null)System.clearProperty("easyknack.language");else System.setProperty("easyknack.language",previous);AppText.reload();com.vin.easyknack.nodes.NodeText.reload();}

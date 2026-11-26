@@ -4,6 +4,10 @@
 
 Records triggered audio takes as WAV or MP3 files.
 
+On macOS, MP3 uses the bundled replaceable LAME library, as on Linux: 128 kbit/s
+mono or 192 kbit/s stereo, with finalized gapless delay/padding metadata. The
+bundled library is also available to locally compiled Bake/plugin hosts.
+
 ## Inputs
 
 | [Name](../../user/en/reference-tables.md#name) | [Data type](../../user/en/data-types.md) | [Editor range](../../user/en/reference-tables.md#editor-range) | [Signal range](../../user/en/reference-tables.md#signal-range) | [Default](../../user/en/reference-tables.md#default) | [Unit](../../user/en/units.md) | [Rate](../../user/en/rates.md) | [Visibility](../../user/en/reference-tables.md#visibility) |
@@ -30,7 +34,7 @@ Start includes the triggering sample; Stop ends the take before that sample. Rep
 
 WAV stores 32-bit floating-point audio at the host sample rate. Stereo preserves both channels; Mono averages left and right. Polyphonic voices are summed. Without Overwrite, the first take uses `Take.wav` directly. On the next collision, the existing file becomes `Take_0001.wav` and the new take uses `Take_0002.wav`. Once a numbered series exists, new takes continue above its highest index, even after restarting the recorder. Existing numbered files are never replaced. An active unnumbered take is moved only after its writer closes. Index digits specifies a minimum width: larger indices remain valid. Overwrite replaces the selected file on each new take.
 
-A background thread writes a bounded queue. If the disk cannot keep up, recording stops with an error; accepted audio is finalized as a partial take. Status shows duration and the output path in its tooltip. File/open, queue-overflow, write and WAV size-limit errors are distinguished. A WAV take is limited to the standard WAV/RIFF size (approximately 4 GiB); MP3 requires an available Windows media encoder. MP3 clips input to ±1 before encoding and includes codec delay/padding; use WAV for sample-accurate timing. Browse selects the output folder and file name in a save dialog. The adjacent text field also lets you edit the file name directly. Selecting a target does not create a file; recording starts via Start. Enter accepts the name and leaves the field. The extension selects the format; `.wav` is added when neither `.wav` nor `.mp3` is present. Older documents retain their stored target paths. WAV remains the default.
+A background thread writes a bounded queue. If the disk cannot keep up, recording stops with an error; accepted audio is finalized as a partial take. Status shows duration and the output path in its tooltip. File/open, queue-overflow, write and WAV size-limit errors are distinguished. A WAV take is limited to the standard WAV/RIFF size (approximately 4 GiB); MP3 uses the Windows media encoder on Windows and the bundled LAME encoder on Linux (128 kbit/s mono, 192 kbit/s stereo). Linux recordings include gapless delay/padding metadata; playback depends on the player. MP3 clips input to ±1 before encoding and includes codec delay/padding; use WAV for sample-accurate timing. Browse selects the output folder and file name in a save dialog. The adjacent text field also lets you edit the file name directly. Selecting a target does not create a file; recording starts via Start. Enter accepts the name and leaves the field. The extension selects the format; `.wav` is added when neither `.wav` nor `.mp3` is present. Older documents retain their stored target paths. WAV remains the default.
 
 Save recording as exports a completed take in its recorded format without ending another take or altering the automatic recording target. It is disabled until recorded audio has been finalized. Changing recording target or format/channel settings closes the current take.
 

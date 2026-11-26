@@ -32,7 +32,7 @@ public record AudioEndpoint(String id, String name, Type type, boolean input, bo
         return switch (type) {
             case ASIO_INPUT, ASIO_OUTPUT -> "ASIO";
             case SYSTEM_MIX, APPLICATION -> "Capture";
-            default -> "WASAPI";
+            default -> com.vin.easyknack.NativePlatform.current().windows()?"WASAPI":"Audio";
         };
     }
     @Override public String toString() { return "[" + interfaceLabel() + "] " + name + (available ? "" : " (unavailable)"); }

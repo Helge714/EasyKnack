@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ "$("$root/zig" version)" != '0.15.2' ]; then
+  echo 'Unexpected bundled C++ compiler version (expected Zig 0.15.2).' >&2
+  exit 1
+fi
+# Clang's version-only path parses an LLVM triple, not Zig's glibc suffix.
+if [ "$#" -eq 1 ] && [ "$1" = '--version' ]; then
+  exec "$root/zig" c++ --version
+fi
+exec "$root/zig" c++ -target x86_64-linux-gnu.2.28 "$@"

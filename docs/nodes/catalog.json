@@ -1,6 +1,13 @@
 {
   "schema": 1,
   "nodes": [
+    {"id":"easyknack.audio.envelopefollower","slug":"envelope-follower","category":"analysis","title":{"en":"Envelope Follower","de":"Hüllkurvenfolger"},"source":"EnvelopeFollowerNode.java","kind":"node"},
+    {"id":"easyknack.audio.dynamicscurve","slug":"dynamics-curve","category":"math","title":{"en":"Dynamics Curve","de":"Dynamikkennlinie"},"source":"DynamicsCurveNode.java","kind":"node"},
+    {"id":"easyknack.audio.allpass","slug":"allpass","category":"effect","title":{"en":"Allpass","de":"Allpass"},"source":"AllpassNode.java","kind":"node"},
+    {"id":"easyknack.audio.delayallpass","slug":"delay-allpass","category":"effect","title":{"en":"Delay Allpass","de":"Delay-Allpass"},"source":"DelayAllpassNode.java","kind":"node"},
+    {"id":"easyknack.audio.compressor","slug":"compressor","category":"effect","title":{"en":"Compressor","de":"Kompressor"},"source":"CompressorNode.java","kind":"node"},
+    {"id":"easyknack.audio.limiter","slug":"limiter","category":"effect","title":{"en":"Limiter","de":"Limiter"},"source":"LimiterNode.java","kind":"node"},
+    {"id":"easyknack.audio.freeverb","slug":"freeverb","category":"effect","title":{"en":"Freeverb","de":"Freeverb"},"source":"FreeverbNode.java","kind":"node"},
     {
       "id": "easyknack.audio.sinecloud",
       "slug": "sine-cloud",

@@ -6,6 +6,9 @@ import com.vingame.glswing.node.*;
 /** Application mute policy and grouped validation around Core editing commands. */
 final class NodeEditingActions implements GLNodeEditingActions {
     @Override public void arrangeAll() { core.arrangeAll(); }
+    @Override public boolean canMirror() { return core.canMirror(); }
+    @Override public void setSelectedMirrored(boolean mirrored) { core.setSelectedMirrored(mirrored); }
+    @Override public void toggleMirrored() { core.toggleMirrored(); }
     private final GLNodeEditingActions core;
     private final BooleanSupplier muteable;
     private final java.util.function.BiConsumer<String,Runnable> edit;

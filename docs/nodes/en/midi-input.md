@@ -1,5 +1,9 @@
 # MIDI Input
 
+On macOS, hardware and virtual MIDI inputs use CoreMIDI. Device identities follow
+CoreMIDI's unique IDs. Refresh devices after hotplug; unavailable devices do not
+disable keyboard MIDI. Learn and MIDI event routing use the same controls.
+
 ## Overview
 
 Receives MIDI from a device or the computer keyboard.
@@ -22,6 +26,10 @@ Receives MIDI from a device or the computer keyboard.
 ## Behavior
 
 Select a hardware input or Keyboard. Click the keyboard control to capture musical keys; clicking elsewhere releases that focus. At zero transposition, A plays C4. All notes off releases active notes and clears pending MIDI delays.
+
+Linux hardware and virtual inputs use the ALSA sequencer. The system needs
+`libasound.so.2` and an accessible sequencer device; unavailable/disconnected
+inputs are reported without disabling the computer keyboard.
 
 ## Mute
 

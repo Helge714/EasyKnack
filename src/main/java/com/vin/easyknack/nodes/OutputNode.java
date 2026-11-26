@@ -12,10 +12,10 @@ public final class OutputNode extends BasicNode {
         node.addInput(IN, "Audio In");
         node.addEditor(ENDPOINT, "Device", new EndpointEditor(com.vin.easyknack.audio.AudioEndpoint.DEFAULT)).keepVisibleOnHide();
         var endpoint=com.vin.easyknack.audio.AudioEndpoint.reference(state.text(ENDPOINT,com.vin.easyknack.audio.AudioEndpoint.DEFAULT.reference()));
-        boolean windows=endpoint.id().equals("default") || endpoint.id().startsWith("out:");
-        node.addEditor(DEVICE_VOLUME,"Device volume",new DeviceVolumeEditor(endpoint.id())).visible(windows).keepVisibleOnHide();
-        node.addEditor(VOLUME_KEYS,"Link volume keys",Editor.checkBox(false)).visible(windows);
-        node.addEditor(LEVEL,"Signal",new OutputLevelEditor(endpoint.id())).visible(windows);
+        boolean volumeControls=endpoint.id().equals("default") || endpoint.id().startsWith("out:");
+        node.addEditor(DEVICE_VOLUME,"Device volume",new DeviceVolumeEditor(endpoint.id())).visible(volumeControls).keepVisibleOnHide();
+        node.addEditor(VOLUME_KEYS,"Link volume keys",Editor.checkBox(false)).visible(volumeControls);
+        node.addEditor(LEVEL,"Signal",new OutputLevelEditor(endpoint.id())).visible(volumeControls);
     }
     @Override public NativeProcessor processor() { return new NativeProcessor("deviceout", "nodes/DeviceOutputNode.hpp",
             ParameterContract.builder().source(IN).mapped(ENDPOINT,s -> com.vin.easyknack.audio.AudioEndpoint.hex(com.vin.easyknack.audio.AudioEndpoint.reference(s.text(ENDPOINT,com.vin.easyknack.audio.AudioEndpoint.DEFAULT.reference())).id())).build()); }

@@ -1,0 +1,5 @@
+{
+  "source": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+  "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e",
+  "scope": "Unmodified portable encoder sources, public header and notices. Decoder and assembler/SIMD paths are not built; easyknack/config.h is EasyKnack build policy."
+}

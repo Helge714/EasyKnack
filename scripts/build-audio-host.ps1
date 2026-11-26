@@ -10,7 +10,7 @@ New-Item -ItemType Directory -Force $OutputDirectory | Out-Null
 $nodes = @(Get-ChildItem -LiteralPath "$sourceRoot/src/nodes" -Filter '*.cpp' -File -Recurse | Sort-Object FullName | ForEach-Object FullName)
 Invoke-EasyKnackNativeCompiler -Cxx $Cxx -SourceRoot $sourceRoot -Generated $generated -Sources (@("$sourceRoot/src/main.cpp") + $nodes) -Output "$OutputDirectory/easyknack-audio-host.exe"
 if ($SkipTests) { return }
-foreach ($test in @('WindowsAudioBackendTest', 'AsioBackendTest', 'AudioGraphTest', 'SharedAudioTransportTest', 'DriverBridgeTest')) {
+foreach ($test in @('WindowsAudioBackendTest', 'AsioBackendTest', 'AudioGraphTest', 'SharedAudioTransportTest', 'DriverBridgeTest', 'DynamicsTest')) {
     Write-Host "Building native test: $test"
     $sources = @("$sourceRoot/tests/$test.cpp")
     if ($test -in @('WindowsAudioBackendTest','AsioBackendTest','AudioGraphTest')) { $sources += $nodes }

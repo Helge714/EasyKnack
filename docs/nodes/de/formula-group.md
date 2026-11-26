@@ -1,5 +1,9 @@
 # Formelgruppe (Formula Group)
 
+Unter macOS benötigt die native Optimierung Apples Command Line Tools oder Xcode.
+Ohne nativen Compiler bleibt der Interpreter verfügbar. Compilerfehler enthalten
+ein Protokoll; nach Installation der Werkzeuge die native Optimierung erneut starten.
+
 ## Übersicht
 
 Berechnet eigene Formeln mit konfigurierbarer Gruppenschnittstelle.

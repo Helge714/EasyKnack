@@ -1,6 +1,18 @@
 # Release notes
 
-## Unreleased - 0.3.3
+## 0.4.0 - 2026-11-26
+
+- **Native Freeverb:** the stereo reverb network runs directly in C++, avoiding the overhead of a large processing group.
+- **Dynamics building blocks:** Envelope Follower, Dynamics Curve, Compressor with optional sidechain, and a stereo-linked sample-peak Limiter with adjustable lookahead.
+- **Allpass effects:** first-/second-order Allpass and Delay Allpass for phase processing and diffusion.
+- **Better graph editing:** mirrored nodes, layout that follows physical port sides, larger socket hit areas and clearer focus indicators.
+- **More reliable groups:** preserve boundary connections when grouping feedback graphs; keep group heights and viewer sizes consistent through edits and navigation.
+- **Windows fixes:** restore device-volume discovery and linked volume keys. Bitcrusher now uses Audio colors and signal ports.
+- German and English references describe every new node. The external GLSwing 0.3.0 SDK is available for source builds.
+
+### Compatibility
+
+Existing projects can be opened. Keep a backup before saving: documents saved by this version use graph schema 11 and need a compatible reader. Source plugins may rebuild once after upgrading. The Limiter adds its selected lookahead as latency (5 ms by default); it is not an oversampled true-peak limiter.
 
 ## 0.3.2 - 2026-11-25
 

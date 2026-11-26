@@ -10,6 +10,7 @@ public final class EasyKnack {
     private EasyKnack() { }
 
     public static void main(String[] args) {
+        GraphicsDiagnostics.startIfEnabled();
         final DocumentLaunch launches;
         try {
             launches = DocumentLaunch.start(LaunchArguments.decode(args));
@@ -20,6 +21,7 @@ public final class EasyKnack {
             return;
         }
         Runtime.getRuntime().addShutdownHook(new Thread(launches::close, "EasyKnack instance cleanup"));
+        MacDesktop.install(launches);
         GLApplication.builder()
                 .locale(com.vin.easyknack.app.ApplicationSettings.locale())
                 .title(com.vin.easyknack.i18n.AppText.literal("EasyKnack"))

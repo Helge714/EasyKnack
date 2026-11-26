@@ -7,6 +7,27 @@ import com.vingame.glswing.component.*;
 import com.vingame.glswing.input.*;
 import com.vingame.glswing.ui.*;
 class InspectorKeyboardTest {
+ @Test void resizeKeepsCameraCenterWhileInspectorToggleKeepsScreenPositions()throws Exception{
+  SwingUtilities.invokeAndWait(()->{try(var controller=new WorkspaceController()){
+   controller.openDocument("Camera",StarterDocument.create());var workspace=controller.workspace();
+   workspace.setInspectorVisible(false);workspace.setBounds(0,0,1000,700);var editor=workspace.editor();
+   var graph=workspace.currentGraph().snapshot();
+   for(float zoom:new float[]{.5f,1,2}){
+    editor.setZoom(zoom);editor.setPan(73,-42);
+    float x=editor.getWidth()*.5f-editor.getPanX()/zoom,y=editor.getHeight()*.5f-editor.getPanY()/zoom;
+    workspace.setBounds(0,0,workspace.getWidth()==1000?1400:1000,workspace.getHeight()==700?900:700);
+    assertEquals(x,editor.getWidth()*.5f-editor.getPanX()/zoom,.001);
+    assertEquals(y,editor.getHeight()*.5f-editor.getPanY()/zoom,.001);
+    float screenX=editor.getWidth()*.5f*(1-zoom)+editor.getPanX();
+    float screenY=editor.getHeight()*.5f*(1-zoom)+editor.getPanY();float width=editor.getWidth();
+    workspace.setInspectorVisible(true);assertTrue(editor.getWidth()<width);
+    assertEquals(screenX,editor.getWidth()*.5f*(1-zoom)+editor.getPanX(),.001);
+    assertEquals(screenY,editor.getHeight()*.5f*(1-zoom)+editor.getPanY(),.001);
+    workspace.setInspectorVisible(false);
+   }
+   assertEquals(graph,workspace.currentGraph().snapshot());
+  }});
+ }
  @Test void windowFallbackWorksWithoutFocusOnBothSurfaceTypes()throws Exception{
   SwingUtilities.invokeAndWait(()->{
    for(GLParent host:java.util.List.of(new GLSwingPanel(){},new GLSwingContainerCanvas(){})){

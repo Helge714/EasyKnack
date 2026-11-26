@@ -1,13 +1,13 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "sdk": {
-    "file": "GLSwing-0.2.0-SDK.zip",
-    "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-SDK.zip",
-    "sha256": "61fbd1cbfbba62e3e3c11cc7a742dc3b0c334a2195bb8c90c24d5b0421a2fbfb"
+    "file": "GLSwing-0.3.0-SDK.zip",
+    "url": "https://github.com/Helge714/GLSwing/releases/download/v0.3.0/GLSwing-0.3.0-SDK.zip",
+    "sha256": "c727b28233a654eba3dc5460d8dde7c96150b715b76dca7fa367f1de8faa8db6"
   },
   "source": {
-    "file": "GLSwing-0.2.0-source.zip",
-    "url": "https://github.com/Helge714/GLSwing/releases/download/v0.2.0/GLSwing-0.2.0-source.zip",
-    "sha256": "5e171e4304090a74b1456cb2cd604d3b61555121324af094f79be5a9132d647f"
+    "file": "GLSwing-0.3.0-source.zip",
+    "url": "https://github.com/Helge714/GLSwing/releases/download/v0.3.0/GLSwing-0.3.0-source.zip",
+    "sha256": "c70c194a07b2139d2918233163c325a774ef6ead457d22c63a18f35888d8a9aa"
   }
 }

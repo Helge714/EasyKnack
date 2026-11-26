@@ -38,20 +38,25 @@ public final class FormulaNativeCompiler {
     /** Caller owns the background executor; never invoke from the UI or audio thread. */
     public synchronized Result compile(FormulaCompiler.Program program)throws IOException,InterruptedException{
         long start=System.nanoTime();String source=translationUnit(program);
-        String identity=compiler+":"+Files.size(compiler)+":"+Files.getLastModifiedTime(compiler)+":-O3:-ffp-contract=off:abi6:"+source;
+        var platform=com.vin.easyknack.NativePlatform.current();
+        String identity=platform.cacheKey()+":"+compiler+":"+Files.size(compiler)+":"+Files.getLastModifiedTime(compiler)+":-O3:-ffp-contract=off:abi6:"
+                +(platform.compilerArchitectureFlags().isEmpty()?"":String.join(" ",platform.compilerArchitectureFlags())+":")+source;
         String key;
         try{key=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(identity.getBytes(StandardCharsets.UTF_8)));}catch(java.security.NoSuchAlgorithmException e){throw new AssertionError(e);}
-        Files.createDirectories(cache);boolean windows=System.getProperty("os.name").startsWith("Windows");
-        Path library=cache.resolve(key+(windows?".dll":".so"));
+        Files.createDirectories(cache);
+        Path library=cache.resolve(key+platform.libraryExtension());
         if(Files.isRegularFile(library)&&Files.size(library)>0)return new Result(library,true,elapsed(start));
         Path work=Files.createTempDirectory(cache,"compile-");Path cpp=work.resolve("formula.cpp"),log=work.resolve("build.log"),built=work.resolve(library.getFileName());
         Files.writeString(cpp,source,StandardCharsets.UTF_8);
-        var command=new ArrayList<>(List.of(compiler.toString(),"-std=c++17","-O3","-ffp-contract=off","-shared"));
-        if(windows)command.add("-static");else command.add("-fPIC");
+        var command=new ArrayList<>(List.of(compiler.toString(),"-std=c++17","-O3","-ffp-contract=off"));
+        command.addAll(platform.sharedLibraryFlags());
+        command.addAll(platform.compilerArchitectureFlags());
         command.addAll(List.of(cpp.toString(),"-o",built.toString()));
         Process process=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
         try{
-            if(!process.waitFor(60,TimeUnit.SECONDS)){process.destroyForcibly().waitFor();throw new IOException("Formula compilation timed out; log: "+log);}
+            // A bundled portable toolchain may bootstrap its standard libraries
+            // on the first build. Match the source-plugin build's bounded budget.
+            if(!process.waitFor(300,TimeUnit.SECONDS)){process.destroyForcibly().waitFor();throw new IOException("Formula compilation timed out; log: "+log);}
             if(process.exitValue()!=0)throw new IOException("Formula compilation failed; log: "+log+"\n"+Files.readString(log));
             try{Files.move(built,library,StandardCopyOption.ATOMIC_MOVE);}catch(AtomicMoveNotSupportedException e){Files.move(built,library,StandardCopyOption.REPLACE_EXISTING);}
             return new Result(library,false,elapsed(start));
