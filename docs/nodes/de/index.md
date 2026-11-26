@@ -25,6 +25,7 @@
 
 ## Effekte
 
+- [Freeverb](freeverb.md)
 - [Hilbert](hilbert.md)
 
 - [Bitcrusher](bitcrusher.md)

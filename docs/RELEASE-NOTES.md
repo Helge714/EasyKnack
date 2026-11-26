@@ -2,6 +2,9 @@
 
 ## Unreleased - 0.4.0
 
+- Add a native stereo Freeverb effect with room size, damping, width and wet/dry
+  controls, direct delay processing and uninterrupted tails during live parameter changes.
+
 - Prevent Step Switch projection failures after returning from a group and
   changing selection mode or data type in the Inspector. Core ignores obsolete
   event snapshots after application normalization; valid wires and Undo remain intact.

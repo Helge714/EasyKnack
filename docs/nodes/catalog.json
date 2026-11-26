@@ -1,6 +1,7 @@
 {
   "schema": 1,
   "nodes": [
+    {"id":"easyknack.audio.freeverb","slug":"freeverb","category":"effect","title":{"en":"Freeverb","de":"Freeverb"},"source":"FreeverbNode.java","kind":"node"},
     {
       "id": "easyknack.audio.sinecloud",
       "slug": "sine-cloud",
