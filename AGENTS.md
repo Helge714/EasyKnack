@@ -32,7 +32,8 @@
   ordinary version maintenance does not itself authorize a release.
 - Package identity generation and the Help/About display are implemented; see
   docs/development/BUILD-IDENTITY.md. Windows installers use the numeric Maven product version.
-  Official release CI and publication remain pending; do not claim those are ready.
+  Official release CI remains pending. Manual GitHub publication uses the reviewed
+  packaging/source/checksum workflow; do not claim CI builds or signing are ready.
 
 ## Code navigation
 

@@ -1,11 +1,11 @@
 # Release readiness
 
-Current release: [0.3.0 - publicly published 2026-11-18](source-audit/RELEASE-0.3.0.md).
-Frozen source `1c837ca`; development continues at `0.4.0-SNAPSHOT` for the Linux-first platform foundation.
-Matching sources/checksums and automated validation evidence accompany it.
-The report distinguishes the full regression from corrected/configured reruns.
-Clean-machine and physical-device manual acceptance remain open; official CI and
-signing remain future work. The November 10 audit below is historical.
+Current release: [0.4.0 - publicly published 2026-11-26](source-audit/RELEASE-0.4.0.md).
+Frozen source `2afd717`; development continues at `0.4.1-SNAPSHOT` with the
+public, checksum-pinned GLSwing 0.3.0 SDK as an external Maven dependency.
+The release has matching sources/checksums and exact-package validation evidence.
+Clean-machine and new physical-device acceptance remain open; official CI/signing
+remain future work. The older audit sections below are historical.
 
 Audited application baseline: `ae41864`; paired local GLSwing change: `2f5ed7c`.
 This is a repository and packaging-readiness review, not acceptance of a release

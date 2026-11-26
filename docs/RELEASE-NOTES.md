@@ -1,5 +1,10 @@
 # Release notes
 
+## Unreleased - 0.4.1
+
+- Use a checksum-identical Debian mirror for LAME source downloads when preparing
+  source materials, avoiding SourceForge responses that are not archives.
+
 ## 0.4.0 - 2026-11-26
 
 - **Native Freeverb:** the stereo reverb network runs directly in C++, avoiding the overhead of a large processing group.
