@@ -108,6 +108,33 @@
 - Include German and English listening exercises; retire the earlier examples
   while preserving edited development copies in a hidden backup.
 
+## 0.3.2 - 2026-11-25
+
+- Display Delay with the Audio node palette, matching its audio inputs and output.
+- Restore Audio colors for Buffer nodes and signals in every bundled theme.
+- Use one Formula variable color while preserving qualifier font emphasis.
+- Improve analysis-curve contrast and line width across dark and light themes.
+- Verify all sixteen packaged examples and both language guides, including saved
+  cameras, document readability and the absence of external asset dependencies.
+
+## 0.3.1 - 2026-11-24
+
+- Use the public GLSwing 0.2.0 SDK with a checksum-verified build bootstrap.
+  Fresh checkouts no longer require a private Core artifact or source-materials ZIP.
+- Restore connection selection, deletion and Undo in borderless themes through the Core.
+- Let the Core refresh Reset name during language changes without an application workaround.
+- Keep Java installation outside the application MSI transaction. Direct MSI
+  installation validates Java and directs missing-JDK users to the Setup EXE.
+
+- Complete German translations for node context menus, MIDI keyboard controls,
+  analysis trigger-line actions, editor-template labels and revised Envelope/MIDI
+  tooltips.
+- Auto-arrange example graphs and inner groups, centering their saved cameras.
+- Replace the bundled examples with sixteen self-contained learning projects covering
+  basics, buffers, MIDI, Instance/Spectral/Formula Groups and delayed feedback.
+- Include German and English listening exercises; retire the earlier examples
+  while preserving edited development copies in a hidden backup.
+
 ## 0.3.0 - 2026-11-18
 
 - Expand Formula with typed user functions, bounded for loops, final locals and
